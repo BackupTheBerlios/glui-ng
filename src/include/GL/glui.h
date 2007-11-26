@@ -38,6 +38,12 @@
 // that come from old GLUT headers.
 #include <cstdlib>
 
+#if defined(DEBUG)
+#define debug(message, ...) fprintf( stderr, __FILE__ ":%d:" message, __LINE__, ## __VA_ARGS__ )
+#else
+#define debug(message, ...)
+#endif
+
 #if defined(GLUI_FREEGLUT)
 
   // FreeGLUT does not yet work perfectly with GLUI

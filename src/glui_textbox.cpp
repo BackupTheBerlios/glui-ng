@@ -778,7 +778,7 @@ void     GLUI_TextBox::draw_insertion_pt( void )
 
   if ( debug )    dump( stdout, "-> DRAW_INS_PT" );
 
-  /*    printf( "insertion pt: %d\n", insertion_pt );              */
+  debug( "insertion pt: %d\n", insertion_pt );
 
   box_width = get_box_width();
 
@@ -881,7 +881,7 @@ int  GLUI_TextBox::substring_width( int start, int end, int initial_width )
 void   GLUI_TextBox::update_and_draw_text( void )
 {
   //update_substring_bounds();
-  /*  printf( "ss: %d/%d\n", substring_start, substring_end );                  */
+  debug( "ss: %d/%d\n", substring_start, substring_end );
 
   redraw();
 }
@@ -895,10 +895,9 @@ int    GLUI_TextBox::special_handler( int key,int modifiers )
   if ( NOT glui )
     return false;
 
-  if ( debug )
-    printf( "SPECIAL:%d - mod:%d   subs:%d/%d  ins:%d  sel:%d/%d\n", 
+    debug( "SPECIAL:%d - mod:%d   subs:%d/%d  ins:%d  sel:%d/%d\n",
         key, modifiers, substring_start, substring_end,insertion_pt,
-        sel_start, sel_end );    
+        sel_start, sel_end );
 
   if ( key == GLUT_KEY_DOWN ) {
     if (insert_x == -1 || insert_y == -1)
@@ -912,7 +911,7 @@ int    GLUI_TextBox::special_handler( int key,int modifiers )
       sel_start = sel_end;
     }
     if ( can_draw())
-      update_and_draw_text();    
+      update_and_draw_text();
   } else if ( key == GLUT_KEY_UP ) {
     if (insert_x == -1 || insert_y == -1)
       return false;
@@ -925,7 +924,7 @@ int    GLUI_TextBox::special_handler( int key,int modifiers )
       sel_start = sel_end;
     }
     if ( can_draw())
-      update_and_draw_text();    
+      update_and_draw_text();
   } else if ( key == GLUT_KEY_LEFT ) {
     if ( (modifiers & GLUT_ACTIVE_CTRL) != 0 ) {
       insertion_pt = find_word_break( insertion_pt, -1 );
@@ -956,9 +955,9 @@ int    GLUI_TextBox::special_handler( int key,int modifiers )
   /*** Update selection if shift key is down ***/
   if ( (modifiers & GLUT_ACTIVE_SHIFT ) != 0 )
     sel_end = insertion_pt;
-  else 
+  else
     sel_start = sel_end = insertion_pt;
-  
+
 
   CLAMP( insertion_pt, 0, text.length()); /* Make sure insertion_pt 
                            is in bounds */
@@ -1069,7 +1068,7 @@ void    GLUI_TextBox::set_text( const char *new_text )
 
 void   GLUI_TextBox::dump( FILE *out, char *name )
 {
-  fprintf( out, 
+  debug(
        "%s (edittext@%p):   line:%d ins_pt:%d  subs:%d/%d  sel:%d/%d   len:%d\n",
        name, this, curr_line,
        insertion_pt, substring_start, substring_end, sel_start, sel_end,
@@ -1086,7 +1085,7 @@ int    GLUI_TextBox::mouse_over( int state, int x, int y )
     glutSetCursor( GLUT_CURSOR_TEXT );
   }
   else {
-    /*    printf( "OUT\n" );              */
+    debug( "OUT\n" );
     glutSetCursor( GLUT_CURSOR_LEFT_ARROW );
   }
 

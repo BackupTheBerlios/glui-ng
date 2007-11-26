@@ -229,7 +229,7 @@ void     GLUI_Listbox::dump( FILE *output )
 {
   GLUI_Listbox_Item *item;
 
-  /*  printf( "%p\n", (char*) name );              */
+  debug( "%p\n", name.c_str() );
 
   fprintf( output, "Listbox: %s\n", name.c_str() );
 
@@ -305,12 +305,12 @@ int     GLUI_Listbox::mouse_over( int state, int x, int y )
 {
   GLUI_Listbox_Item *item;
 
-  /*  printf( "x/y:   %d/%d\n", x, y );              */
+  debug( "x/y:   %d/%d\n", x, y );
 
   if ( state AND enabled AND x > x_abs + text_x_offset) {
     /****  Build a GLUT menu for this listbox   ***/
     
-    /*	printf( "%d %d\n", x, y );              */
+    debug( "%d %d\n", x, y );
 
     glut_menu_id = glutCreateMenu(listbox_callback);
 
@@ -325,7 +325,7 @@ int     GLUI_Listbox::mouse_over( int state, int x, int y )
     GLUI_Master.set_left_button_glut_menu_control( this );
   }
   else if ( glut_menu_id != -1 ) {
-    /*    printf( "OUT\n" );              */
+    debug( "OUT\n" );
     glutDetachMenu( GLUT_LEFT_BUTTON );
     glutDestroyMenu( glut_menu_id );
     glut_menu_id = -1;
@@ -359,7 +359,7 @@ int    GLUI_Listbox::do_selection( int item_num )
   if ( NOT sel_item )
     return false;
 
-  /*  printf( "-> %s\n", (char*) sel_item->text );              */
+  debug( "-> %s\n", sel_item->text.c_str() );
 
   int_val = item_num;
   curr_text = sel_item->text;

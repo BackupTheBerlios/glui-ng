@@ -203,12 +203,12 @@ void   GLUI_Node::unlink( void )
 
 void GLUI_Node::dump( FILE *out, const char *name )
 {
-    fprintf( out, "GLUI_node: %s\n", name );
-    fprintf( out, "   parent: %p     child_head: %p    child_tail: %p\n",
+    debug( "GLUI_node: %s\n", name );
+    debug( "   parent: %p     child_head: %p    child_tail: %p\n",
         (void *) parent_node,
         (void *) child_head,
         (void *) child_tail );
-    fprintf( out, "   next: %p       prev: %p\n",
+    debug( "   next: %p       prev: %p\n",
         (void *) next_sibling,
         (void *) prev_sibling );
 }

@@ -47,7 +47,6 @@ FIXME: there's a heck of a lot of duplication between this and glui_scrollbar.cp
 #include <cmath>
 #include <cassert>
 
-/*static int __debug=0;              */
 
 #define  GLUI_SPINNER_GROWTH_STEPS         800
 #define  GLUI_SPINNER_MIN_GROWTH_STEPS     100
@@ -134,9 +133,8 @@ int    GLUI_Spinner::mouse_down_handler( int local_x, int local_y )
   this->state = find_arrow( local_x, local_y );
   GLUI_Master.glui_setIdleFuncIfNecessary();
 
-  /*  printf( "spinner: mouse down  : %d/%d   arrow:%d\n", local_x, local_y,
+  debug( "spinner: mouse down  : %d/%d   arrow:%d\n", local_x, local_y,
       find_arrow( local_x, local_y ));
-      */
 
   if ( state != GLUI_SPINNER_STATE_UP AND state != GLUI_SPINNER_STATE_DOWN )
     return true;
@@ -168,7 +166,7 @@ int    GLUI_Spinner::mouse_up_handler( int local_x, int local_y, bool inside )
   state = GLUI_SPINNER_STATE_NONE;
   GLUI_Master.glui_setIdleFuncIfNecessary();
 
-  /*  printf("spinner: mouse up  : %d/%d    inside: %d\n",local_x,local_y,inside);              */
+  debug("spinner: mouse up  : %d/%d    inside: %d\n",local_x,local_y,inside);
 
   /*glutSetCursor( GLUT_CURSOR_INHERIT );              */
   glutSetCursor( GLUT_CURSOR_LEFT_ARROW );
@@ -192,9 +190,8 @@ int    GLUI_Spinner::mouse_held_down_handler( int local_x, int local_y,
   if ( state == GLUI_SPINNER_STATE_NONE )
     return false;
 
-  /*  printf("spinner: mouse held: %d/%d    inside: %d\n",local_x,local_y,
+  debug("spinner: mouse held: %d/%d    inside: %d\n",local_x,local_y,
       new_inside);
-      */
 
   if ( state == GLUI_SPINNER_STATE_BOTH ) {   /* dragging? */
     do_drag( local_x, local_y );
@@ -591,7 +588,7 @@ void    GLUI_Spinner::increase_growth( void )
   if ( growth < (hi-lo) / GLUI_SPINNER_MIN_GROWTH_STEPS )
     growth *= growth_exp;
 
-  /*  printf( "growth: %f\n", growth );              */
+  debug( "growth: %f\n", growth );
 }
 
 

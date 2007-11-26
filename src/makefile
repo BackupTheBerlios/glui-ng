@@ -5,9 +5,10 @@
 #CC=gcc
 
 # Compiler options
-OPTS=-g
-OPTS=-O0
-#OPTS=-O2
+OPTS+=-g
+OPTS+=-O0
+#OPTS+=-O2
+OPTS+=-DDEBUG
 
 UNAME = $(shell uname)
 
@@ -18,7 +19,7 @@ endif
 
 #######################################
 
-CPPFLAGS += -I./ -I./include
+CPPFLAGS += -I./ -I./include $(OPTS)
 
 LIBGLUI = -L./lib -lglui
 LIBGL   = -lGLU -lGL

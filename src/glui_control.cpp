@@ -194,7 +194,7 @@ void GLUI_Control::draw_recursive( int x, int y )
 {
   GLUI_Control *node;
 
-  /*  printf( "%s %d\n", this->name.c_str(), this->hidden );*/
+  debug ( "%s %d\n", this->name.c_str(), this->hidden );
   if ( NOT can_draw() )
     return;
 
@@ -223,7 +223,7 @@ void GLUI_Control::draw_recursive( int x, int y )
   else 
   {
     if ( dynamic_cast<GLUI_Column*>(this) ) {
-      /*   printf( "%s w/h:   %d/%d\n", (char*) name, w, h );              */
+      debug ( "%s w/h:   %d/%d\n", name.c_str(), w, h );
       /*w = 2;              */
     }
 
@@ -782,7 +782,7 @@ void GLUI_Control::sync_live(int recurse, int draw_it)
       callbacks ***/
     if ( 0 ) { /* THIS CODE BELOW SHOULD NOT BE EXECUTED */
       if ( glui->mouse_button_down ) {
-	/* printf( "Can't sync\n" );              */
+	debug( "Can't sync\n" );
 	return;
       }
     }
@@ -1183,13 +1183,13 @@ void         GLUI_Control::unhide_internal( int recurse )
 
   node = (GLUI_Node *) this;
   while( node != NULL ) {
-    /*    printf( "unhide: %s [%d]\n", ((GLUI_Control*)node)->name.c_str(), 
-	    ((GLUI_Control*)node)->hidden );*/
+    debug( "unhide: %s [%d]\n", ((GLUI_Control*)node)->name.c_str(),
+	    ((GLUI_Control*)node)->hidden );
     ((GLUI_Control*)node)->hidden = false;
 
-    if ( recurse AND node->first_child() != NULL )  
+    if ( recurse AND node->first_child() != NULL )
       ((GLUI_Control*) node->first_child())->unhide_internal(true);
-      
+
     node = node->next();
   }
 
@@ -1197,9 +1197,9 @@ void         GLUI_Control::unhide_internal( int recurse )
   while( node != NULL ) {
     ((GLUI_Control*)node)->hidden = false;
 
-    if ( recurse AND node->first_child() != NULL )  
+    if ( recurse AND node->first_child() != NULL )
       ((GLUI_Control*) node->first_child())->unhide_internal(true);
-      
+
     node = node->next();
   }
 }

@@ -349,7 +349,7 @@ int    GLUI_EditText::key_handler( unsigned char key,int modifiers )
       }
 
       if ( key == '.' ) {
-        /*printf( "PERIOD: %d\n", num_periods );              */
+        debug( "PERIOD: %d\n", num_periods );
 
         if ( num_periods > 0 ) {
           /** We're trying to type a period, but the text already contains
@@ -359,7 +359,7 @@ int    GLUI_EditText::key_handler( unsigned char key,int modifiers )
           int period_found = false; 
           if ( sel_start != sel_end ) {
             for( i=MIN(sel_end,sel_start); i<MAX(sel_start,sel_end); i++ ) {
-              /*  printf( "%c ", text[i] );              */
+              debug( "%c ", text[i] );
               if ( text[i] == '.' ) {
                 period_found = true;
                 break;
@@ -367,7 +367,7 @@ int    GLUI_EditText::key_handler( unsigned char key,int modifiers )
             }
           }
 
-          /* printf( "found: %d    num: %d\n", period_found, num_periods );              */
+          debug( "found: %d    num: %d\n", period_found, num_periods );
 
           if ( NOT period_found )
             return true;
@@ -670,10 +670,10 @@ void    GLUI_EditText::draw_text( int x, int y )
 
   text_x = text_x_offset + 2 + GLUI_EDITTEXT_BOXINNERMARGINX;
 
-  /*printf( "text_x: %d      substr_width: %d     start/end: %d/%d\n",
+  debug( "text_x: %d      substr_width: %d     start/end: %d/%d\n",
     text_x,     substring_width( substring_start, substring_end ),
     substring_start, substring_end );
-    */
+
   /** Find lower and upper selection bounds **/
   sel_lo = MIN(sel_start, sel_end );
   sel_hi = MAX(sel_start, sel_end );
@@ -767,7 +767,7 @@ int  GLUI_EditText::find_insertion_pt( int x, int y )
     curr_x -= char_width( text[i] );
 
     if ( x > curr_x ) {
-      /*      printf( "-> %d\n", i );              */
+      debug( "-> %d\n", i );
       
       return i+1;
     }
@@ -805,7 +805,7 @@ void     GLUI_EditText::draw_insertion_pt( void )
     return;  /* Don't draw insertion point if there is a current selection */
   }
 
-  /*    printf( "insertion pt: %d\n", insertion_pt );              */
+  debug( "insertion pt: %d\n", insertion_pt );
 
   curr_x = this->x_abs + text_x_offset 
     + substring_width( substring_start, substring_end )
@@ -860,7 +860,7 @@ void   GLUI_EditText::update_and_draw_text( void )
     return;
 
   update_substring_bounds();
-  /*  printf( "ss: %d/%d\n", substring_start, substring_end );                  */
+  debug( "ss: %d/%d\n", substring_start, substring_end );
 
   redraw();
 }
@@ -872,11 +872,10 @@ int    GLUI_EditText::special_handler( int key,int modifiers )
 {
   if ( NOT glui )
     return false;
-  
-  if ( debug )
-    printf( "SPECIAL:%d - mod:%d   subs:%d/%d  ins:%d  sel:%d/%d\n", 
+
+   debug( "SPECIAL:%d - mod:%d   subs:%d/%d  ins:%d  sel:%d/%d\n",
 	    key, modifiers, substring_start, substring_end,insertion_pt,
-	    sel_start, sel_end );	 
+	    sel_start, sel_end );
 
   if ( key == GLUT_KEY_LEFT ) {
     if ( (modifiers & GLUT_ACTIVE_CTRL) != 0 ) {
@@ -1192,7 +1191,7 @@ int    GLUI_EditText::mouse_over( int state, int x, int y )
     glutSetCursor( GLUT_CURSOR_TEXT );
   }
   else {
-    /*    printf( "OUT\n" );              */
+    debug ( "OUT\n" );
     glutSetCursor( GLUT_CURSOR_LEFT_ARROW );
   }
 
