@@ -349,7 +349,8 @@ class GLUIAPI GLUI_Node
     friend class GLUI_Main;
 
 public:
-    GLUI_Node();
+    GLUI_Node(const char* name) { NodeName = name; }
+
     virtual ~GLUI_Node() {}
 
     GLUI_Node *first_sibling();
@@ -371,8 +372,10 @@ public:
     void unlink();
 
     void dump( FILE *out, const char *name );
+    const char* NodeName;
 
 protected:
+    GLUI_Node();
     static void add_child_to_control(GLUI_Node *parent,GLUI_Control *child);
     GLUI_Node *parent_node;
     GLUI_Node *child_head;
@@ -921,6 +924,8 @@ public:
     virtual bool wants_tabs() const      { return false; }
 
     GLUI_Control(const char* name)
+        : GLUI_Node(name)
+        , collapsed_node("collapsed_node")
     {
         x_off          = GLUI_XOFF;
         y_off_top      = GLUI_YOFF;

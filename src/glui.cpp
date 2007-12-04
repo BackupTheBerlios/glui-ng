@@ -486,8 +486,10 @@ void glui_idle_func(void)
 /*********************************** GLUI_Master_Object::GLUI_Master_Object() ******/
 
 GLUI_Master_Object::GLUI_Master_Object()
-:	glui_id_counter(1),
-    glut_idle_CB(NULL)
+    :   glui_id_counter(1)
+    ,   glut_idle_CB(NULL)
+    ,   gluis("gluis")
+    ,   glut_windows("glut_windows")
 {
 }
 
