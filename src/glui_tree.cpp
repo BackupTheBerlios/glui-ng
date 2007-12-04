@@ -31,7 +31,10 @@
 
 /****************************** GLUI_Tree::GLUI_Tree() **********/
 GLUI_Tree::GLUI_Tree(GLUI_Node *parent, const char *name, 
-                     int open, int inset)
+                     int open, int inset):
+    GLUI_Panel(name),
+    button("")
+
 {
   common_init();
   GLUI_StaticText *inset_label;

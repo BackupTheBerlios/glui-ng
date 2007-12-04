@@ -39,7 +39,7 @@
 GLUI_Checkbox::GLUI_Checkbox( GLUI_Node *parent,
                               const char *name, int *value_ptr,
                               int id, 
-                              GLUI_CB cb )
+                              GLUI_CB cb ): GLUI_Control(name)
 {
   common_init();
 

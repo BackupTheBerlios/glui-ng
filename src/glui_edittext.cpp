@@ -38,7 +38,8 @@
 
 GLUI_EditText::GLUI_EditText( GLUI_Node *parent, const char *name,
                              int data_type, void *live_var,
-                             int id, GLUI_CB callback )
+                             int id, GLUI_CB callback ) :
+    GLUI_Control(name)
 {
   if (data_type == GLUI_EDITTEXT_TEXT) {
     live_type = GLUI_LIVE_TEXT;
@@ -61,7 +62,9 @@ GLUI_EditText::GLUI_EditText( GLUI_Node *parent, const char *name,
 /****************************** GLUI_EditText::GLUI_EditText() **********/
 
 GLUI_EditText::GLUI_EditText( GLUI_Node *parent, const char *name,
-                              int text_type, int id, GLUI_CB callback )
+                              int text_type, int id, GLUI_CB callback ):
+    GLUI_Control(name)
+
 {
   common_construct( parent, name, text_type, GLUI_LIVE_NONE, 0, id, callback);
 }
@@ -70,7 +73,9 @@ GLUI_EditText::GLUI_EditText( GLUI_Node *parent, const char *name,
 
 GLUI_EditText::GLUI_EditText( GLUI_Node *parent, const char *name,
                               int *live_var,
-                              int id, GLUI_CB callback )
+                              int id, GLUI_CB callback ):
+    GLUI_Control(name)
+
 {
   common_construct( parent, name, GLUI_EDITTEXT_INT, GLUI_LIVE_INT, live_var, id, callback);
 }
@@ -79,7 +84,9 @@ GLUI_EditText::GLUI_EditText( GLUI_Node *parent, const char *name,
 
 GLUI_EditText::GLUI_EditText( GLUI_Node *parent, const char *name,
                               float *live_var,
-                              int id, GLUI_CB callback )
+                              int id, GLUI_CB callback ):
+    GLUI_Control(name)
+
 {
   common_construct( parent, name, GLUI_EDITTEXT_FLOAT, GLUI_LIVE_FLOAT, live_var, id, callback);
 }
@@ -88,7 +95,9 @@ GLUI_EditText::GLUI_EditText( GLUI_Node *parent, const char *name,
 
 GLUI_EditText::GLUI_EditText( GLUI_Node *parent, const char *name, 
                               char *live_var,
-                              int id, GLUI_CB callback )
+                              int id, GLUI_CB callback ):
+    GLUI_Control(name)
+
 {
   common_construct( parent, name, GLUI_EDITTEXT_TEXT, GLUI_LIVE_TEXT, live_var, id, callback);
 }
@@ -97,7 +106,9 @@ GLUI_EditText::GLUI_EditText( GLUI_Node *parent, const char *name,
 
 GLUI_EditText::GLUI_EditText( GLUI_Node *parent, const char *name, 
                               std::string &live_var,
-                              int id, GLUI_CB callback )
+                              int id, GLUI_CB callback ):
+    GLUI_Control(name)
+
 {
   common_construct( parent, name, GLUI_EDITTEXT_TEXT, GLUI_LIVE_STRING, &live_var, id, callback);
 }

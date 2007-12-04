@@ -55,33 +55,40 @@ FIXME: there's a heck of a lot of duplication between this and glui_scrollbar.cp
  
 /****************************** GLUI_Spinner::GLUI_Spinner() ****************/
 
-GLUI_Spinner::GLUI_Spinner( GLUI_Node* parent, const char *name, 
-                            int data_type, int id, GLUI_CB callback )
+GLUI_Spinner::GLUI_Spinner( GLUI_Node* parent, const char *name,
+                            int data_type, int id, GLUI_CB callback ) :
+    GLUI_Control(name)
 {
   common_construct(parent, name, data_type, NULL, id, callback);
 }
 
 /****************************** GLUI_Spinner::GLUI_Spinner() ****************/
 
-GLUI_Spinner::GLUI_Spinner( GLUI_Node* parent, const char *name, 
-                            int *live_var, int id, GLUI_CB callback )
+GLUI_Spinner::GLUI_Spinner( GLUI_Node* parent, const char *name,
+                            int *live_var, int id, GLUI_CB callback ) :
+    GLUI_Control(name)
+
 {
   common_construct(parent, name, GLUI_SPINNER_INT, live_var, id, callback);
 }
 
 /****************************** GLUI_Spinner::GLUI_Spinner() ****************/
 
-GLUI_Spinner::GLUI_Spinner( GLUI_Node* parent, const char *name, 
-             float *live_var, int id, GLUI_CB callback )
+GLUI_Spinner::GLUI_Spinner( GLUI_Node* parent, const char *name,
+             float *live_var, int id, GLUI_CB callback ) :
+    GLUI_Control(name)
+
 {
   common_construct(parent, name, GLUI_SPINNER_FLOAT, live_var, id, callback);
 }
 
 /****************************** GLUI_Spinner::GLUI_Spinner() ****************/
 
-GLUI_Spinner::GLUI_Spinner( GLUI_Node *parent, const char *name, 
+GLUI_Spinner::GLUI_Spinner( GLUI_Node *parent, const char *name,
                             int data_t, void *live_var,
-                            int id, GLUI_CB callback )
+                            int id, GLUI_CB callback ) :
+    GLUI_Control(name)
+
 {
   common_construct(parent, name, data_t, live_var, id, callback);
 }

@@ -23,7 +23,8 @@
 /****************************** GLUI_TreePanel::GLUI_TreePanel() *********/
 
 GLUI_TreePanel::GLUI_TreePanel(GLUI_Node *parent, const char *name, 
-                               bool open, int inset)
+                               bool open, int inset) :
+    GLUI_Panel(name)
 {
   common_init();
 

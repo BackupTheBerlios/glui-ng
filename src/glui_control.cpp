@@ -194,7 +194,7 @@ void GLUI_Control::draw_recursive( int x, int y )
 {
   GLUI_Control *node;
 
-  debug ( "%s %d\n", this->name.c_str(), this->hidden );
+  debug ( "%s %s %d\n",__func__, this->name.c_str(), this->hidden );
   if ( NOT can_draw() )
     return;
 

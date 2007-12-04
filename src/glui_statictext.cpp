@@ -35,6 +35,8 @@
 
 /****************************** GLUI_StaticText::GLUI_StaticText() **********/
 GLUI_StaticText::GLUI_StaticText( GLUI_Node *parent, const char *name )
+    :    GLUI_Control("separator")
+
 {
   common_init();
   set_name( name );

@@ -278,7 +278,7 @@ int main(int argc, char* argv[])
   main_window = edit->get_glut_window_id();
   GLUI_Panel *ep = new GLUI_Panel(edit,"",true);
   new GLUI_StaticText(ep,"Widget Information:");
-  hah = new GLUI_List(ep,true,1,control_cb);
+  hah = new GLUI_List(ep,"hah", true,1,control_cb);
   hah->add_item(0,"GLUI 2.3");
   hah->add_item(1,"TextBox");
   hah->add_item(2,"Scrollbar");
@@ -293,7 +293,7 @@ int main(int argc, char* argv[])
   hah->set_h(180);
   new GLUI_Column(ep,false); 
 
-  moo = new GLUI_TextBox(ep,true,1,textbox_cb);
+  moo = new GLUI_TextBox(ep, "moo", true,1,textbox_cb);
   moo->set_text(general);
   moo->set_h(400);
   moo->set_w(410);

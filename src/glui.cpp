@@ -927,60 +927,58 @@ int  GLUI_Main::needs_idle( void )
 
 
 /******************************************* GLUI_Main::find_control() ******/
-
-GLUI_Control  *GLUI_Main::find_control( int x, int y )
+GLUI_Control  *GLUI_Main::find_control( int x, int y, GLUI_Control * parent )
 {
-  GLUI_Control *node, *last_container;
+    GLUI_Control *node, *found, *child;
 
-  last_container = NULL;
+    found = NULL;
 
-  node = main_panel;
-  while( node != NULL ) {
-    if ( !dynamic_cast<GLUI_Column*>(node) AND
-         PT_IN_BOX( x, y, 
-                    node->x_abs, node->x_abs + node->w, 
-                    node->y_abs, node->y_abs + node->h ) 
-         ) 
+    if( parent == NULL ) {
+        node = main_panel;
+    }
+    else
     {
-      /*** Point is inside current node ***/
-      
-      if ( node->first_child() == NULL ) {
-        /*** SPECIAL CASE: for edittext boxes, we make sure click is
-             in box, and not on name string.  This should be generalized
-             for all controls later... ***/
-        if ( dynamic_cast<GLUI_EditText*>(node) ) {
-          if ( x < node->x_abs + ((GLUI_EditText*)node)->text_x_offset )
-            return (GLUI_Control*) node->parent();
+        node = parent;
+    }
+    if ( PT_IN_BOX( x, y,
+                    node->x_abs, node->x_abs + node->w,
+                    node->y_abs, node->y_abs + node->h ) )
+    {
+        debug ( "ctrl fits: '%s'\n", node->name.c_str() );
+        child = dynamic_cast<GLUI_Control *>(node->first_child());
+        if ( child != NULL )
+        {
+            debug ( "ctrl '%s' has childs\n", node->name.c_str() );
+            do
+            {
+                found = find_control ( x, y, child);
+                if (NULL == found) child =  dynamic_cast<GLUI_Control *>(child->next());
+            }
+            while ( found == NULL && child != NULL );
         }
+        if ( found == NULL ) found = node;
 
-        return node;   /* point is inside this node, and node has no children,
-                          so return this node as the selected node */
-      }
-      else {
-        /*** This is a container class ***/
-        last_container = node;
-        node = (GLUI_Control*) node->first_child();  /* Descend into child */
-      }
-      
+        // SPECIAL CASE: for edittext boxes, we make sure click is
+        //  in box, and not on name string.  This should be generalized
+        //  for all controls later...
+        if ( dynamic_cast<GLUI_EditText*>(node) )
+        {
+            if ( x < node->x_abs + ((GLUI_EditText*)node)->text_x_offset )
+            {
+                debug( "ctrl: '%s'\n", node->name.c_str() );
+                return (GLUI_Control*) node->parent();
+            }
+        }
+        debug ( "found ctrl: '%s'\n", found->name.c_str() );
+        return found;
     }
-    else {
-      node = (GLUI_Control*) node->next();
+    else
+    {
+        debug (" not in %s.... skipping the whole tree \n", node->name.c_str());
+        return NULL;
     }
-  }
- 
-  /** No leaf-level nodes found to accept the mouse click, so
-      return the last container control found which DOES accept the click **/
-  
-  if ( last_container ) {
-    debug( "ctrl: '%s'\n", last_container->name.c_str() );
-  
-    return last_container;
-  }
-  else {
-    return NULL;
-  }
+
 }
-
 
 /************************************* GLUI_Main::pack_controls() ***********/
 
@@ -1006,18 +1004,18 @@ void      GLUI_Main::pack_controls( void )
     debug( "%d %d\n", parent_h, parent_w );
 
     if ( 1 ) {
-      if ( TEST_AND(this->flags,GLUI_SUBWINDOW_TOP )) {
-	main_panel->w = MAX( main_panel->w, parent_w );
-      }
-      else if ( TEST_AND(this->flags,GLUI_SUBWINDOW_LEFT )) {
-	main_panel->h = MAX( main_panel->h, parent_h );
-      }
-      else if ( TEST_AND(this->flags,GLUI_SUBWINDOW_BOTTOM )) {
-	main_panel->w = MAX( main_panel->w, parent_w );
-      }
-      else if ( TEST_AND(this->flags,GLUI_SUBWINDOW_RIGHT )) {
-	main_panel->h = MAX( main_panel->h, parent_h );
-      }
+        if ( TEST_AND(this->flags,GLUI_SUBWINDOW_TOP )) {
+            main_panel->w = MAX( main_panel->w, parent_w );
+        }
+        else if ( TEST_AND(this->flags,GLUI_SUBWINDOW_LEFT )) {
+            main_panel->h = MAX( main_panel->h, parent_h );
+        }
+        else if ( TEST_AND(this->flags,GLUI_SUBWINDOW_BOTTOM )) {
+            main_panel->w = MAX( main_panel->w, parent_w );
+        }
+        else if ( TEST_AND(this->flags,GLUI_SUBWINDOW_RIGHT )) {
+            main_panel->h = MAX( main_panel->h, parent_h );
+        }
     }
   }
 
@@ -1141,7 +1139,7 @@ GLUI_Main::GLUI_Main( void )
   bkgd_color_f[2] = b / 255.0f;
 
   /*** Create the main panel ***/
-  main_panel              = new GLUI_Panel;
+  main_panel              = new GLUI_Panel("root panel");
   main_panel->set_int_val( GLUI_PANEL_NONE );
   main_panel->glui        = (GLUI*) this;
   main_panel->name        = "\0";

@@ -38,7 +38,10 @@
 
 GLUI_RadioGroup::GLUI_RadioGroup(GLUI_Node *parent,
                                  int *value_ptr,
-                                 int id, GLUI_CB cb)
+                                 int id, GLUI_CB cb,
+                                 const char* name ):
+    GLUI_Control(name)
+
 {
   common_init();
   GLUI_String      buf;
@@ -146,7 +149,8 @@ void    GLUI_RadioGroup::set_selected( int int_val )
 
 /************************ GLUI_RadioButton::GLUI_RadioButton() **********/
 
-GLUI_RadioButton::GLUI_RadioButton( GLUI_RadioGroup *grp, const char *name )
+GLUI_RadioButton::GLUI_RadioButton( GLUI_RadioGroup *grp, const char *name ) :
+    GLUI_Control(name)
 {
   common_init();
 

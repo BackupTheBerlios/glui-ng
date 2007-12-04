@@ -39,16 +39,19 @@ static const int LINE_HEIGHT = 15;
 
 /****************************** GLUI_TextBox::GLUI_TextBox() **********/
 
-GLUI_TextBox::GLUI_TextBox(GLUI_Node *parent, GLUI_String &live_var,
+GLUI_TextBox::GLUI_TextBox(GLUI_Node *parent, const char* name, GLUI_String &live_var,
                            bool scroll, int id, GLUI_CB callback )
+    : GLUI_Control (name)
+
 {
   common_construct(parent, &live_var, scroll, id, callback);
 }
 
 /****************************** GLUI_TextBox::GLUI_TextBox() **********/
 
-GLUI_TextBox::GLUI_TextBox( GLUI_Node *parent, bool scroll, int id,
+GLUI_TextBox::GLUI_TextBox( GLUI_Node *parent, const char* name, bool scroll, int id,
                             GLUI_CB callback )
+    : GLUI_Control (name)
 {
   common_construct(parent, NULL, scroll, id, callback);
 }

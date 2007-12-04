@@ -186,7 +186,8 @@ int    GLUI_Rotation::iaction_special_handler( int key,int modifiers )
 
 void  GLUI_Rotation::init_ball( void )
 {
-  debug( "%f %f %f", float( MIN(w/2,h/2)), (float) w/2, (float) h/2 );
+  debug( "GLUI_Rotation::init_ball %f %f %f\n",
+          float( MIN(w/2,h/2)), (float) w/2, (float) h/2 );
 
   ball->set_params( vec2( (float)(w/2), (float)((h-18)/2)), 
 		   (float) 2.0*(h-18) );
@@ -420,6 +421,7 @@ GLUI_Rotation::GLUI_Rotation( GLUI_Node *parent,
                               const char *name, float *value_ptr,
                               int id, 
                               GLUI_CB cb )
+    : GLUI_Mouse_Interaction (name)
 {
   common_init();
   set_ptr_val( value_ptr );

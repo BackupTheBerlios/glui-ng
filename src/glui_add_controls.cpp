@@ -78,21 +78,23 @@ GLUI_Panel *GLUI::add_panel_to_panel( GLUI_Panel *parent_panel,
 /***************************** GLUI::add_radiogroup() ***************/
 
 GLUI_RadioGroup *GLUI::add_radiogroup( int *value_ptr,
-				       int user_id, GLUI_CB callback)
+				       int user_id, GLUI_CB callback,
+                       const char* name )
 {
   return add_radiogroup_to_panel( main_panel, value_ptr,
-				  user_id, callback );
+				  user_id, callback, name );
 }
 
 
 /***************************** GLUI::add_radiogroup_to_panel() ***************/
 
-GLUI_RadioGroup *GLUI::add_radiogroup_to_panel(  
+GLUI_RadioGroup *GLUI::add_radiogroup_to_panel(
   GLUI_Panel *panel, int *value_ptr,
-  int user_id, GLUI_CB callback
+  int user_id, GLUI_CB callback,
+  const char* name
   )
 {
-  return new GLUI_RadioGroup( panel, value_ptr, user_id, callback );
+  return new GLUI_RadioGroup( panel, value_ptr, user_id, callback, name );
 }
 
 

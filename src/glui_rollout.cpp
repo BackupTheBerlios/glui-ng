@@ -38,7 +38,9 @@ enum {rollout_height_pixels=GLUI_DEFAULT_CONTROL_HEIGHT + 7};
 /****************************** GLUI_Rollout::GLUI_Rollout() **********/
 
 GLUI_Rollout::GLUI_Rollout( GLUI_Node *parent, const char *name, 
-                            int open, int type )
+                            int open, int type ) :
+    GLUI_Panel(name),
+    button("")
 {
   common_init();
   set_name( name );

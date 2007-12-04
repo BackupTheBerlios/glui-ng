@@ -36,6 +36,7 @@
 /****************************** GLUI_CommandLine::GLUI_CommandLine() **********/
 GLUI_CommandLine::GLUI_CommandLine( GLUI_Node *parent, const char *name, 
                                     void *data, int id, GLUI_CB cb )
+    : GLUI_EditText (name)
 {
   common_init();
   set_name( name );

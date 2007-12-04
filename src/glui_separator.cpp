@@ -36,6 +36,8 @@
 /****************************** GLUI_Separator::GLUI_Separator() **********/
 
 GLUI_Separator::GLUI_Separator( GLUI_Node *parent )
+     :    GLUI_Control("separator")
+
 {
   common_init();
   parent->add_control( this );

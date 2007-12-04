@@ -33,7 +33,7 @@
 
 #include "glui_internal_control.h"
 
-GLUI_Panel::GLUI_Panel( GLUI_Node *parent, const char *name, int type )
+GLUI_Panel::GLUI_Panel( GLUI_Node *parent, const char *name, int type ): GLUI_Control(name)
 {
   common_init();
   set_name( name );

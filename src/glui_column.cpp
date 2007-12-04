@@ -35,6 +35,7 @@
 /******************************** GLUI_Column::GLUI_Column() ************/
 
 GLUI_Column::GLUI_Column( GLUI_Node *parent, int draw_bar )
+    : GLUI_Control ("Column")
 {
   common_init();
   int_val = draw_bar; /* Whether to draw vertical bar or not */

@@ -55,6 +55,7 @@ GLUI_Scrollbar::GLUI_Scrollbar( GLUI_Node *parent,
                                 /*,GLUI_Control *object
                                 ,GLUI_InterObject_CB obj_cb*/
                                 )
+    : GLUI_Control (name)
 {
   common_construct(parent, name, horz_vert, data_type, NULL, id, callback/*, object, obj_cb*/);
 }
@@ -68,6 +69,7 @@ GLUI_Scrollbar::GLUI_Scrollbar( GLUI_Node *parent, const char *name,
                                 /*,GLUI_Control *object
                                 ,GLUI_InterObject_CB obj_cb*/
                                 )
+    : GLUI_Control (name)
 {
   common_construct(parent, name, horz_vert, GLUI_SCROLL_INT, live_var, id, callback/*, object, obj_cb*/);
 }
@@ -81,6 +83,7 @@ GLUI_Scrollbar::GLUI_Scrollbar( GLUI_Node *parent, const char *name,
                                 /*,GLUI_Control *object
                                 ,GLUI_InterObject_CB obj_cb*/
                                 )
+    : GLUI_Control (name)
 {
   common_construct(parent, name, horz_vert, GLUI_SCROLL_FLOAT, live_var, id, callback/*, object, obj_cb*/);
 }
