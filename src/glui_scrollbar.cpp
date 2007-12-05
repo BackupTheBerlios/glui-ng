@@ -155,7 +155,7 @@ void GLUI_Scrollbar::common_construct(
   }
   this->data_type = data_type;
   this->set_ptr_val( data );
-  this->set_name(name);
+  this->set_name( const_cast<char*>(name));
   this->user_id = id;
   this->callback    = callback;
   //this->associated_object = object;

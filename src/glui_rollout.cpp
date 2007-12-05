@@ -43,7 +43,7 @@ GLUI_Rollout::GLUI_Rollout( GLUI_Node *parent, const char *name,
     button("")
 {
   common_init();
-  set_name( name );
+  set_name( const_cast<char*>(name) );
   user_id    = -1;
   int_val    = type;
 		

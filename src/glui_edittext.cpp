@@ -120,7 +120,7 @@ void GLUI_EditText::common_construct( GLUI_Node *parent, const char *name,
                                       GLUI_CB cb )
 {
   common_init();
-  set_name( name );
+  set_name( const_cast<char*>(name) );
     
   live_type   = live_t;
   data_type   = data_t;
@@ -319,7 +319,7 @@ int    GLUI_EditText::key_handler( unsigned char key,int modifiers )
     }
     else if ( key == CTRL('k') ) { /* KILL TO END OF LINE */
       sel_start = sel_end = insertion_pt;
-      text.erase(insertion_pt,GLUI_String::npos);
+      text.erase(insertion_pt,std::string::npos);
     }
   }
   else if ( modifiers == GLUT_ACTIVE_ALT ) /* ALT ONLY */

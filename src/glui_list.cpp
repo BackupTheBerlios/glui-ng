@@ -47,9 +47,9 @@ GLUI_List::GLUI_List( GLUI_Node *parent, const char* name, bool scroll,
 
 GLUI_List::GLUI_List( GLUI_Node *parent,
                       const char* name,
-                      GLUI_String& live_var, bool scroll, 
-                      int id, 
-                      GLUI_CB callback 
+                      std::string& live_var, bool scroll,
+                      int id,
+                      GLUI_CB callback
                       /* ,GLUI_Control *object
                       ,GLUI_InterObject_CB obj_cb*/ )
     : GLUI_Control (name)
@@ -61,8 +61,8 @@ GLUI_List::GLUI_List( GLUI_Node *parent,
 
 void GLUI_List::common_construct(
   GLUI_Node *parent,
-  GLUI_String* data, bool scroll, 
-  int id, 
+  std::string* data, bool scroll,
+  int id,
   GLUI_CB callback
   /*,GLUI_Control *object
   , GLUI_InterObject_CB obj_cb*/)

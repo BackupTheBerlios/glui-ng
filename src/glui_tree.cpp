@@ -40,7 +40,7 @@ GLUI_Tree::GLUI_Tree(GLUI_Node *parent, const char *name,
   GLUI_StaticText *inset_label;
   GLUI_Column     *col;
 
-  this->set_name( name );
+  this->set_name( const_cast<char*>( name ));
   this->user_id    = -1;
         
   if ( NOT open ) {

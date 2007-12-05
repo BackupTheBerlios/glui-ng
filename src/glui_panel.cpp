@@ -36,7 +36,7 @@
 GLUI_Panel::GLUI_Panel( GLUI_Node *parent, const char *name, int type ): GLUI_Control(name)
 {
   common_init();
-  set_name( name );
+  set_name( const_cast<char*>(name) );
   user_id    = -1;
   int_val    = type;
 
@@ -142,9 +142,10 @@ void    GLUI_Panel::draw( int x, int y )
 
 /****************************** GLUI_Panel::set_name() **********/
 
-void    GLUI_Panel::set_name( const char *new_name )
+void    GLUI_Panel::set_name( char *new_name )
 {
-  name = new_name ? new_name : "";
+  name.clear();
+  name=new_name;
 
   update_size();
 

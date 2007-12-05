@@ -255,8 +255,7 @@ enum TranslationCodes
 
 /************ A string type for us to use **********/
 
-typedef std::string GLUI_String;
-GLUIAPI GLUI_String& glui_format_str(GLUI_String &str, const char* fmt, ...);
+GLUIAPI std::string& glui_format_str(std::string &str, const char* fmt, ...);
 
 /********* Pre-declare classes as needed *********/
 
@@ -342,14 +341,14 @@ class GLUI_Control;
  Everything onscreen is a GLUI_Node--windows, buttons, etc.
  The nodes are traversed for event processing, sizing, redraws, etc.
 */
-class GLUIAPI GLUI_Node 
+class GLUIAPI GLUI_Node
 {
     friend class GLUI_Tree;     /* JVK */
     friend class GLUI_Rollout;
     friend class GLUI_Main;
 
 public:
-    GLUI_Node(const char* name) { NodeName = name; }
+    GLUI_Node(const char* name);
 
     virtual ~GLUI_Node() {}
 
@@ -372,7 +371,9 @@ public:
     void unlink();
 
     void dump( FILE *out, const char *name );
+    const char* whole_tree(int start=1);
     const char* NodeName;
+
 
 protected:
     GLUI_Node();
@@ -714,7 +715,7 @@ protected:
 
 public:
     GLUI_StdBitmaps  std_bitmaps;
-    GLUI_String      window_name;
+    std::string      window_name;
     unsigned char    bkgd_color[3];
     float            bkgd_color_f[3];
 
@@ -807,7 +808,7 @@ public:
     int             int_val;          /**< Our integer value */
     float           float_array_val[GLUI_DEF_MAX_ARRAY];
     int             float_array_size;
-    GLUI_String     text;       /**< The text inside this control */
+    std::string     text;       /**< The text inside this control */
 
 /** "Live variable" updating */
     void           *ptr_val;          /**< A pointer to the user's live variable value */
@@ -816,7 +817,7 @@ public:
     /* These variables store the last value that live variable was known to have. */
     int             last_live_int;
     float           last_live_float;
-    GLUI_String     last_live_text;
+    std::string     last_live_text;
     float           last_live_float_array[GLUI_DEF_MAX_ARRAY];
 
 /** Properties of our control */
@@ -824,7 +825,7 @@ public:
     bool            is_container;  /**< Is this a container class (e.g., panel) */
     int             alignment;
     bool            enabled;    /**< Is this control grayed out? */
-    GLUI_String     name;       /**< The name of this control */
+    std::string     name;       /**< The name of this control */
     void           *font;       /**< Our glutbitmap font */
     bool            collapsible, is_open;
     GLUI_Node       collapsed_node;
@@ -833,7 +834,7 @@ public:
 
 public:
     /*** Get/Set values ***/
-    virtual void   set_name( const char *string );
+    virtual void   set_name( char *string );
     virtual void   set_int_val( int new_int )         { int_val = new_int; output_live(true); }
     virtual void   set_float_val( float new_float )   { float_val = new_float; output_live(true); }
     virtual void   set_ptr_val( void *new_ptr )       { ptr_val = new_ptr; output_live(true); }
@@ -891,7 +892,7 @@ public:
     void         set_font( void *new_font );
     void        *get_font( void );
     int          string_width( const char *text );
-    int          string_width( const GLUI_String &str )
+    int          string_width( const std::string &str )
     { return string_width(str.c_str()); }
     int          char_width( char c );
 
@@ -903,7 +904,7 @@ public:
     void         draw_bkgd_box( int x_min, int x_max, int y_min, int y_max );
     void         draw_emboss_box( int x_min, int x_max,int y_min,int y_max);
     void         draw_string( const char *text );
-    void         draw_string( const GLUI_String &s )
+    void         draw_string( const std::string &s )
     { draw_string(s.c_str()); }
     void         draw_char( char c );
     void         draw_active_box( int x_min, int x_max, int y_min, int y_max );
@@ -958,7 +959,7 @@ public:
         hidden         = false;
         memset(char_widths, -1, sizeof(char_widths)); /* JVK */
         int i;
-        set_name(name);
+        set_name(const_cast<char*>(name));
         for( i=0; i<GLUI_DEF_MAX_ARRAY; i++ )
             float_array_val[i] = last_live_float_array[i] = 0.0;
     }
@@ -1133,10 +1134,10 @@ public:
 */
     GLUI_Panel( GLUI_Node *parent, const char *name, 
                 int type=GLUI_PANEL_EMBOSSED );
-    GLUI_Panel(const char *name): GLUI_Control(name) { set_name( name ); common_init(); }
+    GLUI_Panel(const char *name): GLUI_Control(name) { set_name( const_cast<char*>(name) ); common_init(); }
 
     void draw( int x, int y );
-    void set_name( const char *text );
+    void set_name( char *text );
     void set_type( int new_type );
 
     void update_size( void );
@@ -1183,7 +1184,7 @@ public:
                       GLUI_CB callback = GLUI_CB());
 
     GLUI_List *list;
-    GLUI_String current_dir;
+    std::string current_dir;
 
     void fbreaddir(const char *);
     static void dir_list_callback(GLUI_Control*);
@@ -1212,7 +1213,7 @@ protected:
 
 private:
     int last_item;
-    GLUI_String file;
+    std::string file;
     int allow_change_dir;
 
 };
@@ -1308,7 +1309,7 @@ private:
 public:
     bool        currently_inside, initially_inside;
     GLUI_Button  button;
-    GLUI_String  level_name; // level name, eg: 1.1.2, III, or 3
+    std::string  level_name; // level name, eg: 1.1.2, III, or 3
     GLUI_TreePanel *panel; 
 
     void draw( int x, int y );
@@ -1320,7 +1321,7 @@ public:
     void  open( void ); 
     void  close( void );
 
-    /*   void set_name( const char *text )   { panel.set_name( text ); }; */
+    /*   void set_name( char *text )   { panel.set_name( text ); }; */
     void update_size( void );
     void set_id(int i) { id = i; }
     void set_level(int l) { level = l; }
@@ -1504,41 +1505,41 @@ public:
         int trans_type, float *live_var=NULL,
         int id=-1, GLUI_CB callback=GLUI_CB());
   
-    GLUI_Checkbox  *add_checkbox( const char *name, 
+    GLUI_Checkbox  *add_checkbox( const char *name,
                                   int *live_var=NULL,
                                   int id=-1, GLUI_CB callback=GLUI_CB());
-    GLUI_Checkbox  *add_checkbox_to_panel( GLUI_Panel *panel, const char *name, 
-                                           int *live_var=NULL, int id=-1, 
+    GLUI_Checkbox  *add_checkbox_to_panel( GLUI_Panel *panel, const char *name,
+                                           int *live_var=NULL, int id=-1,
                                            GLUI_CB callback=GLUI_CB());
 
-    GLUI_Button  *add_button( const char *name, int id=-1, 
+    GLUI_Button  *add_button( const char *name, int id=-1,
                               GLUI_CB callback=GLUI_CB());
-    GLUI_Button  *add_button_to_panel( GLUI_Panel *panel, const char *name, 
+    GLUI_Button  *add_button_to_panel( GLUI_Panel *panel, const char *name,
                                        int id=-1, GLUI_CB callback=GLUI_CB() );
 
     GLUI_StaticText  *add_statictext( const char *name );
     GLUI_StaticText  *add_statictext_to_panel( GLUI_Panel *panel, const char *name );
 
-    GLUI_EditText  *add_edittext( const char *name, 
+    GLUI_EditText  *add_edittext( const char *name,
                                   int data_type=GLUI_EDITTEXT_TEXT,
                                   void*live_var=NULL,
                                   int id=-1, GLUI_CB callback=GLUI_CB()	);
-    GLUI_EditText  *add_edittext_to_panel( GLUI_Panel *panel, 
+    GLUI_EditText  *add_edittext_to_panel( GLUI_Panel *panel,
                                            const char *name,
                                            int data_type=GLUI_EDITTEXT_TEXT,
-                                           void *live_var=NULL, int id=-1, 
+                                           void *live_var=NULL, int id=-1,
                                            GLUI_CB callback=GLUI_CB() );
-    GLUI_EditText  *add_edittext( const char *name, GLUI_String& live_var, 
+    GLUI_EditText  *add_edittext( const char *name, std::string& live_var,
                                   int id=-1, GLUI_CB callback=GLUI_CB()	);
-    GLUI_EditText  *add_edittext_to_panel( GLUI_Panel *panel, const char *name, 
-                                           GLUI_String& live_var, int id=-1,
+    GLUI_EditText  *add_edittext_to_panel( GLUI_Panel *panel, const char *name,
+                                           std::string& live_var, int id=-1,
                                            GLUI_CB callback=GLUI_CB() );
 
-    GLUI_Spinner  *add_spinner( const char *name, 
+    GLUI_Spinner  *add_spinner( const char *name,
                                 int data_type=GLUI_SPINNER_INT,
                                 void *live_var=NULL,
                                 int id=-1, GLUI_CB callback=GLUI_CB() );
-    GLUI_Spinner  *add_spinner_to_panel( GLUI_Panel *panel, 
+    GLUI_Spinner  *add_spinner_to_panel( GLUI_Panel *panel,
                                          const char *name,
                                          int data_type=GLUI_SPINNER_INT,
                                          void *live_var=NULL,
@@ -1546,13 +1547,13 @@ public:
                                          GLUI_CB callback=GLUI_CB() );
 
     GLUI_Panel     *add_panel( const char *name, int type=GLUI_PANEL_EMBOSSED );
-    GLUI_Panel     *add_panel_to_panel( GLUI_Panel *panel, const char *name, 
+    GLUI_Panel     *add_panel_to_panel( GLUI_Panel *panel, const char *name,
                                         int type=GLUI_PANEL_EMBOSSED );
 
 
     GLUI_Rollout   *add_rollout( const char *name, int open=true,
                                  int type=GLUI_PANEL_EMBOSSED);
-    GLUI_Rollout   *add_rollout_to_panel( GLUI_Panel *panel, const char *name, 
+    GLUI_Rollout   *add_rollout_to_panel( GLUI_Panel *panel, const char *name,
                                           int open=true,
                                           int type=GLUI_PANEL_EMBOSSED);
 
@@ -1609,7 +1610,7 @@ class GLUIAPI GLUI_EditText : public GLUI_Control
 public:
     int                 has_limits;
     int                 data_type;
-    GLUI_String         orig_text;
+    std::string         orig_text;
     int                 insertion_pt;
     int                 title_x_offset;
     int                 text_x_offset;
@@ -1655,7 +1656,7 @@ public:
     void set_float_val( float new_val );
     void set_int_val( int new_val );
     void set_text( const char *text );
-    void set_text( const GLUI_String &s) { set_text(s.c_str()); }
+    void set_text( const std::string &s) { set_text(s.c_str()); }
     const char *get_text()               { return text.c_str(); }
 
     void dump( FILE *out, const char *text );
@@ -1731,11 +1732,11 @@ public:
 
     #ifdef _MSC_VER
     // Explicit template instantiation needed for dll
-    template class GLUIAPI std::allocator<GLUI_String>;
-    template class GLUIAPI std::vector<GLUI_String, std::allocator<GLUI_String> >;
+    template class GLUIAPI std::allocator<std::string>;
+    template class GLUIAPI std::vector<std::string, std::allocator<std::string> >;
     #endif
 
-    std::vector<GLUI_String> hist_list;
+    std::vector<std::string> hist_list;
     int  curr_hist;
     int  oldest_hist;
     int  newest_hist;
@@ -1748,9 +1749,9 @@ public:
 
     virtual const char *get_history( int command_number ) const
     { return hist_list[command_number - oldest_hist].c_str(); }
-    virtual GLUI_String& get_history_str( int command_number )
+    virtual std::string& get_history_str( int command_number )
     { return hist_list[command_number - oldest_hist]; }
-    virtual const GLUI_String& get_history_str( int command_number ) const
+    virtual const std::string& get_history_str( int command_number ) const
     { return hist_list[command_number - oldest_hist]; }
     virtual void recall_history( int history_number );
     virtual void scroll_history( int direction );
@@ -1786,7 +1787,7 @@ public:
     int  num_buttons;
 
     void draw( int x, int y );
-    void set_name( const char *text );
+    void set_name( char *text );
     void set_int_val( int int_val ); 
     void set_selected( int int_val );
 
@@ -1988,7 +1989,7 @@ protected:
 class GLUIAPI GLUI_StaticText : public GLUI_Control
 {
 public:
-    void set_text( const char *text );
+    void set_text( char *text );
     void draw( int x, int y );
     void draw_text( void );
     void update_size( void );
@@ -2015,14 +2016,14 @@ class GLUIAPI GLUI_TextBox : public GLUI_Control
 {
 public:
     /* GLUI Textbox - JVK */
-    GLUI_TextBox( GLUI_Node *parent, const char* name, GLUI_String &live_var,
+    GLUI_TextBox( GLUI_Node *parent, const char* name, std::string &live_var,
                  bool scroll = false, int id=-1, GLUI_CB callback=GLUI_CB() );
     GLUI_TextBox( GLUI_Node *parent,
                   const char* name,
                   bool scroll = false, int id=-1,
                   GLUI_CB callback=GLUI_CB() );
 
-    GLUI_String         orig_text;
+    std::string         orig_text;
     int                 insertion_pt;
     int                 substring_start; /*substring that gets displayed in box*/
     int                 substring_end;  
@@ -2106,8 +2107,8 @@ protected:
         draw_text_only        = false;
     }
     void common_construct(
-        GLUI_Node *parent, GLUI_String *live_var, 
-        bool scroll, int id, GLUI_CB callback); 
+        GLUI_Node *parent, std::string *live_var,
+        bool scroll, int id, GLUI_CB callback);
 };
 
 /************************************************************/
@@ -2116,10 +2117,10 @@ protected:
 /*                                                          */
 /************************************************************/
 
-class GLUIAPI GLUI_List_Item : public GLUI_Node 
+class GLUIAPI GLUI_List_Item : public GLUI_Node
 {
 public:
-    GLUI_String text;
+    std::string text;
     int         id;
 };
 
@@ -2135,19 +2136,19 @@ public:
     /* GLUI List - JVK */
     GLUI_List( GLUI_Node *parent, const char* name, bool scroll = false,
                int id=-1, GLUI_CB callback=GLUI_CB() );
-               /*, GLUI_Control *object = NULL 
+               /*, GLUI_Control *object = NULL
                ,GLUI_InterObject_CB obj_cb = NULL);*/
 
     GLUI_List( GLUI_Node *parent,
                const char* name,
-               GLUI_String& live_var, bool scroll = false, 
-               int id=-1, 
+               std::string& live_var, bool scroll = false,
+               int id=-1,
                GLUI_CB callback=GLUI_CB()
                /*,GLUI_Control *object = NULL */
                /*,GLUI_InterObject_CB obj_cb = NULL*/);
 
 
-    GLUI_String         orig_text;
+    std::string         orig_text;
     int                 debug;
     int                 draw_text_only;
     int                 start_line;
@@ -2224,7 +2225,7 @@ protected:
     };
     void common_construct(
         GLUI_Node *parent,
-        GLUI_String* live_var, bool scroll,
+        std::string* live_var, bool scroll,
         int id,
         GLUI_CB callback
         /*,GLUI_Control *object*/
@@ -2353,14 +2354,14 @@ protected:
 class GLUIAPI GLUI_Listbox_Item : public GLUI_Node 
 {
 public:
-    GLUI_String text;
+    std::string text;
     int         id;
 };
 
 class GLUIAPI GLUI_Listbox : public GLUI_Control
 {
 public:
-    GLUI_String       curr_text;
+    std::string       curr_text;
     GLUI_Listbox_Item items_list;
     int               depressed;
 

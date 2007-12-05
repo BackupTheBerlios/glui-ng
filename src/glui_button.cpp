@@ -40,7 +40,7 @@ GLUI_Button::GLUI_Button( GLUI_Node *parent, const char *name,
   common_init();
   user_id     = id;
   callback    = cb;
-  set_name( name );
+  set_name( const_cast<char*>(name) );
   currently_inside = false; 
   
   parent->add_control( this );

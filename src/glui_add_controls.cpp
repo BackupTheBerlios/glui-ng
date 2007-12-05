@@ -183,7 +183,7 @@ GLUI_EditText  *GLUI::add_edittext_to_panel( GLUI_Panel *panel,
 /********************************** GLUI::add_edittext() ************/
 
 GLUI_EditText  *GLUI::add_edittext( const char *name, 
-                                    GLUI_String & data,
+                                    std::string & data,
                                     int id, GLUI_CB callback)
 {
   return add_edittext_to_panel( main_panel, name, data, id, callback );
@@ -194,7 +194,7 @@ GLUI_EditText  *GLUI::add_edittext( const char *name,
 
 GLUI_EditText*
 GLUI::add_edittext_to_panel( GLUI_Panel *panel, const char *name, 
-                             GLUI_String& data,
+                             std::string& data,
                              int id, GLUI_CB callback)
 {
   return new GLUI_EditText( panel, name, GLUI_EDITTEXT_STRING, &data, id, callback );

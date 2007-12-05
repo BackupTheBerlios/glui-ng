@@ -35,7 +35,7 @@
 #define vsnprintf _vsnprintf
 #endif
 
-GLUI_String& glui_format_str(GLUI_String& str, const char* fmt, ...)
+ std::string& glui_format_str( std::string& str, const char* fmt, ...)
 {
   const size_t ISIZE = 128;
   char stackbuf[ISIZE];

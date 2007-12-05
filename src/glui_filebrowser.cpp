@@ -53,7 +53,7 @@ GLUI_FileBrowser::GLUI_FileBrowser( GLUI_Node *parent,
 {
   common_init();
 
-  set_name( name );
+  set_name( const_cast<char*>(name) );
   user_id    = id;
   int_val    = type;
   callback   = cb;
@@ -99,7 +99,7 @@ void GLUI_FileBrowser::dir_list_callback(GLUI_Control *glui_object) {
 
 
 void GLUI_FileBrowser::fbreaddir(const char *d) {
-  GLUI_String item;
+  std::string item;
   int i = 0;
 	
 	if (!d)
@@ -149,7 +149,7 @@ void GLUI_FileBrowser::fbreaddir(const char *d) {
       while ((dirp = readdir(dir)) != NULL)   /* open directory     */
       { 
         if (!lstat(dirp->d_name,&dr) && S_ISDIR(dr.st_mode)) /* dir is directory   */
-          item = dirp->d_name + GLUI_String("/");
+          item = dirp->d_name + std::string("/");
         else
           item = dirp->d_name;
 

@@ -28,7 +28,7 @@ GLUI_TreePanel::GLUI_TreePanel(GLUI_Node *parent, const char *name,
 {
   common_init();
 
-  set_name( name );
+  set_name( const_cast<char*>(name) );
   user_id    = -1;
         
   if ( !open ) {
@@ -183,8 +183,8 @@ void GLUI_TreePanel::formatNode(GLUI_Tree *temp)
     return;
   int level = temp->get_level();
   int child_number = temp->get_child_number();
-  GLUI_String level_name="";
-  GLUI_String full_name="";
+  std::string level_name="";
+  std::string full_name="";
 
   temp->level_name == "";
 

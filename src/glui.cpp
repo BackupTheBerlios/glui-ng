@@ -514,7 +514,7 @@ GLUI *GLUI_Master_Object::create_glui_subwindow( int parent_window,
 						   long flags )
 {
   GLUI *new_glui = new GLUI;
-  GLUI_String new_name;
+  std::string new_name;
   glui_format_str( new_name, "subwin_%p", this );
 
   new_glui->init( new_name.c_str(), flags | GLUI_SUBWINDOW, 0,0,
@@ -713,7 +713,7 @@ void    GLUI_Main::keyboard(unsigned char key, int x, int y)
     }
 
     if ( new_control ) {
-        debug( "new_control: %s\n", new_control->name.c_str() );
+        debug( "new_control: %s\n", new_control->NodeName );
 	}
 
     deactivate_current_control();
@@ -765,7 +765,7 @@ void    GLUI_Main::mouse(int button, int state, int x, int y)
     control = find_control( x, y );
 
     if ( control ) {
-        debug( "control: %s\n", control->name.c_str() );
+        debug( "control: %s\n", control->NodeName );
     }
 
     if ( mouse_button_down AND active_control != NULL AND
@@ -946,11 +946,11 @@ GLUI_Control  *GLUI_Main::find_control( int x, int y, GLUI_Control * parent )
                     node->x_abs, node->x_abs + node->w,
                     node->y_abs, node->y_abs + node->h ) )
     {
-        debug ( "ctrl fits: '%s'\n", node->name.c_str() );
+        //debug ( "ctrl fits: '%s'\n", node->NodeName );
         child = dynamic_cast<GLUI_Control *>(node->first_child());
         if ( child != NULL )
         {
-            debug ( "ctrl '%s' has childs\n", node->name.c_str() );
+            //debug ( "ctrl '%s' has childs\n", node->NodeName );
             do
             {
                 found = find_control ( x, y, child);
@@ -967,16 +967,18 @@ GLUI_Control  *GLUI_Main::find_control( int x, int y, GLUI_Control * parent )
         {
             if ( x < node->x_abs + ((GLUI_EditText*)node)->text_x_offset )
             {
-                debug( "ctrl: '%s'\n", node->name.c_str() );
+                debug( "ctrl: '%s'\n",
+                        dynamic_cast<GLUI_Node*>(node)->whole_tree() );
                 return (GLUI_Control*) node->parent();
             }
         }
-        debug ( "found ctrl: '%s'\n", found->name.c_str() );
+        debug ( "found ctrl: '%s'\n",
+                dynamic_cast<GLUI_Node*>(found)->whole_tree() );
         return found;
     }
     else
     {
-        debug (" not in %s.... skipping the whole tree \n", node->name.c_str());
+        debug (" not in %s.... skipping the whole tree \n", node->NodeName);
         return NULL;
     }
 
@@ -1996,8 +1998,9 @@ void     GLUI_Master_Object::get_viewport_area( int *x, int *y,
     if ( TEST_AND( curr_glui->flags, GLUI_SUBWINDOW) AND 
 	 curr_glui->parent_window == curr_window ) {
 
-      debug( "%s -> %d   %d %d\n", curr_glui->window_name.c_str(), curr_glui->flags,
-				curr_glui->w, curr_glui->h );
+// this debug line cause obscure segfaulting.... the NodeName seems to be corrupted
+//      debug( "%s -> %d   %d %d\n", curr_glui->NodeName, curr_glui->flags,
+//				curr_glui->w, curr_glui->h );
 
       if ( TEST_AND( curr_glui->flags,GLUI_SUBWINDOW_LEFT ) ) {
 	curr_x += curr_glui->w;

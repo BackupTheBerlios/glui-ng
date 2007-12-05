@@ -39,7 +39,7 @@ GLUI_CommandLine::GLUI_CommandLine( GLUI_Node *parent, const char *name,
     : GLUI_EditText (name)
 {
   common_init();
-  set_name( name );
+  set_name( const_cast<char*>(name) );
     
   data_type   = GLUI_EDITTEXT_TEXT;
   ptr_val     = data;

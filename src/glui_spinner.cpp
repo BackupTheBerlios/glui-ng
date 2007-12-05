@@ -118,7 +118,7 @@ void GLUI_Spinner::common_construct( GLUI_Node* parent, const char *name,
   user_id     = id;
   data_type   = data_t;
   callback    = cb;
-  set_name( name );
+  set_name( const_cast<char*>(name) );
   //glui        = parent->get_glui();
 
   parent->add_control( this );

@@ -44,7 +44,7 @@ GLUI_Checkbox::GLUI_Checkbox( GLUI_Node *parent,
   common_init();
 
   set_ptr_val( value_ptr );
-  set_name( name );
+  set_name( const_cast<char*>(name) );
   user_id    = id;
   callback   = cb;
 

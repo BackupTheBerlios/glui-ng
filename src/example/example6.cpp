@@ -67,18 +67,18 @@ const char commandline[] =
   "users can recall previous commands.\n";
 
 const char gstring[] = 
-  "GLUI_String\n"
+  "std::string\n"
   "\n"
   "The GLUI string class used to be wrapper class around \n"
   "a fixed 300 char buffer.\n"
-  "Now GLUI_String is just a typedef for std::string.\n"
+  "Now std::string is just a typedef for std::string.\n"
   "\n"
   "One new function has been introduced, which is a sprintf() equivalent\n"
-  "for std::string/GLUI_String.\n"
+  "for std::string/std::string.\n"
   "\n"
-  "  glui_format_str(GLUI_String& str, const char *format_str, ...);\n"
+  "  glui_format_str(std::string& str, const char *format_str, ...);\n"
   "\n"
-  "Other than the fact that it takes a GLUI_String as the first argument,\n"
+  "Other than the fact that it takes a std::string as the first argument,\n"
   "it works just like sprintf().\n";
 
 const char list[] =
@@ -157,7 +157,7 @@ const char text_box[] =
 
 void control_cb(int control) {
   int item;
-  GLUI_String text;
+  std::string text;
   std::string file_name;
   FILE  *file;
   char c;
@@ -282,7 +282,7 @@ int main(int argc, char* argv[])
   hah->add_item(0,"GLUI 2.3");
   hah->add_item(1,"TextBox");
   hah->add_item(2,"Scrollbar");
-  hah->add_item(3,"GLUI_String");
+  hah->add_item(3,"std::string");
   hah->add_item(4,"CommandLine");
   hah->add_item(5,"Tree");
   hah->add_item(6,"List");

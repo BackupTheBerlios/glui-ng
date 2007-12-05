@@ -44,7 +44,7 @@ GLUI_RadioGroup::GLUI_RadioGroup(GLUI_Node *parent,
 
 {
   common_init();
-  GLUI_String      buf;
+  std::string      buf;
 
   set_ptr_val( value_ptr );
   if ( value_ptr ) {
@@ -57,7 +57,7 @@ GLUI_RadioGroup::GLUI_RadioGroup(GLUI_Node *parent,
 
   user_id    = id;
   glui_format_str( buf, "RadioGroup: %p", this );
-  set_name( buf.c_str() );
+  set_name( const_cast<char*>(buf.c_str()) );
   callback   = cb;
 
   parent->add_control( this );
@@ -112,7 +112,7 @@ void    GLUI_RadioGroup::draw_group( int translate )
 
 /****************************** GLUI_RadioGroup::set_name() **********/
 
-void    GLUI_RadioGroup::set_name( const char *text )
+void    GLUI_RadioGroup::set_name( char *text )
 {
   name = text;
 
@@ -159,7 +159,7 @@ GLUI_RadioButton::GLUI_RadioButton( GLUI_RadioGroup *grp, const char *name ) :
   /** A radio button's user id is always its ordinal number (zero-indexed)
       within the group */
   user_id    = grp->num_buttons;
-  set_name( name );
+  set_name( const_cast<char*>(name) );
   group = grp;
   
   group->num_buttons++;   /* Increments radiogroup's button count */

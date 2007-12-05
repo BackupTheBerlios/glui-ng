@@ -39,7 +39,7 @@ static const int LINE_HEIGHT = 15;
 
 /****************************** GLUI_TextBox::GLUI_TextBox() **********/
 
-GLUI_TextBox::GLUI_TextBox(GLUI_Node *parent, const char* name, GLUI_String &live_var,
+GLUI_TextBox::GLUI_TextBox(GLUI_Node *parent, const char* name, std::string &live_var,
                            bool scroll, int id, GLUI_CB callback )
     : GLUI_Control (name)
 
@@ -58,7 +58,7 @@ GLUI_TextBox::GLUI_TextBox( GLUI_Node *parent, const char* name, bool scroll, in
 
 /****************************** GLUI_TextBox::common_construct() **********/
 void GLUI_TextBox::common_construct(
-  GLUI_Node *parent, GLUI_String *data, 
+  GLUI_Node *parent, std::string *data,
   bool scroll, int id, GLUI_CB callback)
 {
   common_init();
@@ -253,7 +253,7 @@ int    GLUI_TextBox::key_handler( unsigned char key,int modifiers )
     }
     else if ( key == CTRL('k') ) { /* KILL TO END OF LINE */
       sel_start = sel_end = insertion_pt;
-      text.erase(insertion_pt,GLUI_String::npos);
+      text.erase(insertion_pt,std::string::npos);
     }
   }
   else if ( modifiers == GLUT_ACTIVE_ALT ) /* ALT ONLY */

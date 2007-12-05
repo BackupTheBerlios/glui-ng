@@ -1030,8 +1030,9 @@ void  GLUI_Control::get_float_array_val( float *array_ptr )
 
 /**** GLUI_Control::set_name() ********************/
 
-void   GLUI_Control::set_name( const char *str )
+void   GLUI_Control::set_name( char *str )
 {
+  name.clear();
   name = str;
   redraw(); 
 }
