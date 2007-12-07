@@ -172,6 +172,7 @@ void myGlutIdle( void )
                                        application  */
 
   glutPostRedisplay();
+  usleep(100);
 }
 
 /***************************************** myGlutMouse() **********/

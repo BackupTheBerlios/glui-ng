@@ -215,6 +215,7 @@ void myGlutIdle( void )
   counter++;
    
   glui->sync_live();
+  usleep(100);
 
 }
 
