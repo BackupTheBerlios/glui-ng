@@ -967,13 +967,13 @@ GLUI_Control  *GLUI_Main::find_control( int x, int y, GLUI_Control * parent )
         {
             if ( x < node->x_abs + ((GLUI_EditText*)node)->text_x_offset )
             {
-                debug( "ctrl: '%s'\n",
-                        dynamic_cast<GLUI_Node*>(node)->whole_tree() );
                 return (GLUI_Control*) node->parent();
             }
         }
-        debug ( "found ctrl: '%s'\n",
-                dynamic_cast<GLUI_Node*>(found)->whole_tree() );
+        if( parent == NULL ) {
+            debug ( "found ctrl: '%s'\n",
+                    dynamic_cast<GLUI_Node*>(found)->whole_tree() );
+        }
         return found;
     }
     else
