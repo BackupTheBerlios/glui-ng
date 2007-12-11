@@ -288,7 +288,7 @@ int main(int argc, char* argv[])
 							   x, and y */
 
   /*** Add invisible panel to hold rest of controls ***/
-  GLUI_Panel *panel1 = new GLUI_Panel(glui, "", GLUI_PANEL_NONE );
+  GLUI_Panel *panel1 = new GLUI_Panel(glui, "panel1", GLUI_PANEL_NONE );
 
   obj_panel = new GLUI_Panel( panel1, "Objects" );
 
@@ -305,7 +305,7 @@ int main(int argc, char* argv[])
   scale_spinner->set_float_limits( .2f, 4.0 );
   scale_spinner->set_alignment( GLUI_ALIGN_RIGHT );
 
-  GLUI_Panel *panel2 = new GLUI_Panel( obj_panel, "", GLUI_PANEL_NONE );
+  GLUI_Panel *panel2 = new GLUI_Panel( obj_panel, "panel2", GLUI_PANEL_NONE );
   new GLUI_Checkbox( panel2, "Sphere", &show_sphere );
   new GLUI_Column( panel2 );
   new GLUI_Checkbox( panel2, "Torus", &show_torus );

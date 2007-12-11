@@ -226,11 +226,17 @@ void GLUI_Node::dump( FILE *out, const char *name )
 const char* GLUI_Node::whole_tree(int start)
 {
     static std::string tree;
-    if (start)    tree.clear();
+    if (start) {
+        tree.clear();
+        tree += "\"";
+    }
     if (parent_node != NULL) {
         parent_node->whole_tree(0);
         tree += ".";
     }
     tree += NodeName;
+    if (start) {
+        tree += "\"";
+    }
     return tree.c_str();
 }

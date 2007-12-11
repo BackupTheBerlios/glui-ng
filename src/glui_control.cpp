@@ -194,11 +194,13 @@ void GLUI_Control::draw_recursive( int x, int y )
 {
   GLUI_Control *node;
 
-  debug ( "%s %s %d\n",__func__, this->name.c_str(), this->hidden );
+  debug ( "%s %s hidden(%d)\n",__func__,
+          dynamic_cast<GLUI_Node*>(this)->whole_tree(),
+          this->hidden );
   if ( NOT can_draw() )
     return;
 
-  /*if ( 1 ) {  --  Debugging to check control width  
+  /*if ( 1 ) {  --  Debugging to check control width
     glColor3f( 1.0, 0.0, 0.0 );
     glBegin( GL_LINES );
     glVertex2i( x_abs, y_abs );00
@@ -210,17 +212,17 @@ void GLUI_Control::draw_recursive( int x, int y )
   glMatrixMode( GL_MODELVIEW );
   glPushMatrix();
 
-  glTranslatef( (float) this->x_abs + .5, 
-		(float) this->y_abs + .5, 
-		0.0 );
+  glTranslatef( (float) this->x_abs + .5,
+          (float) this->y_abs + .5,
+          0.0 );
 
   if ( NOT _glui_draw_border_only ) {
     if ( NOT strcmp( name.c_str(), "Rollout" ) ) {
     }
 
     this->draw( this->x_off, this->y_off_top );
-  } 
-  else 
+  }
+  else
   {
     if ( dynamic_cast<GLUI_Column*>(this) ) {
       debug ( "%s w/h:   %d/%d\n", name.c_str(), w, h );
@@ -235,7 +237,7 @@ void GLUI_Control::draw_recursive( int x, int y )
     glEnd();
   }
   glPopMatrix();
-  
+
   node = (GLUI_Control*) first_child();
   while( node ) {
     node->draw_recursive( node->x_abs, node->y_abs );
