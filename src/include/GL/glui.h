@@ -37,9 +37,10 @@
 // Having stdlib here first fixes some 'exit() redefined' errors on MSVC.NET
 // that come from old GLUT headers.
 #include <cstdlib>
+#include "glui_debug.h"
 
 #if defined(DEBUG)
-#define debug(message, ...) fprintf( stderr, __FILE__ ":%d:" message, __LINE__, ## __VA_ARGS__ )
+#define debug(message, ...) GLUI_debug::GLUI_debugInstance()->print( __FILE__ ":%d:" message, __LINE__, ## __VA_ARGS__ )
 #else
 #define debug(message, ...)
 #endif
@@ -562,10 +563,11 @@ public:
 
     void glui_setIdleFuncIfNecessary(void);
 
+
 private:
     GLUI_Node     glut_windows;
-    void (*glut_idle_CB)(void);
 
+    void (*glut_idle_CB)(void);
     void          add_cb_to_glut_window(int window,int cb_type,void *cb);
 };
 
