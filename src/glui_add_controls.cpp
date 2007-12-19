@@ -221,20 +221,6 @@ GLUI_Spinner  *GLUI::add_spinner_to_panel(
 }
 
 
-/********************************** GLUI::add_column() ************/
-
-void   GLUI::add_column( int draw_bar )
-{
-  add_column_to_panel( main_panel, draw_bar );
-}
-
-
-/******************************* GLUI::add_column_to_panel() **********/
-
-void   GLUI::add_column_to_panel( GLUI_Panel *panel, int draw_bar )
-{
-  new GLUI_Column( panel, draw_bar );
-}
 
 
 /*********************************** GLUI:: add_listbox() ************/

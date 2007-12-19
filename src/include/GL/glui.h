@@ -3,7 +3,7 @@
   GLUI User Interface Toolkit
   ---------------------------
 
-     glui.h - Main (and only) external header for 
+     glui.h - Main header for
         GLUI User Interface Toolkit
 
           --------------------------------------------------
@@ -775,8 +775,9 @@ public:
 /** Onscreen coordinates */
     int             w, h;                        /* dimensions of control */
     int             x_abs, y_abs;
-    int             x_off, y_off_top, y_off_bot; /* INNER margins, by which child
-                                                    controls are indented */
+    int             x_off, y_off;            // offset between childs elements
+    int             y_off_top, y_off_bot;    // top and bottom margin inside the control
+    int             x_off_left, x_off_right; // right and left inner margin
     int             contain_x, contain_y; 
     int             contain_w, contain_h;
     /* if this is a container control (e.g., 
@@ -812,11 +813,15 @@ public:
     
 /** Properties of our control */    
     GLUI           *glui;       /**< Our containing event handler (NEVER NULL during event processing!) */
+
+#warning "remove and use a class container and derivate from it"
     bool            is_container;  /**< Is this a container class (e.g., panel) */
     int             alignment;
     bool            enabled;    /**< Is this control grayed out? */
     GLUI_String     name;       /**< The name of this control */
     void           *font;       /**< Our glutbitmap font */
+
+#warning "remove and use a class collapsible"
     bool            collapsible, is_open;
     GLUI_Node       collapsed_node;
     bool            hidden; /* Collapsed controls (and children) are hidden */
@@ -870,9 +875,8 @@ public:
     void         redraw_window(void);
 
     virtual void align( void );
-    void         pack( int x, int y );    /* Recalculate positions and offsets */
-    void         pack_old( int x, int y );    
-    void         draw_recursive( int x, int y );
+    virtual void pack( int x, int y );    /* Recalculate positions and offsets */
+    virtual void draw_recursive( int x, int y );
     int          set_to_glut_window( void );
     void         restore_window( int orig );
     void         translate_and_draw_front( void );
@@ -908,9 +912,6 @@ public:
     void         output_live( int update_main_gfx );        /** Writes live variable **/
     virtual void set_text( const char *t )   {}
     void         execute_callback( void );
-    void         get_this_column_dims( int *col_x, int *col_y, 
-                                       int *col_w, int *col_h, 
-                                       int *col_x_off, int *col_y_off );
     virtual bool needs_idle( void ) const;
     virtual bool wants_tabs() const      { return false; }
 
@@ -955,6 +956,8 @@ public:
     virtual ~GLUI_Control();
 };
 
+#include <GL/glui/glui_container.h>
+
 /************************************************************/
 /*                                                          */
 /*               Button class (container)                   */
@@ -965,7 +968,7 @@ public:
   can be clicked.  When clicked, a button
   calls its GLUI_CB callback with its ID.
 */
-class GLUIAPI GLUI_Button : public GLUI_Control
+class GLUIAPI GLUI_Button : public GLUI_Container
 {
 public:
     bool currently_inside;
@@ -1014,7 +1017,7 @@ protected:
  A checkbox, which can be checked on or off.  Can be linked
  to an int value, which gets 1 for on and 0 for off.
 */
-class GLUIAPI GLUI_Checkbox : public GLUI_Control
+class GLUIAPI GLUI_Checkbox : public GLUI_Container
 {
 public:
     int  orig_value;
@@ -1060,40 +1063,6 @@ protected:
     }
 };
 
-/************************************************************/
-/*                                                          */
-/*               Column class                               */
-/*                                                          */
-/************************************************************/
-
-/**
- A GLUI_Column object separates all previous controls
- from subsequent controls with a vertical bar.
-*/
-class GLUIAPI GLUI_Column : public GLUI_Control
-{
-public:
-    void draw( int x, int y );
-
-/**
- Create a new column, which separates the previous controls
- from subsequent controls.
- 
-  @param parent The panel our object is inside; or the main GLUI object.
-  @param draw_bar If true, draw a visible bar between new and old controls.
-*/
-    GLUI_Column( GLUI_Node *parent, int draw_bar = true );
-    GLUI_Column( void ) { common_init(); }
-
-protected:
-    void common_init() {
-        w            = 0;
-        h            = 0;
-        int_val      = 0;
-        can_activate = false;
-    }
-};
-
 
 /************************************************************/
 /*                                                          */
@@ -1104,7 +1073,7 @@ protected:
 /**
  A GLUI_Panel contains a group of related controls.
 */
-class GLUIAPI GLUI_Panel : public GLUI_Control
+class GLUIAPI GLUI_Panel : public GLUI_Container
 {
 public:
 
@@ -1138,6 +1107,9 @@ protected:
         name="";
     };
 };
+
+
+#include <GL/glui/glui_splitter.h>
 
 /************************************************************/
 /*                                                          */
@@ -1285,7 +1257,7 @@ private:
     float lgreen;
     float lblue;
     int id;
-    GLUI_Column *column;
+    GLUI_Splitter *column;
     int is_current;          // Whether this tree is the
     // current root in a treePanel
     int child_number;
@@ -1302,7 +1274,6 @@ public:
     int mouse_down_handler( int local_x, int local_y );
     int mouse_up_handler( int local_x, int local_y, bool inside );
     int  mouse_held_down_handler( int local_x, int local_y, bool inside );
-    void set_column(GLUI_Column *c) { column = c; }
     void  open( void ); 
     void  close( void );
 
@@ -1450,8 +1421,6 @@ public:
 /** DEPRECATED interface for creating new GLUI objects */
     int   add_control( GLUI_Control *control ) { return main_panel->add_control(control); }
 
-    void  add_column( int draw_bar = true );
-    void  add_column_to_panel( GLUI_Panel *panel, int draw_bar = true );
 
     void  add_separator( void );
     void  add_separator_to_panel( GLUI_Panel *panel );
@@ -1588,7 +1557,7 @@ protected:
 /*                                                          */
 /************************************************************/
 
-class GLUIAPI GLUI_EditText : public GLUI_Control
+class GLUIAPI GLUI_EditText : public GLUI_Container
 {
 public:
     int                 has_limits;
@@ -1764,7 +1733,7 @@ protected:
 /*                                                          */
 /************************************************************/
 
-class GLUIAPI GLUI_RadioGroup : public GLUI_Control
+class GLUIAPI GLUI_RadioGroup : public GLUI_Container
 {
 public:
     int  num_buttons;
@@ -1801,7 +1770,7 @@ protected:
 /*                                                          */
 /************************************************************/
 
-class GLUIAPI GLUI_RadioButton : public GLUI_Control
+class GLUIAPI GLUI_RadioButton : public GLUI_Container
 {
 public:
     int orig_value;
@@ -1838,7 +1807,7 @@ protected:
 
 /************************************************************/
 /*                                                          */
-/*               Separator class (container)                */
+/*               Separator class                            */
 /*                                                          */
 /************************************************************/
 
@@ -1871,11 +1840,11 @@ protected:
 
 /************************************************************/
 /*                                                          */
-/*               Spinner class (container)                  */
+/*               Spinner class                              */
 /*                                                          */
 /************************************************************/
  
-class GLUIAPI GLUI_Spinner : public GLUI_Control
+class GLUIAPI GLUI_Spinner : public GLUI_Container
 {
 public:
     // Constructor, no live var
@@ -1994,7 +1963,7 @@ protected:
 /*                                                          */
 /************************************************************/
 
-class GLUIAPI GLUI_TextBox : public GLUI_Control
+class GLUIAPI GLUI_TextBox : public GLUI_Container
 {
 public:
     /* GLUI Textbox - JVK */

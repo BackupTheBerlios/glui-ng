@@ -166,23 +166,30 @@ void    GLUI_Panel::set_type( int new_type )
 
 
 /************************************** GLUI_Panel::update_size() **********/
+int GLUI_Panel::min_w()
+{
+    int text_size;
+
+    if ( NOT glui )
+        return;
+
+    text_size = string_width(name);
+
+    if ( w < text_size + 16 )
+        w = text_size + 16 ;
+    return x_off_left + x_off_right;
+}
+
+int GLUI_Panel::min_h() { return y_off_top  + y_off_bot; }
+
 
 void   GLUI_Panel::update_size( void )
 {
-  int text_size;
-
-  if ( NOT glui )
-    return;
-
-  text_size = string_width(name);
-
-  if ( w < text_size + 16 )
-    w = text_size + 16 ;
-
   if ( name != "" AND int_val == GLUI_PANEL_EMBOSSED ) {
     this->y_off_top = GLUI_YOFF + 8;
   }
   else {
     this->y_off_top = GLUI_YOFF;
   }
+  GLUI_Container::update_size();
 }
