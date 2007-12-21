@@ -31,6 +31,7 @@ void myGlutIdle( void )
     glutSetWindow(main_window);  
 
   glutPostRedisplay();
+  usleep(100);
 }
 
 

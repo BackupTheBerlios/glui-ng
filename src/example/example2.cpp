@@ -233,13 +233,13 @@ int main(int argc, char* argv[])
   GLUI *glui = GLUI_Master.create_glui( "GLUI", 0, 400, 50 ); /* name, flags,
 								 x, and y */
   new GLUI_StaticText( glui, "GLUI Example 2" );
-  new GLUI_Separator( glui );
+  new GLUI_Separator( glui, "separator" );
   checkbox = new GLUI_Checkbox( glui, "Wireframe", &wireframe, 1, control_cb );
   spinner  = new GLUI_Spinner( glui, "Segments:", &segments, 2, control_cb );
   spinner->set_int_limits( 3, 60 );
   edittext = new GLUI_EditText( glui, "Text:", text, 3, control_cb );
   GLUI_Panel *obj_panel = new GLUI_Panel( glui, "Object Type" );
-  radio = new GLUI_RadioGroup( obj_panel,&obj,4,control_cb );
+  radio = new GLUI_RadioGroup( obj_panel,"radio", &obj,4,control_cb );
   new GLUI_RadioButton( radio, "Sphere" );
   new GLUI_RadioButton( radio, "Torus" );
   new GLUI_RadioButton( radio, "Teapot" );

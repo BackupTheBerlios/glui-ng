@@ -34,9 +34,12 @@
 using namespace std;
 #include <algorithm>
 
-GLUI_Container::GLUI_Container()
+GLUI_Container::GLUI_Container(const char *name ,
+                   GLUI_orientation orient):
+    GLUI_Control(name)
+
 {
-    orientation = GLUI_vertical;
+    orientation = orient;
 }
 
 int GLUI_Container::min_w() { return x_off_left + x_off_right;}
@@ -108,4 +111,46 @@ void GLUI_Container::pack (int x, int y)
     }
 
 
+}
+
+void GLUI_Container::draw (void)
+{
+  GLUI_Control *node;
+
+  debug ( "%s %s hidden(%d)\n",__func__,
+          dynamic_cast<GLUI_Node*>(this)->whole_tree(),
+          this->hidden );
+  if ( ! can_draw() )
+    return;
+
+  /*if ( 1 ) {  --  Debugging to check control width
+    glColor3f( 1.0, 0.0, 0.0 );
+    glBegin( GL_LINES );
+    glVertex2i( x_abs, y_abs );00
+    glVertex2i( x_abs+w, y_abs );
+
+    glEnd();
+    }*/
+
+  glMatrixMode( GL_MODELVIEW );
+  glPushMatrix();
+
+  glTranslatef( (float) this->x_abs + .5,
+          (float) this->y_abs + .5,
+          0.0 );
+
+  /* The following draws the area of each control              */
+  glColor3f( 1.0, 0.0, 0.0 );
+  glBegin( GL_LINE_LOOP );
+  glVertex2i( 0, 0 ); glVertex2i( w, 0 );
+  glVertex2i( w, h ); glVertex2i( 0, h );
+  glEnd();
+
+  node = dynamic_cast<GLUI_Control*>(first_child());
+  while( node ) {
+    node->draw();
+    node = dynamic_cast<GLUI_Control*>(node->next());
+  }
+
+  glPopMatrix();
 }

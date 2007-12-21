@@ -46,6 +46,16 @@ GLUI_Node::GLUI_Node()
 {
 }
 
+GLUI_Node::GLUI_Node(const char* name)
+{
+    NodeName = name;
+    parent_node = NULL;
+    child_head = NULL;
+    child_tail = NULL;
+    next_sibling = NULL;
+    prev_sibling = NULL;
+}
+
 /********************************************* GLUI_Node::first() *******/
 /* Returns first sibling in 'this' node's sibling list                  */
 
@@ -203,12 +213,30 @@ void   GLUI_Node::unlink( void )
 
 void GLUI_Node::dump( FILE *out, const char *name )
 {
-    fprintf( out, "GLUI_node: %s\n", name );
-    fprintf( out, "   parent: %p     child_head: %p    child_tail: %p\n",
+    debug( "GLUI_node: %s\n", name );
+    debug( "   parent: %p     child_head: %p    child_tail: %p\n",
         (void *) parent_node,
         (void *) child_head,
         (void *) child_tail );
-    fprintf( out, "   next: %p       prev: %p\n",
+    debug( "   next: %p       prev: %p\n",
         (void *) next_sibling,
         (void *) prev_sibling );
+}
+
+const char* GLUI_Node::whole_tree(int start)
+{
+    static std::string tree;
+    if (start) {
+        tree.clear();
+        tree += "\"";
+    }
+    if (parent_node != NULL) {
+        parent_node->whole_tree(0);
+        tree += ".";
+    }
+    tree += NodeName;
+    if (start) {
+        tree += "\"";
+    }
+    return tree.c_str();
 }

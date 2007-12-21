@@ -288,9 +288,10 @@ int main(int argc, char* argv[])
 							   x, and y */
 
   /*** Add invisible panel to hold rest of controls ***/
-  GLUI_Panel *panel1 = new GLUI_Panel(glui, "", GLUI_PANEL_NONE );
+  GLUI_Panel *panel1 = new GLUI_Panel(glui, "panel1", GLUI_PANEL_NONE );
+  GLUI_Splitter *split1 = new GLUI_Splitter(panel1, "slpit1");
 
-  obj_panel = new GLUI_Panel( panel1, "Objects" );
+  obj_panel = new GLUI_Panel( split1->GetFirstPanel(), "Objects" );
 
   /***** Control for object params *****/
 
@@ -305,20 +306,17 @@ int main(int argc, char* argv[])
   scale_spinner->set_float_limits( .2f, 4.0 );
   scale_spinner->set_alignment( GLUI_ALIGN_RIGHT );
 
-  GLUI_Panel *panel2 = new GLUI_Panel( obj_panel, "", GLUI_PANEL_NONE );
-  new GLUI_Checkbox( panel2, "Sphere", &show_sphere );
-  new GLUI_Column( panel2 );
-  new GLUI_Checkbox( panel2, "Torus", &show_torus );
+  GLUI_Panel *panel2 = new GLUI_Panel( obj_panel, "panel2", GLUI_PANEL_NONE );
+  GLUI_Splitter *split2 = new GLUI_Splitter(panel2, "slpit2");
+  new GLUI_Checkbox( split2->GetFirstPanel(), "Sphere", &show_sphere );
+  new GLUI_Checkbox( split2->GetSecondPanel(), "Torus", &show_torus );
 
-
-  /*** Start a new column in this panel ***/
-  new GLUI_Column( panel1, false ); /* 'false' means don't draw bar */
 
 
   /******** Add some controls for lights ********/
 
-  GLUI_Panel *light0 = new GLUI_Panel( panel1, "Light 1" );
-  GLUI_Panel *light1 = new GLUI_Panel( panel1, "Light 2" );
+  GLUI_Panel *light0 = new GLUI_Panel( split1->GetSecondPanel(), "Light 1" );
+  GLUI_Panel *light1 = new GLUI_Panel( split1->GetSecondPanel(), "Light 2" );
 
   new GLUI_Checkbox( light0, "Enabled", &light0_enabled,
                      LIGHT0_ENABLED_ID, control_cb );

@@ -2,12 +2,13 @@
   GLUI User Interface Toolkit
   ---------------------------
 
-     glui_column.cpp - GLUI_Column control class
+     glui_splittercolumn.cpp - GLUI_Splitter control class
 
 
           --------------------------------------------------
 
   Copyright (c) 1998 Paul Rademacher
+  Copyright (c) 2007 MALET Jean-Luc
 
   WWW:    http://sourceforge.net/projects/glui/
   Forums: http://sourceforge.net/forum/?group_id=92496
@@ -32,9 +33,13 @@
 
 #include "glui_internal_control.h"
 
-/******************************** GLUI_Column::GLUI_Column() ************/
+/******************************** GLUI_Splitter::GLUI_Splitter() ************/
 
-GLUI_Column::GLUI_Column( GLUI_Node *parent, int draw_bar )
+GLUI_Splitter::GLUI_Splitter( GLUI_Node *parent, const char* name, int draw_bar )
+    : GLUI_Container (name),
+      first_panel (this, "first_panel"),
+      second_panel (this, "second_panel"),
+      separator    (this, "separator")
 {
   common_init();
   int_val = draw_bar; /* Whether to draw vertical bar or not */
@@ -42,16 +47,17 @@ GLUI_Column::GLUI_Column( GLUI_Node *parent, int draw_bar )
   parent->add_control( this );
 }
 
-/**************************************** GLUI_Column::draw() ************/
-
-void  GLUI_Column::draw( int x, int y )
+/*
+void  GLUI_Splitter::draw (void)
 {
   int   panel_x, panel_y, panel_w, panel_h, panel_x_off, panel_y_off;
   int   y_diff;
+  GLUI_Control* curr_parent = dynamic_cast<GLUI_Control*>(parent());
 
-  if ( int_val == 1 ) {  /* Draw a vertical bar */
+  if ( int_val == 1 ) {  // Draw a vertical bar 
     GLUI_DRAWINGSENTINAL_IDIOM
-    if ( parent() != NULL ) {
+    
+    if ( curr_parent != NULL ) {
       get_this_column_dims(&panel_x, &panel_y, &panel_w, &panel_h, 
 			   &panel_x_off, &panel_y_off);
 
@@ -75,17 +81,17 @@ void  GLUI_Column::draw( int x, int y )
 	glColor3f( .5, .5, .5 );
 	glVertex2i( -2, 0 );
 	glVertex2i( -2, h );
-	/*glVertex2i( 0, -y_diff + GLUI_SEPARATOR_HEIGHT/2 );              */
-	/*glVertex2i( 0, -y_diff + panel_h - GLUI_SEPARATOR_HEIGHT/2);              */
+	//glVertex2i( 0, -y_diff + GLUI_SEPARATOR_HEIGHT/2 );
+	//glVertex2i( 0, -y_diff + panel_h - GLUI_SEPARATOR_HEIGHT/2);
 
 	glColor3f( 1.0, 1.0, 1.0 );
 	glVertex2i( -1, 0 );
 	glVertex2i( -1, h );
-	/*glVertex2i( 1, -y_diff + GLUI_SEPARATOR_HEIGHT/2 );              */
-	/*glVertex2i( 1, -y_diff + panel_h - GLUI_SEPARATOR_HEIGHT/2);              */
+	//glVertex2i( 1, -y_diff + GLUI_SEPARATOR_HEIGHT/2 );
+	//glVertex2i( 1, -y_diff + panel_h - GLUI_SEPARATOR_HEIGHT/2);
 	glEnd();
       }		
     } 
   }
 }
-
+*/

@@ -49,17 +49,8 @@
 class GLUIAPI GLUI_Splitter : public GLUI_Container
 {
 public:
-    virtual void draw( int x, int y );
 
-/**
- Create a new column, which separates the previous controls
- from subsequent controls.
-
-  @param parent The panel our object is inside; or the main GLUI object.
-  @param draw_bar If true, draw a visible bar between new and old controls.
-*/
-    GLUI_Splitter( GLUI_Node *parent, int draw_bar = true );
-    GLUI_Splitter( void ) { common_init(); }
+    GLUI_Splitter( GLUI_Node *parent, const char* name, int draw_bar = true );
 
     GLUI_Panel *GetFirstPanel() {return &first_panel;}
     GLUI_Panel *GetSecondPanel() {return &second_panel;}
@@ -67,8 +58,10 @@ public:
 protected:
     GLUI_Panel first_panel;
     GLUI_Panel second_panel;
+    GLUI_Separator separator;
 
     void common_init() {
+        set_orientation(GLUI_horizontal);
         w            = 0;
         h            = 0;
         int_val      = 0;

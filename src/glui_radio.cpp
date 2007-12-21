@@ -1,5 +1,5 @@
 /****************************************************************************
-  
+
   GLUI User Interface Toolkit
   ---------------------------
 
@@ -13,21 +13,21 @@
   WWW:    http://sourceforge.net/projects/glui/
   Forums: http://sourceforge.net/forum/?group_id=92496
 
-  This software is provided 'as-is', without any express or implied 
-  warranty. In no event will the authors be held liable for any damages 
-  arising from the use of this software. 
+  This software is provided 'as-is', without any express or implied
+  warranty. In no event will the authors be held liable for any damages
+  arising from the use of this software.
 
-  Permission is granted to anyone to use this software for any purpose, 
-  including commercial applications, and to alter it and redistribute it 
-  freely, subject to the following restrictions: 
+  Permission is granted to anyone to use this software for any purpose,
+  including commercial applications, and to alter it and redistribute it
+  freely, subject to the following restrictions:
 
-  1. The origin of this software must not be misrepresented; you must not 
-  claim that you wrote the original software. If you use this software 
-  in a product, an acknowledgment in the product documentation would be 
-  appreciated but is not required. 
-  2. Altered source versions must be plainly marked as such, and must not be 
-  misrepresented as being the original software. 
-  3. This notice may not be removed or altered from any source distribution. 
+  1. The origin of this software must not be misrepresented; you must not
+  claim that you wrote the original software. If you use this software
+  in a product, an acknowledgment in the product documentation would be
+  appreciated but is not required.
+  2. Altered source versions must be plainly marked as such, and must not be
+  misrepresented as being the original software.
+  3. This notice may not be removed or altered from any source distribution.
 
 *****************************************************************************/
 
@@ -37,16 +37,19 @@
 /****************************** GLUI_RadioGroup::GLUI_RadioGroup() **********/
 
 GLUI_RadioGroup::GLUI_RadioGroup(GLUI_Node *parent,
+                                 const char* name,
                                  int *value_ptr,
-                                 int id, GLUI_CB cb)
+                                 int id, GLUI_CB cb ):
+    GLUI_Container(name)
+
 {
   common_init();
-  GLUI_String      buf;
+  std::string      buf;
 
   set_ptr_val( value_ptr );
   if ( value_ptr ) {
-    int_val = *value_ptr;  /** Can't call set_int_val(), b/c that 
-                               function will try to call the 
+    int_val = *value_ptr;  /** Can't call set_int_val(), b/c that
+                               function will try to call the
                                callback, etc */
     /** Actually, maybe not **/
     last_live_int = *value_ptr;
@@ -54,7 +57,7 @@ GLUI_RadioGroup::GLUI_RadioGroup(GLUI_Node *parent,
 
   user_id    = id;
   glui_format_str( buf, "RadioGroup: %p", this );
-  set_name( buf.c_str() );
+  set_name( const_cast<char*>(buf.c_str()) );
   callback   = cb;
 
   parent->add_control( this );
@@ -65,19 +68,10 @@ GLUI_RadioGroup::GLUI_RadioGroup(GLUI_Node *parent,
 
 /****************************** GLUI_RadioGroup::draw() **********/
 
-void    GLUI_RadioGroup::draw( int x, int y )
+void    GLUI_RadioGroup::draw()
 {
   if ( NOT can_draw() )
     return;
-
-  draw_group(false);
-}
-
-
-/********************* GLUI_RadioGroup::draw_group(int translate) **********/
-
-void    GLUI_RadioGroup::draw_group( int translate )
-{
   GLUI_DRAWINGSENTINAL_IDIOM
   GLUI_RadioButton *button;
   this->int_val = int_val;
@@ -86,30 +80,20 @@ void    GLUI_RadioGroup::draw_group( int translate )
 
   button = (GLUI_RadioButton*) first_child();
   while( button != NULL ) {
-    glPushMatrix();
-    if (translate) {
-      button->translate_to_origin();
-    }
-    else {
-      glTranslatef(button->x_abs-x_abs,
-                   button->y_abs-y_abs,0.0);
-    }
-
-    if ( button->int_val ) 
+    if ( button->int_val )
       button->draw_checked();
-    else 
+    else
       button->draw_unchecked();
-    
-    glPopMatrix();
-
     button = (GLUI_RadioButton*) button->next();
   }
+
 }
+
 
 
 /****************************** GLUI_RadioGroup::set_name() **********/
 
-void    GLUI_RadioGroup::set_name( const char *text )
+void    GLUI_RadioGroup::set_name( char *text )
 {
   name = text;
 
@@ -146,7 +130,8 @@ void    GLUI_RadioGroup::set_selected( int int_val )
 
 /************************ GLUI_RadioButton::GLUI_RadioButton() **********/
 
-GLUI_RadioButton::GLUI_RadioButton( GLUI_RadioGroup *grp, const char *name )
+GLUI_RadioButton::GLUI_RadioButton( GLUI_RadioGroup *grp, const char *name ) :
+    GLUI_Container(name)
 {
   common_init();
 
@@ -155,9 +140,9 @@ GLUI_RadioButton::GLUI_RadioButton( GLUI_RadioGroup *grp, const char *name )
   /** A radio button's user id is always its ordinal number (zero-indexed)
       within the group */
   user_id    = grp->num_buttons;
-  set_name( name );
+  set_name( const_cast<char*>(name) );
   group = grp;
-  
+
   group->num_buttons++;   /* Increments radiogroup's button count */
   group->add_control( this );
 
@@ -177,12 +162,12 @@ int    GLUI_RadioButton::mouse_down_handler( int local_x, int local_y )
     return false;
 
   orig_value = group->int_val;
-  
+
   currently_inside = true;
 
   group->set_selected( this->user_id );
   redraw();
-  
+
   return false;
 }
 
@@ -197,14 +182,14 @@ int    GLUI_RadioButton::mouse_held_down_handler( int local_x, int local_y,
      currently_inside = inside;
      redraw();
   }
-  
+
   return false;
 }
 
 
 /*************************** GLUI_RadioButton::mouse_up_handler() **********/
 
-int    GLUI_RadioButton::mouse_up_handler( int local_x, int local_y, 
+int    GLUI_RadioButton::mouse_up_handler( int local_x, int local_y,
 					   bool inside )
 {
   if ( NOT group )
@@ -218,7 +203,7 @@ int    GLUI_RadioButton::mouse_up_handler( int local_x, int local_y,
     /** Now we update the radio button group.  We tell the group
       handler to set the currently-selected item to this button, which
       is reference by its user_id/ordinal number within group **/
-      
+
     group->set_selected( this->user_id );
     redraw();
 
@@ -226,7 +211,7 @@ int    GLUI_RadioButton::mouse_up_handler( int local_x, int local_y,
       but ONLY if the value of the radio group actually changed ***/
     if ( group->int_val != orig_value ) {
       group->output_live(true); /** Output live and update gfx ***/
-      
+
       group->execute_callback();
     }
   }
@@ -235,31 +220,41 @@ int    GLUI_RadioButton::mouse_up_handler( int local_x, int local_y,
 }
 
 /****************************** GLUI_RadioButton::draw() **********/
-
-void    GLUI_RadioButton::draw( int x, int y )
+#warning "remove draw_checked and draw_unchecked to use this"
+void    GLUI_RadioButton::draw(void)
 {
-  GLUI_DRAWINGSENTINAL_IDIOM
+    glMatrixMode( GL_MODELVIEW );
+    glPushMatrix();
 
-  if ( NOT group OR NOT can_draw() )
-    return;
+    glTranslatef( (float) this->x_abs + .5,
+            (float) this->y_abs + .5,
+            0.0 );
 
-  /*** See if we're the currently-selected button.  If so, draw ***/
-  if ( group->int_val == this->user_id ) {
-    if ( enabled )
-      glui->std_bitmaps.draw( GLUI_STDBITMAP_RADIOBUTTON_ON, 0, 0 );
-    else
-      glui->std_bitmaps.draw( GLUI_STDBITMAP_RADIOBUTTON_ON_DIS, 0, 0 );
-  }
-  else {
-    if ( enabled ) 
-      glui->std_bitmaps.draw( GLUI_STDBITMAP_RADIOBUTTON_OFF, 0, 0 );
-    else
-      glui->std_bitmaps.draw( GLUI_STDBITMAP_RADIOBUTTON_OFF_DIS, 0, 0 );
-  }
 
-  draw_active_area();
+    GLUI_DRAWINGSENTINAL_IDIOM
 
-  draw_name( text_x_offset, 10 );
+        if ( NOT group OR NOT can_draw() )
+            return;
+
+    /*** See if we're the currently-selected button.  If so, draw ***/
+    if ( group->int_val == this->user_id ) {
+        if ( enabled )
+            glui->std_bitmaps.draw( GLUI_STDBITMAP_RADIOBUTTON_ON, 0, 0 );
+        else
+            glui->std_bitmaps.draw( GLUI_STDBITMAP_RADIOBUTTON_ON_DIS, 0, 0 );
+    }
+    else {
+        if ( enabled )
+            glui->std_bitmaps.draw( GLUI_STDBITMAP_RADIOBUTTON_OFF, 0, 0 );
+        else
+            glui->std_bitmaps.draw( GLUI_STDBITMAP_RADIOBUTTON_OFF_DIS, 0, 0 );
+    }
+
+    draw_active_area();
+
+    draw_name( text_x_offset, 10 );
+    glPopMatrix();
+
 }
 
 
@@ -267,12 +262,23 @@ void    GLUI_RadioButton::draw( int x, int y )
 
 void   GLUI_RadioButton::draw_checked( void )
 {
-  GLUI_DRAWINGSENTINAL_IDIOM
-  if ( enabled )
-    glui->std_bitmaps.draw( GLUI_STDBITMAP_RADIOBUTTON_ON, 0, 0 );
-  else
-    glui->std_bitmaps.draw( GLUI_STDBITMAP_RADIOBUTTON_ON_DIS, 0, 0 );    
-  draw_active_area();
+    glMatrixMode( GL_MODELVIEW );
+    glPushMatrix();
+
+    glTranslatef( (float) this->x_abs + .5,
+            (float) this->y_abs + .5,
+            0.0 );
+
+
+
+    GLUI_DRAWINGSENTINAL_IDIOM
+        if ( enabled )
+            glui->std_bitmaps.draw( GLUI_STDBITMAP_RADIOBUTTON_ON, 0, 0 );
+        else
+            glui->std_bitmaps.draw( GLUI_STDBITMAP_RADIOBUTTON_ON_DIS, 0, 0 );
+    draw_active_area();
+    glPopMatrix();
+
 }
 
 
@@ -280,13 +286,24 @@ void   GLUI_RadioButton::draw_checked( void )
 
 void   GLUI_RadioButton::draw_unchecked( void )
 {
-  GLUI_DRAWINGSENTINAL_IDIOM
-  
-  if ( enabled )
-    glui->std_bitmaps.draw( GLUI_STDBITMAP_RADIOBUTTON_OFF, 0, 0 );
-  else
-    glui->std_bitmaps.draw( GLUI_STDBITMAP_RADIOBUTTON_OFF_DIS, 0, 0 );
-  draw_active_area();
+    glMatrixMode( GL_MODELVIEW );
+    glPushMatrix();
+
+    glTranslatef( (float) this->x_abs + .5,
+            (float) this->y_abs + .5,
+            0.0 );
+
+
+
+    GLUI_DRAWINGSENTINAL_IDIOM
+
+        if ( enabled )
+            glui->std_bitmaps.draw( GLUI_STDBITMAP_RADIOBUTTON_OFF, 0, 0 );
+        else
+            glui->std_bitmaps.draw( GLUI_STDBITMAP_RADIOBUTTON_OFF_DIS, 0, 0 );
+    draw_active_area();
+    glPopMatrix();
+
 }
 
 
@@ -344,7 +361,7 @@ void    GLUI_RadioButton::draw_active_area( void )
   glVertex2i(left,0);     glVertex2i( right,0);
   glVertex2i(right,h+1);   glVertex2i( left,h+1);
   glEnd();
-  
+
   glDisable( GL_LINE_STIPPLE );
 }
 
@@ -357,8 +374,8 @@ void    GLUI_RadioGroup::set_int_val( int new_val )
     return;
 
   set_selected( new_val );
-  redraw();  
+  redraw();
 
   output_live(true);
-     
+
 }

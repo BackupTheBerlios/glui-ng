@@ -3,12 +3,12 @@
   GLUI User Interface Toolkit
   ---------------------------
 
-     glui_splitter.h - header for Splitter class
-        GLUI User Interface Toolkit
+     glui_debug.h - Glui trace facility
+
 
           --------------------------------------------------
 
-  Copyright (c) 2007 MALET Jean-Luc
+  Copyright (c) 2007 Jean-Luc MALET
 
   WWW:    http://sourceforge.net/projects/glui/
   Forums: http://sourceforge.net/forum/?group_id=92496
@@ -30,39 +30,43 @@
   3. This notice may not be removed or altered from any source distribution.
 
 *****************************************************************************/
-#ifndef __GLUI_CONTAINER_H
-#define __GLUI_CONTAINER_H
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdarg.h>
+#include <iostream>
+#include <fstream>
+using namespace std;
 
-enum GLUI_orientation {
-    GLUI_horizontal,
-    GLUI_vertical,
-};
+const size_t ISIZE = 500;
 
-/************************************************************/
-/*                                                          */
-/*               Container class (container)                   */
-/*                                                          */
-/************************************************************/
-/**
-  Special control that contain other child (compared to GLUI_Control leafs)
-*/
-
-class GLUIAPI GLUI_Container : public GLUI_Control
+class GLUI_debug
 {
     public :
-    GLUI_Container(const char *name,
-                   GLUI_orientation orient=GLUI_vertical);
-    virtual void update_size( void ); //<recursively update all control sizes
-    virtual void pack ( int x, int y); //<recursively update positions
-    virtual void draw (void);  //<draw with the right size and position
-    void set_orientation( GLUI_orientation new_orientation) {orientation = new_orientation; }
-    virtual int min_w();
-    virtual int min_h();
+        static GLUI_debug* GLUI_debugInstance();
 
+        ~GLUI_debug();
+        int print(const char* format,...);
 
-    private :
-    GLUI_orientation orientation;
-
+    private:
+        GLUI_debug();
+        char* use_debug;
+        char* buf;
 };
-#endif //__GLUI_SPLITTER_H
 
+/*
+public class ClassSingleton {
+    // Seule instance de Class Factory
+    public static ClassSingleton seuleInstance;
+    // Initialisateur
+    static {
+        // Crée la seule instance
+        seuleInstance = new ClassSingleton();
+    }
+    // Constructeur privé
+    private ClassSingleton() {
+    }
+    // Getter qui renvoie l’instance
+    public ClassSingleton getInstance() {
+        return seuleInstance;
+    }
+}*/

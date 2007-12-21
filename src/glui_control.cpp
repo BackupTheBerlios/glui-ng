@@ -56,15 +56,14 @@ void	     GLUI_Control::redraw_window(void) {
 
 
 /* GLUI_Control::translate_and_draw_front() ********/
-
+#warning "remove"
 void GLUI_Control::translate_and_draw_front()
 {
   GLUI_DRAWINGSENTINAL_IDIOM
 
   glMatrixMode( GL_MODELVIEW );
   glPushMatrix();
-  translate_to_origin();
-  draw(0,0);
+  draw();
   glPopMatrix();
 }
 
@@ -187,57 +186,6 @@ void   GLUI_Control::draw_emboss_box(int x_min,int x_max,int y_min,int y_max)
 }
 
 
-
-/******* GLUT_Control::draw_recursive() **********/
-
-void GLUI_Control::draw_recursive( int x, int y )
-{
-  GLUI_Control *node;
-
-  /*  printf( "%s %d\n", this->name.c_str(), this->hidden );*/
-  if ( NOT can_draw() )
-    return;
-
-  /*if ( 1 ) {  --  Debugging to check control width  
-    glColor3f( 1.0, 0.0, 0.0 );
-    glBegin( GL_LINES );
-    glVertex2i( x_abs, y_abs );00
-    glVertex2i( x_abs+w, y_abs );
-
-    glEnd();
-    }*/
-
-  glMatrixMode( GL_MODELVIEW );
-  glPushMatrix();
-
-  glTranslatef( (float) this->x_abs + .5, 
-		(float) this->y_abs + .5, 
-		0.0 );
-
-  if ( NOT _glui_draw_border_only ) {
-    if ( NOT strcmp( name.c_str(), "Rollout" ) ) {
-    }
-
-    this->draw( this->x_off, this->y_off_top );
-  } 
-  else 
-  {
-
-    /* The following draws the area of each control              */
-    glColor3f( 1.0, 0.0, 0.0 );
-    glBegin( GL_LINE_LOOP );
-    glVertex2i( 0, 0 ); glVertex2i( w, 0 );
-    glVertex2i( w, h ); glVertex2i( 0, h );
-    glEnd();
-  }
-  glPopMatrix();
-  
-  node = (GLUI_Control*) first_child();
-  while( node ) {
-    node->draw_recursive( node->x_abs, node->y_abs );
-    node = (GLUI_Control*) node->next();
-  }
-}
 
 
 /****** GLUI_Control::set_to_glut_window() *********/
@@ -373,7 +321,7 @@ void GLUI_Control::align()
 {
     int  parent_x, par_y, col_w, col_h, col_x_off, col_y_off;
     int  orig_x_abs;
-    GLUI_Control* parent;
+    GLUI_Control* par;
 
     orig_x_abs = x_abs;
 
@@ -383,18 +331,18 @@ void GLUI_Control::align()
     if ( NULL == parent() )
         return;  /* Clearly this shouldn't happen, though */
 
-    parent = dynamic_cast<GLUI_Control*>(parent())
-    if ( NULL == parent )
+    par = dynamic_cast<GLUI_Control*>(parent());
+    if ( NULL == par )
         return;
 
     if ( alignment == GLUI_ALIGN_LEFT ) {
-        x_abs = parent->x_abs + parent->x_off;
+        x_abs = par->x_abs + par->x_off;
     }
     else if ( alignment == GLUI_ALIGN_RIGHT ) {
-        x_abs = parent->x_abs + parent->w - parent->x_off - this->w;
+        x_abs = par->x_abs + par->w - par->x_off - this->w;
     }
     else if ( alignment == GLUI_ALIGN_CENTER ) {
-        x_abs = parent->x_abs + (parent->w - this->w) / 2;
+        x_abs = par->x_abs + (par->w - this->w) / 2;
     }
 
 
@@ -436,7 +384,7 @@ void GLUI_Control::sync_live(int recurse, int draw_it)
       callbacks ***/
     if ( 0 ) { /* THIS CODE BELOW SHOULD NOT BE EXECUTED */
       if ( glui->mouse_button_down ) {
-	/* printf( "Can't sync\n" );              */
+	debug( "Can't sync\n" );
 	return;
       }
     }
@@ -684,8 +632,9 @@ void  GLUI_Control::get_float_array_val( float *array_ptr )
 
 /**** GLUI_Control::set_name() ********************/
 
-void   GLUI_Control::set_name( const char *str )
+void   GLUI_Control::set_name( char *str )
 {
+  name.clear();
   name = str;
   redraw(); 
 }
@@ -837,13 +786,13 @@ void         GLUI_Control::unhide_internal( int recurse )
 
   node = (GLUI_Node *) this;
   while( node != NULL ) {
-    /*    printf( "unhide: %s [%d]\n", ((GLUI_Control*)node)->name.c_str(), 
-	    ((GLUI_Control*)node)->hidden );*/
+    debug( "unhide: %s [%d]\n", ((GLUI_Control*)node)->name.c_str(),
+	    ((GLUI_Control*)node)->hidden );
     ((GLUI_Control*)node)->hidden = false;
 
-    if ( recurse AND node->first_child() != NULL )  
+    if ( recurse AND node->first_child() != NULL )
       ((GLUI_Control*) node->first_child())->unhide_internal(true);
-      
+
     node = node->next();
   }
 
@@ -851,9 +800,9 @@ void         GLUI_Control::unhide_internal( int recurse )
   while( node != NULL ) {
     ((GLUI_Control*)node)->hidden = false;
 
-    if ( recurse AND node->first_child() != NULL )  
+    if ( recurse AND node->first_child() != NULL )
       ((GLUI_Control*) node->first_child())->unhide_internal(true);
-      
+
     node = node->next();
   }
 }

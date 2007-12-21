@@ -1,5 +1,5 @@
 /****************************************************************************
-  
+
   GLUI User Interface Toolkit
   ---------------------------
 
@@ -30,26 +30,28 @@
 
 
 /****************************** GLUI_Tree::GLUI_Tree() **********/
-GLUI_Tree::GLUI_Tree(GLUI_Node *parent, const char *name, 
-                     int open, int inset)
+#warning "this need more work : try creating a Tree panel and look at behaviour"
+GLUI_Tree::GLUI_Tree(GLUI_Node *parent, const char *name,
+                     int open, int inset):
+    GLUI_Panel(name),
+    button(this, ""),
+    splitter(this, "splitter")
+
 {
   common_init();
   GLUI_StaticText *inset_label;
-  GLUI_Column     *col;
 
-  this->set_name( name );
+  this->set_name( const_cast<char*>( name ));
   this->user_id    = -1;
-        
+
   if ( NOT open ) {
     this->is_open = false;
     this->h = GLUI_DEFAULT_CONTROL_HEIGHT + 7;
   }
 
   parent->add_control( this );
-  inset_label = new GLUI_StaticText(this,"");
+  inset_label = new GLUI_StaticText(splitter.GetFirstPanel(),"");
   inset_label->set_w(inset);
-  col = new GLUI_Column(this,true);
-  this->set_column(col);
   this->set_alignment(GLUI_ALIGN_LEFT);
 }
 
@@ -102,7 +104,7 @@ void    GLUI_Tree::close( void )
   child_tail = NULL;
 
   this->h = GLUI_DEFAULT_CONTROL_HEIGHT + 7;
-  
+
   glui->refresh();
 }
 
@@ -126,8 +128,8 @@ int   GLUI_Tree::mouse_down_handler( int local_x, int local_y )
 
 /**************************** GLUI_Tree::mouse_held_down_handler() ****/
 
-int  GLUI_Tree::mouse_held_down_handler( 
-                       int local_x, int local_y, 
+int  GLUI_Tree::mouse_held_down_handler(
+                       int local_x, int local_y,
                        bool new_inside )
 {
   if ( NOT initially_inside )
@@ -138,7 +140,7 @@ int  GLUI_Tree::mouse_held_down_handler(
 
   if (currently_inside != new_inside)
     redraw();
-  
+
   return false;
 }
 
@@ -147,7 +149,7 @@ int  GLUI_Tree::mouse_held_down_handler(
 
 int   GLUI_Tree::mouse_up_handler( int local_x, int local_y, bool inside )
 {
-  if ( currently_inside ) {    
+  if ( currently_inside ) {
     if ( is_open )
       close();
     else
@@ -164,82 +166,89 @@ int   GLUI_Tree::mouse_up_handler( int local_x, int local_y, bool inside )
 
 /********************************* GLUI_Tree::draw() ***********/
 
-void   GLUI_Tree::draw( int x, int y )
+void   GLUI_Tree::draw( )
 {
-  GLUI_DRAWINGSENTINAL_IDIOM
-  int left, right, top, bottom, delta_x;
-    
-  left   = 5;
-  right  = w-left;
-  top    = 3;
-  bottom = 3+16;
-  delta_x = 0;
+    glMatrixMode( GL_MODELVIEW );
+    glPushMatrix();
 
-  glui->draw_raised_box( left, top, 16, 16 );
+    glTranslatef( (float) this->x_abs + .5,
+            (float) this->y_abs + .5,
+            0.0 );
+    GLUI_DRAWINGSENTINAL_IDIOM
+        int left, right, top, bottom, delta_x;
 
-  if ( glui )
-    glColor3ubv(glui->bkgd_color);
-  glDisable( GL_CULL_FACE );
-  glBegin( GL_QUADS );
-  glVertex2i( left+17, top+1 );      glVertex2i( right-1, top+1 );
-  glVertex2i( right-1, bottom-1 );  glVertex2i( left+17, bottom-1 );
-  glEnd();
+    left   = 5;
+    right  = w-left;
+    top    = 3;
+    bottom = 3+16;
+    delta_x = 0;
 
-  if (format & GLUI_TREEPANEL_DISPLAY_HIERARCHY) {
-    delta_x = string_width( level_name ) + char_width(' ');
-    glColor3f( lred, lgreen, lblue);    /* The hierarchy is drawn in bold */
-    glRasterPos2i(left + 25, top + 11);
-    draw_string(level_name);
-    glRasterPos2i(left + 24, top + 11);
-    draw_string(level_name);
-  }
+    glui->draw_raised_box( left, top, 16, 16 );
 
-  draw_name( delta_x+left+24, top+11 );
+    if ( glui )
+        glColor3ubv(glui->bkgd_color);
+    glDisable( GL_CULL_FACE );
+    glBegin( GL_QUADS );
+    glVertex2i( left+17, top+1 );      glVertex2i( right-1, top+1 );
+    glVertex2i( right-1, bottom-1 );  glVertex2i( left+17, bottom-1 );
+    glEnd();
 
-  if ( active )
-    draw_active_box( left+22, delta_x+left+string_width( name )+32,
-		     top, bottom-2 );
+    if (format & GLUI_TREEPANEL_DISPLAY_HIERARCHY) {
+        delta_x = string_width( level_name ) + char_width(' ');
+        glColor3f( lred, lgreen, lblue);    /* The hierarchy is drawn in bold */
+        glRasterPos2i(left + 25, top + 11);
+        draw_string(level_name);
+        glRasterPos2i(left + 24, top + 11);
+        draw_string(level_name);
+    }
+
+    draw_name( delta_x+left+24, top+11 );
+
+    if ( active )
+        draw_active_box( left+22, delta_x+left+string_width( name )+32,
+                top, bottom-2 );
 
 
-  /**   Draw '+' or '-'  **/
+    /**   Draw '+' or '-'  **/
 
-  glBegin( GL_LINES );
-  if ( is_open ) {
-    if ( enabled )      
-      if (is_current) 
-	glColor3f( 0, 0, 1 ); 
-      else 
-	glColor3f( 0.0, 0.0, 0.0 );
-    else 
-	glColor3f( 0.5, 0.5, 0.5 );
-    glVertex2i(left+4,(top+bottom)/2);  glVertex2i(left+13,(top+bottom)/2);
+    glBegin( GL_LINES );
+    if ( is_open ) {
+        if ( enabled )
+            if (is_current)
+                glColor3f( 0, 0, 1 );
+            else
+                glColor3f( 0.0, 0.0, 0.0 );
+        else
+            glColor3f( 0.5, 0.5, 0.5 );
+        glVertex2i(left+4,(top+bottom)/2);  glVertex2i(left+13,(top+bottom)/2);
 
-    glColor3f( 1.0, 1.0, 1.0 );
-    glVertex2i(left+4,1+(top+bottom)/2);glVertex2i(left+13,1+(top+bottom)/2);
-  }
-  else
-  {
-    glColor3f( 1.0, 1.0, 1.0 );
-    glVertex2i(left+9,top+3);                          glVertex2i(left+9,bottom-4);
-    glVertex2i(left+4,(top+bottom)/2);        glVertex2i(left+13,(top+bottom)/2);
+        glColor3f( 1.0, 1.0, 1.0 );
+        glVertex2i(left+4,1+(top+bottom)/2);glVertex2i(left+13,1+(top+bottom)/2);
+    }
+    else
+    {
+        glColor3f( 1.0, 1.0, 1.0 );
+        glVertex2i(left+9,top+3);                          glVertex2i(left+9,bottom-4);
+        glVertex2i(left+4,(top+bottom)/2);        glVertex2i(left+13,(top+bottom)/2);
 
-    if ( enabled )
-      if (is_current) 
-	glColor3f( 0, 0, 1 ); 
-      else       
-	glColor3f( 0.0, 0.0, 0.0 );
-    else 
-      glColor3f( 0.5, 0.5, 0.5 );
-    glVertex2i(left+4,-1+(top+bottom)/2);
-    glVertex2i(left+13,-1+(top+bottom)/2);
-    glVertex2i(left+8,top+3);
-    glVertex2i(left+8,bottom-4);
-  }
-  glEnd();
+        if ( enabled )
+            if (is_current)
+                glColor3f( 0, 0, 1 );
+            else
+                glColor3f( 0.0, 0.0, 0.0 );
+        else
+            glColor3f( 0.5, 0.5, 0.5 );
+        glVertex2i(left+4,-1+(top+bottom)/2);
+        glVertex2i(left+13,-1+(top+bottom)/2);
+        glVertex2i(left+8,top+3);
+        glVertex2i(left+8,bottom-4);
+    }
+    glEnd();
 
-  glLineWidth( 1.0 );
-  
-  if (currently_inside) draw_pressed();
+    glLineWidth( 1.0 );
+
+    if (currently_inside) draw_pressed();
+    glPopMatrix();
 }
 
 
@@ -273,7 +282,7 @@ void   GLUI_Tree::draw_pressed( void )
   right  = w-left;
   top    = 3;
   bottom = 3+16;
-  
+
   glColor3f( 0.0, 0.0, 0.0 );
 
   glBegin( GL_LINE_LOOP );

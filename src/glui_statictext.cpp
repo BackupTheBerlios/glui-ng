@@ -35,25 +35,37 @@
 
 /****************************** GLUI_StaticText::GLUI_StaticText() **********/
 GLUI_StaticText::GLUI_StaticText( GLUI_Node *parent, const char *name )
+    :    GLUI_Control("separator")
+
 {
   common_init();
-  set_name( name );
+  set_name( const_cast<char*>(name) );
   parent->add_control( this );
 }
 
 /****************************** GLUI_StaticText::draw() **********/
 
-void    GLUI_StaticText::draw( int x, int y )
+void    GLUI_StaticText::draw( )
 {
-  GLUI_DRAWINGSENTINAL_IDIOM
+    glMatrixMode( GL_MODELVIEW );
+    glPushMatrix();
 
-  draw_text();
+    glTranslatef( (float) this->x_abs + .5,
+            (float) this->y_abs + .5,
+            0.0 );
+
+
+    GLUI_DRAWINGSENTINAL_IDIOM
+
+        draw_text();
+
+    glPopMatrix();
 }
 
 
 /****************************** GLUI_StaticText::set_text() **********/
 
-void    GLUI_StaticText::set_text( const char *text )
+void    GLUI_StaticText::set_text( char *text )
 {
   set_name( text );
   redraw();

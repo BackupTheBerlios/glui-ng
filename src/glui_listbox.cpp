@@ -38,11 +38,12 @@ GLUI_Listbox::GLUI_Listbox( GLUI_Node *parent,
                             const char *name, int *value_ptr,
                             int id, 
                             GLUI_CB cb)
+    : GLUI_Control(name)
 {
   common_init();
   set_ptr_val( value_ptr );
   user_id    = id;
-  set_name( name );
+  set_name( const_cast<char*>(name) );
   callback    = cb;
 
   parent->add_control( this );
@@ -88,47 +89,58 @@ int    GLUI_Listbox::key_handler( unsigned char key,int modifiers )
 
 /****************************** GLUI_Listbox::draw() **********/
 
-void    GLUI_Listbox::draw( int x, int y )
+void    GLUI_Listbox::draw( )
 {
-  GLUI_DRAWINGSENTINAL_IDIOM
-  int name_x;
 
-  /*  draw_active_area();              */
+    glMatrixMode( GL_MODELVIEW );
+    glPushMatrix();
 
-  name_x = MAX(text_x_offset - string_width(this->name) - 3,0);
-  draw_name( name_x , 13);
-  draw_box_inwards_outline( text_x_offset, w,
-			    0, h );
-
-  if ( NOT active ) {
-    draw_box( text_x_offset+3, w-2, 2, h-2, 1.0, 1.0, 1.0 );
-    if ( NOT enabled )
-      glColor3b( 32, 32, 32 );
-    else
-      glColor3f( 0.0, 0.0, 0.0 );
-    glRasterPos2i( text_x_offset+5, 13 );
-    draw_string( curr_text );
-  }
-  else {
-    draw_box( text_x_offset+3, w-2, 2, h-2, .0, .0, .6 );
-    glColor3f( 1.0, 1.0, 1.0 );
-    glRasterPos2i( text_x_offset+5, 13 );
-    draw_string( curr_text );
-  }
+    glTranslatef( (float) this->x_abs + .5,
+            (float) this->y_abs + .5,
+            0.0 );
 
 
-  if ( enabled ) {
-    glui->std_bitmaps.
-      draw(GLUI_STDBITMAP_LISTBOX_UP,
-	   w-glui->std_bitmaps.width(GLUI_STDBITMAP_LISTBOX_UP)-1,
-	   2 );
-  }
-  else {
-    glui->std_bitmaps.
-      draw(GLUI_STDBITMAP_LISTBOX_UP_DIS,
-	   w-glui->std_bitmaps.width(GLUI_STDBITMAP_LISTBOX_UP)-1,
-	   2 );
-  }
+    GLUI_DRAWINGSENTINAL_IDIOM
+        int name_x;
+
+    /*  draw_active_area();              */
+
+    name_x = MAX(text_x_offset - string_width(this->name) - 3,0);
+    draw_name( name_x , 13);
+    draw_box_inwards_outline( text_x_offset, w,
+            0, h );
+
+    if ( NOT active ) {
+        draw_box( text_x_offset+3, w-2, 2, h-2, 1.0, 1.0, 1.0 );
+        if ( NOT enabled )
+            glColor3b( 32, 32, 32 );
+        else
+            glColor3f( 0.0, 0.0, 0.0 );
+        glRasterPos2i( text_x_offset+5, 13 );
+        draw_string( curr_text );
+    }
+    else {
+        draw_box( text_x_offset+3, w-2, 2, h-2, .0, .0, .6 );
+        glColor3f( 1.0, 1.0, 1.0 );
+        glRasterPos2i( text_x_offset+5, 13 );
+        draw_string( curr_text );
+    }
+
+
+    if ( enabled ) {
+        glui->std_bitmaps.
+            draw(GLUI_STDBITMAP_LISTBOX_UP,
+                    w-glui->std_bitmaps.width(GLUI_STDBITMAP_LISTBOX_UP)-1,
+                    2 );
+    }
+    else {
+        glui->std_bitmaps.
+            draw(GLUI_STDBITMAP_LISTBOX_UP_DIS,
+                    w-glui->std_bitmaps.width(GLUI_STDBITMAP_LISTBOX_UP)-1,
+                    2 );
+    }
+
+    glPopMatrix();
 }
 
 
@@ -229,7 +241,7 @@ void     GLUI_Listbox::dump( FILE *output )
 {
   GLUI_Listbox_Item *item;
 
-  /*  printf( "%p\n", (char*) name );              */
+  debug( "%p\n", name.c_str() );
 
   fprintf( output, "Listbox: %s\n", name.c_str() );
 
@@ -305,12 +317,12 @@ int     GLUI_Listbox::mouse_over( int state, int x, int y )
 {
   GLUI_Listbox_Item *item;
 
-  /*  printf( "x/y:   %d/%d\n", x, y );              */
+  debug( "x/y:   %d/%d\n", x, y );
 
   if ( state AND enabled AND x > x_abs + text_x_offset) {
     /****  Build a GLUT menu for this listbox   ***/
     
-    /*	printf( "%d %d\n", x, y );              */
+    debug( "%d %d\n", x, y );
 
     glut_menu_id = glutCreateMenu(listbox_callback);
 
@@ -325,7 +337,7 @@ int     GLUI_Listbox::mouse_over( int state, int x, int y )
     GLUI_Master.set_left_button_glut_menu_control( this );
   }
   else if ( glut_menu_id != -1 ) {
-    /*    printf( "OUT\n" );              */
+    debug( "OUT\n" );
     glutDetachMenu( GLUT_LEFT_BUTTON );
     glutDestroyMenu( glut_menu_id );
     glut_menu_id = -1;
@@ -359,7 +371,7 @@ int    GLUI_Listbox::do_selection( int item_num )
   if ( NOT sel_item )
     return false;
 
-  /*  printf( "-> %s\n", (char*) sel_item->text );              */
+  debug( "-> %s\n", sel_item->text.c_str() );
 
   int_val = item_num;
   curr_text = sel_item->text;

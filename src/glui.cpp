@@ -220,7 +220,7 @@ void glui_display_func(void)
 {
   GLUI *glui;
 
-  /*  printf( "display func\n" );          */
+  debug( "display func\n" );
 
   glui = GLUI_Master.find_glui_by_window_id( glutGetWindow() );
 
@@ -242,7 +242,7 @@ void glui_reshape_func(int w,int h )
   GLUI_Glut_Window *glut_window;
   int               current_window;
 
-  /*printf( "glui_reshape_func(): %d  w/h: %d/%d\n", glutGetWindow(), w, h );          */
+  debug( "glui_reshape_func(): %d  w/h: %d/%d\n", glutGetWindow(), w, h );
 
   current_window = glutGetWindow();
 
@@ -285,7 +285,7 @@ void glui_keyboard_func(unsigned char key, int x, int y)
   current_window = glutGetWindow();
   glut_window = GLUI_Master.find_glut_window( current_window );
 
-  /*printf( "key: %d\n", current_window );          */
+  debug( "key: %d\n", current_window );
 
   if ( glut_window ) { /**  Was event in a GLUT window?  **/
     if ( GLUI_Master.active_control_glui AND GLUI_Master.active_control ) {
@@ -433,7 +433,7 @@ void glui_visibility_func(int state)
 {
   GLUI *glui;
 
-  /*  printf( "IN GLUI VISIBILITY()\n" );          */
+  debug( "IN GLUI VISIBILITY()\n" );
   /*  fflush( stdout );          */
 
   glui = GLUI_Master.find_glui_by_window_id( glutGetWindow() );
@@ -486,8 +486,10 @@ void glui_idle_func(void)
 /*********************************** GLUI_Master_Object::GLUI_Master_Object() ******/
 
 GLUI_Master_Object::GLUI_Master_Object()
-:	glui_id_counter(1),
-    glut_idle_CB(NULL)
+    :   glui_id_counter(1)
+    ,   glut_idle_CB(NULL)
+    ,   gluis("gluis")
+    ,   glut_windows("glut_windows")
 {
 }
 
@@ -512,7 +514,7 @@ GLUI *GLUI_Master_Object::create_glui_subwindow( int parent_window,
 						   long flags )
 {
   GLUI *new_glui = new GLUI;
-  GLUI_String new_name;
+  std::string new_name;
   glui_format_str( new_name, "subwin_%p", this );
 
   new_glui->init( new_name.c_str(), flags | GLUI_SUBWINDOW, 0,0,
@@ -603,7 +605,9 @@ void    GLUI_Main::display( void )
 
   // Recursively draw the main panel
   //  main_panel->draw_bkgd_box( 0, 0, win_w, win_h );
-  main_panel->draw_recursive( 0, 0 );
+  main_panel->update_size();
+  main_panel->pack(0, 0);
+  main_panel->draw();
 
   switch (buffer_mode) {
   case buffer_front: /* Make sure drawing gets to screen */
@@ -685,7 +689,7 @@ void    GLUI_Main::reshape( int reshape_w, int reshape_h )
   
   glViewport( 0, 0, new_w, new_h );
 
-  /*  printf( "%d: %d\n", glutGetWindow(), this->flags );          */
+  debug( "%d: %d\n", glutGetWindow(), this->flags );
 
   glutPostRedisplay();
 }
@@ -710,9 +714,9 @@ void    GLUI_Main::keyboard(unsigned char key, int x, int y)
       new_control = find_next_control( active_control );
     }
 
-    /*    if ( new_control )
-	  printf( "new_control: %s\n", new_control->name );
-	  */
+    if ( new_control ) {
+        debug( "new_control: %s\n", new_control->NodeName );
+	}
 
     deactivate_current_control();
     activate_control( new_control, GLUI_ACTIVATE_TAB );
@@ -753,7 +757,7 @@ void    GLUI_Main::mouse(int button, int state, int x, int y)
   int callthrough;
   GLUI_Control *control;
 
-  /*  printf( "MOUSE: %d %d\n", button, state );          */
+  debug( "MOUSE: %d %d\n", button, state );
 
   callthrough = true;
 
@@ -762,10 +766,12 @@ void    GLUI_Main::mouse(int button, int state, int x, int y)
   if ( button == GLUT_LEFT ) {
     control = find_control( x, y );
 
-    /*if ( control ) printf( "control: %s\n", control->name.c_str() );      */
-    
+    if ( control ) {
+        debug( "control: %s\n", control->NodeName );
+    }
+
     if ( mouse_button_down AND active_control != NULL AND
-      	 state == GLUT_UP ) 
+         state == GLUT_UP )
     {
       /** We just released the mouse, which was depressed at some control **/
 
@@ -824,7 +830,7 @@ void    GLUI_Main::motion(int x, int y)
   int           callthrough;
   GLUI_Control *control;
 
-  /*  printf( "MOTION: %d %d\n", x, y );          */
+  debug( "MOTION: %d %d\n", x, y );
 
   callthrough = true;
 
@@ -854,7 +860,7 @@ void    GLUI_Main::passive_motion(int x, int y)
 
   control = find_control( x, y );
 
-  /*  printf( "%p %p\n", control, mouse_over_control );          */
+  debug( "%p %p\n", control, mouse_over_control );
 
   if ( control != mouse_over_control ) {
     if ( mouse_over_control ) {
@@ -899,7 +905,7 @@ void    GLUI_Main::idle(void)
 {
   /*** Pass the idle event onto the active control, if any ***/
 
-  /*  printf( "IDLE \t" );          */
+  debug( "IDLE \t" );
 
   if ( active_control != NULL ) {
     /* First we check if the control actually needs the idle right now.
@@ -925,60 +931,60 @@ int  GLUI_Main::needs_idle( void )
 
 
 /******************************************* GLUI_Main::find_control() ******/
-
-GLUI_Control  *GLUI_Main::find_control( int x, int y )
+GLUI_Control  *GLUI_Main::find_control( int x, int y, GLUI_Control * parent )
 {
-  GLUI_Control *node, *last_container;
+    GLUI_Control *node, *found, *child;
 
-  last_container = NULL;
+    found = NULL;
 
-  node = main_panel;
-  while( node != NULL ) {
-    if ( !dynamic_cast<GLUI_Column*>(node) AND
-         PT_IN_BOX( x, y, 
-                    node->x_abs, node->x_abs + node->w, 
-                    node->y_abs, node->y_abs + node->h ) 
-         ) 
+    if( parent == NULL ) {
+        node = main_panel;
+    }
+    else
     {
-      /*** Point is inside current node ***/
-      
-      if ( node->first_child() == NULL ) {
-        /*** SPECIAL CASE: for edittext boxes, we make sure click is
-             in box, and not on name string.  This should be generalized
-             for all controls later... ***/
-        if ( dynamic_cast<GLUI_EditText*>(node) ) {
-          if ( x < node->x_abs + ((GLUI_EditText*)node)->text_x_offset )
-            return (GLUI_Control*) node->parent();
+        node = parent;
+    }
+    if ( PT_IN_BOX( x, y,
+                    node->x_abs, node->x_abs + node->w,
+                    node->y_abs, node->y_abs + node->h ) )
+    {
+        //debug ( "ctrl fits: '%s'\n", node->NodeName );
+        child = dynamic_cast<GLUI_Control *>(node->first_child());
+        if ( child != NULL )
+        {
+            //debug ( "ctrl '%s' has childs\n", node->NodeName );
+            do
+            {
+                found = find_control ( x, y, child);
+                if (NULL == found) child =  dynamic_cast<GLUI_Control *>(child->next());
+            }
+            while ( found == NULL && child != NULL );
         }
+        if ( found == NULL ) found = node;
 
-        return node;   /* point is inside this node, and node has no children,
-                          so return this node as the selected node */
-      }
-      else {
-        /*** This is a container class ***/
-        last_container = node;
-        node = (GLUI_Control*) node->first_child();  /* Descend into child */
-      }
-      
+        // SPECIAL CASE: for edittext boxes, we make sure click is
+        //  in box, and not on name string.  This should be generalized
+        //  for all controls later...
+        if ( dynamic_cast<GLUI_EditText*>(node) )
+        {
+            if ( x < node->x_abs + ((GLUI_EditText*)node)->text_x_offset )
+            {
+                return (GLUI_Control*) node->parent();
+            }
+        }
+        if( parent == NULL ) {
+            debug ( "found ctrl: '%s'\n",
+                    dynamic_cast<GLUI_Node*>(found)->whole_tree() );
+        }
+        return found;
     }
-    else {
-      node = (GLUI_Control*) node->next();
+    else
+    {
+        debug (" not in %s.... skipping the whole tree \n", node->NodeName);
+        return NULL;
     }
-  }
- 
-  /** No leaf-level nodes found to accept the mouse click, so
-      return the last container control found which DOES accept the click **/
-  
-  if ( last_container ) {
-    /*    printf( "ctrl: '%s'\n", last_container->name );          */
-  
-    return last_container;
-  }
-  else {
-    return NULL;
-  }
+
 }
-
 
 /************************************* GLUI_Main::pack_controls() ***********/
 
@@ -1001,21 +1007,21 @@ void      GLUI_Main::pack_controls( void )
 
     glutSetWindow( orig_window );
 
-    /*		printf( "%d %d\n", parent_h, parent_w );          */
+    debug( "%d %d\n", parent_h, parent_w );
 
     if ( 1 ) {
-      if ( TEST_AND(this->flags,GLUI_SUBWINDOW_TOP )) {
-	main_panel->w = MAX( main_panel->w, parent_w );
-      }
-      else if ( TEST_AND(this->flags,GLUI_SUBWINDOW_LEFT )) {
-	main_panel->h = MAX( main_panel->h, parent_h );
-      }
-      else if ( TEST_AND(this->flags,GLUI_SUBWINDOW_BOTTOM )) {
-	main_panel->w = MAX( main_panel->w, parent_w );
-      }
-      else if ( TEST_AND(this->flags,GLUI_SUBWINDOW_RIGHT )) {
-	main_panel->h = MAX( main_panel->h, parent_h );
-      }
+        if ( TEST_AND(this->flags,GLUI_SUBWINDOW_TOP )) {
+            main_panel->w = MAX( main_panel->w, parent_w );
+        }
+        else if ( TEST_AND(this->flags,GLUI_SUBWINDOW_LEFT )) {
+            main_panel->h = MAX( main_panel->h, parent_h );
+        }
+        else if ( TEST_AND(this->flags,GLUI_SUBWINDOW_BOTTOM )) {
+            main_panel->w = MAX( main_panel->w, parent_w );
+        }
+        else if ( TEST_AND(this->flags,GLUI_SUBWINDOW_RIGHT )) {
+            main_panel->h = MAX( main_panel->h, parent_h );
+        }
     }
   }
 
@@ -1139,7 +1145,7 @@ GLUI_Main::GLUI_Main( void )
   bkgd_color_f[2] = b / 255.0f;
 
   /*** Create the main panel ***/
-  main_panel              = new GLUI_Panel;
+  main_panel              = new GLUI_Panel(NULL, "root panel");
   main_panel->set_int_val( GLUI_PANEL_NONE );
   main_panel->glui        = (GLUI*) this;
   main_panel->name        = "\0";
@@ -1232,7 +1238,7 @@ void         GLUI_Main::activate_control( GLUI_Control *control, int how )
     active_control = NULL;
   }
 
-  /*  printf( "activate: %d\n", glutGetWindow() );          */
+  debug( "activate: %d\n", glutGetWindow() );
   GLUI_Master.active_control      = active_control;
   GLUI_Master.active_control_glui = (GLUI*) this;
 }
@@ -1263,7 +1269,7 @@ void         GLUI_Main::deactivate_current_control( void )
     active_control = NULL;
   }
 
-  /*  printf( "deactivate: %d\n", glutGetWindow() );          */
+  debug( "deactivate: %d\n", glutGetWindow() );
   GLUI_Master.active_control      = NULL;
   GLUI_Master.active_control_glui = NULL;
 }
@@ -1696,7 +1702,7 @@ void glui_parent_window_reshape_func( int w, int h )
   GLUI  *glui;
   int   first = true;
 
-  /*  printf( "glui_parent_window_reshape_func: %d\n", glutGetWindow() );          */
+  debug( "glui_parent_window_reshape_func: %d\n", glutGetWindow() );
 
   current_window = glutGetWindow();
 
@@ -1724,7 +1730,7 @@ void glui_parent_window_reshape_func( int w, int h )
 
 void glui_parent_window_keyboard_func(unsigned char key, int x, int y)
 {
-  /*  printf( "glui_parent_window_keyboard_func: %d\n", glutGetWindow() );          */
+  debug( "glui_parent_window_keyboard_func: %d\n", glutGetWindow() );
 
   int   current_window;
   GLUI  *glui;
@@ -1759,7 +1765,7 @@ void glui_parent_window_keyboard_func(unsigned char key, int x, int y)
 
 void glui_parent_window_special_func(int key, int x, int y)
 {
-  /*printf( "glui_parent_window_special_func: %d\n", glutGetWindow() );          */
+  debug( "glui_parent_window_special_func: %d\n", glutGetWindow() );
 
   int   current_window;
   GLUI  *glui;
@@ -1994,8 +2000,9 @@ void     GLUI_Master_Object::get_viewport_area( int *x, int *y,
     if ( TEST_AND( curr_glui->flags, GLUI_SUBWINDOW) AND 
 	 curr_glui->parent_window == curr_window ) {
 
-      /*			printf( "%s -> %d   %d %d\n", curr_glui->window_name.c_str(), curr_glui->flags,
-				curr_glui->w, curr_glui->h );*/
+// this debug line cause obscure segfaulting.... the NodeName seems to be corrupted
+//      debug( "%s -> %d   %d %d\n", curr_glui->NodeName, curr_glui->flags,
+//				curr_glui->w, curr_glui->h );
 
       if ( TEST_AND( curr_glui->flags,GLUI_SUBWINDOW_LEFT ) ) {
 	curr_x += curr_glui->w;

@@ -41,12 +41,13 @@ GLUI_Translation::GLUI_Translation(
   GLUI_Node *parent, const char *name, 
   int trans_t, float *value_ptr,
   int id, GLUI_CB cb )
+    : GLUI_Mouse_Interaction (name)
 {
   common_init();
 
   set_ptr_val( value_ptr );
   user_id    = id;
-  set_name( name );
+  set_name( const_cast<char*>( name ) );
   callback    = cb;
   parent->add_control( this );
   //init_live();

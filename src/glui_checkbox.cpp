@@ -1,7 +1,7 @@
 
 /****************************************************************************
-  
-  GLUI User Interface Toolkit 
+
+  GLUI User Interface Toolkit
   ---------------------------
 
      glui_checkbox - GLUI_Checkbox control class
@@ -14,21 +14,21 @@
   WWW:    http://sourceforge.net/projects/glui/
   Forums: http://sourceforge.net/forum/?group_id=92496
 
-  This software is provided 'as-is', without any express or implied 
-  warranty. In no event will the authors be held liable for any damages 
-  arising from the use of this software. 
+  This software is provided 'as-is', without any express or implied
+  warranty. In no event will the authors be held liable for any damages
+  arising from the use of this software.
 
-  Permission is granted to anyone to use this software for any purpose, 
-  including commercial applications, and to alter it and redistribute it 
-  freely, subject to the following restrictions: 
+  Permission is granted to anyone to use this software for any purpose,
+  including commercial applications, and to alter it and redistribute it
+  freely, subject to the following restrictions:
 
-  1. The origin of this software must not be misrepresented; you must not 
-  claim that you wrote the original software. If you use this software 
-  in a product, an acknowledgment in the product documentation would be 
-  appreciated but is not required. 
-  2. Altered source versions must be plainly marked as such, and must not be 
-  misrepresented as being the original software. 
-  3. This notice may not be removed or altered from any source distribution. 
+  1. The origin of this software must not be misrepresented; you must not
+  claim that you wrote the original software. If you use this software
+  in a product, an acknowledgment in the product documentation would be
+  appreciated but is not required.
+  2. Altered source versions must be plainly marked as such, and must not be
+  misrepresented as being the original software.
+  3. This notice may not be removed or altered from any source distribution.
 
 *****************************************************************************/
 
@@ -38,13 +38,13 @@
 
 GLUI_Checkbox::GLUI_Checkbox( GLUI_Node *parent,
                               const char *name, int *value_ptr,
-                              int id, 
-                              GLUI_CB cb )
+                              int id,
+                              GLUI_CB cb ): GLUI_Container(name)
 {
   common_init();
 
   set_ptr_val( value_ptr );
-  set_name( name );
+  set_name( const_cast<char*>(name) );
   user_id    = id;
   callback   = cb;
 
@@ -72,7 +72,7 @@ int    GLUI_Checkbox::mouse_down_handler( int local_x, int local_y )
 int    GLUI_Checkbox::mouse_up_handler( int local_x, int local_y, bool inside )
 {
   if ( NOT inside ) { /* undo effect on value */
-    int_val = orig_value;    
+    int_val = orig_value;
   }
   else {
     set_int_val( int_val );
@@ -97,7 +97,7 @@ int    GLUI_Checkbox::mouse_held_down_handler( int local_x, int local_y,
      currently_inside = inside;
      redraw();
   }
-  
+
   return false;
 }
 
@@ -112,26 +112,36 @@ int    GLUI_Checkbox::key_handler( unsigned char key,int modifiers )
 
 /****************************** GLUI_Checkbox::draw() **********/
 
-void    GLUI_Checkbox::draw( int x, int y )
+void    GLUI_Checkbox::draw()
 {
-  GLUI_DRAWINGSENTINAL_IDIOM
+    glMatrixMode( GL_MODELVIEW );
+    glPushMatrix();
 
-  if ( int_val != 0 ) {
-    if ( enabled ) 
-      glui->std_bitmaps.draw( GLUI_STDBITMAP_CHECKBOX_ON, 0, 0 );
-    else
-      glui->std_bitmaps.draw( GLUI_STDBITMAP_CHECKBOX_ON_DIS, 0, 0 );
-  }
-  else {
-    if ( enabled )
-      glui->std_bitmaps.draw( GLUI_STDBITMAP_CHECKBOX_OFF, 0, 0 );
-    else
-      glui->std_bitmaps.draw( GLUI_STDBITMAP_CHECKBOX_OFF_DIS, 0, 0 );      
-  }
+    glTranslatef( (float) this->x_abs + .5,
+            (float) this->y_abs + .5,
+            0.0 );
 
-  draw_active_area();
 
-  draw_name( text_x_offset, 10);
+    GLUI_DRAWINGSENTINAL_IDIOM
+
+        if ( int_val != 0 ) {
+            if ( enabled )
+                glui->std_bitmaps.draw( GLUI_STDBITMAP_CHECKBOX_ON, 0, 0 );
+            else
+                glui->std_bitmaps.draw( GLUI_STDBITMAP_CHECKBOX_ON_DIS, 0, 0 );
+        }
+        else {
+            if ( enabled )
+                glui->std_bitmaps.draw( GLUI_STDBITMAP_CHECKBOX_OFF, 0, 0 );
+            else
+                glui->std_bitmaps.draw( GLUI_STDBITMAP_CHECKBOX_OFF_DIS, 0, 0 );
+        }
+
+    draw_active_area();
+
+    draw_name( text_x_offset, 10);
+    glPopMatrix();
+
 }
 
 /**************************** GLUI_Checkbox::draw_active_area() **************/
@@ -157,7 +167,7 @@ void    GLUI_Checkbox::draw_active_area( void )
   glVertex2i(left,0);     glVertex2i( right,0);
   glVertex2i(right,h+1);   glVertex2i( left,h+1);
   glEnd();
-  
+
   glDisable( GL_LINE_STIPPLE );
 }
 

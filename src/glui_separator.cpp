@@ -1,5 +1,5 @@
 /****************************************************************************
-  
+
   GLUI User Interface Toolkit
   ---------------------------
 
@@ -13,21 +13,21 @@
   WWW:    http://sourceforge.net/projects/glui/
   Forums: http://sourceforge.net/forum/?group_id=92496
 
-  This software is provided 'as-is', without any express or implied 
-  warranty. In no event will the authors be held liable for any damages 
-  arising from the use of this software. 
+  This software is provided 'as-is', without any express or implied
+  warranty. In no event will the authors be held liable for any damages
+  arising from the use of this software.
 
-  Permission is granted to anyone to use this software for any purpose, 
-  including commercial applications, and to alter it and redistribute it 
-  freely, subject to the following restrictions: 
+  Permission is granted to anyone to use this software for any purpose,
+  including commercial applications, and to alter it and redistribute it
+  freely, subject to the following restrictions:
 
-  1. The origin of this software must not be misrepresented; you must not 
-  claim that you wrote the original software. If you use this software 
-  in a product, an acknowledgment in the product documentation would be 
-  appreciated but is not required. 
-  2. Altered source versions must be plainly marked as such, and must not be 
-  misrepresented as being the original software. 
-  3. This notice may not be removed or altered from any source distribution. 
+  1. The origin of this software must not be misrepresented; you must not
+  claim that you wrote the original software. If you use this software
+  in a product, an acknowledgment in the product documentation would be
+  appreciated but is not required.
+  2. Altered source versions must be plainly marked as such, and must not be
+  misrepresented as being the original software.
+  3. This notice may not be removed or altered from any source distribution.
 
 *****************************************************************************/
 
@@ -35,7 +35,9 @@
 
 /****************************** GLUI_Separator::GLUI_Separator() **********/
 
-GLUI_Separator::GLUI_Separator( GLUI_Node *parent )
+GLUI_Separator::GLUI_Separator( GLUI_Node *parent, const char* name )
+     :    GLUI_Control(name)
+
 {
   common_init();
   parent->add_control( this );
@@ -43,35 +45,43 @@ GLUI_Separator::GLUI_Separator( GLUI_Node *parent )
 
 /****************************** GLUI_Separator::draw() **********/
 
-void    GLUI_Separator::draw( int x, int y )
+void    GLUI_Separator::draw( )
 {
-  GLUI_DRAWINGSENTINAL_IDIOM
-  
-  int width, indent;
-  int           cont_x, cont_y, cont_w, cont_h, cont_x_off, cont_y_off;
+    glMatrixMode( GL_MODELVIEW );
+    glPushMatrix();
 
-  if ( parent() != NULL ) {
-    get_this_column_dims(&cont_x, &cont_y, &cont_w, &cont_h, 
-			 &cont_x_off, &cont_y_off);
+    glTranslatef( (float) this->x_abs + .5,
+            (float) this->y_abs + .5,
+            0.0 );
 
-    width = cont_w - cont_x_off*2;
-  }
-  else {
-    width = this->w;
-  }
+    GLUI_DRAWINGSENTINAL_IDIOM
+        GLUI_Control* par;
 
-  indent = (int) floor(width * .05);
+    int width, indent;
 
-  glLineWidth( 1.0 );
-  glBegin( GL_LINES );
-  glColor3f( .5, .5, .5 );
-  glVertex2i( indent,       GLUI_SEPARATOR_HEIGHT/2-1 );    
-  glVertex2i( width-indent, GLUI_SEPARATOR_HEIGHT/2-1 );    
+    par = dynamic_cast<GLUI_Control*>(parent());
+    if ( par != NULL ) {
+        width = par->w;
+    }
+    else {
+        width = this->w;
+    }
 
-  glColor3f( 1., 1., 1. );
-  glVertex2i( indent,       GLUI_SEPARATOR_HEIGHT/2 );    
-  glVertex2i( width-indent, GLUI_SEPARATOR_HEIGHT/2 );    
-  glEnd();
+    indent = (int) floor(width * .05);
+
+    glLineWidth( 1.0 );
+    glBegin( GL_LINES );
+    glColor3f( .5, .5, .5 );
+    glVertex2i( indent,       GLUI_SEPARATOR_HEIGHT/2-1 );
+    glVertex2i( width-indent, GLUI_SEPARATOR_HEIGHT/2-1 );
+
+    glColor3f( 1., 1., 1. );
+    glVertex2i( indent,       GLUI_SEPARATOR_HEIGHT/2 );
+    glVertex2i( width-indent, GLUI_SEPARATOR_HEIGHT/2 );
+    glEnd();
+
+
+    glPopMatrix();
 }
 
 
