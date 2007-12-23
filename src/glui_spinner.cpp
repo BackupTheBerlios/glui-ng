@@ -249,6 +249,7 @@ int    GLUI_Spinner::key_handler( unsigned char key,int modifiers )
 
 void    GLUI_Spinner::draw( )
 {
+	edittext->draw();
     glMatrixMode( GL_MODELVIEW );
     glPushMatrix();
 
@@ -364,6 +365,7 @@ void   GLUI_Spinner::set_int_val( int new_val )
 void   GLUI_Spinner::update_size( void )
 {
   if (!edittext) return;
+  edittext->update_size();
   /*edittext->w = this->w - GLUI_SPINNER_ARROW_WIDTH-3;              */
   this->w = edittext->w + GLUI_SPINNER_ARROW_WIDTH + 3;
 }
