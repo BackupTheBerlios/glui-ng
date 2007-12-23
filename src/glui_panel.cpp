@@ -40,14 +40,17 @@ GLUI_Panel::GLUI_Panel( GLUI_Node *parent, const char *name, int type ):
   set_name( const_cast<char*>(name) );
   user_id    = -1;
   int_val    = type;
-
-  parent->add_control( this );
+  if (parent != NULL)
+	{
+	  parent->add_control( this );
+	}
 }
 
 /****************************** GLUI_Panel::draw() **********/
 
 void    GLUI_Panel::draw( )
 {
+	GLUI_Container::draw();
     glMatrixMode( GL_MODELVIEW );
     glPushMatrix();
 

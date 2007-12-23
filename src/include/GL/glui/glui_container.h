@@ -35,7 +35,7 @@
 
 enum GLUI_orientation {
     GLUI_horizontal,
-    GLUI_vertical,
+    GLUI_vertical
 };
 
 /************************************************************/

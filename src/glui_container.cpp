@@ -58,7 +58,7 @@ void GLUI_Container::update_size( void )
     //parse all childs updating their size firt
     while (NULL != node)
     {
-        child = dynamic_cast<GLUI_Control*>(this->first_child());
+        child = dynamic_cast<GLUI_Control*>(node);
         if ( NULL != child)
         {
             child->update_size();
@@ -94,7 +94,7 @@ void GLUI_Container::pack (int x, int y)
     //parse all childs updating their size firt
     while (NULL != node)
     {
-        child = dynamic_cast<GLUI_Control*>(this->first_child());
+        child = dynamic_cast<GLUI_Control*>(node);
         if ( NULL != child)
         {
             child->pack(this->x_abs + x_offset, this->y_abs + y_offset);

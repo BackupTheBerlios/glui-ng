@@ -546,6 +546,7 @@ GLUI  *GLUI_Master_Object::find_glui_by_window_id( int window_id )
 
 void    GLUI_Main::display( void )
 {
+	debug ("display\n");
   int       win_w, win_h;
 
   /* SUBTLE: on freeGLUT, the correct window is always already set.
@@ -990,6 +991,7 @@ GLUI_Control  *GLUI_Main::find_control( int x, int y, GLUI_Control * parent )
 
 void      GLUI_Main::pack_controls( void )
 {
+	main_panel->update_size();
   main_panel->pack(0,0);
 
   /**** Now align controls within their bounds ****/
