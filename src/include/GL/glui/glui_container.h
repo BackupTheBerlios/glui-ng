@@ -35,7 +35,8 @@
 
 enum GLUI_orientation {
     GLUI_horizontal,
-    GLUI_vertical
+    GLUI_vertical,
+	GLUI_parent
 };
 
 /************************************************************/
@@ -54,13 +55,13 @@ class GLUIAPI GLUI_Container : public GLUI_Control
                    GLUI_orientation orient=GLUI_vertical);
     virtual void update_size( void ); //<recursively update all control sizes
     virtual void pack ( int x, int y); //<recursively update positions
-    virtual void draw (void);  //<draw with the right size and position
+    virtual void translate_and_draw (void);  //<draw with the right size and position
     void set_orientation( GLUI_orientation new_orientation) {orientation = new_orientation; }
     virtual int min_w();
     virtual int min_h();
 
 
-    private :
+    protected :
     GLUI_orientation orientation;
 
 };

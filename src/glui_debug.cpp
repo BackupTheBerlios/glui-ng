@@ -53,7 +53,7 @@ GLUI_debug::~GLUI_debug()
   if ( use_debug != NULL ) delete buf;
 }
 
-int GLUI_debug::print(const char* format,...)
+int GLUI_debug::print(const char* file, int line, const char* format,...)
 {
 
     if (use_debug != NULL )
@@ -71,7 +71,7 @@ int GLUI_debug::print(const char* format,...)
     }
 }
 
-GLUI_debug* GLUI_debug::GLUI_debugInstance()
+GLUI_debug* GLUI_debug::Instance()
 {
     static GLUI_debug instance;
     return &instance;

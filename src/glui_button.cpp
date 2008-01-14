@@ -40,7 +40,6 @@ GLUI_Button::GLUI_Button( GLUI_Node *parent, const char *name,
   common_init();
   user_id     = id;
   callback    = cb;
-  set_name( const_cast<char*>(name) );
   currently_inside = false; 
   
   parent->add_control( this );
@@ -104,20 +103,11 @@ int    GLUI_Button::key_handler( unsigned char key,int modifiers )
 
 void    GLUI_Button::draw()
 {
-  glMatrixMode( GL_MODELVIEW );
-  glPushMatrix();
-
-  glTranslatef( (float) this->x_abs + .5,
-          (float) this->y_abs + .5,
-          0.0 );
-
-
   if (currently_inside) draw_pressed();
   else {
     glui->draw_raised_box( 0, 0, w, h );
-    draw_text( 0 );
+    //draw_text( 0 );
   }
-  glPopMatrix();
 }
 
 
@@ -127,7 +117,7 @@ void   GLUI_Button::draw_pressed( void )
 {
   glColor3f( 0.0, 0.0, 0.0 );
 
-  draw_text( 1 );
+  //draw_text( 1 );
 
   glBegin( GL_LINE_LOOP );
   glVertex2i( 0, 0 );         glVertex2i( w, 0 );
@@ -143,7 +133,7 @@ void   GLUI_Button::draw_pressed( void )
 
 /**************************************** GLUI_Button::draw_text() **********/
 
-void     GLUI_Button::draw_text( int sunken )
+/*void     GLUI_Button::draw_text( int sunken )
 {
   int string_width;
 
@@ -178,20 +168,6 @@ void     GLUI_Button::draw_text( int sunken )
     
     glDisable( GL_LINE_STIPPLE );
   }
-}
+}*/
 
 
-/************************************** GLUI_Button::update_size() **********/
-
-void   GLUI_Button::update_size( void )
-{
-  int text_size;
-
-  if ( NOT glui )
-    return;
-
-  text_size = string_width( name );
-
-  if ( w < text_size + 16 )
-    w = text_size + 16 ;
-}

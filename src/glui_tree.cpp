@@ -35,7 +35,8 @@ GLUI_Tree::GLUI_Tree(GLUI_Node *parent, const char *name,
                      int open, int inset):
     GLUI_Panel(name),
     button(this, ""),
-    splitter(this, "splitter")
+    splitter(this, "splitter"),
+    level_name(this->glui->font)
 
 {
   common_init();
@@ -194,19 +195,21 @@ void   GLUI_Tree::draw( )
     glEnd();
 
     if (format & GLUI_TREEPANEL_DISPLAY_HIERARCHY) {
-        delta_x = string_width( level_name ) + char_width(' ');
+		GLUI_Text space(level_name.get_font(), " ");
+        delta_x = level_name.graph_Width() + space.graph_Width();
         glColor3f( lred, lgreen, lblue);    /* The hierarchy is drawn in bold */
         glRasterPos2i(left + 25, top + 11);
-        draw_string(level_name);
+        level_name.draw();
         glRasterPos2i(left + 24, top + 11);
-        draw_string(level_name);
+        level_name.draw();
     }
 
-    draw_name( delta_x+left+24, top+11 );
-
-    if ( active )
-        draw_active_box( left+22, delta_x+left+string_width( name )+32,
-                top, bottom-2 );
+#warning "fix this"
+//    draw_name( delta_x+left+24, top+11 );
+//
+//    if ( active )
+//        draw_active_box( left+22, delta_x+left+string_width( name )+32,
+//                top, bottom-2 );
 
 
     /**   Draw '+' or '-'  **/
@@ -261,11 +264,12 @@ void   GLUI_Tree::update_size( void )
   if ( NOT glui )
     return;
 
-  text_size = string_width(name);
-
-  if (format & GLUI_TREEPANEL_DISPLAY_HIERARCHY) {
-    delta_x = string_width( level_name );
-  }
+#warning "fix this"
+//  text_size = string_width(name);
+//
+//  if (format & GLUI_TREEPANEL_DISPLAY_HIERARCHY) {
+//    delta_x = string_width( level_name );
+//  }
 
   if ( w < text_size + 36 + delta_x)
     w = text_size + 36 + delta_x;

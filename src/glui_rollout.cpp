@@ -173,13 +173,6 @@ int   GLUI_Rollout::mouse_up_handler( int local_x, int local_y, bool inside )
 
 void   GLUI_Rollout::draw( )
 {
-    glMatrixMode( GL_MODELVIEW );
-    glPushMatrix();
-
-    glTranslatef( (float) this->x_abs + .5,
-            (float) this->y_abs + .5,
-            0.0 );
-
 
     GLUI_DRAWINGSENTINAL_IDIOM
 
@@ -205,7 +198,8 @@ void   GLUI_Rollout::draw( )
     glVertex2i( right-1, bottom-1 );  glVertex2i( left+1, bottom-1 );
     glEnd();
 
-    draw_name( left+8, top+11 );
+#warning "fix this"
+//    draw_name( left+8, top+11 );
 
     if ( active )
         /*draw_active_box( left+4, left+string_width( name.c_str() )+12,       */
@@ -242,7 +236,6 @@ void   GLUI_Rollout::draw( )
     glLineWidth( 1.0 );
 
     if (currently_inside) {draw_pressed(); /* heavy black outline when pressed */ }
-    glPopMatrix();
 }
 
 
@@ -255,7 +248,9 @@ void   GLUI_Rollout::update_size( void )
   if ( NOT glui )
     return;
 
-  text_size = string_width(name);
+  GLUI_Container::update_size();
+#warning "fix this"
+//  text_size = string_width(name);
 
   if ( w < text_size + 36 )
     w = text_size + 36;

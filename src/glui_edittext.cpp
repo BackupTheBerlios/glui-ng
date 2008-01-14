@@ -120,7 +120,6 @@ void GLUI_EditText::common_construct( GLUI_Node *parent, const char *name,
                                       GLUI_CB cb )
 {
   common_init();
-  set_name( const_cast<char*>(name) );
 
   live_type   = live_t;
   data_type   = data_t;
@@ -140,6 +139,7 @@ void GLUI_EditText::common_construct( GLUI_Node *parent, const char *name,
   }
 
   parent->add_control( this );
+  text = new GLUI_Text (this->glui->font);
 
   init_live();
 }
@@ -197,7 +197,7 @@ int    GLUI_EditText::mouse_held_down_handler( int local_x, int local_y,
   if ( tmp_pt == -1 AND sel_end != 0 ) {    /* moved mouse past left edge */
     special_handler( GLUT_KEY_LEFT, GLUT_ACTIVE_SHIFT );
   }
-  else if ( tmp_pt == substring_end+1 AND sel_end != (int) text.length()) {
+  else if ( tmp_pt == substring_end+1 AND sel_end != (int) text->length()) {
     /* moved mouse past right edge */
     special_handler( GLUT_KEY_RIGHT, GLUT_ACTIVE_SHIFT );
   }
@@ -246,13 +246,13 @@ int    GLUI_EditText::key_handler( unsigned char key,int modifiers )
             ( key == CTRL('d') AND modifiers == GLUT_ACTIVE_CTRL) )
   {
     if ( sel_start == sel_end ) {   /* no selection */
-      if ( insertion_pt < (int)text.length() ) {
+      if ( insertion_pt < (int)text->length() ) {
         /*** See if we're deleting a period in a float data-type box ***/
-        if ( data_type == GLUI_EDITTEXT_FLOAT AND text[insertion_pt]=='.' )
+        if ( data_type == GLUI_EDITTEXT_FLOAT AND (*text)[insertion_pt]=='.' )
           num_periods--;
 
         /*** Shift over string first ***/
-        text.erase(insertion_pt,1);
+        text->erase(insertion_pt,1);
       }
     }
     else {                         /* There is a selection */
@@ -277,12 +277,12 @@ int    GLUI_EditText::key_handler( unsigned char key,int modifiers )
     if ( sel_start == sel_end ) {   /* no selection */
       if ( insertion_pt > 0 ) {
         /*** See if we're deleting a period in a float data-type box ***/
-        if ( data_type == GLUI_EDITTEXT_FLOAT AND text[insertion_pt-1]=='.' )
+        if ( data_type == GLUI_EDITTEXT_FLOAT AND (*text)[insertion_pt-1]=='.' )
           num_periods--;
 
         /*** Shift over string first ***/
         insertion_pt--;
-        text.erase(insertion_pt,1);
+        text->erase(insertion_pt,1);
       }
     }
     else {                         /* There is a selection */
@@ -314,12 +314,12 @@ int    GLUI_EditText::key_handler( unsigned char key,int modifiers )
     }
     else if ( key == CTRL('u') ) { /* ERASE LINE */
       insertion_pt = 0;
-      text.erase(0,text.length());
+      text->erase(0,text->length());
       sel_start = sel_end = 0;
     }
     else if ( key == CTRL('k') ) { /* KILL TO END OF LINE */
       sel_start = sel_end = insertion_pt;
-      text.erase(insertion_pt,std::string::npos);
+      text->erase(insertion_pt,std::string::npos);
     }
   }
   else if ( modifiers == GLUT_ACTIVE_ALT ) /* ALT ONLY */
@@ -352,7 +352,7 @@ int    GLUI_EditText::key_handler( unsigned char key,int modifiers )
                    MAX(sel_start,sel_end) > 0 ) ) {
 
           /* User does not have 1st char selected */
-          if (insertion_pt != 0 OR text[0] == '-' ) {
+          if (insertion_pt != 0 OR (*text)[0] == '-' ) {
             return true; /* Can only place negative at beginning of text,
                             and only one of them */
           }
@@ -360,7 +360,8 @@ int    GLUI_EditText::key_handler( unsigned char key,int modifiers )
       }
 
       if ( key == '.' ) {
-        debug( "PERIOD: %d\n", num_periods );
+		    GLUI_debug::Instance()->print( __FILE__, __LINE__,
+               "PERIOD: %d\n", num_periods );
 
         if ( num_periods > 0 ) {
           /** We're trying to type a period, but the text already contains
@@ -370,15 +371,17 @@ int    GLUI_EditText::key_handler( unsigned char key,int modifiers )
           int period_found = false;
           if ( sel_start != sel_end ) {
             for( i=MIN(sel_end,sel_start); i<MAX(sel_start,sel_end); i++ ) {
-              debug( "%c ", text[i] );
-              if ( text[i] == '.' ) {
+			  GLUI_debug::Instance()->print( __FILE__, __LINE__,
+                     "%c ", (*text)[i] );
+              if ( (*text)[i] == '.' ) {
                 period_found = true;
                 break;
               }
             }
           }
 
-          debug( "found: %d    num: %d\n", period_found, num_periods );
+		    GLUI_debug::Instance()->print( __FILE__, __LINE__,
+                 "found: %d    num: %d\n", period_found, num_periods );
 
           if ( NOT period_found )
             return true;
@@ -397,7 +400,7 @@ int    GLUI_EditText::key_handler( unsigned char key,int modifiers )
           MAX(sel_start,sel_end) > 0 ) ) {
 
             /* User does not have 1st char selected */
-            if (insertion_pt != 0 OR text[0] == '-' ) {
+            if (insertion_pt != 0 OR (*text)[0] == '-' ) {
               return true; /* Can only place negative at beginning of text,
                            and only one of them */
             }
@@ -420,7 +423,7 @@ int    GLUI_EditText::key_handler( unsigned char key,int modifiers )
 
     /******** We insert the character into the string ***/
 
-    text.insert(insertion_pt,1,key);
+    text->insert(insertion_pt,1,key);
 
     /******** Move the insertion point and substring_end one over ******/
     insertion_pt++;
@@ -446,8 +449,8 @@ int    GLUI_EditText::key_handler( unsigned char key,int modifiers )
 
   /*** Now look to see if this string has a period ***/
   num_periods = 0;
-  for( i=0; i<(int)text.length(); i++ )
-    if ( text[i] == '.' )
+  for( i=0; i<(int)text->length(); i++ )
+    if ( (*text)[i] == '.' )
       num_periods++;
 
   return true;
@@ -466,10 +469,10 @@ void    GLUI_EditText::activate( int how )
   if ( how == GLUI_ACTIVATE_MOUSE )
     return;  /* Don't select everything if activated with mouse */
 
-  orig_text = text;
+  orig_text = *text;
 
   sel_start    = 0;
-  sel_end      = (int)text.length();
+  sel_end      = (int)text->length();
   insertion_pt = 0;
 
   if ( debug )
@@ -497,24 +500,24 @@ void    GLUI_EditText::deactivate( void )
   /***** Retrieve the current value from the text *****/
   /***** The live variable will be updated by set_text() ****/
   if ( data_type == GLUI_EDITTEXT_FLOAT ) {
-    if ( text.length() == 0 ) /* zero-length string - make it "0.0" */
-      text = "0.0";
+    if ( text->length() == 0 ) /* zero-length string - make it "0.0" */
+      *(dynamic_cast<std::string*>(text)) = "0.0";
 
-    new_float_val = atof( text.c_str() );
+    new_float_val = atof( text->c_str() );
 
     set_float_val( new_float_val );
   }
   else if ( data_type == GLUI_EDITTEXT_INT ) {
-    if ( text.length() == 0 ) /* zero-length string - make it "0" */
-      text = "0";
+    if ( text->length() == 0 ) /* zero-length string - make it "0" */
+      *(dynamic_cast<std::string*>(text)) = "0";
 
-    new_int_val = atoi( text.c_str() );
+    new_int_val = atoi( text->c_str() );
 
     set_int_val( new_int_val );
   }
   else
     if ( data_type == GLUI_EDITTEXT_TEXT ) {
-      set_text(text); /* This will force callbacks and gfx refresh */
+      set_text(*text); /* This will force callbacks and gfx refresh */
     }
 
   update_substring_bounds();
@@ -523,7 +526,7 @@ void    GLUI_EditText::deactivate( void )
   redraw();
 
   /***** Now do callbacks if value changed ******/
-  if ( orig_text != text ) {
+  if ( orig_text != *text ) {
     this->execute_callback();
 
     if ( 0 ) {
@@ -547,18 +550,12 @@ void    GLUI_EditText::deactivate( void )
 
 void    GLUI_EditText::draw( void )
 {
-    glMatrixMode( GL_MODELVIEW );
-    glPushMatrix();
-
-    glTranslatef( (float) this->x_abs + .5,
-            (float) this->y_abs + .5,
-            0.0 );
-
     GLUI_DRAWINGSENTINAL_IDIOM
         int name_x;
 
-    name_x = MAX(text_x_offset - string_width(this->name) - 3,0);
-    draw_name( name_x , 13);
+#warning "fix this"
+    //name_x = MAX(text_x_offset - string_width(this->name) - 3,0);
+    //draw_name( name_x , 13);
 
     glBegin( GL_LINES );
     glColor3f( .5, .5, .5 );
@@ -586,8 +583,6 @@ void    GLUI_EditText::draw( void )
     draw_text(0,0);
 
     draw_insertion_pt();
-    glPopMatrix();
-
 }
 
 
@@ -597,7 +592,7 @@ void    GLUI_EditText::draw( void )
 int    GLUI_EditText::update_substring_bounds( void )
 {
   int box_width;
-  int text_len = (int)text.length();
+  int text_len = (int)text->length();
   int old_start, old_end;
 
   old_start = substring_start;
@@ -690,7 +685,8 @@ void    GLUI_EditText::draw_text( int x, int y )
 
   text_x = text_x_offset + 2 + GLUI_EDITTEXT_BOXINNERMARGINX;
 
-  debug( "text_x: %d      substr_width: %d     start/end: %d/%d\n",
+    GLUI_debug::Instance()->print( __FILE__, __LINE__,
+         "text_x: %d      substr_width: %d     start/end: %d/%d\n",
     text_x,     substring_width( substring_start, substring_end ),
     substring_start, substring_end );
 
@@ -705,7 +701,7 @@ void    GLUI_EditText::draw_text( int x, int y )
     sel_x_start = text_x;
     sel_x_end   = text_x;
     for( i=substring_start; i<=substring_end; i++ ) {
-      delta = char_width( text[i] );
+      delta = text->char_width( (*text)[i] );
 
       if ( i < sel_lo ) {
 	sel_x_start += delta;
@@ -732,7 +728,7 @@ void    GLUI_EditText::draw_text( int x, int y )
 
     glRasterPos2i( text_x, 13);
     for( i=substring_start; i<=substring_end; i++ ) {
-      glutBitmapCharacter( get_font(), this->text[i] );
+      glutBitmapCharacter( text->get_font(), (*text)[i] );
     }
   }
   else {                          /* There is a selection */
@@ -741,15 +737,15 @@ void    GLUI_EditText::draw_text( int x, int y )
       if ( IN_BOUNDS( i, sel_lo, sel_hi-1)) { /* This character is selected */
 	glColor3f( 1., 1., 1. );
 	glRasterPos2i( x, 13);
-	glutBitmapCharacter( get_font(), this->text[i] );
+	glutBitmapCharacter( text->get_font(), (*text)[i] );
       }
       else {
 	glColor3f( 0., 0., 0. );
 	glRasterPos2i( x, 13);
-	glutBitmapCharacter( get_font(), this->text[i] );
+	glutBitmapCharacter( text->get_font(), (*text)[i] );
       }
 
-      x += char_width( text[i] );
+      x += text->char_width( (*text)[i] );
     }
   }
 
@@ -779,15 +775,16 @@ int  GLUI_EditText::find_insertion_pt( int x, int y )
 					 between the text and the box       **/
 
   /*** See if we clicked in an empty box ***/
-  if ( (int) text.length() == 0 )
+  if ( (int) text->length() == 0 )
     return 0;
 
   /** find mouse click in text **/
   for( i=substring_end; i>=substring_start; i-- ) {
-    curr_x -= char_width( text[i] );
+    curr_x -= text->char_width( (*text)[i] );
 
     if ( x > curr_x ) {
-      debug( "-> %d\n", i );
+		  GLUI_debug::Instance()->print( __FILE__, __LINE__,
+             "-> %d\n", i );
 
       return i+1;
     }
@@ -825,7 +822,8 @@ void     GLUI_EditText::draw_insertion_pt( void )
     return;  /* Don't draw insertion point if there is a current selection */
   }
 
-  debug( "insertion pt: %d\n", insertion_pt );
+    GLUI_debug::Instance()->print( __FILE__, __LINE__,
+         "insertion pt: %d\n", insertion_pt );
 
   curr_x = this->x_abs + text_x_offset
     + substring_width( substring_start, substring_end )
@@ -834,7 +832,7 @@ void     GLUI_EditText::draw_insertion_pt( void )
 					 between the text and the box       **/
 
   for( i=substring_end; i>=insertion_pt; i-- ) {
-    curr_x -= char_width( text[i] );
+    curr_x -= text->char_width( (*text)[i] );
   }
 
   glColor3f( 0.0, 0.0, 0.0 );
@@ -866,7 +864,7 @@ int  GLUI_EditText::substring_width( int start, int end )
   width = 0;
 
   for( i=start; i<=end; i++ )
-    width += char_width( text[i] );
+    width += text->char_width( (*text)[i] );
 
   return width;
 }
@@ -880,7 +878,8 @@ void   GLUI_EditText::update_and_draw_text( void )
     return;
 
   update_substring_bounds();
-  debug( "ss: %d/%d\n", substring_start, substring_end );
+    GLUI_debug::Instance()->print( __FILE__, __LINE__,
+         "ss: %d/%d\n", substring_start, substring_end );
 
   redraw();
 }
@@ -893,7 +892,8 @@ int    GLUI_EditText::special_handler( int key,int modifiers )
   if ( NOT glui )
     return false;
 
-   debug( "SPECIAL:%d - mod:%d   subs:%d/%d  ins:%d  sel:%d/%d\n",
+	  GLUI_debug::Instance()->print( __FILE__, __LINE__,
+          "SPECIAL:%d - mod:%d   subs:%d/%d  ins:%d  sel:%d/%d\n",
 	    key, modifiers, substring_start, substring_end,insertion_pt,
 	    sel_start, sel_end );
 
@@ -917,7 +917,7 @@ int    GLUI_EditText::special_handler( int key,int modifiers )
     insertion_pt = 0;
   }
   else if ( key == GLUT_KEY_END ) {
-    insertion_pt = (int) text.length();
+    insertion_pt = (int) text->length();
   }
 
   /*** Update selection if shift key is down ***/
@@ -927,11 +927,11 @@ int    GLUI_EditText::special_handler( int key,int modifiers )
     sel_start = sel_end = insertion_pt;
 
 
-  CLAMP( insertion_pt, 0, (int) text.length()); /* Make sure insertion_pt
+  CLAMP( insertion_pt, 0, (int) text->length()); /* Make sure insertion_pt
 						                                      is in bounds */
-  CLAMP( sel_start, 0, (int) text.length()); /* Make sure insertion_pt
+  CLAMP( sel_start, 0, (int) text->length()); /* Make sure insertion_pt
 						                                    is in bounds */
-  CLAMP( sel_end, 0, (int) text.length()); /* Make sure insertion_pt
+  CLAMP( sel_end, 0, (int) text->length()); /* Make sure insertion_pt
 					                                     is in bounds */
 
   /******** Now redraw text ***********/
@@ -953,7 +953,7 @@ int    GLUI_EditText::find_word_break( int start, int direction )
 {
   int    i, j;
   char   *breaks = " :-.,";
-  int     num_break_chars = (int)strlen(breaks), text_len = (int)text.length();
+  int     num_break_chars = (int)strlen(breaks), text_len = (int)text->length();
   int     new_pt;
 
   /** If we're moving left, we have to start two back, in case we're either
@@ -968,7 +968,7 @@ int    GLUI_EditText::find_word_break( int start, int direction )
 
     /** For each character in text, iterate over list of separating tokens **/
     for( j=0; j<num_break_chars; j++ ) {
-      if ( text[i] == breaks[j] ) {
+      if ( (*text)[i] == breaks[j] ) {
 
         /** character 'i' is a separating token, so we return i+1 **/
         new_pt = i + 1;
@@ -996,17 +996,17 @@ void   GLUI_EditText::clear_substring( int start, int end )
   /*
   printf( "clearing: %d-%d   '", start,end);
   for(i=start;i<end;i++ )
-  putchar(text[i]);
+  putchar((*text)[i]);
   printf( "'\n" ); flushout;
   */
   /*** See if we're deleting a period in a float data-type box ***/
   if ( data_type == GLUI_EDITTEXT_FLOAT ) {
     for( i=start; i<end; i++ )
-      if ( text[i] == '.' )
+      if ( (*text)[i] == '.' )
         num_periods = 0;
   }
 
-  text.erase(start,end-start);
+  text->erase(start,end-start);
 }
 
 
@@ -1019,8 +1019,8 @@ void   GLUI_EditText::update_size( void )
 
   if ( NOT glui )
     return;
-
-  text_size = string_width( name );
+#warning "fix this"
+//  text_size = string_width( name );
 
   delta = 0;
   if ( text_x_offset < text_size +2 )
@@ -1045,9 +1045,9 @@ void   GLUI_EditText::update_size( void )
 
 void    GLUI_EditText::set_text( const char *new_text )
 {
-  text=new_text;
+  *(dynamic_cast<std::string*>(text))=new_text;
   substring_start = 0;
-  substring_end   = (int) text.length() - 1;
+  substring_end   = (int) text->length() - 1;
   insertion_pt    = -1;
   sel_start       = 0;
   sel_end         = 0;
@@ -1198,7 +1198,7 @@ void   GLUI_EditText::dump( FILE *out, const char *name )
            substring_end,
            sel_start,
            sel_end,
-           (int) text.length());
+           (int) text->length());
 }
 
 
@@ -1211,7 +1211,8 @@ int    GLUI_EditText::mouse_over( int state, int x, int y )
     glutSetCursor( GLUT_CURSOR_TEXT );
   }
   else {
-    debug ( "OUT\n" );
+	    GLUI_debug::Instance()->print( __FILE__, __LINE__,
+           "OUT\n" );
     glutSetCursor( GLUT_CURSOR_LEFT_ARROW );
   }
 

@@ -41,7 +41,9 @@ static const int LINE_HEIGHT = 15;
 
 GLUI_TextBox::GLUI_TextBox(GLUI_Node *parent, const char* name, std::string &live_var,
                            bool scroll, int id, GLUI_CB callback )
-    : GLUI_Container (name)
+    : GLUI_Container (name),
+    text(this->glui->font),
+    name(this->glui->font, name)
 
 {
   common_construct(parent, &live_var, scroll, id, callback);
@@ -51,7 +53,9 @@ GLUI_TextBox::GLUI_TextBox(GLUI_Node *parent, const char* name, std::string &liv
 
 GLUI_TextBox::GLUI_TextBox( GLUI_Node *parent, const char* name, bool scroll, int id,
                             GLUI_CB callback )
-    : GLUI_Container (name)
+    : GLUI_Container (name),
+    text(this->glui->font),
+    name(this->glui->font, name)
 {
   common_construct(parent, NULL, scroll, id, callback);
 }
@@ -91,6 +95,7 @@ void GLUI_TextBox::common_construct(
     scrollbar->set_alignment(GLUI_ALIGN_LEFT);
     // scrollbar->can_activate = false; //kills ability to mouse drag too
   }
+  text = GLUI_Text(glui->font);
   init_live();
 }
 
@@ -395,12 +400,6 @@ void    GLUI_TextBox::deactivate( void )
 
 void    GLUI_TextBox::draw( )
 {
-    glMatrixMode( GL_MODELVIEW );
-    glPushMatrix();
-
-    glTranslatef( (float) this->x_abs + .5,
-            (float) this->y_abs + .5,
-            0.0 );
 
   GLUI_DRAWINGSENTINAL_IDIOM
   int line = 0;
@@ -499,7 +498,6 @@ void    GLUI_TextBox::draw( )
     scrollbar->draw_scroll();
     glPopMatrix();
   }
-  glPopMatrix();
 }
 
 
@@ -607,7 +605,7 @@ void    GLUI_TextBox::draw_text( int x, int y )
           (delta == 0 || delta % tab_width))
           delta++;
         else
-          delta = char_width( text[i] );
+          delta = this->text.char_width(text[i]);
 
         if ( i < sel_lo ) {
           sel_x_start += delta;
@@ -636,8 +634,8 @@ void    GLUI_TextBox::draw_text( int x, int y )
         x_pos = ((x_pos-text_x)/tab_width)*tab_width+tab_width+text_x;
         glRasterPos2i( x_pos, y+LINE_HEIGHT); // Reposition pen after tab
       } else {
-        glutBitmapCharacter( get_font(), this->text[i] );
-        x_pos += char_width( this->text[i] );
+        glutBitmapCharacter( this->text.get_font(), this->text[i] );
+        x_pos += this->text.char_width( this->text[i] );
       }
     }
   }
@@ -651,7 +649,7 @@ void    GLUI_TextBox::draw_text( int x, int y )
          x_pos = ((x_pos-text_x)/tab_width)*tab_width+tab_width+text_x;
         }
         else
-          glutBitmapCharacter( get_font(), this->text[i] );
+          glutBitmapCharacter( this->text.get_font(), this->text[i] );
       }
       else {
         glColor3f( 0., 0., 0. );
@@ -660,10 +658,10 @@ void    GLUI_TextBox::draw_text( int x, int y )
           x_pos = ((x_pos-text_x)/tab_width)*tab_width+tab_width+text_x;
           glRasterPos2i( x_pos, y+LINE_HEIGHT); // Reposition pen after tab
         } else
-          glutBitmapCharacter( get_font(), this->text[i] );
+          glutBitmapCharacter( this->text.get_font(), this->text[i] );
       }
 
-      x_pos += char_width( text[i] );
+      x_pos += this->text.char_width( text[i] );
     }
   }
 
@@ -789,7 +787,8 @@ void     GLUI_TextBox::draw_insertion_pt( void )
 
   if ( debug )    dump( stdout, "-> DRAW_INS_PT" );
 
-  debug( "insertion pt: %d\n", insertion_pt );
+  GLUI_debug::Instance()->print( __FILE__, __LINE__,
+          "insertion pt: %d\n", insertion_pt );
 
   box_width = get_box_width();
 
@@ -881,7 +880,7 @@ int  GLUI_TextBox::substring_width( int start, int end, int initial_width )
 	    //  width++;
     }
     else
-      width += char_width( text[i] );
+      width += this->text.char_width( text[i] );
 
   return width;
 }
@@ -891,8 +890,9 @@ int  GLUI_TextBox::substring_width( int start, int end, int initial_width )
 
 void   GLUI_TextBox::update_and_draw_text( void )
 {
-  //update_substring_bounds();
-  debug( "ss: %d/%d\n", substring_start, substring_end );
+    //update_substring_bounds();
+    GLUI_debug::Instance()->print( __FILE__, __LINE__,
+            "ss: %d/%d\n", substring_start, substring_end );
 
   redraw();
 }
@@ -906,7 +906,8 @@ int    GLUI_TextBox::special_handler( int key,int modifiers )
   if ( NOT glui )
     return false;
 
-    debug( "SPECIAL:%d - mod:%d   subs:%d/%d  ins:%d  sel:%d/%d\n",
+    GLUI_debug::Instance()->print( __FILE__, __LINE__,
+        "SPECIAL:%d - mod:%d   subs:%d/%d  ins:%d  sel:%d/%d\n",
         key, modifiers, substring_start, substring_end,insertion_pt,
         sel_start, sel_end );
 
@@ -1079,8 +1080,9 @@ void    GLUI_TextBox::set_text( const char *new_text )
 
 void   GLUI_TextBox::dump( FILE *out, char *name )
 {
-  debug(
-       "%s (edittext@%p):   line:%d ins_pt:%d  subs:%d/%d  sel:%d/%d   len:%d\n",
+    GLUI_debug::Instance()->print( __FILE__, __LINE__,
+
+            "%s (edittext@%p):   line:%d ins_pt:%d  subs:%d/%d  sel:%d/%d   len:%d\n",
        name, this, curr_line,
        insertion_pt, substring_start, substring_end, sel_start, sel_end,
        text.length());
@@ -1096,7 +1098,8 @@ int    GLUI_TextBox::mouse_over( int state, int x, int y )
     glutSetCursor( GLUT_CURSOR_TEXT );
   }
   else {
-    debug( "OUT\n" );
+  GLUI_debug::Instance()->print( __FILE__, __LINE__,
+      "OUT\n" );
     glutSetCursor( GLUT_CURSOR_LEFT_ARROW );
   }
 

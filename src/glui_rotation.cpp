@@ -47,7 +47,8 @@ int    GLUI_Rotation::iaction_mouse_down_handler( int local_x, int local_y )
 
   ball->mouse_down( local_x, local_y );
 
-  debug( "%d %d - %f %f\n", local_x, local_y, ball->center[0], ball->center[1] );
+  GLUI_debug::Instance()->print( __FILE__, __LINE__,
+		  "%d %d - %f %f\n", local_x, local_y, ball->center[0], ball->center[1] );
 
   copy_ball_to_float_array();
 
@@ -82,7 +83,8 @@ int    GLUI_Rotation::iaction_mouse_held_down_handler( int local_x, int local_y,
 
   local_y = (int) floor(2.0 * ball->center[1] - local_y);
 
-  debug( "%d %d\n", local_x, local_y );
+  GLUI_debug::Instance()->print( __FILE__, __LINE__,
+		  "%d %d\n", local_x, local_y );
 
   ball->mouse_motion( local_x, local_y, 0, 
 		     (glui->curr_modifiers & GLUT_ACTIVE_ALT) != 0, 
@@ -186,7 +188,8 @@ int    GLUI_Rotation::iaction_special_handler( int key,int modifiers )
 
 void  GLUI_Rotation::init_ball( void )
 {
-  debug( "GLUI_Rotation::init_ball %f %f %f\n",
+  GLUI_debug::Instance()->print( __FILE__, __LINE__,
+		  "GLUI_Rotation::init_ball %f %f %f\n",
           float( MIN(w/2,h/2)), (float) w/2, (float) h/2 );
 
   ball->set_params( vec2( (float)(w/2), (float)((h-18)/2)), 
@@ -328,7 +331,7 @@ void  GLUI_Rotation::reset( void )
 
   copy_ball_to_float_array();
 
-  translate_and_draw_front();
+  translate_and_draw();
 
   output_live(true); /*** Output live and draw main grx window ***/
 }
@@ -360,7 +363,7 @@ void        GLUI_Rotation::idle( void )
     copy_ball_to_float_array();
 
     draw_active_area_only = true;
-    translate_and_draw_front();
+    translate_and_draw();
     draw_active_area_only = false;
 
     output_live(true); /** output live and update gfx **/
@@ -426,7 +429,6 @@ GLUI_Rotation::GLUI_Rotation( GLUI_Node *parent,
   common_init();
   set_ptr_val( value_ptr );
   user_id    = id;
-  set_name( const_cast<char*>( name ));
   callback    = cb;
   parent->add_control( this );
   init_live();
@@ -459,7 +461,6 @@ NO! WVB
 
 void GLUI_Rotation::common_init( void ) 
 {
-  glui_format_str( name, "Rotation: %p", this );
 //  type                = GLUI_CONTROL_ROTATION;
   w                   = GLUI_ROTATION_WIDTH;
   h                   = GLUI_ROTATION_HEIGHT;

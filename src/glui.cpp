@@ -129,8 +129,8 @@ int GLUI::init( const char *text, long flags, int x, int y, int parent_window )
 
   window_name = text;
   
-  buffer_mode = buffer_back;  ///< New smooth way
-  //buffer_mode = buffer_front; ///< Old flickery way (a bit faster).
+  //buffer_mode = buffer_back;  ///< New smooth way
+  buffer_mode = buffer_front; ///< Old flickery way (a bit faster).
 
   /*** We copy over the current window callthroughs ***/
   /*** (I think this might actually only be needed for subwindows) ***/
@@ -220,7 +220,8 @@ void glui_display_func(void)
 {
   GLUI *glui;
 
-  debug( "display func\n" );
+  GLUI_debug::Instance()->print( __FILE__, __LINE__,
+         "display func\n" );
 
   glui = GLUI_Master.find_glui_by_window_id( glutGetWindow() );
 
@@ -242,7 +243,8 @@ void glui_reshape_func(int w,int h )
   GLUI_Glut_Window *glut_window;
   int               current_window;
 
-  debug( "glui_reshape_func(): %d  w/h: %d/%d\n", glutGetWindow(), w, h );
+  GLUI_debug::Instance()->print( __FILE__, __LINE__,
+         "glui_reshape_func(): %d  w/h: %d/%d\n", glutGetWindow(), w, h );
 
   current_window = glutGetWindow();
 
@@ -285,7 +287,8 @@ void glui_keyboard_func(unsigned char key, int x, int y)
   current_window = glutGetWindow();
   glut_window = GLUI_Master.find_glut_window( current_window );
 
-  debug( "key: %d\n", current_window );
+  GLUI_debug::Instance()->print( __FILE__, __LINE__,
+         "key: %d\n", current_window );
 
   if ( glut_window ) { /**  Was event in a GLUT window?  **/
     if ( GLUI_Master.active_control_glui AND GLUI_Master.active_control ) {
@@ -433,7 +436,8 @@ void glui_visibility_func(int state)
 {
   GLUI *glui;
 
-  debug( "IN GLUI VISIBILITY()\n" );
+  GLUI_debug::Instance()->print( __FILE__, __LINE__,
+         "IN GLUI VISIBILITY()\n" );
   /*  fflush( stdout );          */
 
   glui = GLUI_Master.find_glui_by_window_id( glutGetWindow() );
@@ -486,10 +490,11 @@ void glui_idle_func(void)
 /*********************************** GLUI_Master_Object::GLUI_Master_Object() ******/
 
 GLUI_Master_Object::GLUI_Master_Object()
-    :   glui_id_counter(1)
-    ,   glut_idle_CB(NULL)
-    ,   gluis("gluis")
+    :   gluis("gluis")
+	,   glui_id_counter(1)
     ,   glut_windows("glut_windows")
+    ,   glut_idle_CB(NULL)
+
 {
 }
 
@@ -546,7 +551,8 @@ GLUI  *GLUI_Master_Object::find_glui_by_window_id( int window_id )
 
 void    GLUI_Main::display( void )
 {
-	debug ("display\n");
+  GLUI_debug::Instance()->print( __FILE__, __LINE__,
+	      "display\n");
   int       win_w, win_h;
 
   /* SUBTLE: on freeGLUT, the correct window is always already set.
@@ -608,7 +614,7 @@ void    GLUI_Main::display( void )
   //  main_panel->draw_bkgd_box( 0, 0, win_w, win_h );
   main_panel->update_size();
   main_panel->pack(0, 0);
-  main_panel->draw();
+  main_panel->translate_and_draw();
 
   switch (buffer_mode) {
   case buffer_front: /* Make sure drawing gets to screen */
@@ -622,35 +628,6 @@ void    GLUI_Main::display( void )
 
 
 
-
-/*************************************** _glutBitmapWidthString() **********/
-
-int _glutBitmapWidthString( void *font, const char *s )
-{
-  const char *p = s;
-  int  width = 0;
-
-  while( *p != '\0' )  {
-    width += glutBitmapWidth( font, *p );
-    p++;
-  }
-
-  return width;
-}
-
-/************************************ _glutBitmapString *********************/
-/* Displays the contents of a string using GLUT's bitmap character function */
-/* Does not handle newlines                                             */
-
-void _glutBitmapString( void *font, const char *s )
-{
-  const char *p = s;
-
-  while( *p != '\0' )  {
-    glutBitmapCharacter( font, *p );
-    p++;
-  }
-}
 
 
 
@@ -690,7 +667,8 @@ void    GLUI_Main::reshape( int reshape_w, int reshape_h )
   
   glViewport( 0, 0, new_w, new_h );
 
-  debug( "%d: %d\n", glutGetWindow(), this->flags );
+  GLUI_debug::Instance()->print( __FILE__, __LINE__,
+         "%d: %d\n", glutGetWindow(), this->flags );
 
   glutPostRedisplay();
 }
@@ -716,7 +694,8 @@ void    GLUI_Main::keyboard(unsigned char key, int x, int y)
     }
 
     if ( new_control ) {
-        debug( "new_control: %s\n", new_control->NodeName );
+  GLUI_debug::Instance()->print( __FILE__, __LINE__,
+               "new_control: %s\n", new_control->NodeName );
 	}
 
     deactivate_current_control();
@@ -758,7 +737,8 @@ void    GLUI_Main::mouse(int button, int state, int x, int y)
   int callthrough;
   GLUI_Control *control;
 
-  debug( "MOUSE: %d %d\n", button, state );
+  GLUI_debug::Instance()->print( __FILE__, __LINE__,
+         "MOUSE: %d %d\n", button, state );
 
   callthrough = true;
 
@@ -768,7 +748,8 @@ void    GLUI_Main::mouse(int button, int state, int x, int y)
     control = find_control( x, y );
 
     if ( control ) {
-        debug( "control: %s\n", control->NodeName );
+  GLUI_debug::Instance()->print( __FILE__, __LINE__,
+               "control: %s\n", control->NodeName );
     }
 
     if ( mouse_button_down AND active_control != NULL AND
@@ -831,7 +812,8 @@ void    GLUI_Main::motion(int x, int y)
   int           callthrough;
   GLUI_Control *control;
 
-  debug( "MOTION: %d %d\n", x, y );
+  GLUI_debug::Instance()->print( __FILE__, __LINE__,
+         "MOTION: %d %d\n", x, y );
 
   callthrough = true;
 
@@ -861,7 +843,8 @@ void    GLUI_Main::passive_motion(int x, int y)
 
   control = find_control( x, y );
 
-  debug( "%p %p\n", control, mouse_over_control );
+  GLUI_debug::Instance()->print( __FILE__, __LINE__,
+         "%p %p\n", control, mouse_over_control );
 
   if ( control != mouse_over_control ) {
     if ( mouse_over_control ) {
@@ -906,7 +889,8 @@ void    GLUI_Main::idle(void)
 {
   /*** Pass the idle event onto the active control, if any ***/
 
-  debug( "IDLE \t" );
+  GLUI_debug::Instance()->print( __FILE__, __LINE__,
+         "IDLE \t" );
 
   if ( active_control != NULL ) {
     /* First we check if the control actually needs the idle right now.
@@ -974,14 +958,16 @@ GLUI_Control  *GLUI_Main::find_control( int x, int y, GLUI_Control * parent )
             }
         }
         if( parent == NULL ) {
-            debug ( "found ctrl: '%s'\n",
+			GLUI_debug::Instance()->print( __FILE__, __LINE__,
+                   "found ctrl: '%s'\n",
                     dynamic_cast<GLUI_Node*>(found)->whole_tree() );
         }
         return found;
     }
     else
     {
-        debug (" not in %s.... skipping the whole tree \n", node->NodeName);
+	  GLUI_debug::Instance()->print( __FILE__, __LINE__,
+              " not in %s.... skipping the whole tree \n", node->NodeName);
         return NULL;
     }
 
@@ -1009,7 +995,8 @@ void      GLUI_Main::pack_controls( void )
 
     glutSetWindow( orig_window );
 
-    debug( "%d %d\n", parent_h, parent_w );
+  GLUI_debug::Instance()->print( __FILE__, __LINE__,
+           "%d %d\n", parent_h, parent_w );
 
     if ( 1 ) {
         if ( TEST_AND(this->flags,GLUI_SUBWINDOW_TOP )) {
@@ -1150,7 +1137,6 @@ GLUI_Main::GLUI_Main( void )
   main_panel              = new GLUI_Panel(NULL, "root panel");
   main_panel->set_int_val( GLUI_PANEL_NONE );
   main_panel->glui        = (GLUI*) this;
-  main_panel->name        = "\0";
 }
 
 /************************************ GLUI_Main::draw_raised_box() **********/
@@ -1240,7 +1226,8 @@ void         GLUI_Main::activate_control( GLUI_Control *control, int how )
     active_control = NULL;
   }
 
-  debug( "activate: %d\n", glutGetWindow() );
+  GLUI_debug::Instance()->print( __FILE__, __LINE__,
+         "activate: %d\n", glutGetWindow() );
   GLUI_Master.active_control      = active_control;
   GLUI_Master.active_control_glui = (GLUI*) this;
 }
@@ -1271,7 +1258,8 @@ void         GLUI_Main::deactivate_current_control( void )
     active_control = NULL;
   }
 
-  debug( "deactivate: %d\n", glutGetWindow() );
+  GLUI_debug::Instance()->print( __FILE__, __LINE__,
+         "deactivate: %d\n", glutGetWindow() );
   GLUI_Master.active_control      = NULL;
   GLUI_Master.active_control_glui = NULL;
 }
@@ -1704,7 +1692,8 @@ void glui_parent_window_reshape_func( int w, int h )
   GLUI  *glui;
   int   first = true;
 
-  debug( "glui_parent_window_reshape_func: %d\n", glutGetWindow() );
+  GLUI_debug::Instance()->print( __FILE__, __LINE__,
+			"glui_parent_window_reshape_func: %d\n", glutGetWindow() );
 
   current_window = glutGetWindow();
 
@@ -1732,7 +1721,8 @@ void glui_parent_window_reshape_func( int w, int h )
 
 void glui_parent_window_keyboard_func(unsigned char key, int x, int y)
 {
-  debug( "glui_parent_window_keyboard_func: %d\n", glutGetWindow() );
+  GLUI_debug::Instance()->print( __FILE__, __LINE__,
+         "glui_parent_window_keyboard_func: %d\n", glutGetWindow() );
 
   int   current_window;
   GLUI  *glui;
@@ -1767,7 +1757,8 @@ void glui_parent_window_keyboard_func(unsigned char key, int x, int y)
 
 void glui_parent_window_special_func(int key, int x, int y)
 {
-  debug( "glui_parent_window_special_func: %d\n", glutGetWindow() );
+  GLUI_debug::Instance()->print( __FILE__, __LINE__,
+         "glui_parent_window_special_func: %d\n", glutGetWindow() );
 
   int   current_window;
   GLUI  *glui;

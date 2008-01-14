@@ -105,16 +105,16 @@ void GLUI_Spinner::common_construct( GLUI_Node* parent, const char *name,
     assert(0); /* Did not pass in a valid data type */
   }
 
+  orientation = GLUI_horizontal;
   user_id     = id;
   data_type   = data_t;
   callback    = cb;
-  set_name( const_cast<char*>(name) );
   //glui        = parent->get_glui();
 
   parent->add_control( this );
 
   GLUI_EditText *txt =
-    new GLUI_EditText( this, name, text_type, data, id, cb);
+    new GLUI_EditText( this, "edit_text", text_type, data, id, cb);
 
   edittext    = txt;  /* Link the edittext to the spinner */
   /*      control->ptr_val     = data;               */
@@ -129,8 +129,8 @@ int    GLUI_Spinner::mouse_down_handler( int local_x, int local_y )
 {
   this->state = find_arrow( local_x, local_y );
   GLUI_Master.glui_setIdleFuncIfNecessary();
-
-  debug( "spinner: mouse down  : %d/%d   arrow:%d\n", local_x, local_y,
+  GLUI_debug::Instance()->print( __FILE__, __LINE__,
+		  "spinner: mouse down  : %d/%d   arrow:%d\n", local_x, local_y,
       find_arrow( local_x, local_y ));
 
   if ( state != GLUI_SPINNER_STATE_UP AND state != GLUI_SPINNER_STATE_DOWN )
@@ -162,8 +162,8 @@ int    GLUI_Spinner::mouse_up_handler( int local_x, int local_y, bool inside )
 {
   state = GLUI_SPINNER_STATE_NONE;
   GLUI_Master.glui_setIdleFuncIfNecessary();
-
-  debug("spinner: mouse up  : %d/%d    inside: %d\n",local_x,local_y,inside);
+  GLUI_debug::Instance()->print( __FILE__, __LINE__,
+		  "spinner: mouse up  : %d/%d    inside: %d\n",local_x,local_y,inside);
 
   /*glutSetCursor( GLUT_CURSOR_INHERIT );              */
   glutSetCursor( GLUT_CURSOR_LEFT_ARROW );
@@ -187,7 +187,8 @@ int    GLUI_Spinner::mouse_held_down_handler( int local_x, int local_y,
   if ( state == GLUI_SPINNER_STATE_NONE )
     return false;
 
-  debug("spinner: mouse held: %d/%d    inside: %d\n",local_x,local_y,
+  GLUI_debug::Instance()->print( __FILE__, __LINE__,
+		  "spinner: mouse held: %d/%d    inside: %d\n",local_x,local_y,
       new_inside);
 
   if ( state == GLUI_SPINNER_STATE_BOTH ) {   /* dragging? */
@@ -249,13 +250,8 @@ int    GLUI_Spinner::key_handler( unsigned char key,int modifiers )
 
 void    GLUI_Spinner::draw( )
 {
-	edittext->draw();
-    glMatrixMode( GL_MODELVIEW );
-    glPushMatrix();
-
-    glTranslatef( (float) this->x_abs + .5,
-            (float) this->y_abs + .5,
-            0.0 );
+#warning "check if this line has to be commented"
+	//edittext->draw();
     GLUI_DRAWINGSENTINAL_IDIOM
 
         if ( enabled ) {
@@ -307,7 +303,6 @@ void    GLUI_Spinner::draw( )
     glEnd();
     glDisable( GL_LINE_STIPPLE );
     glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-    glPopMatrix();
 }
 
 
@@ -594,7 +589,8 @@ void    GLUI_Spinner::increase_growth( void )
   if ( growth < (hi-lo) / GLUI_SPINNER_MIN_GROWTH_STEPS )
     growth *= growth_exp;
 
-  debug( "growth: %f\n", growth );
+  GLUI_debug::Instance()->print( __FILE__, __LINE__,
+		  "growth: %f\n", growth );
 }
 
 
@@ -603,7 +599,8 @@ void    GLUI_Spinner::increase_growth( void )
 const char    *GLUI_Spinner::get_text( void )
 {
   if (edittext)
-    return edittext->text.c_str();
+    //return dynamic_cast<std::string*>(edittext->text.c_str();
+    return edittext->get_text();
   else
     return "";
 }

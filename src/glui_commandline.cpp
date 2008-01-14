@@ -39,7 +39,6 @@ GLUI_CommandLine::GLUI_CommandLine( GLUI_Node *parent, const char *name,
     : GLUI_EditText (this, name)
 {
   common_init();
-  set_name( const_cast<char*>(name) );
     
   data_type   = GLUI_EDITTEXT_TEXT;
   ptr_val     = data;
@@ -90,14 +89,14 @@ void    GLUI_CommandLine::deactivate( void )
   // are the same to decide whether or not to call the callback.
   // Force them to be different for commit, and the same for no commit.
   if (commit_flag) {
-    add_to_history(text.c_str());
+    add_to_history(text->c_str());
     orig_text = "";
     Super::deactivate( );
     set_text( "" );
     commit_flag = false;
   }
   else {
-    orig_text = text;
+    orig_text = *text;
   }
 }
 
@@ -147,12 +146,12 @@ void    GLUI_CommandLine::recall_history( int hist_num )
 
   // Commit the current text first before we blow it away!
   if (curr_hist == newest_hist) {
-    get_history_str(newest_hist) = text;
+    get_history_str(newest_hist) = *text;
   }
 
   curr_hist = hist_num;
   set_text(get_history_str(curr_hist));
-  sel_end = sel_start = insertion_pt = (int)text.length();
+  sel_end = sel_start = insertion_pt = (int)text->length();
   update_and_draw_text();
 }
 
@@ -163,7 +162,7 @@ void    GLUI_CommandLine::add_to_history( const char *cmd )
   if (cmd[0]=='\0') return; // don't add if it's empty
 
   curr_hist = newest_hist;
-  get_history_str(newest_hist) = text;
+  get_history_str(newest_hist) = *text;
 
   newest_hist = ++curr_hist;
   if ( newest_hist >= HIST_SIZE )
@@ -193,7 +192,7 @@ void   GLUI_CommandLine::dump( FILE *out, const char *name )
 	   "%s (commandline@%p):  ins_pt:%d  subs:%d/%d  sel:%d/%d   len:%d\n",
 	   name, this, 
 	   insertion_pt, substring_start, substring_end, sel_start, sel_end,
-	   (int)text.length());
+	   (int)text->length());
 }
 
 

@@ -113,11 +113,11 @@ void GLUI_Container::pack (int x, int y)
 
 }
 
-void GLUI_Container::draw (void)
+void GLUI_Container::translate_and_draw (void)
 {
   GLUI_Control *node;
-
-  debug ( "%s %s hidden(%d)\n",__func__,
+  GLUI_debug::Instance()->print( __FILE__, __LINE__,
+          "%s %s hidden(%d)\n",__func__,
           dynamic_cast<GLUI_Node*>(this)->whole_tree(),
           this->hidden );
   if ( ! can_draw() )
@@ -134,23 +134,29 @@ void GLUI_Container::draw (void)
 
   glMatrixMode( GL_MODELVIEW );
   glPushMatrix();
-
+  //glLoadIdentity();
   glTranslatef( (float) this->x_abs + .5,
           (float) this->y_abs + .5,
           0.0 );
-
-  /* The following draws the area of each control              */
+/*
+  // The following draws the area of each control
   glColor3f( 1.0, 0.0, 0.0 );
   glBegin( GL_LINE_LOOP );
   glVertex2i( 0, 0 ); glVertex2i( w, 0 );
   glVertex2i( w, h ); glVertex2i( 0, h );
   glEnd();
-
+*/
   node = dynamic_cast<GLUI_Control*>(first_child());
   while( node ) {
-    node->draw();
+    node->translate_and_draw();
     node = dynamic_cast<GLUI_Control*>(node->next());
   }
 
+  draw();
+
   glPopMatrix();
+    if (DEBUG && glui->get_buffer_mode() == GLUI_Main::buffer_front) {
+	  glFlush();
+  }
+
 }

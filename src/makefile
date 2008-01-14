@@ -8,7 +8,7 @@
 OPTS+=-g
 OPTS+=-O0
 #OPTS+=-O2
-OPTS+=-DDEBUG
+OPTS+=-DDEBUG=1
 
 UNAME = $(shell uname)
 
@@ -38,6 +38,8 @@ LIBS    = -lXmu -lXext -lX11 -lXi -lm
 # (3) GLUT
 LIBGLUT   = -L/usr/X11R6/lib -lglut
 CPPFLAGS += -I/usr/X11R6/include
+
+GLUI_HEADERS = $(shell ls include/GL/glui)
 
 #######################################
 
@@ -70,10 +72,10 @@ bin/%: example/%.cpp $(GLUI_LIB)
 $(GLUI_LIB): $(GLUI_OBJS)
 	ar -r $(GLUI_LIB) $(GLUI_OBJS)
 
-.cpp.o:
+.cpp.o: ${GLUI_HEADERS}
 	$(CXX) $(CPPFLAGS) -c $<
 
-.c.o:
+.c.o: ${GLUI_HEADERS}
 	$(CXX) $(CPPFLAGS) -c $<
 
 docs:
@@ -82,9 +84,6 @@ docs:
 clean:
 	rm -f *.o $(GLUI_LIB) $(GLUI_EXAMPLES) $(GLUI_TOOLS) 
 	rm -fr doc/doxygen
-
-depend:
-	makedepend -Y./include `find -name "*.cpp"` `find -name "*.c"`
 
 DIST = glui-2.35
 
@@ -119,44 +118,3 @@ dist: clean
 	rm -Rf $(DIST)
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
-
-./algebra3.o: algebra3.h glui_internal.h
-./arcball.o: arcball.h glui_internal.h algebra3.h quaternion.h
-./glui_button.o: ./include/GL/glui.h glui_internal.h
-./glui_checkbox.o: ./include/GL/glui.h glui_internal.h
-./glui_column.o: ./include/GL/glui.h glui_internal.h
-./glui_control.o: ./include/GL/glui.h glui_internal.h
-./glui_edittext.o: ./include/GL/glui.h glui_internal.h
-./glui_listbox.o: ./include/GL/glui.h glui_internal.h
-./glui_mouse_iaction.o: ./include/GL/glui.h glui_internal.h
-./glui_node.o: ./include/GL/glui.h glui_internal.h
-./glui_panel.o: ./include/GL/glui.h glui_internal.h
-./glui_radio.o: ./include/GL/glui.h glui_internal.h
-./glui_rollout.o: ./include/GL/glui.h glui_internal.h
-./glui_rotation.o: ./include/GL/glui.h arcball.h glui_internal.h algebra3.h
-./glui_rotation.o: quaternion.h
-./glui_separator.o: ./include/GL/glui.h glui_internal.h
-./glui_spinner.o: ./include/GL/glui.h glui_internal.h
-./glui_translation.o: ./include/GL/glui.h glui_internal.h algebra3.h
-./glui_window.o: ./include/GL/glui.h glui_internal.h
-./quaternion.o: quaternion.h algebra3.h glui_internal.h
-./viewmodel.o: viewmodel.h algebra3.h ./include/GL/glui.h
-./glui_bitmaps.o: ./include/GL/glui.h glui_internal.h
-./glui_statictext.o: ./include/GL/glui.h glui_internal.h
-./glui.o: ./include/GL/glui.h glui_internal.h
-./glui_add_controls.o: ./include/GL/glui.h glui_internal.h
-./glui_commandline.o: ./include/GL/glui.h glui_internal.h
-./glui_list.o: ./include/GL/glui.h glui_internal.h
-./glui_scrollbar.o: ./include/GL/glui.h glui_internal.h
-./glui_string.o: ./include/GL/glui.h
-./glui_textbox.o: ./include/GL/glui.h glui_internal.h
-./glui_tree.o: ./include/GL/glui.h glui_internal.h
-./glui_treepanel.o: ./include/GL/glui.h
-./example/example1.o: ./include/GL/glui.h
-./example/example2.o: ./include/GL/glui.h
-./example/example3.o: ./include/GL/glui.h
-./example/example4.o: ./include/GL/glui.h
-./example/example5.o: ./include/GL/glui.h
-./example/example6.o: ./include/GL/glui.h
-./tools/ppm2array.o: ./tools/ppm.hpp
-./glui_filebrowser.o: ./include/GL/glui.h glui_internal.h

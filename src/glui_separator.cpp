@@ -47,12 +47,6 @@ GLUI_Separator::GLUI_Separator( GLUI_Node *parent, const char* name )
 
 void    GLUI_Separator::draw( )
 {
-    glMatrixMode( GL_MODELVIEW );
-    glPushMatrix();
-
-    glTranslatef( (float) this->x_abs + .5,
-            (float) this->y_abs + .5,
-            0.0 );
 
     GLUI_DRAWINGSENTINAL_IDIOM
         GLUI_Control* par;
@@ -81,7 +75,6 @@ void    GLUI_Separator::draw( )
     glEnd();
 
 
-    glPopMatrix();
 }
 
 

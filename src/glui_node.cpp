@@ -213,14 +213,18 @@ void   GLUI_Node::unlink( void )
 
 void GLUI_Node::dump( FILE *out, const char *name )
 {
-    debug( "GLUI_node: %s\n", name );
-    debug( "   parent: %p     child_head: %p    child_tail: %p\n",
-        (void *) parent_node,
-        (void *) child_head,
-        (void *) child_tail );
-    debug( "   next: %p       prev: %p\n",
-        (void *) next_sibling,
-        (void *) prev_sibling );
+	GLUI_debug::Instance()->print( __FILE__, __LINE__,
+
+			"GLUI_node: %s\n", name );
+	GLUI_debug::Instance()->print( __FILE__, __LINE__,
+			"   parent: %p     child_head: %p    child_tail: %p\n",
+			(void *) parent_node,
+			(void *) child_head,
+			(void *) child_tail );
+	GLUI_debug::Instance()->print( __FILE__, __LINE__,
+			"   next: %p       prev: %p\n",
+			(void *) next_sibling,
+			(void *) prev_sibling );
 }
 
 const char* GLUI_Node::whole_tree(int start)

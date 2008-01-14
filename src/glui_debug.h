@@ -42,10 +42,10 @@ const size_t ISIZE = 500;
 class GLUI_debug
 {
     public :
-        static GLUI_debug* GLUI_debugInstance();
+        static GLUI_debug* Instance();
 
         ~GLUI_debug();
-        int print(const char* format,...);
+        int print(const char* file, int line, const char* format,...);
 
     private:
         GLUI_debug();

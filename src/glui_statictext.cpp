@@ -35,39 +35,38 @@
 
 /****************************** GLUI_StaticText::GLUI_StaticText() **********/
 GLUI_StaticText::GLUI_StaticText( GLUI_Node *parent, const char *name )
-    :    GLUI_Control("separator")
+    :    GLUI_Control(name), GLUI_Text(GLUT_BITMAP_HELVETICA_12)
 
 {
+  GLUI_Control* ctrl;
   common_init();
-  set_name( const_cast<char*>(name) );
   parent->add_control( this );
+  ctrl = dynamic_cast<GLUI_Control*>(this);
+  if (ctrl)
+	{
+		set_font(ctrl->glui->font);
+	}
 }
 
 /****************************** GLUI_StaticText::draw() **********/
 
 void    GLUI_StaticText::draw( )
 {
-    glMatrixMode( GL_MODELVIEW );
-    glPushMatrix();
-
-    glTranslatef( (float) this->x_abs + .5,
-            (float) this->y_abs + .5,
-            0.0 );
-
 
     GLUI_DRAWINGSENTINAL_IDIOM
+  if ( NOT can_draw() )
+    return;
 
-        draw_text();
-
-    glPopMatrix();
+  erase_text();
+  GLUI_Text::draw();
 }
 
 
 /****************************** GLUI_StaticText::set_text() **********/
 
-void    GLUI_StaticText::set_text( char *text )
+void    GLUI_StaticText::set_text(const char *text )
 {
-  set_name( text );
+  *(dynamic_cast<std::string*>(this)) = text;
   redraw();
 }
 
@@ -76,28 +75,11 @@ void    GLUI_StaticText::set_text( char *text )
 
 void   GLUI_StaticText::update_size( void )
 {
-  int text_size;
-
-  if ( NOT glui )
-    return;
-
-  text_size = string_width( name );
-
-  if ( w < text_size )
-    w = text_size;    
+	w = GLUI_Text::graph_Length( );
+	h = GLUI_Text::graph_Width( );
 }
 
 
-/****************************** GLUI_StaticText::draw_text() **********/
-
-void    GLUI_StaticText::draw_text( void )
-{
-  if ( NOT can_draw() )
-    return;
-
-  erase_text();
-  draw_name( 0, 9 );
-}
 
 
 /****************************** GLUI_StaticText::erase_text() **********/

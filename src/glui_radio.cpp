@@ -57,12 +57,19 @@ GLUI_RadioGroup::GLUI_RadioGroup(GLUI_Node *parent,
 
   user_id    = id;
   glui_format_str( buf, "RadioGroup: %p", this );
-  set_name( const_cast<char*>(buf.c_str()) );
+  title = new GLUI_StaticText(this,"title");
+  title->set_text(name);
   callback   = cb;
 
   parent->add_control( this );
 
   init_live();
+}
+
+
+GLUI_RadioGroup::~GLUI_RadioGroup()
+{
+	delete title;
 }
 
 
@@ -95,7 +102,7 @@ void    GLUI_RadioGroup::draw()
 
 void    GLUI_RadioGroup::set_name( char *text )
 {
-  name = text;
+  title->set_text(text);
 
   if ( glui )
     glui->refresh();
@@ -140,7 +147,6 @@ GLUI_RadioButton::GLUI_RadioButton( GLUI_RadioGroup *grp, const char *name ) :
   /** A radio button's user id is always its ordinal number (zero-indexed)
       within the group */
   user_id    = grp->num_buttons;
-  set_name( const_cast<char*>(name) );
   group = grp;
 
   group->num_buttons++;   /* Increments radiogroup's button count */
@@ -223,12 +229,6 @@ int    GLUI_RadioButton::mouse_up_handler( int local_x, int local_y,
 #warning "remove draw_checked and draw_unchecked to use this"
 void    GLUI_RadioButton::draw(void)
 {
-    glMatrixMode( GL_MODELVIEW );
-    glPushMatrix();
-
-    glTranslatef( (float) this->x_abs + .5,
-            (float) this->y_abs + .5,
-            0.0 );
 
 
     GLUI_DRAWINGSENTINAL_IDIOM
@@ -252,12 +252,12 @@ void    GLUI_RadioButton::draw(void)
 
     draw_active_area();
 
-    draw_name( text_x_offset, 10 );
-    glPopMatrix();
+#warning "is this correct"
+	GLUI_Container::translate_and_draw();
 
 }
 
-
+#warning "add pack function"
 /************************************ GLUI_RadioButton::draw_checked() ******/
 
 void   GLUI_RadioButton::draw_checked( void )
@@ -324,25 +324,12 @@ void   GLUI_RadioButton::draw_O( void )
 
 /******************************** GLUI_RadioButton::update_size() **********/
 
-void   GLUI_RadioButton::update_size( void )
-{
-  int text_size;
-
-  if ( NOT glui )
-    return;
-
-  text_size = _glutBitmapWidthString( glui->font, name.c_str() );
-
-  /*  if ( w < text_x_offset + text_size + 6 )              */
-  w = text_x_offset + text_size + 6 ;
-}
-
 
 /************************* GLUI_RadioButton::draw_active_area() **************/
-
+#warning "re activate this"
 void    GLUI_RadioButton::draw_active_area( void )
 {
-  GLUI_DRAWINGSENTINAL_IDIOM
+/*  GLUI_DRAWINGSENTINAL_IDIOM
   int text_width, left, right;
 
   text_width = _glutBitmapWidthString( glui->font, name.c_str() );
@@ -362,7 +349,7 @@ void    GLUI_RadioButton::draw_active_area( void )
   glVertex2i(right,h+1);   glVertex2i( left,h+1);
   glEnd();
 
-  glDisable( GL_LINE_STIPPLE );
+  glDisable( GL_LINE_STIPPLE );*/
 }
 
 

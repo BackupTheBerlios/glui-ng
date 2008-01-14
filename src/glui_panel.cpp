@@ -44,19 +44,18 @@ GLUI_Panel::GLUI_Panel( GLUI_Node *parent, const char *name, int type ):
 	{
 	  parent->add_control( this );
 	}
+  title = new GLUI_StaticText(this, "title");
+}
+
+GLUI_Panel::~GLUI_Panel()
+{
+	delete title;
 }
 
 /****************************** GLUI_Panel::draw() **********/
 
 void    GLUI_Panel::draw( )
 {
-	GLUI_Container::draw();
-    glMatrixMode( GL_MODELVIEW );
-    glPushMatrix();
-
-    glTranslatef( (float) this->x_abs + .5,
-            (float) this->y_abs + .5,
-            0.0 );
     int top;
     GLUI_DRAWINGSENTINAL_IDIOM
 
@@ -103,7 +102,7 @@ void    GLUI_Panel::draw( )
              **/
         }
         else if ( int_val == GLUI_PANEL_EMBOSSED ) {
-            if ( parent_node == NULL || name == "" ) {
+            if ( parent_node == NULL || *title == "" ) {
                 top = 0;
             }
             else {
@@ -129,35 +128,31 @@ void    GLUI_Panel::draw( )
             glEnd();
 
             /**** Only display text in embossed panel ****/
-            if ( parent_node != NULL && name != "" ) { /* Only  draw non-null strings */
+            if ( parent_node != NULL && *title != "" ) { /* Only  draw non-null strings */
                 int left = 7, height=GLUI_PANEL_NAME_DROP+1;
-                int str_width;
 
-                str_width = string_width(name);
 
                 if ( glui )
                     glColor3ubv(glui->bkgd_color);
                 glDisable( GL_CULL_FACE );
                 glBegin( GL_QUADS );
-                glVertex2i( left-3, 0 );               glVertex2i( left+str_width+3, 0 );
-                glVertex2i( left+str_width+3, height );  glVertex2i( left-3, height );
+                glVertex2i( left-3, 0 );               glVertex2i( left+title->w+3, 0 );
+                glVertex2i( left+title->w+3, height );  glVertex2i( left-3, height );
                 glEnd();
 
-                draw_name( left, GLUI_PANEL_NAME_DROP );
+                title->draw();
             }
         }
 
     glLineWidth( 1.0 );
 
-    glPopMatrix();
 }
 
 /****************************** GLUI_Panel::set_name() **********/
 
 void    GLUI_Panel::set_name( char *new_name )
 {
-  name.clear();
-  name=new_name;
+  *(dynamic_cast<std::string*>(title))=new_name;
 
   update_size();
 
@@ -181,29 +176,25 @@ void    GLUI_Panel::set_type( int new_type )
 /************************************** GLUI_Panel::update_size() **********/
 int GLUI_Panel::min_w()
 {
-    int text_size;
 
 #warning "assert on it"
     if ( NOT glui )
         return 0;
 
-    text_size = string_width(name);
-
-    if ( w < text_size + 16 )
-        w = text_size + 16 ;
-    return x_off_left + x_off_right;
+    return x_off_left + x_off_right + title->w;
 }
 
-int GLUI_Panel::min_h() { return y_off_top  + y_off_bot; }
+int GLUI_Panel::min_h() { return y_off_top  + y_off_bot + title->h; }
 
 
 void   GLUI_Panel::update_size( void )
 {
-  if ( name != "" AND int_val == GLUI_PANEL_EMBOSSED ) {
+  if ( *title != "" AND int_val == GLUI_PANEL_EMBOSSED ) {
     this->y_off_top = GLUI_YOFF + 8;
   }
   else {
     this->y_off_top = GLUI_YOFF;
   }
   GLUI_Container::update_size();
+  w = max<int>(title->w + 16,w) ;
 }

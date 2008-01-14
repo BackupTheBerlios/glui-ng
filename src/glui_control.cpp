@@ -41,7 +41,7 @@ int _glui_draw_border_only = 0;
 void	      GLUI_Control::redraw(void) {
     if (glui==NULL || hidden) return;
     if (glui->should_redraw_now(this))
-      translate_and_draw_front();
+      translate_and_draw();
 }
 
 /** Redraw everybody in our window. */
@@ -55,16 +55,21 @@ void	     GLUI_Control::redraw_window(void) {
 
 
 
-/* GLUI_Control::translate_and_draw_front() ********/
-#warning "remove"
-void GLUI_Control::translate_and_draw_front()
+/* GLUI_Control::translate_and_draw() ********/
+void GLUI_Control::translate_and_draw()
 {
   GLUI_DRAWINGSENTINAL_IDIOM
 
   glMatrixMode( GL_MODELVIEW );
   glPushMatrix();
+  glTranslatef( (float) this->x_abs + .5,
+		  (float) this->y_abs + .5,
+		  0.0 );
   draw();
   glPopMatrix();
+  if (DEBUG && glui->buffer_mode == GLUI_Main::buffer_front) {
+	  glFlush();
+  }
 }
 
 
@@ -216,102 +221,6 @@ void GLUI_Control::restore_window(int orig)
 
 
 
-/****************************** Text ***************************/
-
-/*************** GLUI_Control::set_font() **********/
-
-void GLUI_Control::set_font(void *new_font)
-{
-  font = new_font;
-  redraw();
-}
-
-
-/********** GLUI_Control::draw_string() ************/
-
-void GLUI_Control::draw_string( const char *text )
-{
-  _glutBitmapString( get_font(), text );
-}
-
-
-/**************** GLUI_Control::draw_char() ********/
-
-void GLUI_Control::draw_char(char c)
-{
-  glutBitmapCharacter( get_font(), c );
-}
-
-
-/*********** GLUI_Control::string_width() **********/
-
-int GLUI_Control::string_width(const char *text)
-{
-  return _glutBitmapWidthString( get_font(), text );
-}
-
-
-/************* GLUI_Control::char_width() **********/
-
-int GLUI_Control::char_width(char c)
-{ /* Hash table for faster character width lookups - JVK 
-       Speeds up the textbox a little bit.
-  */
-  int hash_index = c % CHAR_WIDTH_HASH_SIZE;
-  if (char_widths[hash_index][0] != c) {
-    char_widths[hash_index][0] = c;
-    char_widths[hash_index][1] = glutBitmapWidth( get_font(), c );
-  }
-  return char_widths[hash_index][1];
-}
-
-
-/*************** GLUI_Control::get_font() **********/
-
-void *GLUI_Control::get_font( void )
-{
-  /*** Does this control have its own font? ***/
-  if ( this->font != NULL )
-    return this->font;
-  
-  /*** Does the parent glui have a font? ***/
-  if ( glui )
-    return glui->font;
-
-  /*** Return the default font ***/
-  return GLUT_BITMAP_HELVETICA_12;
-}
-
-
-/************* GLUI_Control::draw_name() ***********/
-/* This draws the name of the control as either black (if enabled), or       */
-/* embossed if disabled.                                                     */
-
-void GLUI_Control::draw_name(int x, int y)
-{
-  if ( NOT can_draw() )
-    return;
-
-  if ( enabled )
-  {
-    set_to_bkgd_color();
-    glRasterPos2i(x+1, y+1);
-    draw_string(name);
-    glColor3b( 0, 0, 0 );
-    glRasterPos2i(x, y);
-    draw_string(name);
-  }
-  else
-  {   /* Control is disabled - emboss the string */
-    glColor3f( 1.0f, 1.0f, 1.0f );
-    glRasterPos2i(x+1, y+1);
-    draw_string(name);
-    glColor3f( .4f, .4f, .4f );
-    glRasterPos2i(x, y);
-    draw_string(name);
-  }
-}
-
 
 /**************************** Layout and Packing *********************/
 
@@ -319,7 +228,6 @@ void GLUI_Control::draw_name(int x, int y)
 
 void GLUI_Control::align()
 {
-    int  parent_x, par_y, col_w, col_h, col_x_off, col_y_off;
     int  orig_x_abs;
     GLUI_Control* par;
 
@@ -384,7 +292,8 @@ void GLUI_Control::sync_live(int recurse, int draw_it)
       callbacks ***/
     if ( 0 ) { /* THIS CODE BELOW SHOULD NOT BE EXECUTED */
       if ( glui->mouse_button_down ) {
-	debug( "Can't sync\n" );
+		  GLUI_debug::Instance()->print( __FILE__, __LINE__,
+				  "Can't sync\n" );
 	return;
       }
     }
@@ -410,6 +319,8 @@ void GLUI_Control::sync_live(int recurse, int draw_it)
         changed = true;
       }
     } 
+#warning "fix this"
+	/*
     else if ( live_type == GLUI_LIVE_TEXT ) {
       if ( last_live_text.compare((const char*)ptr_val) != 0 ) {
         set_text( (char*) ptr_val );
@@ -423,7 +334,7 @@ void GLUI_Control::sync_live(int recurse, int draw_it)
         last_live_text = *((std::string*) ptr_val);
         changed = true;
       }
-    } 
+    } */
     else if ( live_type == GLUI_LIVE_FLOAT_ARRAY ) { 
       /***  Step through the arrays, and see if they're the same  ***/
       
@@ -502,6 +413,8 @@ void GLUI_Control::output_live(int update_main_gfx)
     *((float*)ptr_val) = float_val;
     last_live_float    = float_val;
   } 
+#warning "fix this"
+  /*
   else if ( live_type == GLUI_LIVE_TEXT ) {
     strncpy( (char*) ptr_val, text.c_str(), text.length()+1);
     last_live_text =  text;
@@ -509,7 +422,7 @@ void GLUI_Control::output_live(int update_main_gfx)
   else if ( live_type == GLUI_LIVE_STRING ) {
     (*(std::string*)ptr_val)= text.c_str();
     last_live_text =  text;
-  } 
+  } */
   else if ( live_type == GLUI_LIVE_FLOAT_ARRAY ) {
     fp = (float*) ptr_val;
 
@@ -569,6 +482,8 @@ void GLUI_Control::init_live()
     set_float_val( *((float*)ptr_val) );
     last_live_float = *((float*)ptr_val);
   } 
+#warning "fix this"
+  /*
   else if ( live_type == GLUI_LIVE_TEXT ) {
     set_text( (const char*) ptr_val );
     last_live_text = (const char*) ptr_val;
@@ -576,7 +491,7 @@ void GLUI_Control::init_live()
   else if ( live_type == GLUI_LIVE_STRING ) {
     set_text( ((std::string*) ptr_val)->c_str() );
     last_live_text = ((std::string*) ptr_val)->c_str();
-  }
+  }*/
   else if ( live_type == GLUI_LIVE_FLOAT_ARRAY ) {
     set_float_array_val( (float*) ptr_val );
 
@@ -629,15 +544,6 @@ void  GLUI_Control::get_float_array_val( float *array_ptr )
 
 
 /**************************** Little Utility Routines ********************/
-
-/**** GLUI_Control::set_name() ********************/
-
-void   GLUI_Control::set_name( char *str )
-{
-  name.clear();
-  name = str;
-  redraw(); 
-}
 
 /**** GLUI_Control::enable() ****************/
 
@@ -786,9 +692,10 @@ void         GLUI_Control::unhide_internal( int recurse )
 
   node = (GLUI_Node *) this;
   while( node != NULL ) {
-    debug( "unhide: %s [%d]\n", ((GLUI_Control*)node)->name.c_str(),
-	    ((GLUI_Control*)node)->hidden );
-    ((GLUI_Control*)node)->hidden = false;
+	  GLUI_debug::Instance()->print( __FILE__, __LINE__,
+			  "unhide: %s [%d]\n", node->NodeName,
+			  ((GLUI_Control*)node)->hidden );
+	  ((GLUI_Control*)node)->hidden = false;
 
     if ( recurse AND node->first_child() != NULL )
       ((GLUI_Control*) node->first_child())->unhide_internal(true);

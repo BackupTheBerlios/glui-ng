@@ -78,16 +78,10 @@ int    GLUI_Mouse_Interaction::mouse_held_down_handler( int local_x, int local_y
 
 
 /****************************** GLUI_Mouse_Interaction::draw() **********/
-
+#warning "fix this"
 void    GLUI_Mouse_Interaction::draw( )
 {
-    GLUI_DRAWINGSENTINAL_IDIOM
-        glMatrixMode( GL_MODELVIEW );
-    glPushMatrix();
-
-    glTranslatef( (float) this->x_abs + .5,
-            (float) this->y_abs + .5,
-            0.0 );
+/*    GLUI_DRAWINGSENTINAL_IDIOM
 
     int text_width	= string_width( this->name );
     int x_left			= this->w/2 - text_width/2;
@@ -98,16 +92,15 @@ void    GLUI_Mouse_Interaction::draw( )
                 h, h-14 );
     }
 
-    draw_active_area();
-    glPopMatrix();
+    draw_active_area();*/
 }
 
 
 /************************************ GLUI_Mouse_Interaction::update_size() **********/
-
+#warning "fix this"
 void   GLUI_Mouse_Interaction::update_size( void )
 {
-  if ( NOT glui )
+/*  if ( NOT glui )
     return;
 
   int text_width = string_width( this->name );
@@ -118,7 +111,7 @@ void   GLUI_Mouse_Interaction::update_size( void )
   if ( h - 18 > w )
     w = h - 18;
 
-  iaction_init();
+  iaction_init();*/
 }
 
 

@@ -44,13 +44,19 @@ GLUI_Checkbox::GLUI_Checkbox( GLUI_Node *parent,
   common_init();
 
   set_ptr_val( value_ptr );
-  set_name( const_cast<char*>(name) );
+  text = new GLUI_StaticText(this, "text" );
+  text->set_text(name);
   user_id    = id;
   callback   = cb;
 
   parent->add_control( this );
 
   init_live();
+}
+
+GLUI_Checkbox::~GLUI_Checkbox()
+{
+	delete text;
 }
 
 /****************************** GLUI_Checkbox::mouse_down_handler() **********/
@@ -111,17 +117,8 @@ int    GLUI_Checkbox::key_handler( unsigned char key,int modifiers )
 
 
 /****************************** GLUI_Checkbox::draw() **********/
-
 void    GLUI_Checkbox::draw()
 {
-    glMatrixMode( GL_MODELVIEW );
-    glPushMatrix();
-
-    glTranslatef( (float) this->x_abs + .5,
-            (float) this->y_abs + .5,
-            0.0 );
-
-
     GLUI_DRAWINGSENTINAL_IDIOM
 
         if ( int_val != 0 ) {
@@ -137,15 +134,13 @@ void    GLUI_Checkbox::draw()
                 glui->std_bitmaps.draw( GLUI_STDBITMAP_CHECKBOX_OFF_DIS, 0, 0 );
         }
 
-    draw_active_area();
-
-    draw_name( text_x_offset, 10);
-    glPopMatrix();
-
+	glFlush();
+	GLUI_Container::translate_and_draw();
+	glFlush();
 }
 
 /**************************** GLUI_Checkbox::draw_active_area() **************/
-
+/*
 void    GLUI_Checkbox::draw_active_area( void )
 {
   GLUI_DRAWINGSENTINAL_IDIOM
@@ -155,13 +150,13 @@ void    GLUI_Checkbox::draw_active_area( void )
   left       = text_x_offset-3;
   right      = left + 7 + text_width;
 
-  if ( active ) {
+//  if ( active ) {
     glEnable( GL_LINE_STIPPLE );
     glLineStipple( 1, 0x5555 );
     glColor3f( 0., 0., 0. );
-  } else {
-    glColor3ubv( glui->bkgd_color );
-  }
+//  } else {
+//    glColor3ubv( glui->bkgd_color );
+//  }
 
   glBegin( GL_LINE_LOOP );
   glVertex2i(left,0);     glVertex2i( right,0);
@@ -169,22 +164,16 @@ void    GLUI_Checkbox::draw_active_area( void )
   glEnd();
 
   glDisable( GL_LINE_STIPPLE );
-}
+}*/
 
 
 /************************************ GLUI_Checkbox::update_size() **********/
 
 void   GLUI_Checkbox::update_size( void )
 {
-  int text_size;
-
-  if ( NOT glui )
-    return;
-
-  text_size = _glutBitmapWidthString( glui->font, name.c_str() );
-
-  /*  if ( w < text_x_offset + text_size + 6 )              */
-  w = text_x_offset + text_size + 6 ;
+	GLUI_Container::update_size();
+	this->w += 13;
+	this->h = max<int>(13, this->h);
 }
 
 

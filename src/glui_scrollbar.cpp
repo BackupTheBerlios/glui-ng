@@ -155,7 +155,6 @@ void GLUI_Scrollbar::common_construct(
   }
   this->data_type = data_type;
   this->set_ptr_val( data );
-  this->set_name( const_cast<char*>(name));
   this->user_id = id;
   this->callback    = callback;
   //this->associated_object = object;
@@ -180,7 +179,8 @@ int    GLUI_Scrollbar::mouse_down_handler( int local_x, int local_y )
   this->state = find_arrow( local_x, local_y );
   GLUI_Master.glui_setIdleFuncIfNecessary();
 
-  debug( "spinner: mouse down  : %d/%d   arrow:%d\n", local_x, local_y,
+  GLUI_debug::Instance()->print( __FILE__, __LINE__,
+          "spinner: mouse down  : %d/%d   arrow:%d\n", local_x, local_y,
       find_arrow( local_x, local_y ));
 
 
@@ -225,7 +225,8 @@ int    GLUI_Scrollbar::mouse_up_handler( int local_x, int local_y, bool inside )
   state = GLUI_SCROLL_STATE_NONE;
   GLUI_Master.glui_setIdleFuncIfNecessary();
 
-  debug("spinner: mouse up  : %d/%d    inside: %d\n",local_x,local_y,inside);
+  GLUI_debug::Instance()->print( __FILE__, __LINE__,
+          "spinner: mouse up  : %d/%d    inside: %d\n",local_x,local_y,inside);
 
   /*glutSetCursor( GLUT_CURSOR_INHERIT );              */
   glutSetCursor( GLUT_CURSOR_LEFT_ARROW );
@@ -249,7 +250,8 @@ int    GLUI_Scrollbar::mouse_held_down_handler( int local_x, int local_y,
   if ( state == GLUI_SCROLL_STATE_NONE )
     return false;
   
-  debug("spinner: mouse held: %d/%d    inside: %d\n",local_x,local_y,
+  GLUI_debug::Instance()->print( __FILE__, __LINE__,
+          "spinner: mouse held: %d/%d    inside: %d\n",local_x,local_y,
       new_inside);
 
   if ( state == GLUI_SCROLL_STATE_SCROLL) {   /* dragging? */
@@ -281,13 +283,6 @@ int    GLUI_Scrollbar::key_handler( unsigned char key,int modifiers )
 
 void    GLUI_Scrollbar::draw( )
 {
-
-    glMatrixMode( GL_MODELVIEW );
-    glPushMatrix();
-
-    glTranslatef( (float) this->x_abs + .5,
-            (float) this->y_abs + .5,
-            0.0 );
     GLUI_DRAWINGSENTINAL_IDIOM
 
         if ( horizontal ) {
@@ -298,7 +293,6 @@ void    GLUI_Scrollbar::draw( )
             draw_scroll_arrow(GLUI_SCROLL_ARROW_DOWN, 0, h-GLUI_SCROLL_ARROW_HEIGHT);
         }
     draw_scroll();
-    glPopMatrix();
 }
 
 
@@ -629,7 +623,8 @@ void    GLUI_Scrollbar::do_click( void )
   new_val += direction * incr;
   if (1 || data_type==GLUI_SCROLL_FLOAT) set_float_val(new_val);
   if (0 && data_type==GLUI_SCROLL_INT) set_int_val((int)new_val);
-  debug("do_click: incr %f  val=%f  float_val=%f\n",incr,new_val,float_val);
+  GLUI_debug::Instance()->print( __FILE__, __LINE__,
+          "do_click: incr %f  val=%f  float_val=%f\n",incr,new_val,float_val);
 
   /*** Now update live variable and do callback.  We don't want
     to do the callback on each iteration of this function, just on every 

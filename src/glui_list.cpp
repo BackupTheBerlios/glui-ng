@@ -38,7 +38,8 @@ GLUI_List::GLUI_List( GLUI_Node *parent, const char* name, bool scroll,
                       int id, GLUI_CB callback
                       /*,GLUI_Control *object
                       GLUI_InterObject_CB obj_cb*/)
-    : GLUI_Container (name)
+    : GLUI_Container (name),
+    name(this->glui->font)
 {
   common_construct(parent, NULL, scroll, id, callback/*, object, obj_cb*/);
 }
@@ -52,7 +53,8 @@ GLUI_List::GLUI_List( GLUI_Node *parent,
                       GLUI_CB callback
                       /* ,GLUI_Control *object
                       ,GLUI_InterObject_CB obj_cb*/ )
-    : GLUI_Container (name)
+    : GLUI_Container (name),
+    name(this->glui->font)
 {
   common_construct(parent, &live_var, scroll, id, callback/*, object, obj_cb*/);
 }
@@ -201,14 +203,6 @@ void    GLUI_List::deactivate( void )
 
 void    GLUI_List::draw( )
 {
-    glMatrixMode( GL_MODELVIEW );
-    glPushMatrix();
-
-    glTranslatef( (float) this->x_abs + .5,
-            (float) this->y_abs + .5,
-            0.0 );
-
-
     int line = 0;
     int box_width;
     GLUI_List_Item *item;
@@ -287,24 +281,25 @@ void    GLUI_List::draw( )
         scrollbar->draw_scroll();
         glPopMatrix();
     }
-
-    glPopMatrix();
 }
 
 /********************************* GLUI_List::draw_text() ****************/
 
 void    GLUI_List::draw_text(const char *t, int selected, int x, int y )
 {
+
   int text_x, i, x_pos;
   int box_width;
+    GLUI_Text text(this->glui->font,t);
+
 
   GLUI_DRAWINGSENTINAL_IDIOM
 
-  /** Find where to draw the text **/
+  // Find where to draw the text
 
   text_x = 2 + GLUI_LIST_BOXINNERMARGINX;
 
-  /** Draw selection area dark **/
+  // Draw selection area dark
   if ( enabled && selected ) {
     glColor3f( 0.0f, 0.0f, .6f );
     glBegin( GL_QUADS );
@@ -314,8 +309,8 @@ void    GLUI_List::draw_text(const char *t, int selected, int x, int y )
   }
   box_width = get_box_width();
 
-  if ( !selected || !enabled ) {   /* No current selection */
-    x_pos = text_x;                /*  or control disabled */
+  if ( !selected || !enabled ) {   // No current selection
+    x_pos = text_x;                //  or control disabled
     if ( enabled )
       glColor3b( 0, 0, 0 );
     else
@@ -323,23 +318,25 @@ void    GLUI_List::draw_text(const char *t, int selected, int x, int y )
 
     glRasterPos2i( text_x, y+15);
     i = 0;
-    while( t[i] != '\0' && substring_width(t,0,i) < box_width) {
-      glutBitmapCharacter( get_font(), t[i] );
-      x_pos += char_width( t[i] );
+    while( text[i] != '\0' && substring_width(t,0,i) < box_width) {
+      glutBitmapCharacter( text.get_font(), text[i] );
+      x_pos += text.char_width( text[i] );
       i++;
     }
   }
-  else { /* There is a selection */
+  else { // There is a selection
     i = 0;
     x_pos = text_x;
     glColor3f( 1., 1., 1. );
     glRasterPos2i( text_x, y+15);
-    while( t[i] != '\0' && substring_width(t,0,i) < box_width) {
-      glutBitmapCharacter( get_font(), t[i] );
-      x_pos += char_width( t[i] );
+    while( text[i] != '\0' && substring_width(t,0,i) < box_width) {
+      glutBitmapCharacter( text.get_font(), text[i] );
+      x_pos += text.char_width( text[i] );
       i++;
     }
   }
+
+#warning "replace this with real drawing elements"
 }
 
 
@@ -358,11 +355,12 @@ int      GLUI_List::get_box_width() {
 int  GLUI_List::substring_width( const char *t, int start, int end )
 {
   int i, width;
+  GLUI_Text text(this->glui->font,t);
 
   width = 0;
 
   for( i=start; i<=end; i++ )
-    width += char_width( t[i] );
+    width += text.char_width( text[i] );
 
   return width;
 }

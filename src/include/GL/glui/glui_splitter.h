@@ -54,6 +54,7 @@ public:
 
     GLUI_Panel *GetFirstPanel() {return &first_panel;}
     GLUI_Panel *GetSecondPanel() {return &second_panel;}
+	void draw() {} //<nothing done here, all is done by translate_and_draw
 
 protected:
     GLUI_Panel first_panel;

@@ -43,7 +43,6 @@ GLUI_Listbox::GLUI_Listbox( GLUI_Node *parent,
   common_init();
   set_ptr_val( value_ptr );
   user_id    = id;
-  set_name( const_cast<char*>(name) );
   callback    = cb;
 
   parent->add_control( this );
@@ -92,24 +91,16 @@ int    GLUI_Listbox::key_handler( unsigned char key,int modifiers )
 void    GLUI_Listbox::draw( )
 {
 
-    glMatrixMode( GL_MODELVIEW );
-    glPushMatrix();
-
-    glTranslatef( (float) this->x_abs + .5,
-            (float) this->y_abs + .5,
-            0.0 );
-
-
     GLUI_DRAWINGSENTINAL_IDIOM
         int name_x;
 
-    /*  draw_active_area();              */
-
+#warning "fix this"
+/*
     name_x = MAX(text_x_offset - string_width(this->name) - 3,0);
     draw_name( name_x , 13);
     draw_box_inwards_outline( text_x_offset, w,
             0, h );
-
+*/
     if ( NOT active ) {
         draw_box( text_x_offset+3, w-2, 2, h-2, 1.0, 1.0, 1.0 );
         if ( NOT enabled )
@@ -117,13 +108,15 @@ void    GLUI_Listbox::draw( )
         else
             glColor3f( 0.0, 0.0, 0.0 );
         glRasterPos2i( text_x_offset+5, 13 );
-        draw_string( curr_text );
+#warning "fix this"
+//        draw_string( curr_text );
     }
     else {
         draw_box( text_x_offset+3, w-2, 2, h-2, .0, .0, .6 );
         glColor3f( 1.0, 1.0, 1.0 );
         glRasterPos2i( text_x_offset+5, 13 );
-        draw_string( curr_text );
+#warning "fix this"
+//        draw_string( curr_text );
     }
 
 
@@ -139,8 +132,6 @@ void    GLUI_Listbox::draw( )
                     w-glui->std_bitmaps.width(GLUI_STDBITMAP_LISTBOX_UP)-1,
                     2 );
     }
-
-    glPopMatrix();
 }
 
 
@@ -241,9 +232,10 @@ void     GLUI_Listbox::dump( FILE *output )
 {
   GLUI_Listbox_Item *item;
 
-  debug( "%p\n", name.c_str() );
+  GLUI_debug::Instance()->print( __FILE__, __LINE__,
+		  "%s\n", NodeName );
 
-  fprintf( output, "Listbox: %s\n", name.c_str() );
+  fprintf( output, "Listbox: %s\n", NodeName );
 
   item = (GLUI_Listbox_Item *) items_list.first_child();
   while( item ) {
@@ -315,35 +307,38 @@ static void listbox_callback( int i )
 
 int     GLUI_Listbox::mouse_over( int state, int x, int y )
 {
-  GLUI_Listbox_Item *item;
+	GLUI_Listbox_Item *item;
 
-  debug( "x/y:   %d/%d\n", x, y );
+	GLUI_debug::Instance()->print( __FILE__, __LINE__,
+			"x/y:   %d/%d\n", x, y );
 
-  if ( state AND enabled AND x > x_abs + text_x_offset) {
-    /****  Build a GLUT menu for this listbox   ***/
-    
-    debug( "%d %d\n", x, y );
+	if ( state AND enabled AND x > x_abs + text_x_offset) {
+		/****  Build a GLUT menu for this listbox   ***/
 
-    glut_menu_id = glutCreateMenu(listbox_callback);
+		GLUI_debug::Instance()->print( __FILE__, __LINE__,
+				"%d %d\n", x, y );
 
-    item = (GLUI_Listbox_Item *) items_list.first_child();
-    while( item ) {
-      glutAddMenuEntry( item->text.c_str(), item->id );
-      item = (GLUI_Listbox_Item *) item->next();
-    }
+		glut_menu_id = glutCreateMenu(listbox_callback);
 
-    glutAttachMenu( GLUT_LEFT_BUTTON);
-    
-    GLUI_Master.set_left_button_glut_menu_control( this );
-  }
-  else if ( glut_menu_id != -1 ) {
-    debug( "OUT\n" );
-    glutDetachMenu( GLUT_LEFT_BUTTON );
-    glutDestroyMenu( glut_menu_id );
-    glut_menu_id = -1;
-  }
+		item = (GLUI_Listbox_Item *) items_list.first_child();
+		while( item ) {
+			glutAddMenuEntry( item->text.c_str(), item->id );
+			item = (GLUI_Listbox_Item *) item->next();
+		}
 
-  return true;
+		glutAttachMenu( GLUT_LEFT_BUTTON);
+
+		GLUI_Master.set_left_button_glut_menu_control( this );
+	}
+	else if ( glut_menu_id != -1 ) {
+		GLUI_debug::Instance()->print( __FILE__, __LINE__,
+				"OUT\n" );
+		glutDetachMenu( GLUT_LEFT_BUTTON );
+		glutDestroyMenu( glut_menu_id );
+		glut_menu_id = -1;
+	}
+
+	return true;
 }
 
 
@@ -371,7 +366,8 @@ int    GLUI_Listbox::do_selection( int item_num )
   if ( NOT sel_item )
     return false;
 
-  debug( "-> %s\n", sel_item->text.c_str() );
+  GLUI_debug::Instance()->print( __FILE__, __LINE__,
+		  "-> %s\n", sel_item->text.c_str() );
 
   int_val = item_num;
   curr_text = sel_item->text;
@@ -439,14 +435,16 @@ bool    GLUI_Listbox::recalculate_item_width( void )
     return false;
 
   /* Find the title size */
-  text_x_offset = string_width( name );
+#warning "fix this"
+//  text_x_offset = string_width( name );
 
   /* Find the longest item string ***/
   item_text_size = 0;   
  
   GLUI_Listbox_Item *item = (GLUI_Listbox_Item *) items_list.first_child();
   while( item ) {
-    item_text_size = MAX(item_text_size,string_width(item->text));
+#warning "fix this"
+//    item_text_size = MAX(item_text_size,string_width(item->text));
     item = (GLUI_Listbox_Item *) item->next();
   }
   

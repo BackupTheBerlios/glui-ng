@@ -47,7 +47,6 @@ GLUI_Translation::GLUI_Translation(
 
   set_ptr_val( value_ptr );
   user_id    = id;
-  set_name( const_cast<char*>( name ) );
   callback    = cb;
   parent->add_control( this );
   //init_live();
