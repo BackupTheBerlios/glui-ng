@@ -78,7 +78,7 @@ void    GLUI_Rollout::open( void )
     ((GLUI_Control*) child_head)->unhide_internal( true );
   }
 
-  glui->refresh();
+  glutPostRedisplay();
 }
 
 
@@ -107,7 +107,7 @@ void    GLUI_Rollout::close( void )
 
   this->h = rollout_height_pixels;
 
-  glui->refresh();
+  glutPostRedisplay();
 }
 
 
@@ -123,7 +123,7 @@ int   GLUI_Rollout::mouse_down_handler( int local_x, int local_y )
 
   currently_inside = true;
   initially_inside = true;
-  redraw();
+  glutPostRedisplay();
 
   return false;
 }
@@ -143,7 +143,7 @@ int  GLUI_Rollout::mouse_held_down_handler(
 
   if (new_inside != currently_inside) {
      currently_inside = new_inside;
-     redraw();
+     glutPostRedisplay();
   }
 
   return false;
@@ -163,7 +163,7 @@ int   GLUI_Rollout::mouse_up_handler( int local_x, int local_y, bool inside )
 
   currently_inside = false;
   initially_inside = false;
-  redraw();
+  glutPostRedisplay();
 
   return false;
 }

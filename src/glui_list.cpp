@@ -196,7 +196,7 @@ void    GLUI_List::activate( int how )
 void    GLUI_List::deactivate( void )
 {
   active = false;
-  redraw();
+  glutPostRedisplay();
 }
 
 /****************************** GLUI_List::draw() **********/
@@ -376,7 +376,7 @@ void   GLUI_List::update_and_draw_text( void )
   //update_substring_bounds();
   /*  printf( "ss: %d/%d\n", substring_start, substring_end );                  */
 
-  redraw();
+  glutPostRedisplay();
 }
 
 
@@ -403,7 +403,7 @@ int    GLUI_List::special_handler( int key,int modifiers )
 
   if (scrollbar)
     scrollbar->set_int_val(curr_line);
-  redraw();
+  glutPostRedisplay();
   return true;
 }
 

@@ -235,7 +235,7 @@ int    GLUI_EditText::key_handler( unsigned char key,int modifiers )
     /*    glui->deactivate_current_control();              */
     deactivate();  /** Force callbacks, etc **/
     activate(GLUI_ACTIVATE_TAB);     /** Reselect all text **/
-    redraw();
+    glutPostRedisplay();
     return true;
   }
   else if ( key  == CTRL('[')) {         /* ESCAPE */
@@ -523,7 +523,7 @@ void    GLUI_EditText::deactivate( void )
   update_substring_bounds();
 
   /******** redraw text without insertion point ***********/
-  redraw();
+  glutPostRedisplay();
 
   /***** Now do callbacks if value changed ******/
   if ( orig_text != *text ) {
@@ -880,8 +880,8 @@ void   GLUI_EditText::update_and_draw_text( void )
   update_substring_bounds();
     GLUI_debug::Instance()->print( __FILE__, __LINE__,
          "ss: %d/%d\n", substring_start, substring_end );
+    glutPostRedisplay();
 
-  redraw();
 }
 
 

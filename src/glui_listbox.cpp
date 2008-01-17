@@ -176,7 +176,7 @@ int  GLUI_Listbox::add_item( int id, const char *new_text )
     if( glui )
       glui->post_update_main_gfx();
   }
-  if (recalculate_item_width()) glui->refresh();
+  if (recalculate_item_width()) glutPostRedisplay();
 
   return true;
 }
@@ -194,7 +194,7 @@ int  GLUI_Listbox::delete_item( const char *text )
     delete node;
     return true;
   }
-  if (recalculate_item_width()) glui->refresh();
+  if (recalculate_item_width()) glutPostRedisplay();
 
   return false;
 }
@@ -212,7 +212,7 @@ int  GLUI_Listbox::delete_item(int id)
     delete node;
     return true;
   }
-  if (recalculate_item_width()) glui->refresh();
+  if (recalculate_item_width()) glutPostRedisplay();
   
   return false;
 }
@@ -371,7 +371,7 @@ int    GLUI_Listbox::do_selection( int item_num )
 
   int_val = item_num;
   curr_text = sel_item->text;
-  redraw();
+  glutPostRedisplay();
 
   return true;
 }

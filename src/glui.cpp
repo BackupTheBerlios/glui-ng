@@ -69,7 +69,7 @@ void GLUI_Node::add_child_to_control(GLUI_Node *parent,GLUI_Control *child)
   child->glui = (GLUI*) parent_control->glui;
   child->update_size();
   child->enabled = parent_control->enabled;
-  child->glui->refresh();
+  glutPostRedisplay();
 
   /** Now set the 'hidden' var based on the parent **/
   if ( parent_control->hidden OR 
@@ -615,7 +615,6 @@ void    GLUI_Main::display( void )
   main_panel->update_size();
   main_panel->pack(0, 0);
   main_panel->translate_and_draw();
-
   switch (buffer_mode) {
   case buffer_front: /* Make sure drawing gets to screen */
   	glFlush();
@@ -1134,9 +1133,8 @@ GLUI_Main::GLUI_Main( void )
   bkgd_color_f[2] = b / 255.0f;
 
   /*** Create the main panel ***/
-  main_panel              = new GLUI_Panel(NULL, "root panel");
+  main_panel              = new GLUI_Panel((GLUI*)this, NULL, "root panel");
   main_panel->set_int_val( GLUI_PANEL_NONE );
-  main_panel->glui        = (GLUI*) this;
 }
 
 /************************************ GLUI_Main::draw_raised_box() **********/
@@ -1217,10 +1215,8 @@ void         GLUI_Main::activate_control( GLUI_Control *control, int how )
     
     control->activate(how);
 
-    /*if ( NOT active_control->is_container OR           */
-    /*		active_control->type == GLUI_CONTROL_ROLLOUT) {          */
-    active_control->redraw();
-    /*}          */
+    glutPostRedisplay();
+
   }
   else {
     active_control = NULL;
@@ -1247,11 +1243,7 @@ void         GLUI_Main::deactivate_current_control( void )
     /** If this isn't a container control, then redraw it in its 
       deactivated state.  Container controls, such as panels, look
       the same activated or not **/
-
-    /*if ( NOT active_control->is_container OR           */
-    /*		active_control->type == GLUI_CONTROL_ROLLOUT ) {        */
-    active_control->redraw();
-    /*}          */
+    glutPostRedisplay();
 
     active_control->restore_window( orig );
 
@@ -1931,46 +1923,6 @@ void  GLUI_Main::set_viewport( void )
 {
   glViewport( 0, 0, main_panel->w, main_panel->h );
 }
-
-
-/****************************** GLUI_Main::refresh() ****************/
-
-void    GLUI_Main::refresh( void )
-{
-  int orig;
-
-  /******  GLUI_Glut_Window *glut_window;
-    int              current_window;
-    current_window = glutGetWindow();
-    glut_window    = GLUI_Master.find_glut_window( current_window );
-    if ( glut_window ) {
-    glut_window->glut_reshape_CB(w,h);
-    ******/
-
-  orig  = glutGetWindow();
-
-  pack_controls();
-
-  if ( glut_window_id > 0 )
-    glutSetWindow( glut_window_id );
-
-
-  if ( TEST_AND( this->flags, GLUI_SUBWINDOW ) ) {
-    /*** GLUI subwindow ***/
-
-    check_subwindow_position();
-  }
-  else {
-    /*** Standalone GLUI window ***/
-
-    glutReshapeWindow( this->h, this->w );
-
-  }
-
-  glutPostRedisplay();
-  glutSetWindow( orig);
-}
-
 
 
 /***************** GLUI_Master_Object::get_main_gfx_viewport() ***********/

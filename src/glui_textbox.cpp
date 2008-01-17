@@ -382,7 +382,7 @@ void    GLUI_TextBox::deactivate( void )
   update_substring_bounds();
 
   /******** redraw text without insertion point ***********/
-  redraw();
+  glutPostRedisplay();
 
   /***** Now do callbacks if value changed ******/
   if ( orig_text != text ) {
@@ -894,7 +894,7 @@ void   GLUI_TextBox::update_and_draw_text( void )
     GLUI_debug::Instance()->print( __FILE__, __LINE__,
             "ss: %d/%d\n", substring_start, substring_end );
 
-  redraw();
+  glutPostRedisplay();
 }
 
 

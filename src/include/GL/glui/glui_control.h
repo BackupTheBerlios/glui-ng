@@ -108,17 +108,6 @@ public:
     /** Return true if it currently makes sense to draw this class. */
     int          can_draw( void ) { return (glui != NULL && hidden == false); }
 
-    /** Redraw this control.
-       In single-buffering mode (drawing to GL_FRONT), this is just
-           a call to translate_and_draw (after a can_draw() check).
-       In double-buffering mode (drawing to GL_BACK), this queues up
-          a redraw and returns false, since you shouldn't draw yet.
-    */
-    void          redraw(void);
-
-    /** Redraw everybody in our window. */
-    void         redraw_window(void);
-
     virtual void align( void );
     virtual void pack( int x, int y );    /* Recalculate positions and offsets */
     virtual void draw(void)=0;

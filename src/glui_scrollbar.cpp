@@ -212,7 +212,7 @@ int    GLUI_Scrollbar::mouse_down_handler( int local_x, int local_y )
   }
 #endif
   do_click();  
-  redraw();
+  glutPostRedisplay();
   
   return false;
 }
@@ -231,7 +231,7 @@ int    GLUI_Scrollbar::mouse_up_handler( int local_x, int local_y, bool inside )
   /*glutSetCursor( GLUT_CURSOR_INHERIT );              */
   glutSetCursor( GLUT_CURSOR_LEFT_ARROW );
 
-  redraw();
+  glutPostRedisplay();
 
   /*  do_callbacks(); --- stub               */
   /*  if ( callback )               */
@@ -265,7 +265,7 @@ int    GLUI_Scrollbar::mouse_held_down_handler( int local_x, int local_y,
       do_click();
     }
   }
-  redraw();
+  glutPostRedisplay();
 
   return false;
 }
@@ -759,7 +759,7 @@ void   GLUI_Scrollbar::set_float_val( float new_val )
   float_val = new_val;
   int_val = (int)new_val;
 
-  redraw();
+  glutPostRedisplay();
 
   /*** Now update the live variable ***/
   output_live(true);
@@ -780,7 +780,7 @@ void   GLUI_Scrollbar::set_int_val( int new_val )
   last_int_val = int_val;
   float_val = int_val = new_val;
 
-  redraw();
+  glutPostRedisplay();
 
   /*** Now update the live variable ***/
   output_live(true);

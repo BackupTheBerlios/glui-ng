@@ -44,13 +44,13 @@ GLUI_Checkbox::GLUI_Checkbox( GLUI_Node *parent,
   common_init();
 
   set_ptr_val( value_ptr );
-  text = new GLUI_StaticText(this, "text" );
-  text->set_text(name);
   user_id    = id;
   callback   = cb;
 
   parent->add_control( this );
 
+  text = new GLUI_StaticText(this, "text" );
+  text->set_text(name);
   init_live();
 }
 
@@ -67,7 +67,7 @@ int    GLUI_Checkbox::mouse_down_handler( int local_x, int local_y )
   int_val = !int_val;
 
   currently_inside = true;
-  redraw();
+  glutPostRedisplay();
 
   return false;
 }
@@ -101,7 +101,7 @@ int    GLUI_Checkbox::mouse_held_down_handler( int local_x, int local_y,
   if ( inside != currently_inside ) {
      int_val = !int_val;
      currently_inside = inside;
-     redraw();
+     glutPostRedisplay();
   }
 
   return false;
@@ -185,5 +185,5 @@ void    GLUI_Checkbox::set_int_val( int new_val )
 
   /*** Update the variable we're (possibly) pointing to ***/
   output_live(true);
-  redraw();
+  glutPostRedisplay();
 }

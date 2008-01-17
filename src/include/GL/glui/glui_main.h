@@ -101,6 +101,7 @@ protected:
     void (*glut_special_CB)(int, int, int);
     void (*glut_reshape_CB)(int, int);
 
+   /** Pack, resize the window, and redraw all the controls. */
 
     /*********** Controls ************/
 
@@ -142,9 +143,6 @@ public:
     int          set_current_draw_buffer();
     /** Go back to using this draw buffer.  Undoes set_current_draw_buffer. */
     void         restore_draw_buffer( int buffer_state );
-
-    /** Pack, resize the window, and redraw all the controls. */
-    void         refresh();
 
     /** Redraw the main graphics window */
     void         post_update_main_gfx();

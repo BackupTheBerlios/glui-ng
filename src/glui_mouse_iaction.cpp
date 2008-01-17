@@ -42,7 +42,7 @@ int    GLUI_Mouse_Interaction::mouse_down_handler( int local_x, int local_y )
   /*	iaction_mouse_down_handler( local_x, local_y );              */
   iaction_mouse_down_handler( local_x-x_abs, local_y-y_abs );
   /*local_x-x_abs, ((glui->h-local_y)-y_abs) );              */
-  redraw();
+  glutPostRedisplay();
 
   return false;
 }
@@ -64,7 +64,7 @@ int    GLUI_Mouse_Interaction::mouse_held_down_handler( int local_x, int local_y
 {
   iaction_mouse_held_down_handler( local_x-x_abs, local_y-y_abs , inside );
 
-  redraw();
+  glutPostRedisplay();
 
   /** Tell the main graphics window to update iteself **/
   if( glui )

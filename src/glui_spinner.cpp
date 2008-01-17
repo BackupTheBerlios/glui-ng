@@ -137,7 +137,7 @@ int    GLUI_Spinner::mouse_down_handler( int local_x, int local_y )
     return true;
 
   reset_growth();
-  redraw();
+  glutPostRedisplay();
 
   /*** ints and floats behave a bit differently.  When you click on
     an int spinner, you expect the value to immediately go up by 1, whereas
@@ -167,7 +167,7 @@ int    GLUI_Spinner::mouse_up_handler( int local_x, int local_y, bool inside )
 
   /*glutSetCursor( GLUT_CURSOR_INHERIT );              */
   glutSetCursor( GLUT_CURSOR_LEFT_ARROW );
-  redraw();
+  glutPostRedisplay();
 
   /*  do_callbacks(); --- stub               */
   /*  if ( callback )               */
@@ -229,7 +229,7 @@ int    GLUI_Spinner::mouse_held_down_handler( int local_x, int local_y,
 	reset_growth();
     }
 
-    redraw();
+    glutPostRedisplay();
   }
 
   return false;

@@ -149,7 +149,6 @@ public:
     /* Resets curr_root and curr branch to TreePanel and lastChild */
     void            resetToRoot(GLUI_Panel *new_root = NULL);
     void            next( void );
-    void            refresh( void );
     void            expand_all( void );
     void            collapse_all( void );
     void            update_all( void );

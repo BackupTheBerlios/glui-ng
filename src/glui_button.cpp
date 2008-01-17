@@ -54,7 +54,7 @@ int    GLUI_Button::mouse_down_handler( int local_x, int local_y )
 		   now we invariably set it to 'depressed' **/
 
   currently_inside = true;
-  redraw();
+  glutPostRedisplay();
 
   return false;
 }
@@ -67,7 +67,7 @@ int    GLUI_Button::mouse_up_handler( int local_x, int local_y, bool inside )
   set_int_val( 0 );   /** A button always turns off after you press it **/
 
   currently_inside = false; 
-  redraw();
+  glutPostRedisplay();
 
   if ( inside ) { 
     /*** Invoke the user's callback ***/
@@ -85,7 +85,7 @@ int    GLUI_Button::mouse_held_down_handler( int local_x, int local_y,
 {
   if (new_inside != currently_inside) {
     currently_inside = new_inside;
-    redraw();
+    glutPostRedisplay();
   }
   
   return false;

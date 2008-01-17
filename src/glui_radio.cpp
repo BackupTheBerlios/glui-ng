@@ -103,9 +103,7 @@ void    GLUI_RadioGroup::draw()
 void    GLUI_RadioGroup::set_name( char *text )
 {
   title->set_text(text);
-
-  if ( glui )
-    glui->refresh();
+  glutPostRedisplay();
 }
 
 
@@ -131,7 +129,7 @@ void    GLUI_RadioGroup::set_selected( int int_val )
     }
     button = (GLUI_RadioButton*) button->next();
   }
-  redraw();
+  glutPostRedisplay();
 }
 
 
@@ -172,7 +170,7 @@ int    GLUI_RadioButton::mouse_down_handler( int local_x, int local_y )
   currently_inside = true;
 
   group->set_selected( this->user_id );
-  redraw();
+  glutPostRedisplay();
 
   return false;
 }
@@ -186,7 +184,7 @@ int    GLUI_RadioButton::mouse_held_down_handler( int local_x, int local_y,
      if (inside) group->set_selected( this->user_id );
      else group->set_selected( orig_value );
      currently_inside = inside;
-     redraw();
+     glutPostRedisplay();
   }
 
   return false;
@@ -203,7 +201,7 @@ int    GLUI_RadioButton::mouse_up_handler( int local_x, int local_y,
 
   if ( NOT inside ) {
     group->set_selected( orig_value );
-    redraw();
+    glutPostRedisplay();
   }
   else {
     /** Now we update the radio button group.  We tell the group
@@ -211,7 +209,7 @@ int    GLUI_RadioButton::mouse_up_handler( int local_x, int local_y,
       is reference by its user_id/ordinal number within group **/
 
     group->set_selected( this->user_id );
-    redraw();
+    glutPostRedisplay();
 
     /*** Now update the linked variable, and call the callback,
       but ONLY if the value of the radio group actually changed ***/
@@ -361,7 +359,7 @@ void    GLUI_RadioGroup::set_int_val( int new_val )
     return;
 
   set_selected( new_val );
-  redraw();
+  glutPostRedisplay();
 
   output_live(true);
 

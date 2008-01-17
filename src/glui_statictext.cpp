@@ -67,7 +67,7 @@ void    GLUI_StaticText::draw( )
 void    GLUI_StaticText::set_text(const char *text )
 {
   *(dynamic_cast<std::string*>(this)) = text;
-  redraw();
+  glutPostRedisplay();
 }
 
 

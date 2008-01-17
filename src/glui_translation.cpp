@@ -117,7 +117,7 @@ int    GLUI_Translation::iaction_mouse_down_handler( int local_x,
   }
 
   trans_mouse_code = 1;
-  redraw();
+  glutPostRedisplay();
 
   return false;
 }
@@ -131,7 +131,7 @@ int    GLUI_Translation::iaction_mouse_up_handler( int local_x, int local_y,
   trans_mouse_code = GLUI_TRANSLATION_MOUSE_NONE;
   locked = GLUI_TRANSLATION_LOCK_NONE;
 
-  redraw();
+  glutPostRedisplay();
 
   return false;
 }

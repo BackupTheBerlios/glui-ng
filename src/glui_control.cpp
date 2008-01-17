@@ -37,23 +37,6 @@ int _glui_draw_border_only = 0;
 
 /*************************** Drawing Utility routines *********************/
 
-/* Redraw this control. */
-void	      GLUI_Control::redraw(void) {
-    if (glui==NULL || hidden) return;
-    if (glui->should_redraw_now(this))
-      translate_and_draw();
-}
-
-/** Redraw everybody in our window. */
-void	     GLUI_Control::redraw_window(void) {
-  if (glui==NULL || hidden) return;
-  if ( glui->get_glut_window_id() == -1 ) return;
-  int orig = set_to_glut_window();
-  glutPostRedisplay();
-  restore_window(orig);
-}
-
-
 
 /* GLUI_Control::translate_and_draw() ********/
 void GLUI_Control::translate_and_draw()
@@ -364,7 +347,7 @@ void GLUI_Control::sync_live(int recurse, int draw_it)
   /***  If this control is changed and we're supposed to be drawing, then
     draw it now    ***/
   if ( changed == true AND draw_it ) {
-    redraw();
+    glutPostRedisplay();
   }
 
   if ( recurse ) {
@@ -556,7 +539,7 @@ void GLUI_Control::enable()
   if ( NOT glui )
     return;
 
-  redraw();
+  glutPostRedisplay();
 
   /*** Now recursively enable all buttons below it ***/
   node = (GLUI_Control*) first_child();
@@ -581,7 +564,7 @@ void GLUI_Control::disable()
 
   if ( glui->active_control == this )
     glui->deactivate_current_control();
-  redraw();
+  glutPostRedisplay();
 
   /*** Now recursively disable all buttons below it ***/
   node = (GLUI_Control*) first_child();
@@ -597,7 +580,7 @@ void GLUI_Control::set_w(int new_w)
 {
   w = new_w;
   update_size();  /* Make sure control is big enough to fit text */
-  if (glui) glui->refresh();
+  glutPostRedisplay();
 }
 
 
@@ -607,7 +590,7 @@ void GLUI_Control::set_h(int new_h)
 {
   h = new_h;
   update_size();  /* Make sure control is big enough to fit text */
-  if (glui) glui->refresh();
+  glutPostRedisplay();
 }
 
 
@@ -620,7 +603,7 @@ void GLUI_Control::set_alignment(int new_align)
   if ( glui )
   {
     glui->align_controls(this);
-    redraw_window();
+    glutPostRedisplay();
   }
 }
 

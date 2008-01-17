@@ -77,7 +77,7 @@ void GLUI_Tree::open( void )
     ((GLUI_Control*) child_head)->unhide_internal( true );
   }
 
-  glui->refresh();
+  glutPostRedisplay();
 }
 
 
@@ -106,7 +106,7 @@ void    GLUI_Tree::close( void )
 
   this->h = GLUI_DEFAULT_CONTROL_HEIGHT + 7;
 
-  glui->refresh();
+  glutPostRedisplay();
 }
 
 
@@ -122,7 +122,7 @@ int   GLUI_Tree::mouse_down_handler( int local_x, int local_y )
 
   currently_inside = true;
   initially_inside = true;
-  redraw();
+  glutPostRedisplay();
 
   return false;
 }
@@ -140,7 +140,7 @@ int  GLUI_Tree::mouse_held_down_handler(
     new_inside = false;
 
   if (currently_inside != new_inside)
-    redraw();
+    glutPostRedisplay();
 
   return false;
 }
@@ -159,7 +159,7 @@ int   GLUI_Tree::mouse_up_handler( int local_x, int local_y, bool inside )
 
   currently_inside = false;
   initially_inside = false;
-  redraw();
+  glutPostRedisplay();
 
   return false;
 }

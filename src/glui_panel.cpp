@@ -32,19 +32,32 @@
 *****************************************************************************/
 
 #include "glui_internal_control.h"
-
-GLUI_Panel::GLUI_Panel( GLUI_Node *parent, const char *name, int type ):
+GLUI_Panel::GLUI_Panel(GLUI* theglui, GLUI_Node *parent, const char *name,
+                int type):
     GLUI_Container(name)
 {
   common_init();
-  set_name( const_cast<char*>(name) );
   user_id    = -1;
   int_val    = type;
   if (parent != NULL)
 	{
 	  parent->add_control( this );
 	}
-  title = new GLUI_StaticText(this, "title");
+  glui       = theglui;
+  title = new GLUI_StaticText(this, name);
+}
+
+GLUI_Panel::GLUI_Panel( GLUI_Node *parent, const char *name, int type):
+    GLUI_Container(name)
+{
+  common_init();
+  user_id    = -1;
+  int_val    = type;
+  if (parent != NULL)
+	{
+	  parent->add_control( this );
+	}
+  title = new GLUI_StaticText(this, name);
 }
 
 GLUI_Panel::~GLUI_Panel()
@@ -155,9 +168,7 @@ void    GLUI_Panel::set_name( char *new_name )
   *(dynamic_cast<std::string*>(title))=new_name;
 
   update_size();
-
-  if ( glui )
-    glui->refresh();
+  glutPostRedisplay();
 }
 
 
@@ -168,7 +179,7 @@ void    GLUI_Panel::set_type( int new_type )
   if ( new_type != int_val ) {
     int_val = new_type;
     update_size();
-    redraw();
+    glutPostRedisplay();
   }
 }
 
