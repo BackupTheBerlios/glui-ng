@@ -92,7 +92,9 @@ protected:
     void           visibility(int state);
     void           motion(int x, int y);
     void           entry(int state);
-    void           display( void );
+
+    void           display( void );   //< Main display entry point called by glutPostRedisplay();
+
     void           idle(void);
     int            needs_idle(void);
 

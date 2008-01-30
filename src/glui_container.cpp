@@ -40,6 +40,7 @@ GLUI_Container::GLUI_Container(const char *name ,
 
 {
     orientation = orient;
+    HowToPack = AdaptParent;
 }
 
 int GLUI_Container::min_w() { return x_off_left + x_off_right;}
@@ -50,33 +51,67 @@ void GLUI_Container::update_size( void )
 {
     GLUI_Node* node;
     GLUI_Control* child;
-    node = this->first_child();
-    //default value (no child)
-    this->w = x_off_left + x_off_right;
-    this->h = y_off_top  + y_off_bot;
-
-    //parse all childs updating their size firt
-    while (NULL != node)
+    if (this->resizeable == Scale || this->resizeable == FixedSize)
     {
-        child = dynamic_cast<GLUI_Control*>(node);
-        if ( NULL != child)
+        GLUI_Control::update_size();
+    }
+    else if (this->resizeable == AdaptCurrent)
+    {
+
+        node = this->first_child();
+        //this is to ensure that scalable childs will go to min size
+        this->w = 0;
+        this->h = 0;
+        int width = 0;
+        int height = 0;
+
+        //parse all childs updating their size firt
+        while (NULL != node)
         {
-            child->update_size();
-            if (orientation == GLUI_horizontal )
+            child = dynamic_cast<GLUI_Control*>(node);
+            if ( NULL != child)
             {
-                this->w += child->w + x_off;
-                this->h = max<int> (this->h, child->h);
+                child->update_size();
+                //default value (no child)
+                width = x_off_left + x_off_right;
+                height = y_off_top  + y_off_bot;
+
+                if (orientation == GLUI_horizontal )
+                {
+                    width += child->Width() + x_off;
+                    height = max<int> (this->Height(), child->Height());
+                }
+                else
+                {
+                    width = max<int> (this->Width(), child->Width());
+                    height += child->Height() + y_off;
+                }
+                break;
             }
-            else
+            node = node->next();
+        }
+        this->w = width;
+        this->h = height;
+    }
+
+    int TotalChildsWidth;
+    int TotalChildsHeight;
+
+    if (HowToPack == scale )
+    {
+        node = this->first_child();
+        TotalChildsWidth = x_off;
+        TotalChildsHeight = y_off;
+        while (NULL != node)
+        {
+            child = dynamic_cast<GLUI_Control*>(node);
+            if ( NULL != child)
             {
-                this->w = max<int> (this->w, child->w);
-                this->h += child->h + y_off;
+                TotalChildsWidth += child->Width() + x_off;
+                TotalChildsHeight += child->Height() + y_off;
             }
         }
-        node = node->next();
     }
-    this->w = max<int>(this->min_w(), this->w);
-    this->h = max<int>(this->min_h(), this->h);
 
 }
 
@@ -100,11 +135,11 @@ void GLUI_Container::pack (int x, int y)
             child->pack(this->x_abs + x_offset, this->y_abs + y_offset);
             if (orientation == GLUI_horizontal )
             {
-                x_offset += child->w + x_off;
+                x_offset += child->Width() + x_off;
             }
             else
             {
-               y_offset += child->h + y_off;
+               y_offset += child->Height() + y_off;
             }
         }
         node = node->next();
@@ -160,3 +195,15 @@ void GLUI_Container::translate_and_draw (void)
   }
 
 }
+
+
+void GLUI_Container::set_w( int new_w )
+{
+    this->w = new_w;
+}
+void GLUI_Container::set_h( int new_w )
+{
+    this->h = new_w;
+}
+
+

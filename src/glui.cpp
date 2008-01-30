@@ -555,65 +555,61 @@ void    GLUI_Main::display( void )
 	      "display\n");
   int       win_w, win_h;
 
-  /* SUBTLE: on freeGLUT, the correct window is always already set.
-  But older versions of GLUT need this call, or else subwindows
-  don't update properly when resizing or damage-painting.
-  */
+  // SUBTLE: on freeGLUT, the correct window is always already set.
+  // But older versions of GLUT need this call, or else subwindows
+  // don't update properly when resizing or damage-painting.
   glutSetWindow( glut_window_id );
   
-  /* Set up OpenGL state for widget drawing */
+  // Set up OpenGL state for widget drawing
   glDisable( GL_DEPTH_TEST );
   glCullFace( GL_BACK );
   glDisable( GL_CULL_FACE );
   glDisable( GL_LIGHTING );
   set_current_draw_buffer();
 
-  /**** This function is used as a special place to do 'safe' processing,
-    e.g., handling window close requests.
-    That is, we can't close the window directly in the callback, so 
-    we set a flag, post a redisplay message (which eventually calls
-    this function), then close the window safely in here.  ****/
+  // This function is used as a special place to do 'safe' processing,
+  //  e.g., handling window close requests.
+  //  That is, we can't close the window directly in the callback, so
+  //  we set a flag, post a redisplay message (which eventually calls
+  //  this function), then close the window safely in here.
   if ( closing ) {
     close_internal();
     return;
   }
 
-  /*  if ( TEST_AND( this->flags, GLUI_SUBWINDOW ))
-      check_subwindow_position();
-      */
+  //update sizes and positions
+  main_panel->update_size();
+  main_panel->pack(0, 0);
 
+
+  // Check here if the window needs resizing
   win_w = glutGet( GLUT_WINDOW_WIDTH );
   win_h = glutGet( GLUT_WINDOW_HEIGHT );
-
-  /*** Check here if the window needs resizing ***/
   if ( win_w != main_panel->w OR win_h != main_panel->h ) {
     glutReshapeWindow( main_panel->w, main_panel->h );
     return;
   }
 
-  /*******    Draw GLUI window     ******/
+  //    Draw GLUI window
   glClearColor( bkgd_color[0] / 255.0f,
 		        bkgd_color[1] / 255.0f,
 		        bkgd_color[2] / 255.0f,
 		        1.0f );
-  glClear( GL_COLOR_BUFFER_BIT ); /* | GL_DEPTH_BUFFER_BIT );          */
+  glClear( GL_COLOR_BUFFER_BIT ); // | GL_DEPTH_BUFFER_BIT );
 
   set_ortho_projection();
 
   glMatrixMode( GL_MODELVIEW );
   glLoadIdentity();
 
-  /*** Rotate image so y increases downward.
-      In normal OpenGL, y increases upward. ***/
+  // Rotate image so y increases downward.
+  // In normal OpenGL, y increases upward.
   glTranslatef( (float) win_w/2.0, (float) win_h/2.0, 0.0 );
   glRotatef( 180.0, 0.0, 1.0, 0.0 );
   glRotatef( 180.0, 0.0, 0.0, 1.0 );
   glTranslatef( (float) -win_w/2.0, (float) -win_h/2.0, 0.0 );
 
   // Recursively draw the main panel
-  //  main_panel->draw_bkgd_box( 0, 0, win_w, win_h );
-  main_panel->update_size();
-  main_panel->pack(0, 0);
   main_panel->translate_and_draw();
   switch (buffer_mode) {
   case buffer_front: /* Make sure drawing gets to screen */

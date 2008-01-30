@@ -574,12 +574,36 @@ void GLUI_Control::disable()
   }
 }
 
+void GLUI_Control::update_size( void )
+{
+
+    if (this->resizeable == scale)
+    {
+        GLUI_Control* par= dynamic_cast<GLUI_Control*>(this->parent());
+        if (par)
+        {
+            this->w = par->Width() * percent_w / 100;
+            this->h = par->Height() * percent_h / 100;
+        }
+    }
+    else if (this->resizeable == FixedSize)
+    {
+        return; //nothing to do since we already have a fixed size
+    }
+}
 /******* GLUI_Control::set_w() **************/
 
 void GLUI_Control::set_w(int new_w)
 {
-  w = new_w;
-  update_size();  /* Make sure control is big enough to fit text */
+    if (this->resizeable == scale)
+    {
+        percent_w = new_w;
+        update_size();
+    }
+    else if (this->resizeable == FixedSize)
+    {
+        w = new_w;
+    }
   glutPostRedisplay();
 }
 
@@ -588,8 +612,15 @@ void GLUI_Control::set_w(int new_w)
 
 void GLUI_Control::set_h(int new_h)
 {
-  h = new_h;
-  update_size();  /* Make sure control is big enough to fit text */
+    if (this->resizeable == scale)
+    {
+        percent_h = new_h;
+        update_size();
+    }
+    else if (this->resizeable == FixedSize)
+    {
+        h = new_h;
+    }
   glutPostRedisplay();
 }
 

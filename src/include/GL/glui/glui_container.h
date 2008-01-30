@@ -57,12 +57,18 @@ class GLUIAPI GLUI_Container : public GLUI_Control
     virtual void pack ( int x, int y); //<recursively update positions
     virtual void translate_and_draw (void);  //<draw with the right size and position
     void set_orientation( GLUI_orientation new_orientation) {orientation = new_orientation; }
-    virtual int min_w();
-    virtual int min_h();
+    void set_packrule (PackPolicy pol);
+    virtual void align( void );
+    virtual void pack( int x, int y );    /* Recalculate positions and offsets */
+
+    void         set_w( int new_w );
+    void         set_h( int new_w );
+
 
 
     protected :
     GLUI_orientation orientation;
+    int              total_child_w
 
 };
 #endif //__GLUI_SPLITTER_H
