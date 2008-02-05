@@ -204,52 +204,6 @@ void GLUI_Control::restore_window(int orig)
 
 
 
-
-/**************************** Layout and Packing *********************/
-
-/****** GLUI_Control::align() **************/
-
-void GLUI_Control::align()
-{
-    int  orig_x_abs;
-    GLUI_Control* par;
-
-    orig_x_abs = x_abs;
-
-    /* Fix alignment bug relating to columns              */
-    /*return;              */
-
-    if ( NULL == parent() )
-        return;  /* Clearly this shouldn't happen, though */
-
-    par = dynamic_cast<GLUI_Control*>(parent());
-    if ( NULL == par )
-        return;
-
-    if ( alignment == GLUI_ALIGN_LEFT ) {
-        x_abs = par->x_abs + par->x_off;
-    }
-    else if ( alignment == GLUI_ALIGN_RIGHT ) {
-        x_abs = par->x_abs + par->w - par->x_off - this->w;
-    }
-    else if ( alignment == GLUI_ALIGN_CENTER ) {
-        x_abs = par->x_abs + (par->w - this->w) / 2;
-    }
-
-
-}
-
-
-/************** GLUI_Control::pack() ************/
-/* Recalculate positions and offsets  */
-
-void    GLUI_Control::pack( int x, int y )
-{
-    return;
-}
-
-
-
 /******************************** Live Variables **************************/
 /*********** GLUI_Control::sync_live() ************/
 /* Reads live variable and sets control to its current value                */
@@ -574,55 +528,56 @@ void GLUI_Control::disable()
   }
 }
 
+void GLUI_Control::pack (int x, int y)
+{
+    this->x_abs = x;
+    this->y_abs = y;
+}
+
 void GLUI_Control::update_size( void )
 {
 
-    if (this->resizeable == scale)
+    if (this->resizeable == PercentOfParent)
     {
         GLUI_Control* par= dynamic_cast<GLUI_Control*>(this->parent());
         if (par)
         {
-            this->w = par->Width() * percent_w / 100;
-            this->h = par->Height() * percent_h / 100;
+            this->w = par->Width() * this->CurrentSize.percent.w / 100;
+            this->h = par->Height() * this->CurrentSize.percent.h / 100;
+            if (Min > CurrentSize)
+            {
+                CurrentSize = Min;
+            }
         }
     }
-    else if (this->resizeable == FixedSize)
+    else if (this->resizeable == FixedSize ||
+             this->resizeable == FillSpace)
     {
+        this->w = CurrentSize.size.w;
+        this->h = CurrentSize.size.h;
         return; //nothing to do since we already have a fixed size
     }
 }
 /******* GLUI_Control::set_w() **************/
-
-void GLUI_Control::set_w(int new_w)
+int GLUI_Control::set_size( Size sz, Size min)
 {
-    if (this->resizeable == scale)
+    Size dontchange(0, 0);
+    if (dontchange != min)
     {
-        percent_w = new_w;
-        update_size();
+        this->Min = min;
     }
-    else if (this->resizeable == FixedSize)
+    if (sz > this->Min)
     {
-        w = new_w;
+        this->CurrentSize = sz;
     }
-  glutPostRedisplay();
+    else
+    {
+        return EINVAL;
+    }
+    update_size();
+    glutPostRedisplay();
 }
 
-
-/**** GLUI_Control::set_h() **************/
-
-void GLUI_Control::set_h(int new_h)
-{
-    if (this->resizeable == scale)
-    {
-        percent_h = new_h;
-        update_size();
-    }
-    else if (this->resizeable == FixedSize)
-    {
-        h = new_h;
-    }
-  glutPostRedisplay();
-}
 
 
 /***** GLUI_Control::set_alignment() ******/
@@ -633,7 +588,7 @@ void GLUI_Control::set_alignment(int new_align)
 
   if ( glui )
   {
-    glui->align_controls(this);
+    glui->Get_main_panel()->align();
     glutPostRedisplay();
   }
 }

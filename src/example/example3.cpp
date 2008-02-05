@@ -125,7 +125,7 @@ void pointer_cb( GLUI_Control* control )
     
     cmd_line = new GLUI_CommandLine( 
       cmd_line_glui, "Command (try 'exit'):", NULL, -1, pointer_cb );
-    cmd_line->set_w( 400 );  /** Widen 'command line' control **/
+    cmd_line->set_size( GLUI_Control::Size(50,400) );  /** Widen 'command line' control **/
 
     GLUI_Panel *panel = new GLUI_Panel(cmd_line_glui,"", GLUI_PANEL_NONE);
     GLUI_Splitter* split = new GLUI_Splitter(panel, "split");
@@ -390,7 +390,7 @@ int main(int argc, char* argv[])
 
   new GLUI_Separator( obj_panel, "separator" );
   edittext = new GLUI_EditText( obj_panel, "Text:", text );
-  edittext->set_w( 150 );
+  edittext->set_size( GLUI_Control::Size(150, obj_panel->h) );
 
   /******** Add some controls for lights ********/
 

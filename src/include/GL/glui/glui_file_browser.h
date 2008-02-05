@@ -36,8 +36,7 @@ public:
     void fbreaddir(const char *);
     static void dir_list_callback(GLUI_Control*);
 
-    void set_w(int w);
-    void set_h(int h);
+    int   set_size( Size sz, Size min=Size(0,0) );
     const char* get_file() { return file.c_str(); }
     void set_allow_change_dir(int c) { allow_change_dir = c; }
 
@@ -48,7 +47,6 @@ protected:
         h            = GLUI_DEFAULT_CONTROL_HEIGHT;
         int_val      = GLUI_PANEL_EMBOSSED;
         alignment    = GLUI_ALIGN_CENTER;
-        is_container = true;
         can_activate = false;
         allow_change_dir = true;
         last_item    = -1;

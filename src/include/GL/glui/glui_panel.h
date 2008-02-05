@@ -44,7 +44,6 @@ protected:
         h            = GLUI_DEFAULT_CONTROL_HEIGHT + 7;
         int_val      = GLUI_PANEL_EMBOSSED;
         alignment    = GLUI_ALIGN_CENTER;
-        is_container = true;
         can_activate = false;
     };
 	GLUI_StaticText* title;

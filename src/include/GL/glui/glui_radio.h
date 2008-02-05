@@ -27,7 +27,6 @@ protected:
         x_off         = 0;
         y_off_top     = 0;
         y_off_bot     = 0;
-        is_container  = true;
         w             = 300;
         h             = 300;
         num_buttons   = 0;

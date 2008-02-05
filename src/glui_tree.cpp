@@ -52,7 +52,7 @@ GLUI_Tree::GLUI_Tree(GLUI_Node *parent, const char *name,
 
   parent->add_control( this );
   inset_label = new GLUI_StaticText(splitter.GetFirstPanel(),"");
-  inset_label->set_w(inset);
+  inset_label->set_size(Size(inset, this->h));
   this->set_alignment(GLUI_ALIGN_LEFT);
 }
 

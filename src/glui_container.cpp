@@ -40,30 +40,122 @@ GLUI_Container::GLUI_Container(const char *name ,
 
 {
     orientation = orient;
-    HowToPack = AdaptParent;
 }
 
-int GLUI_Container::min_w() { return x_off_left + x_off_right;}
-int GLUI_Container::min_h() { return y_off_top  + y_off_bot; }
+
+inline void GLUI_Container::check_size_constency( void )
+{
+    GLUI_Node* node;
+    GLUI_Control* child;
+    int width;
+    int height;
+
+    node = this->first_child();
+    while (NULL != node)
+    {
+        child = dynamic_cast<GLUI_Control*>(node);
+        if (NULL != child)
+        {
+          if (orientation == GLUI_horizontal )
+                {
+                    width += child->Width() + x_off;
+                    height = max<int> (this->Height(), child->Height());
+                }
+                else
+                {
+                    width = max<int> (this->Width(), child->Width());
+                    height += child->Height() + y_off;
+                }
+        }
+    }
+    if (width > w) w = width;
+    if(height > h) h = height;
 
 
+
+}
+
+#warning "split this in inline functions"
 void GLUI_Container::update_size( void )
 {
     GLUI_Node* node;
     GLUI_Control* child;
-    if (this->resizeable == Scale || this->resizeable == FixedSize)
+    if ( this->resizeable == PercentOfParent ||
+         this->resizeable == FixedSize //we have a fixed size
+       )
     {
+        int FillSpaceCount=0;
+        int width = x_off_left + x_off_right;
+        int height = y_off_top  + y_off_bot;
+
+
         GLUI_Control::update_size();
+        node = this->first_child();
+        while (NULL != node)
+        {
+            child = dynamic_cast<GLUI_Control*>(node);
+            if ( (NULL != child) &&
+                 (child->get_resize_policy() != FillSpace)
+               )
+            {
+
+                child->update_size();
+                if (orientation == GLUI_horizontal )
+                {
+                    width += child->Width() + x_off;
+                    height = max<int> (this->Height(), child->Height());
+                }
+                else
+                {
+                    width = max<int> (this->Width(), child->Width());
+                    height += child->Height() + y_off;
+                }
+
+            }
+            node = node->next();
+        }
+        if (FillSpaceCount)
+        {
+            // now change type of auto fill space childs to have them
+            // use percent size of parent instead of autofill feature
+            node = this->first_child();
+            Size newsize;
+
+            if (orientation == GLUI_horizontal )
+            {
+                newsize.size.w = (this->w - width) / FillSpaceCount;
+                newsize.size.h = this->h;
+            }
+            else
+            {
+                newsize.size.w = this->w;
+                newsize.size.h = (this->h - width) / FillSpaceCount;
+            }
+
+
+            while (NULL != node)
+            {
+                child = dynamic_cast<GLUI_Control*>(node);
+                if ( (NULL != child) &&
+                     (child->get_resize_policy() != FillSpace)
+                   )
+                {
+                    child->set_size(newsize);
+                }
+                node = node->next();
+            }
+        }
+
     }
-    else if (this->resizeable == AdaptCurrent)
+    else if (this->resizeable == AdaptThisToFitChilds)
     {
 
         node = this->first_child();
         //this is to ensure that scalable childs will go to min size
         this->w = 0;
         this->h = 0;
-        int width = 0;
-        int height = 0;
+        int width = x_off_left + x_off_right;
+        int height = y_off_top  + y_off_bot;
 
         //parse all childs updating their size firt
         while (NULL != node)
@@ -72,9 +164,6 @@ void GLUI_Container::update_size( void )
             if ( NULL != child)
             {
                 child->update_size();
-                //default value (no child)
-                width = x_off_left + x_off_right;
-                height = y_off_top  + y_off_bot;
 
                 if (orientation == GLUI_horizontal )
                 {
@@ -93,26 +182,7 @@ void GLUI_Container::update_size( void )
         this->w = width;
         this->h = height;
     }
-
-    int TotalChildsWidth;
-    int TotalChildsHeight;
-
-    if (HowToPack == scale )
-    {
-        node = this->first_child();
-        TotalChildsWidth = x_off;
-        TotalChildsHeight = y_off;
-        while (NULL != node)
-        {
-            child = dynamic_cast<GLUI_Control*>(node);
-            if ( NULL != child)
-            {
-                TotalChildsWidth += child->Width() + x_off;
-                TotalChildsHeight += child->Height() + y_off;
-            }
-        }
-    }
-
+    check_size_constency();
 }
 
 void GLUI_Container::pack (int x, int y)
@@ -126,7 +196,6 @@ void GLUI_Container::pack (int x, int y)
     this->x_abs = x;
     this->y_abs = y;
 
-    //parse all childs updating their size firt
     while (NULL != node)
     {
         child = dynamic_cast<GLUI_Control*>(node);
@@ -197,13 +266,48 @@ void GLUI_Container::translate_and_draw (void)
 }
 
 
-void GLUI_Container::set_w( int new_w )
+
+/****** GLUI_Control::align() **************/
+#warning "remove alignement code and create spacer control instead"
+void GLUI_Container::align()
 {
-    this->w = new_w;
-}
-void GLUI_Container::set_h( int new_w )
-{
-    this->h = new_w;
-}
+    int  orig_x_abs;
+    GLUI_Control* par;
+
+    orig_x_abs = x_abs;
+
+    /* Fix alignment bug relating to columns              */
+    /*return;              */
+
+    if ( NULL == parent() )
+        return;  /* Clearly this shouldn't happen, though */
+
+    par = dynamic_cast<GLUI_Control*>(parent());
+    if ( NULL == par )
+        return;
+
+    if ( alignment == GLUI_ALIGN_LEFT ) {
+        x_abs = par->x_abs + par->x_off;
+    }
+    else if ( alignment == GLUI_ALIGN_RIGHT ) {
+        x_abs = par->x_abs + par->w - par->x_off - this->w;
+    }
+    else if ( alignment == GLUI_ALIGN_CENTER ) {
+        x_abs = par->x_abs + (par->w - this->w) / 2;
+    }
+
+    // now align childs
+    GLUI_Control *child;
+    GLUI_Container *childc;
+    child = dynamic_cast<GLUI_Control*>(this->first_child());
+
+    while( child != NULL )
+    {
+        childc=dynamic_cast<GLUI_Container*>(child);
+        if (childc != NULL) childc->align();
+
+        child = (GLUI_Control*)child->next();
+    }
 
 
+}

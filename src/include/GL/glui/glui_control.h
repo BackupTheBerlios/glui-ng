@@ -18,18 +18,42 @@
  should be directly accessed by users (they should be protected,
  not public); only subclasses.
 */
+#include <errno.h>
 class GLUIAPI GLUI_Control : public GLUI_Node
 {
-    public : //enums
+    public : //types
         enum SizePolicy {
             FixedSize,
-            Scale,
-            AdaptCurrent,
+            PercentOfParent,
+            FillSpace,
+            AdaptThisToFitChilds,
         };
+
+        union Size {
+            struct {
+                int w;
+                int h;
+            } size;
+            struct {
+                char w;
+                char h;
+            } percent;
+            Size(int w, int h) {this->size.w=w; this->size.h=h; }
+            Size() {this->size.w=0; this->size.h=0;}
+            bool operator!=(const Size &other) const
+                 { return (this->size.w != other.size.w) ||
+                          (this->size.h != other.size.h);
+                 }
+            bool operator>(const Size &other) const
+                {return (this->size.w > other.size.w) &&
+                        (this->size.h > other.size.h);
+                }
+        };
+
+
     public:
         int            Width() const  {return w;}
         int            Height() const {return h;}
-        int            UsePercent() const { if (resizeable == Scale) return true; }
 
         /** Onscreen coordinates */
         int             w, h;                        /* dimensions of control */
@@ -72,8 +96,6 @@ class GLUIAPI GLUI_Control : public GLUI_Node
         /** Properties of our control */
         GLUI           *glui;       /**< Our containing event handler (NEVER NULL during event processing!) */
 
-#warning "remove and use a class container and derivate from it"
-        bool            is_container;  /**< Is this a container class (e.g., panel) */
         int             alignment;
         bool            enabled;    /**< Is this control grayed out? */
 
@@ -101,6 +123,7 @@ class GLUIAPI GLUI_Control : public GLUI_Node
         virtual int key_handler( unsigned char key, int modifiers )                { return false; }
         virtual int special_handler( int key,int modifiers )                       { return false; }
 
+        virtual void pack (int x, int y);
         virtual void update_size( void );
         virtual void idle( void )            { }
         virtual int  mouse_over( int state, int x, int y ) { return false; }
@@ -134,9 +157,10 @@ class GLUIAPI GLUI_Control : public GLUI_Node
         void         draw_active_box( int x_min, int x_max, int y_min, int y_max );
         void         set_to_bkgd_color( void );
 
-        virtual void         set_w( int new_w );
-        virtual void         set_h( int new_w );
+        virtual int         set_size( Size sz, Size min=Size(0,0) );
         void         set_alignment( int new_align );
+        void         set_resize_policy( SizePolicy policy) { resizeable = policy; }
+        SizePolicy   get_resize_policy( void ) { return resizeable;}
 
 
         void         sync_live( int recurse, int draw );  /* Reads live variable */
@@ -168,9 +192,10 @@ class GLUIAPI GLUI_Control : public GLUI_Node
         glui           = NULL;
         w              = GLUI_DEFAULT_CONTROL_WIDTH;
         h              = GLUI_DEFAULT_CONTROL_HEIGHT;
+        Min            = Size(x_off_left + x_off_right, y_off_top + y_off_bot);
+        CurrentSize    = Min;
         active_type    = GLUI_CONTROL_ACTIVE_MOUSEDOWN;
         alignment      = GLUI_ALIGN_LEFT;
-        is_container   = false;
         can_activate   = true;         /* By default, you can activate a control */
         spacebar_mouse_click = true;    /* Does spacebar simulate a mouse click? */
         live_type      = GLUI_LIVE_NONE;
@@ -180,8 +205,6 @@ class GLUIAPI GLUI_Control : public GLUI_Node
         is_open        = true;
         hidden         = false;
         resizeable     = FixedSize;
-        min_w = x_off_left + x_off_right;
-        min_h = y_off_left + x_off_right;
         int i;
         for( i=0; i<GLUI_DEF_MAX_ARRAY; i++ )
             float_array_val[i] = last_live_float_array[i] = 0.0;
@@ -193,10 +216,8 @@ class GLUIAPI GLUI_Control : public GLUI_Node
         GLUI_Control();
     protected: //variables
         SizePolicy resizeable;
-        int min_w;
-        int min_h;
-        int percent_w;
-        int percent_h;
+        Size CurrentSize;
+        Size Min;
 };
 
 #endif

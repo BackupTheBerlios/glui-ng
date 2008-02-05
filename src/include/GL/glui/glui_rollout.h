@@ -48,7 +48,6 @@ protected:
         currently_inside = false;
         initially_inside = false;
         can_activate     = true;
-        is_container     = true;
         h                = GLUI_DEFAULT_CONTROL_HEIGHT + 7;
         w                = GLUI_DEFAULT_CONTROL_WIDTH;
         y_off_top        = 21;

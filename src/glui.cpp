@@ -972,11 +972,9 @@ GLUI_Control  *GLUI_Main::find_control( int x, int y, GLUI_Control * parent )
 
 void      GLUI_Main::pack_controls( void )
 {
-	main_panel->update_size();
-  main_panel->pack(0,0);
-
-  /**** Now align controls within their bounds ****/
-  align_controls( main_panel );
+    main_panel->update_size();
+    main_panel->align();
+    main_panel->pack(0,0);
 
   /***  If this is a subwindow, expand panel to fit parent window  ***/
   if ( TEST_AND( this->flags, GLUI_SUBWINDOW ) ) {
@@ -1011,24 +1009,6 @@ void      GLUI_Main::pack_controls( void )
 
   this->w = main_panel->w;
   this->h = main_panel->h;
-}
-
-
-/************************************ GLUI_Main::align_controls() **********/
-
-void    GLUI_Main::align_controls( GLUI_Control *control )
-{
-  GLUI_Control *child;
-
-  control->align();
-
-  child = (GLUI_Control*) control->first_child();
-
-  while( child != NULL ) {
-    align_controls( child );
-    
-    child = (GLUI_Control*)child->next();
-  }  
 }
 
 

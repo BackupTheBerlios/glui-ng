@@ -290,14 +290,13 @@ int main(int argc, char* argv[])
   hah->add_item(7,"FileBrowser");
   new GLUI_StaticText(ep,"Open Text File:");
   fb = new GLUI_FileBrowser(ep, "", false, 7, control_cb);
-  fb->set_h(180);
-  hah->set_h(180);
+  fb->set_size(GLUI_Control::Size(ep->w, 180));
+  hah->set_size(GLUI_Control::Size(ep->w, 180));
   //new GLUI_Column(ep,false);
 
   moo = new GLUI_TextBox(ep, "moo", true,1,textbox_cb);
   moo->set_text(general);
-  moo->set_h(400);
-  moo->set_w(410);
+  moo->set_size(GLUI_Control::Size(410, 400));
   moo->disable();
   enable_textbox=0;
   new GLUI_Checkbox(ep, "Enable text box:",&enable_textbox,12,control_cb);

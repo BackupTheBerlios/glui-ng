@@ -168,12 +168,7 @@ void ProcessFiles(const char *path_name)
 }
 
 
-void GLUI_FileBrowser::set_w(int w) 
+int   GLUI_FileBrowser::set_size( Size sz, Size min)
 { 
-  if (list) list->set_w(w);
-}
-
-void GLUI_FileBrowser::set_h(int h) 
-{
-  if (list) list->set_h(h);
+  if (list) list->set_size(sz, min);
 }

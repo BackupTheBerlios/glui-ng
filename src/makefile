@@ -39,7 +39,7 @@ LIBS    = -lXmu -lXext -lX11 -lXi -lm
 LIBGLUT   = -L/usr/X11R6/lib -lglut
 CPPFLAGS += -I/usr/X11R6/include
 
-GLUI_HEADERS = $(shell ls include/GL/glui)
+GLUI_HEADERS = $(shell find include -type f)
 
 #######################################
 
@@ -71,6 +71,8 @@ bin/%: example/%.cpp $(GLUI_LIB)
 
 $(GLUI_LIB): $(GLUI_OBJS)
 	ar -r $(GLUI_LIB) $(GLUI_OBJS)
+
+${GLUI_OBJS}: ${GLUI_HEADERS}
 
 .cpp.o: ${GLUI_HEADERS}
 	$(CXX) $(CPPFLAGS) -c $<
