@@ -58,6 +58,10 @@ void    GLUI_StaticText::draw( )
     return;
 
   erase_text();
+  glColor3ubv( Color );
+  glRasterPos2i(0,0); //glRasterPos store the color and translate
+                      //we don't need to translate since this is the
+                      //role of the container
   GLUI_Text::draw();
 }
 

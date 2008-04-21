@@ -44,39 +44,11 @@ void GLUI_Node::add_child_to_control(GLUI_Node *parent,GLUI_Control *child)
   /*** Collapsible nodes have to be handled differently, b/c the first and 
     last children are swapped in and out  ***/
   parent_control = ((GLUI_Control*)parent);
-  if ( parent_control->collapsible == true ) {
-    if ( NOT parent_control->is_open ) {
-      /** Swap in the original first and last children **/
-      parent_control->child_head  = parent_control->collapsed_node.child_head;
-      parent_control->child_tail  = parent_control->collapsed_node.child_tail;
-
-      /*** Link this control ***/
-      child->link_this_to_parent_last( parent_control );
-
-      /** Swap the children back out ***/
-      parent_control->collapsed_node.child_head = parent_control->child_head;
-      parent_control->collapsed_node.child_tail = parent_control->child_tail;
-      parent_control->child_head = NULL;
-      parent_control->child_tail = NULL;
-    }
-    else {
-      child->link_this_to_parent_last( parent_control );
-    }
-  }
-  else {
-    child->link_this_to_parent_last( parent_control );
-  }
+  child->link_this_to_parent_last( parent_control );
   child->glui = (GLUI*) parent_control->glui;
-  child->update_size();
   child->enabled = parent_control->enabled;
   glutPostRedisplay();
 
-  /** Now set the 'hidden' var based on the parent **/
-  if ( parent_control->hidden OR 
-       (parent_control->collapsible AND NOT parent_control->is_open ) )
-  {
-    child->hidden = true;
-  }
 }
 
 
@@ -119,9 +91,9 @@ void GLUI_CB::operator()(GLUI_Control*ctrl) const
 }
 
 
-/************************************************ GLUI::GLUI() **********/
+/***************************** GLUI_Main::CreateGluiWindow() **********/
 
-int GLUI::init( const char *text, long flags, int x, int y, int parent_window ) 
+void GLUI_Main::CreateGluiWindow( const char *text, long flags, int x, int y, int parent_window )
 {
   int old_glut_window;
 
@@ -129,9 +101,6 @@ int GLUI::init( const char *text, long flags, int x, int y, int parent_window )
 
   window_name = text;
   
-  //buffer_mode = buffer_back;  ///< New smooth way
-  buffer_mode = buffer_front; ///< Old flickery way (a bit faster).
-
   /*** We copy over the current window callthroughs ***/
   /*** (I think this might actually only be needed for subwindows) ***/
   /*  glut_keyboard_CB = GLUI_Master.glut_keyboard_CB;
@@ -148,6 +117,8 @@ int GLUI::init( const char *text, long flags, int x, int y, int parent_window )
 
     if ( old_glut_window > 0 )
       glutSetWindow( old_glut_window );
+    else
+        glutSetWindow(glut_window_id);
 
     top_level_glut_window_id = glut_window_id;
   } 
@@ -171,10 +142,9 @@ int GLUI::init( const char *text, long flags, int x, int y, int parent_window )
       */
     
   }
+#warning "throw an exception on error here"
 
-  return true;
 }
-
 
 /**************************** GLUI_Main::create_standalone_window() ********/
 
@@ -210,7 +180,7 @@ void GLUI_Main::setup_default_glut_callbacks( void )
   glutPassiveMotionFunc( glui_passive_motion_func );
   glutEntryFunc( glui_entry_func );
   glutVisibilityFunc( glui_visibility_func );
-  /*  glutIdleFunc( glui_idle_func );    // FIXME!  100% CPU usage!      */
+  glutIdleFunc( glui_idle_func );    // FIXME!  100% CPU usage!
 }
 
 
@@ -506,8 +476,7 @@ GLUI_Master_Object::~GLUI_Master_Object()
 
 GLUI *GLUI_Master_Object::create_glui( const char *name, long flags,int x,int y )
 {
-  GLUI *new_glui = new GLUI;
-  new_glui->init( name, flags, x, y, -1 );
+  GLUI *new_glui = new GLUI( name, flags, x, y, -1 );
   new_glui->link_this_to_parent_last( &this->gluis );
   return new_glui;
 }
@@ -518,11 +487,10 @@ GLUI *GLUI_Master_Object::create_glui( const char *name, long flags,int x,int y 
 GLUI *GLUI_Master_Object::create_glui_subwindow( int parent_window, 
 						   long flags )
 {
-  GLUI *new_glui = new GLUI;
   std::string new_name;
   glui_format_str( new_name, "subwin_%p", this );
 
-  new_glui->init( new_name.c_str(), flags | GLUI_SUBWINDOW, 0,0,
+  GLUI *new_glui = new GLUI( new_name.c_str(), flags | GLUI_SUBWINDOW, 0,0,
 		    parent_window );
   new_glui->main_panel->set_int_val( GLUI_PANEL_EMBOSSED );
   new_glui->link_this_to_parent_last( &this->gluis );
@@ -578,8 +546,7 @@ void    GLUI_Main::display( void )
   }
 
   //update sizes and positions
-  main_panel->update_size();
-  main_panel->pack(0, 0);
+  pack_controls();
 
 
   // Check here if the window needs resizing
@@ -598,20 +565,11 @@ void    GLUI_Main::display( void )
   glClear( GL_COLOR_BUFFER_BIT ); // | GL_DEPTH_BUFFER_BIT );
 
   set_ortho_projection();
-
-  glMatrixMode( GL_MODELVIEW );
-  glLoadIdentity();
-
-  // Rotate image so y increases downward.
-  // In normal OpenGL, y increases upward.
-  glTranslatef( (float) win_w/2.0, (float) win_h/2.0, 0.0 );
-  glRotatef( 180.0, 0.0, 1.0, 0.0 );
-  glRotatef( 180.0, 0.0, 0.0, 1.0 );
-  glTranslatef( (float) -win_w/2.0, (float) -win_h/2.0, 0.0 );
+  LoadIdentityYAxisDown();
 
   // Recursively draw the main panel
   main_panel->translate_and_draw();
-  switch (buffer_mode) {
+  switch (get_buffer_mode()) {
   case buffer_front: /* Make sure drawing gets to screen */
   	glFlush();
 	break;
@@ -1044,7 +1002,7 @@ void   GLUI_Main::post_update_main_gfx( void )
 */
 bool	     GLUI_Main::should_redraw_now(GLUI_Control *ctl)
 {
-  switch (buffer_mode) {
+  switch (get_buffer_mode()) {
   case buffer_front: return true; /* always draw in front-buffer mode */
   case buffer_back: {
     int orig = ctl->set_to_glut_window();
@@ -1064,7 +1022,7 @@ int          GLUI_Main::set_current_draw_buffer( void )
   GLint state;
   glGetIntegerv( GL_DRAW_BUFFER, &state );
   /* Switch to new buffer */
-  switch (buffer_mode) {
+  switch (get_buffer_mode()) {
   case buffer_front: glDrawBuffer(GL_FRONT); break;
   case buffer_back:  glDrawBuffer(GL_BACK);  break; /* might not be needed... */
   }
@@ -1082,7 +1040,7 @@ void         GLUI_Main::restore_draw_buffer( int buffer_state )
 
 /******************************************** GLUI_Main::GLUI_Main() ********/
 
-GLUI_Main::GLUI_Main( void ) 
+GLUI_Main::GLUI_Main( const char *text, long flags, int x, int y, int parent_window )
 {
   mouse_button_down       = false;
   w                       = 0;
@@ -1108,6 +1066,7 @@ GLUI_Main::GLUI_Main( void )
   bkgd_color_f[1] = g / 255.0f;
   bkgd_color_f[2] = b / 255.0f;
 
+  CreateGluiWindow(text, flags, x, y, parent_window);
   /*** Create the main panel ***/
   main_panel              = new GLUI_Panel((GLUI*)this, NULL, "root panel");
   main_panel->set_int_val( GLUI_PANEL_NONE );
@@ -1865,6 +1824,21 @@ void  GLUI_Master_Object::set_left_button_glut_menu_control(
 
 
 /******************************* GLUI_Main::set_ortho_projection() **********/
+void  GLUI_Main::LoadIdentityYAxisDown()
+{
+  int win_w = glutGet( GLUT_WINDOW_WIDTH );
+  int win_h = glutGet( GLUT_WINDOW_HEIGHT );
+
+  glMatrixMode( GL_MODELVIEW );
+  glLoadIdentity();
+
+  /*** Rotate image so y increases upwards, contrary to OpenGL axes ***/
+  glTranslatef( (float) win_w/2.0, (float) win_h/2.0, 0.0 );
+  glRotatef( 180.0, 0.0, 1.0, 0.0 );
+  glRotatef( 180.0, 0.0, 0.0, 1.0 );
+  glTranslatef( (float) -win_w/2.0, (float) -win_h/2.0, 0.0 );
+
+}
 
 void  GLUI_Main::set_ortho_projection( void )
 {
@@ -1877,19 +1851,9 @@ void  GLUI_Main::set_ortho_projection( void )
   glLoadIdentity();
   /*  gluOrtho2D( 0.0, (float) win_w, 0.0, (float) win_h );          */
   glOrtho( 0.0, (float)win_w, 0.0, (float) win_h, -1000.0, 1000.0 );
-
   glMatrixMode( GL_MODELVIEW );
- 
-  return; /****-----------------------------------------------***/
 
-  glMatrixMode( GL_MODELVIEW );
-  glLoadIdentity();
 
-  /*** Rotate image so y increases upwards, contrary to OpenGL axes ***/
-  glTranslatef( (float) win_w/2.0, (float) win_h/2.0, 0.0 );
-  glRotatef( 180.0, 0.0, 1.0, 0.0 );
-  glRotatef( 180.0, 0.0, 0.0, 1.0 );
-  glTranslatef( (float) -win_w/2.0, (float) -win_h/2.0, 0.0 );
 }
 
 
@@ -2014,24 +1978,24 @@ GLUI_DrawingSentinal::~GLUI_DrawingSentinal() {
 
 void GLUI_Master_Object::glui_setIdleFuncIfNecessary( void )
 {
-  GLUI *glui;
+    GLUI *glui;
 
-  glui = (GLUI*) GLUI_Master.gluis.first_child();
-  int necessary;
-  if (this->glut_idle_CB) 
-    necessary = true;
-  else {
-    necessary = false;
-    while( glui ) {
-      if( glui->needs_idle() ) {
-	necessary = true;
-	break;
-      }
-      glui = (GLUI*) glui->next();
+    glui = (GLUI*) GLUI_Master.gluis.first_child();
+    int necessary;
+    if (this->glut_idle_CB)
+        necessary = true;
+    else {
+        necessary = false;
+        while( glui ) {
+            if( glui->needs_idle() ) {
+                necessary = true;
+                break;
+            }
+            glui = (GLUI*) glui->next();
+        }
     }
-  }
-  if( necessary )
-    glutIdleFunc( glui_idle_func );  
-  else
-    glutIdleFunc( NULL );  
+    if( necessary )
+        glutIdleFunc( glui_idle_func );
+    else
+        glutIdleFunc( NULL );
 }

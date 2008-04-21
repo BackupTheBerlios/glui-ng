@@ -58,14 +58,6 @@ class GLUIAPI GLUI_Control : public GLUI_Node
         /** Onscreen coordinates */
         int             w, h;                        /* dimensions of control */
         int             x_abs, y_abs;
-        int             x_off, y_off;            // offset between childs elements
-        int             y_off_top, y_off_bot;    // top and bottom margin inside the control
-        int             x_off_left, x_off_right; // right and left inner margin
-        int             contain_x, contain_y;
-        int             contain_w, contain_h;
-        /* if this is a container control (e.g.,
-           radiogroup or panel) this indicated dimensions
-           of inner area in which controls reside */
 
         /** "activation" for tabbing between controls. */
         int             active_type; ///< "GLUI_CONTROL_ACTIVE_..."
@@ -99,10 +91,6 @@ class GLUIAPI GLUI_Control : public GLUI_Node
         int             alignment;
         bool            enabled;    /**< Is this control grayed out? */
 
-#warning "remove and use a class collapsible"
-        bool            collapsible, is_open;
-        GLUI_Node       collapsed_node;
-        bool            hidden; /* Collapsed controls (and children) are hidden */
 
     public:
         /*** Get/Set values ***/
@@ -133,12 +121,8 @@ class GLUIAPI GLUI_Control : public GLUI_Node
         virtual void activate( int how )     { active = true; }
         virtual void deactivate( void )     { active = false; }
 
-        /** Hide (shrink into a rollout) and unhide (expose from a rollout) */
-        void         hide_internal( int recurse );
-        void         unhide_internal( int recurse );
-
         /** Return true if it currently makes sense to draw this class. */
-        int          can_draw( void ) { return (glui != NULL && hidden == false); }
+        int          can_draw( void ) { return (glui != NULL ); }
 
 
         virtual void draw(void)=0;
@@ -172,13 +156,8 @@ class GLUIAPI GLUI_Control : public GLUI_Node
 
         GLUI_Control(const char* name)
             : GLUI_Node(name)
-              , collapsed_node("collapsed_node")
     {
-        x_off          = GLUI_XOFF;
-        y_off_top      = GLUI_YOFF;
-        y_off_bot      = GLUI_YOFF;
-        x_off_left     = GLUI_XOFF;
-        x_off_right    = GLUI_XOFF;
+
         x_abs          = GLUI_XOFF;
         y_abs          = GLUI_YOFF;
         active         = false;
@@ -192,7 +171,7 @@ class GLUIAPI GLUI_Control : public GLUI_Node
         glui           = NULL;
         w              = GLUI_DEFAULT_CONTROL_WIDTH;
         h              = GLUI_DEFAULT_CONTROL_HEIGHT;
-        Min            = Size(x_off_left + x_off_right, y_off_top + y_off_bot);
+        Min            = Size(0, 0);
         CurrentSize    = Min;
         active_type    = GLUI_CONTROL_ACTIVE_MOUSEDOWN;
         alignment      = GLUI_ALIGN_LEFT;
@@ -201,9 +180,6 @@ class GLUIAPI GLUI_Control : public GLUI_Node
         live_type      = GLUI_LIVE_NONE;
         last_live_text == "";
         live_inited    = false;
-        collapsible    = false;
-        is_open        = true;
-        hidden         = false;
         resizeable     = FixedSize;
         int i;
         for( i=0; i<GLUI_DEF_MAX_ARRAY; i++ )

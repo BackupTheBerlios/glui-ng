@@ -11,7 +11,7 @@
 /**
   One collapsible entry in a GLUI_TreePanel.
 */
-class GLUIAPI GLUI_Tree : public GLUI_Panel
+class GLUIAPI GLUI_Tree : public GLUI_Collapsible
 {
 public:
     GLUI_Tree(GLUI_Node *parent, const char *name,
@@ -78,7 +78,6 @@ protected:
         h                = GLUI_DEFAULT_CONTROL_HEIGHT + 7;
         w                = GLUI_DEFAULT_CONTROL_WIDTH;
         y_off_top        = 21;
-        collapsible      = true;
         red              = .5;
         green            = .5;
         blue             = .5;
@@ -130,7 +129,7 @@ public:
        going in reverse */
 
     GLUI_Tree    *curr_branch; /* Current Branch */
-    GLUI_Panel *curr_root;   /* Current Root */
+    GLUI_Tree    *curr_root;   /* Current Root */
 
 public:
     void            set_color(float r, float g, float b);

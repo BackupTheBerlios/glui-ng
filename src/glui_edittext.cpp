@@ -1015,16 +1015,14 @@ void   GLUI_EditText::clear_substring( int start, int end )
 
 void   GLUI_EditText::update_size( void )
 {
-  int text_size, delta;
+  int delta;
 
   if ( NOT glui )
     return;
-#warning "fix this"
-//  text_size = string_width( name );
-
+#warning "fix y size too"
   delta = 0;
-  if ( text_x_offset < text_size +2 )
-    delta = text_size+2-text_x_offset;
+  if ( text_x_offset < this->text->graph_Length() +2 )
+    delta = this->text->graph_Length() + 2 - text_x_offset;
 
   text_x_offset += delta;
   /*  w += delta;              */

@@ -131,6 +131,7 @@ int main(int argc, char* argv[])
     ->set_int_limits( 3, 60 ); 
    
   glui->set_main_gfx_window( main_window );
+  glui->Get_main_panel()->set_resize_policy(GLUI_Control::AdaptThisToFitChilds);
 
   /* We register the idle callback with GLUI, *not* with GLUT */
   GLUI_Master.set_glutIdleFunc( myGlutIdle ); 

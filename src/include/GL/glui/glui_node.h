@@ -19,10 +19,6 @@ class GLUI_Control;
 */
 class GLUIAPI GLUI_Node
 {
-    friend class GLUI_Tree;     /* JVK */
-    friend class GLUI_Rollout;
-    friend class GLUI_Main;
-
 public:
     GLUI_Node(const char* name);
 

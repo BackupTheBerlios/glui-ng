@@ -44,6 +44,13 @@ protected:
     }
 };
 
+
+/*class GLUIAPI GLUI_ToggleButton : public GLUI_Button
+{
+    protected :
+        int state;
+};*/
+
 #include <GL/glui/glui_statictext.h>
 
 class GLUIAPI GLUI_TextButton : public GLUI_Button

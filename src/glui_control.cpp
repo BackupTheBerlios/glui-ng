@@ -45,14 +45,9 @@ void GLUI_Control::translate_and_draw()
 
   glMatrixMode( GL_MODELVIEW );
   glPushMatrix();
-  glTranslatef( (float) this->x_abs + .5,
-		  (float) this->y_abs + .5,
-		  0.0 );
   draw();
   glPopMatrix();
-  if (DEBUG && glui->buffer_mode == GLUI_Main::buffer_front) {
-	  glFlush();
-  }
+  GLUI_debug::Instance()->FlushGL();
 }
 
 
@@ -312,16 +307,6 @@ void GLUI_Control::sync_live(int recurse, int draw_it)
       node = node->next();
     }
 
-    if ( collapsible == true AND is_open == false ) {
-      /** Here we have a collapsed control (e.g., a rollout that is closed **/
-      /** We need to go in and sync all the collapsed controls inside      **/
-       
-      node = this->collapsed_node.first_child();
-      while( node ) {
-	((GLUI_Control*) node)->sync_live(true, false);
-	node = node->next();
-      }
-    }
   }
 }
 
@@ -621,64 +606,3 @@ GLUI_Control::~GLUI_Control()
   }
 }
 
-/********* GLUI_Control::hide_internal() ********/
-/** Sets hidden==true for this  control and all its siblings.             */
-/**  If recurse is true, we go to children as well                       */
-
-void         GLUI_Control::hide_internal( int recurse )
-{
-  GLUI_Node *node;
-
-  node = (GLUI_Node *) this;
-  while( node != NULL ) {
-    ((GLUI_Control*)node)->hidden = true;
-
-    if ( recurse AND node->first_child() != NULL )  
-      ((GLUI_Control*) node->first_child())->hide_internal(true);
-      
-    node = node->next();
-  }
-
-  node = this->collapsed_node.first_child();
-  while( node != NULL ) {
-    ((GLUI_Control*)node)->hidden = true;
-
-    if ( recurse AND node->first_child() != NULL )  
-      ((GLUI_Control*) node->first_child())->hide_internal(true);
-      
-    node = node->next();
-  }
-}
-
-
-/********* GLUI_Control::unhide_internal() ********/
-/** Sets hidden==false for this  control and all its siblings.             */
-/**  If recurse is true, we go to children as well                       */
-
-void         GLUI_Control::unhide_internal( int recurse )
-{
-  GLUI_Node *node;
-
-  node = (GLUI_Node *) this;
-  while( node != NULL ) {
-	  GLUI_debug::Instance()->print( __FILE__, __LINE__,
-			  "unhide: %s [%d]\n", node->NodeName,
-			  ((GLUI_Control*)node)->hidden );
-	  ((GLUI_Control*)node)->hidden = false;
-
-    if ( recurse AND node->first_child() != NULL )
-      ((GLUI_Control*) node->first_child())->unhide_internal(true);
-
-    node = node->next();
-  }
-
-  node = this->collapsed_node.first_child();
-  while( node != NULL ) {
-    ((GLUI_Control*)node)->hidden = false;
-
-    if ( recurse AND node->first_child() != NULL )
-      ((GLUI_Control*) node->first_child())->unhide_internal(true);
-
-    node = node->next();
-  }
-}

@@ -71,7 +71,6 @@ void GLUI_TextBox::common_construct(
 
   if (scroll) {
     GLUI_Panel *p = new GLUI_Panel(parent,"",GLUI_PANEL_NONE);
-    p->x_off = 1;
     tb_panel = p;
   }
   this->ptr_val     = data;

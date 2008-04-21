@@ -171,6 +171,7 @@ void GLUI_StdBitmaps::draw(int i, int x, int y) const
 		glDrawPixels( 
 			bitmaps[i].w, bitmaps[i].h,
 			GL_RGB, GL_UNSIGNED_BYTE, bitmaps[i].pixels); 
+        GLUI_debug::Instance()->FlushGL();
 	}
 }
 

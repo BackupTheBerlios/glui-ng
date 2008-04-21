@@ -39,11 +39,14 @@ enum {rollout_height_pixels=GLUI_DEFAULT_CONTROL_HEIGHT + 7};
 
 GLUI_Rollout::GLUI_Rollout( GLUI_Node *parent, const char *name,
                             int open, int type ) :
-    GLUI_Panel(name),
-    button(this, "")
+    GLUI_Collapsible(name),
+    button(this, "toggle"),
+    panel(this, "panel")
 {
   common_init();
-  set_name( const_cast<char*>(name) );
+  button.SetText( const_cast<char*>(name) );
+  Toggle     = &button;
+  Content    = &panel;
   user_id    = -1;
   int_val    = type;
 		
@@ -55,60 +58,7 @@ GLUI_Rollout::GLUI_Rollout( GLUI_Node *parent, const char *name,
   parent->add_control( this );
 }
 
-/****************************** GLUI_Rollout::open() **********/
 
-void    GLUI_Rollout::open( void )
-{
-  if ( NOT glui )
-    return;
-
-  if ( is_open )
-    return;
-  is_open = true;
-
-  GLUI_DRAWINGSENTINAL_IDIOM
-
-  /* Copy hidden children into our private list "collapsed_node" */
-  child_head = collapsed_node.child_head;
-  child_tail = collapsed_node.child_tail;
-  collapsed_node.child_head = NULL;
-  collapsed_node.child_tail = NULL;
-
-  if ( child_head != NULL ) {
-    ((GLUI_Control*) child_head)->unhide_internal( true );
-  }
-
-  glutPostRedisplay();
-}
-
-
-/****************************** GLUI_Rollout::close() **********/
-
-void    GLUI_Rollout::close( void )
-{
-  if ( NOT glui )
-    return;
-
-  if ( NOT is_open )
-    return;
-  is_open = false;
-
-  GLUI_DRAWINGSENTINAL_IDIOM
-
-  if ( child_head != NULL ) {
-    ((GLUI_Control*) child_head)->hide_internal( true );
-  }
-
-  /* Move all children into a private list of hidden children */
-  collapsed_node.child_head = first_child();
-  collapsed_node.child_tail = last_child();
-  child_head = NULL;
-  child_tail = NULL;
-
-  this->h = rollout_height_pixels;
-
-  glutPostRedisplay();
-}
 
 
 /**************************** GLUI_Rollout::mouse_down_handler() **********/
@@ -170,6 +120,25 @@ int   GLUI_Rollout::mouse_up_handler( int local_x, int local_y, bool inside )
 
 
 /********************************* GLUI_Rollout::draw() ***********/
+void   GLUI_Rollout::translate_and_draw (void)
+{
+    GLUI_DRAWINGSENTINAL_IDIOM
+
+    glMatrixMode( GL_MODELVIEW );
+    glPushMatrix();
+    glTranslatef( this->w/2 - Toggle->Width()/2 , 0.5, 0.1 );
+    Toggle->translate_and_draw();
+    glPopMatrix();
+    glPushMatrix();
+    if (is_open)
+    {
+        glTranslatef( 0.0, 0.5, 0.0 );
+        Content->translate_and_draw();
+        glPopMatrix();
+    }
+
+    GLUI_debug::Instance()->FlushGL();
+}
 
 void   GLUI_Rollout::draw( )
 {

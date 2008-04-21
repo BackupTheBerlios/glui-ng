@@ -71,6 +71,15 @@ int GLUI_debug::print(const char* file, int line, const char* format,...)
     }
 }
 
+void GLUI_debug::FlushGL(void)
+{
+      if (NULL != getenv("GLUI_SYNC") &&
+              GLUI_Main::get_buffer_mode() == GLUI_Main::buffer_front) {
+	  glFlush();
+  }
+}
+
+
 GLUI_debug* GLUI_debug::Instance()
 {
     static GLUI_debug instance;

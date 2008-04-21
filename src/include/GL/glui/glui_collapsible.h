@@ -30,53 +30,21 @@
   3. This notice may not be removed or altered from any source distribution.
 
 *****************************************************************************/
-#ifndef __GLUI_DEBUG_H
-#define __GLUI_DEBUG_H
-
-using namespace std;
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <iostream>
-#include <fstream>
-//#include "GL/glui/glui_main.h"
+#ifndef __GLUI_COLLAPSIBLE_H
+#define __GLUI_COLLAPSIBLE_H
 
 
-const size_t ISIZE = 500;
-
-class GLUI_debug
+class GLUIAPI GLUI_Collapsible : public GLUI_Container
 {
-    public :
-        static GLUI_debug* Instance();
+    public  :
+        GLUI_Collapsible(const char *name,
+                   GLUI_orientation orient=GLUI_vertical);
+        void  open               ( void );
+        void  close              ( void );
 
-        ~GLUI_debug();
-        int print(const char* file, int line, const char* format,...);
-        void FlushGL(); //flush gl operation if possible and if
-                        //GLUI_SYNC environment variable is set
-
-    private:
-        GLUI_debug();
-        char* use_debug;
-        char* buf;
+    protected :
+        bool            is_open;
+        GLUI_Control*   Toggle; //the toggle ie widget that is always displayed
+        GLUI_Control*   Content; //the content that can or not be displayed
 };
-
-/*
-public class ClassSingleton {
-    // Seule instance de Class Factory
-    public static ClassSingleton seuleInstance;
-    // Initialisateur
-    static {
-        // Crée la seule instance
-        seuleInstance = new ClassSingleton();
-    }
-    // Constructeur privé
-    private ClassSingleton() {
-    }
-    // Getter qui renvoie l’instance
-    public ClassSingleton getInstance() {
-        return seuleInstance;
-    }
-}*/
-
-
-#endif //__GLUI_DEBUG_H
+#endif //__GLUI_COLLAPSIBLE_H

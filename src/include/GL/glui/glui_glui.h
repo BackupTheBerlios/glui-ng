@@ -7,6 +7,8 @@
  The main user-visible interface object to GLUI.
 
 */
+
+#warning "this class is a duplicate of GLUI_Main, remove!"
 class GLUIAPI GLUI : public GLUI_Main
 {
 public:
@@ -46,8 +48,10 @@ public:
     */
 
     /***** Constructors and desctructors *****/
+    GLUI( const char *text, long flags, int x, int y, int parent_window ):
+        GLUI_Main(text, flags, x, y, parent_window)
+    {}
 
-    int init( const char *name, long flags, int x, int y, int parent_window );
 protected:
     virtual int add_control( GLUI_Node *parent, GLUI_Control *control ) {
         return GLUI_Main::add_control( parent, control );

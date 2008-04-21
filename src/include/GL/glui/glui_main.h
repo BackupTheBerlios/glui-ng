@@ -54,7 +54,10 @@ public:
 		buffer_front=1, ///< Draw updated controls directly to screen.
 		buffer_back=2   ///< Double buffering: postpone updates until next redraw.
 	};
-	buffer_mode_t get_buffer_mode() {return buffer_mode;}
+	static buffer_mode_t get_buffer_mode() {
+        if ( getenv("GLUI_BUFFER_MODE") == "buffer_front" ) return buffer_front;
+        else return buffer_back;
+    }
 
 protected:
     /*** Variables ***/
@@ -65,7 +68,6 @@ protected:
     GLUI_Control *active_control;
     GLUI_Control *mouse_over_control;
     GLUI_Panel   *main_panel;
-    buffer_mode_t buffer_mode; ///< Current drawing mode
     int           curr_cursor;
     int           w, h;
     long          flags;
@@ -113,8 +115,11 @@ protected:
     /********** Constructors and Destructors ***********/
 
     GLUI_Main( void );
+    void GLUI_Main::CreateGluiWindow( const char *text, long flags, int x, int y, int parent_window );
 
 public:
+    GLUI_Main( const char *text, long flags, int x, int y, int parent_window );
+
     GLUI_StdBitmaps  std_bitmaps;
     std::string      window_name;
     unsigned char    bkgd_color[3];
@@ -155,6 +160,7 @@ public:
     void         close_internal();
     void         check_subwindow_position();
     void         set_ortho_projection();
+    static void  LoadIdentityYAxisDown();
     void         set_viewport();
     int          get_glut_window_id( void ) { return glut_window_id; } /* JVK */
 };

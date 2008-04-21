@@ -51,9 +51,12 @@ GLUI_EXAMPLES = bin/example1 bin/example2 bin/example3 bin/example4 bin/example5
 
 GLUI_TOOLS = bin/ppm2array
 
-.PHONY: all setup examples tools clean depend doc doc-pdf doc-dist dist
+.PHONY: all setup examples tools clean depend doc doc-pdf doc-dist dist tests
 
-all: setup $(GLUI_LIB) examples tools
+all: setup $(GLUI_LIB) examples tools tests
+
+tests :
+	make -C tests $@
 
 setup:
 	mkdir -p bin
@@ -86,6 +89,7 @@ docs:
 clean:
 	rm -f *.o $(GLUI_LIB) $(GLUI_EXAMPLES) $(GLUI_TOOLS) 
 	rm -fr doc/doxygen
+	make -C tests $@
 
 DIST = glui-2.35
 

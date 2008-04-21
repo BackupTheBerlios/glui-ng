@@ -9,7 +9,10 @@
  A rollout contains a set of controls,
  like a panel, but can be collapsed to just the name.
 */
-class GLUIAPI GLUI_Rollout : public GLUI_Panel
+#include <GL/glui/glui_button.h>
+#include <GL/glui/glui_panel.h>
+#include <GL/glui/glui_collapsible.h>
+class GLUIAPI GLUI_Rollout : public GLUI_Collapsible
 {
 public:
 
@@ -30,20 +33,19 @@ public:
 
 
     bool        currently_inside, initially_inside;
-    GLUI_Button  button;
 
     void draw( void );
+    void translate_and_draw( void );
     void draw_pressed( void );
     int mouse_down_handler( int local_x, int local_y );
     int mouse_up_handler( int local_x, int local_y, bool inside );
     int  mouse_held_down_handler( int local_x, int local_y, bool inside );
 
-    void  open( void );
-    void  close( void );
-
     void update_size( void );
 
 protected:
+    GLUI_Panel panel;
+    GLUI_TextButton button;
     void common_init() {
         currently_inside = false;
         initially_inside = false;
@@ -51,7 +53,6 @@ protected:
         h                = GLUI_DEFAULT_CONTROL_HEIGHT + 7;
         w                = GLUI_DEFAULT_CONTROL_WIDTH;
         y_off_top        = 21;
-        collapsible      = true;
     }
 };
 

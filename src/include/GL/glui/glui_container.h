@@ -66,6 +66,17 @@ class GLUIAPI GLUI_Container : public GLUI_Control
     protected : //internal API
     void GLUI_Container::check_size_constency( void );
 
+    ///data :
+    protected :
+    int             x_off, y_off;            // offset between childs elements
+    int             y_off_top, y_off_bot;    // top and bottom margin inside the control
+    int             x_off_left, x_off_right; // right and left inner margin
+    int             contain_x, contain_y;
+    int             contain_w, contain_h;
+    /* if this is a container control (e.g.,
+       radiogroup or panel) this indicated dimensions
+       of inner area in which controls reside */
+
 };
 #endif //__GLUI_SPLITTER_H
 

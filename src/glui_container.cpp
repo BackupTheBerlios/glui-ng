@@ -40,6 +40,12 @@ GLUI_Container::GLUI_Container(const char *name ,
 
 {
     orientation = orient;
+    x_off          = GLUI_XOFF;
+    y_off          = GLUI_YOFF;
+    y_off_top      = GLUI_YOFF;
+    y_off_bot      = GLUI_YOFF;
+    x_off_left     = GLUI_XOFF;
+    x_off_right    = GLUI_XOFF;
 }
 
 
@@ -47,8 +53,8 @@ inline void GLUI_Container::check_size_constency( void )
 {
     GLUI_Node* node;
     GLUI_Control* child;
-    int width;
-    int height;
+    int width(0);
+    int height(0);
 
     node = this->first_child();
     while (NULL != node)
@@ -67,6 +73,7 @@ inline void GLUI_Container::check_size_constency( void )
                     height += child->Height() + y_off;
                 }
         }
+        node = node->next();
     }
     if (width > w) w = width;
     if(height > h) h = height;
@@ -175,7 +182,6 @@ void GLUI_Container::update_size( void )
                     width = max<int> (this->Width(), child->Width());
                     height += child->Height() + y_off;
                 }
-                break;
             }
             node = node->next();
         }
@@ -221,42 +227,30 @@ void GLUI_Container::translate_and_draw (void)
 {
   GLUI_Control *node;
   GLUI_debug::Instance()->print( __FILE__, __LINE__,
-          "%s %s hidden(%d)\n",__func__,
-          dynamic_cast<GLUI_Node*>(this)->whole_tree(),
-          this->hidden );
+          "%s %s \n",__func__,
+          dynamic_cast<GLUI_Node*>(this)->whole_tree());
   if ( ! can_draw() )
     return;
 
-  /*if ( 1 ) {  --  Debugging to check control width
-    glColor3f( 1.0, 0.0, 0.0 );
-    glBegin( GL_LINES );
-    glVertex2i( x_abs, y_abs );00
-    glVertex2i( x_abs+w, y_abs );
-
-    glEnd();
-    }*/
-
   glMatrixMode( GL_MODELVIEW );
   glPushMatrix();
-  //glLoadIdentity();
-  glTranslatef( (float) this->x_abs + .5,
-          (float) this->y_abs + .5,
-          0.0 );
-/*
-  // The following draws the area of each control
-  glColor3f( 1.0, 0.0, 0.0 );
-  glBegin( GL_LINE_LOOP );
-  glVertex2i( 0, 0 ); glVertex2i( w, 0 );
-  glVertex2i( w, h ); glVertex2i( 0, h );
-  glEnd();
-*/
+  glTranslatef( 0.5, 0.5, 0.0 );
+
+  draw();
   node = dynamic_cast<GLUI_Control*>(first_child());
   while( node ) {
+      if (orientation == GLUI_horizontal )
+      {
+          glTranslatef( (float)node->Width() + x_off, 0.0, 0.0);
+      }
+      else
+      {
+          glTranslatef( 0.0, (float) node->Height() + y_off, 0.0);
+      }
     node->translate_and_draw();
     node = dynamic_cast<GLUI_Control*>(node->next());
   }
 
-  draw();
 
   glPopMatrix();
     if (DEBUG && glui->get_buffer_mode() == GLUI_Main::buffer_front) {
@@ -272,7 +266,7 @@ void GLUI_Container::translate_and_draw (void)
 void GLUI_Container::align()
 {
     int  orig_x_abs;
-    GLUI_Control* par;
+    GLUI_Container* par;
 
     orig_x_abs = x_abs;
 
@@ -282,7 +276,7 @@ void GLUI_Container::align()
     if ( NULL == parent() )
         return;  /* Clearly this shouldn't happen, though */
 
-    par = dynamic_cast<GLUI_Control*>(parent());
+    par = dynamic_cast<GLUI_Container*>(parent());
     if ( NULL == par )
         return;
 
@@ -297,16 +291,16 @@ void GLUI_Container::align()
     }
 
     // now align childs
-    GLUI_Control *child;
+    GLUI_Node *child;
     GLUI_Container *childc;
-    child = dynamic_cast<GLUI_Control*>(this->first_child());
+    child = this->first_child();
 
     while( child != NULL )
     {
         childc=dynamic_cast<GLUI_Container*>(child);
         if (childc != NULL) childc->align();
 
-        child = (GLUI_Control*)child->next();
+        child = child->next();
     }
 
 

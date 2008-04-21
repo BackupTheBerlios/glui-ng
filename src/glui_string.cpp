@@ -104,8 +104,11 @@ void GLUI_Text::draw()
 {
   const char *p = this->c_str();
   glPushMatrix();
+  glColor3ubv( Color );
   while( *p != '\0' )  {
     glutBitmapCharacter( font, *p );
+#warning remove
+    glFlush();
     p++;
   }
   glPopMatrix();

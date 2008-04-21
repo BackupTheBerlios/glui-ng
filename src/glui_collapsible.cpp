@@ -3,12 +3,12 @@
   GLUI User Interface Toolkit
   ---------------------------
 
-     glui_debug.h - Glui trace facility
+     glui_panel.cpp - GLUI_Panel control class
 
 
           --------------------------------------------------
 
-  Copyright (c) 2007 Jean-Luc MALET
+  Copyright (c) 1998 Paul Rademacher
 
   WWW:    http://sourceforge.net/projects/glui/
   Forums: http://sourceforge.net/forum/?group_id=92496
@@ -30,53 +30,50 @@
   3. This notice may not be removed or altered from any source distribution.
 
 *****************************************************************************/
-#ifndef __GLUI_DEBUG_H
-#define __GLUI_DEBUG_H
+#include <GL/glui/glui_collapsible.h>
 
-using namespace std;
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <iostream>
-#include <fstream>
-//#include "GL/glui/glui_main.h"
-
-
-const size_t ISIZE = 500;
-
-class GLUI_debug
+GLUI_Collapsible::GLUI_Collapsible(const char *name,
+                   GLUI_orientation orient=GLUI_vertical) :
+    GLUI_Container (name, orient)
 {
-    public :
-        static GLUI_debug* Instance();
+    is_open = false;
+}
 
-        ~GLUI_debug();
-        int print(const char* file, int line, const char* format,...);
-        void FlushGL(); //flush gl operation if possible and if
-                        //GLUI_SYNC environment variable is set
-
-    private:
-        GLUI_debug();
-        char* use_debug;
-        char* buf;
-};
-
-/*
-public class ClassSingleton {
-    // Seule instance de Class Factory
-    public static ClassSingleton seuleInstance;
-    // Initialisateur
-    static {
-        // Crée la seule instance
-        seuleInstance = new ClassSingleton();
+void GLUI_Collapsible::translate_and_draw( void )
+{
+#warning "todo : implement real collapsible mechanism"
+    toggle->translate_and_draw();
+    if (is_open)
+    {
+        Content->translate_and_draw();
     }
-    // Constructeur privé
-    private ClassSingleton() {
-    }
-    // Getter qui renvoie l’instance
-    public ClassSingleton getInstance() {
-        return seuleInstance;
-    }
-}*/
+}
+
+void GLUI_Collapsible::draw (void)
+{
+#warning "todo : implement real drawing"
+}
 
 
-#endif //__GLUI_DEBUG_H
+void    GLUI_Collapsible::open( void )
+{
+  if ( is_open )
+    return;
+  is_open = true;
+
+  glutPostRedisplay();
+}
+
+
+
+void    GLUI_Collapsible::close( void )
+{
+
+  if ( NOT is_open )
+    return;
+  is_open = false;
+
+  this->h = button.Height();
+
+  glutPostRedisplay();
+}

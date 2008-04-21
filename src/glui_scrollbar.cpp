@@ -95,9 +95,6 @@ void GLUI_Scrollbar::common_init(void)
    h		= GLUI_SCROLL_ARROW_HEIGHT;
    w		= GLUI_TEXTBOX_WIDTH;
    alignment	= GLUI_ALIGN_CENTER;
-   x_off	= 0;
-   y_off_top	= 0;
-   y_off_bot	= 0;
    can_activate = true;
    state	= GLUI_SCROLL_STATE_NONE;
    growth_exp	= GLUI_SCROLL_DEFAULT_GROWTH_EXP;

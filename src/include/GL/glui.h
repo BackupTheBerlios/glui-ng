@@ -462,6 +462,7 @@ public:
 #include <GL/glui/glui_panel.h>
 #include <GL/glui/glui_splitter.h>
 #include <GL/glui/glui_file_browser.h>
+#include <GL/glui/glui_collapsible.h>
 #include <GL/glui/glui_rollout.h>
 #include <GL/glui/glui_treepanel.h>
 /************************************************************/
