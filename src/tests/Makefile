@@ -52,6 +52,8 @@ GLUI_TESTS = checkbox statictext
 
 .PHONY: all setup examples tools clean depend doc doc-pdf doc-dist dist
 
+tests : all
+
 all: $(GLUI_LIB) ${GLUI_TESTS}
 
 

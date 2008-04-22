@@ -6,9 +6,8 @@
 /*          Base class, for hierarchical relationships      */
 /*                                                          */
 /************************************************************/
-
-class GLUI_Control;
-
+#include <GL/glui/glui_commondefs.h>
+#include <cstdio>
 /**
  GLUI_Node is a node in a sort of tree of GLUI controls.
  Each GLUI_Node has a list of siblings (in a circular list)
@@ -34,7 +33,7 @@ public:
     GLUI_Node *parent()        { return parent_node; }
 
     /** Link in a new child control */
-    virtual int  add_control( GLUI_Control *control );
+    virtual int  add_control( GLUI_Node *control );
 
     void link_this_to_parent_last (GLUI_Node *parent  );
     void link_this_to_parent_first(GLUI_Node *parent  );
@@ -49,7 +48,6 @@ public:
 
 protected:
     GLUI_Node();
-    static void add_child_to_control(GLUI_Node *parent,GLUI_Control *child);
     GLUI_Node *parent_node;
     GLUI_Node *child_head;
     GLUI_Node *child_tail;

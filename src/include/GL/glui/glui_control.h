@@ -18,7 +18,19 @@
  should be directly accessed by users (they should be protected,
  not public); only subclasses.
 */
+
 #include <errno.h>
+#include <GL/glui/glui_forward.h>
+#include <GL/glui/glui_commondefs.h>
+#include <GL/glui/glui_to_clean.h>
+
+#include <GL/glui/glui_node.h>
+#include <GL/glui/glui_callback.h>
+#include <cstring>
+#include <string>
+
+
+//#include <GL/glui/glui_glui.h>
 class GLUIAPI GLUI_Control : public GLUI_Node
 {
     public : //types
@@ -153,6 +165,7 @@ class GLUIAPI GLUI_Control : public GLUI_Node
         void         execute_callback( void );
         virtual bool needs_idle( void ) const;
         virtual bool wants_tabs() const      { return false; }
+		int  add_control( GLUI_Node *control ); //<prevent adding subsequent controls, nodes still allowed
 
         GLUI_Control(const char* name)
             : GLUI_Node(name)

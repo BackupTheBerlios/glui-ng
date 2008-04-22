@@ -5,6 +5,7 @@
 /*               StaticText class                           */
 /*                                                          */
 /************************************************************/
+#include <GL/glui/glui_forward.h>
 #include <GL/glui/glui_text.h>
 #include <GL/glui/glui_control.h>
 

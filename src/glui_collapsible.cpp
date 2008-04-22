@@ -31,49 +31,78 @@
 
 *****************************************************************************/
 #include <GL/glui/glui_collapsible.h>
+#include <GL/glut.h>
 
 GLUI_Collapsible::GLUI_Collapsible(const char *name,
-                   GLUI_orientation orient=GLUI_vertical) :
+                   GLUI_orientation orient) :
     GLUI_Container (name, orient)
 {
     is_open = false;
 }
 
-void GLUI_Collapsible::translate_and_draw( void )
+
+void    GLUI_Collapsible::open( bool recurse )
 {
-#warning "todo : implement real collapsible mechanism"
-    toggle->translate_and_draw();
-    if (is_open)
-    {
-        Content->translate_and_draw();
-    }
+	if ( is_open )
+		return;
+	is_open = true;
+
+	glutPostRedisplay();
+
+	this->h = Toggle->Height() + Content->Height();
+
+
+	GLUI_Collapsible*    ctrl;
+	GLUI_Node*           node;
+	if ( is_open )
+		return;
+	is_open = true;
+
+	if (recurse)
+	{
+		node = Content;
+		while (node != NULL)
+		{
+			ctrl=static_cast<GLUI_Collapsible*>(node);
+			if (ctrl != NULL)
+			{
+				ctrl->open(recurse);
+			}
+			node=node->next();
+		}
+	}
+	glutPostRedisplay();
+
 }
 
-void GLUI_Collapsible::draw (void)
-{
-#warning "todo : implement real drawing"
-}
 
 
-void    GLUI_Collapsible::open( void )
-{
-  if ( is_open )
-    return;
-  is_open = true;
-
-  glutPostRedisplay();
-}
-
-
-
-void    GLUI_Collapsible::close( void )
+void    GLUI_Collapsible::close( bool recurse )
 {
 
-  if ( NOT is_open )
-    return;
-  is_open = false;
+	if ( ! is_open )
+		return;
+	is_open = false;
 
-  this->h = button.Height();
+	this->h = Toggle->Height();
 
-  glutPostRedisplay();
+	GLUI_Collapsible*    ctrl;
+	GLUI_Node*           node;
+	is_open = false;
+
+	if (recurse)
+	{
+		node = Content;
+		while (node != NULL)
+		{
+			ctrl=static_cast<GLUI_Collapsible*>(node);
+			if (ctrl != NULL)
+			{
+				ctrl->open(recurse);
+			}
+			node=node->next();
+		}
+	}
+	glutPostRedisplay();
+
 }

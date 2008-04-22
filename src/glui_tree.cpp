@@ -33,16 +33,15 @@
 #warning "this need more work : try creating a Tree panel and look at behaviour"
 GLUI_Tree::GLUI_Tree(GLUI_Node *parent, const char *name,
                      int open, int inset):
-    GLUI_Panel(name),
+    GLUI_Collapsible(name),
     button(this, ""),
     splitter(this, "splitter"),
-    level_name(this->glui->font)
-
+    level_name(this->glui->font),
+	entry(this->glui->font)
 {
   common_init();
   GLUI_StaticText *inset_label;
 
-  this->set_name( const_cast<char*>( name ));
   this->user_id    = -1;
 
   if ( NOT open ) {
@@ -54,59 +53,6 @@ GLUI_Tree::GLUI_Tree(GLUI_Node *parent, const char *name,
   inset_label = new GLUI_StaticText(splitter.GetFirstPanel(),"");
   inset_label->set_size(Size(inset, this->h));
   this->set_alignment(GLUI_ALIGN_LEFT);
-}
-
-
-/****************************** GLUI_Tree::open() **********/
-
-void GLUI_Tree::open( void )
-{
-  if ( is_open )
-    return;
-  is_open = true;
-
-  GLUI_DRAWINGSENTINAL_IDIOM
-
-  child_head = collapsed_node.child_head;
-  child_tail = collapsed_node.child_tail;
-
-  collapsed_node.child_head = NULL;
-  collapsed_node.child_tail = NULL;
-
-  if ( child_head != NULL ) {
-    ((GLUI_Control*) child_head)->unhide_internal( true );
-  }
-
-  glutPostRedisplay();
-}
-
-
-/****************************** GLUI_Tree::close() **********/
-
-void    GLUI_Tree::close( void )
-{
-  if ( NOT glui )
-    return;
-
-  if ( NOT is_open )
-    return;
-  is_open = false;
-
-  GLUI_DRAWINGSENTINAL_IDIOM
-
-  if ( child_head != NULL ) {
-    ((GLUI_Control*) child_head)->hide_internal( true );
-  }
-
-  collapsed_node.child_head = first_child();
-  collapsed_node.child_tail = last_child();
-
-  child_head = NULL;
-  child_tail = NULL;
-
-  this->h = GLUI_DEFAULT_CONTROL_HEIGHT + 7;
-
-  glutPostRedisplay();
 }
 
 

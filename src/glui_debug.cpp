@@ -30,8 +30,9 @@
   3. This notice may not be removed or altered from any source distribution.
 
 *****************************************************************************/
-
-#include "glui_debug.h"
+#include <GL/gl.h>
+#include <GL/glui/glui_debug.h>
+#include <GL/glui/glui_main.h>
 
 
 #ifdef _MSC_VER

@@ -44,7 +44,7 @@ int   curr_string = 0;
 GLUI *glui, *glui2;
 GLUI_Spinner    *light0_spinner, *light1_spinner;
 GLUI_RadioGroup *radio;
-GLUI_Panel      *obj_panel;
+GLUI_Rollout      *obj_panel;
 
 /********** User IDs for callbacks ********/
 #define LIGHT0_ENABLED_ID    200

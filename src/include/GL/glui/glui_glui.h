@@ -1,18 +1,20 @@
 #ifndef __GLUI_GLUI_H
 #define __GLUI_GLUI_H
 
+#include <GL/glui/glui_forward.h>
 #include  <GL/glui/glui_main.h>
+#include  <GL/glui/glui_panel.h>
+
 
 /**
  The main user-visible interface object to GLUI.
 
 */
 
-#warning "this class is a duplicate of GLUI_Main, remove!"
 class GLUIAPI GLUI : public GLUI_Main
 {
 public:
-    int   add_control( GLUI_Control *control ) { return main_panel->add_control(control); }
+    int   add_control( GLUI_Node *control ) { return main_panel->add_control(control); }
 
 /** Set the window where our widgets should be displayed. */
     void            set_main_gfx_window( int window_id );

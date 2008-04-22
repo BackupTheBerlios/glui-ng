@@ -464,6 +464,16 @@ void  GLUI_Control::get_float_array_val( float *array_ptr )
 }
 
 
+int  GLUI_Control::add_control( GLUI_Node *control )
+{
+	GLUI_Control *child;
+	child = static_cast<GLUI_Control*>(control);
+	if ( NULL != child)
+	{
+		return -1;
+	}
+	return ((GLUI_Node*)this)->add_control(control);
+} //prevent adding subsequent controls
 
 /**************************** Little Utility Routines ********************/
 

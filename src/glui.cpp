@@ -31,41 +31,25 @@
 *****************************************************************************/
 #include "glui_internal_control.h"
 
+#warning "GLUI class is a duplicate of GLUI_Main, remove!"
 
-/**
- Note: moving this routine here from glui_add_controls.cpp prevents the linker
- from touching glui_add_controls.o in non-deprecated programs, which 
- descreases the linked size of small GLUI programs substantially (100K+). (OSL 2006/06)
-*/
-void GLUI_Node::add_child_to_control(GLUI_Node *parent,GLUI_Control *child)
-{
-  GLUI_Control *parent_control;
 
-  /*** Collapsible nodes have to be handled differently, b/c the first and 
-    last children are swapped in and out  ***/
-  parent_control = ((GLUI_Control*)parent);
-  child->link_this_to_parent_last( parent_control );
-  child->glui = (GLUI*) parent_control->glui;
-  child->enabled = parent_control->enabled;
-  glutPostRedisplay();
-
-}
 
 
 /************************************ GLUI_Node::add_control() **************/
 
-int GLUI_Node::add_control( GLUI_Control *child )
+int GLUI_Node::add_control( GLUI_Node *child )
 {
-  add_child_to_control(this,child);
-  return true;
+	child->link_this_to_parent_last( this );
+	return true;
 }
 
 /************************************ GLUI_Main::add_control() **************/
- 
-int GLUI_Main::add_control( GLUI_Node *parent, GLUI_Control *control )
+
+int GLUI_Main::add_control( GLUI_Node *parent, GLUI_Node *control )
 {
-  add_child_to_control(parent,control);
-  return true;
+	control->link_this_to_parent_last( parent );
+	return true;
 }
 
 

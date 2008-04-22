@@ -1,6 +1,8 @@
 #ifndef __GLUI_TEXT_H
 #define __GLUI_TEXT_H
 #include <stdarg.h>
+#include <cstring>
+#include <string>
 
 /************************************************************/
 /*                                                          */
@@ -19,7 +21,7 @@ class GLUIAPI GLUI_Text : public std::string
 
 		int          char_width( char c );
 
-		GLUI_Text (void* newfont, const string txt="") : std::string(txt) {
+		GLUI_Text (void* newfont, const std::string txt="") : std::string(txt) {
 			memset(char_widths, -1, sizeof(char_widths)); /* JVK */
 			font           = newfont;
             memset(Color, 0, sizeof(Color));

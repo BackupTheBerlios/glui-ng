@@ -32,7 +32,6 @@
 *****************************************************************************/
 #ifndef __GLUI_CONTAINER_H
 #define __GLUI_CONTAINER_H
-
 enum GLUI_orientation {
     GLUI_horizontal,
     GLUI_vertical,
@@ -47,7 +46,8 @@ enum GLUI_orientation {
 /**
   Special control that contain other child (compared to GLUI_Control leafs)
 */
-
+#include <GL/glui/glui_forward.h>
+#include <GL/glui/glui_control.h>
 class GLUIAPI GLUI_Container : public GLUI_Control
 {
     public :
@@ -58,6 +58,7 @@ class GLUIAPI GLUI_Container : public GLUI_Control
     virtual void translate_and_draw (void);  //<draw with the right size and position
     void set_orientation( GLUI_orientation new_orientation) {orientation = new_orientation; }
     virtual void align( void );
+	int  add_control( GLUI_Node *control );
 
     protected :
     GLUI_orientation orientation;

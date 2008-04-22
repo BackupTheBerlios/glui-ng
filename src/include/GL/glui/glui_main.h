@@ -5,6 +5,12 @@
 /*       Main Window GLUI class (not user-level)            */
 /*                                                          */
 /************************************************************/
+#include <GL/glui/glui_forward.h>
+#include <GL/glui/glui_commondefs.h>
+#include <GL/glui/glui_node.h>
+#include <GL/glui/glui_bitmaps.h>
+#include <cstring>
+#include <string>
 
 /**
   A GLUI_Main handles GLUT events for one window, routing them to the
@@ -109,7 +115,7 @@ protected:
 
     /*********** Controls ************/
 
-    virtual int    add_control( GLUI_Node *parent, GLUI_Control *control );
+    virtual int    add_control( GLUI_Node *parent, GLUI_Node *control );
 
 
     /********** Constructors and Destructors ***********/

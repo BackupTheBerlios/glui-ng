@@ -10,6 +10,9 @@
 /**
  A GLUI_Panel contains a group of related controls.
 */
+#include <GL/glui/glui_forward.h>
+#include <GL/glui/glui_container.h>
+#include <GL/glui/glui_statictext.h>
 class GLUIAPI GLUI_Panel : public GLUI_Container
 {
 public:

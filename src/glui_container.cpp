@@ -30,7 +30,11 @@
   3. This notice may not be removed or altered from any source distribution.
 
 *****************************************************************************/
-#include <GL/glui.h>
+#include <GL/glui/glui_container.h>
+#include <GL/glui/glui_glui.h>
+#include <GL/glui/glui_debug.h>
+#include <GL/gl.h>
+#include <GL/glut.h>
 using namespace std;
 #include <algorithm>
 
@@ -261,7 +265,6 @@ void GLUI_Container::translate_and_draw (void)
 
 
 
-/****** GLUI_Control::align() **************/
 #warning "remove alignement code and create spacer control instead"
 void GLUI_Container::align()
 {
@@ -303,5 +306,21 @@ void GLUI_Container::align()
         child = child->next();
     }
 
+
+}
+
+
+int GLUI_Container::add_control(GLUI_Node *control )
+{
+	GLUI_Control *child;
+
+	control->link_this_to_parent_last( this );
+	child = static_cast<GLUI_Control*>(control);
+	if ( NULL != child)
+	{
+		child->glui = (GLUI*) this->glui;
+		child->enabled = this->enabled;
+		glutPostRedisplay();
+	}
 
 }

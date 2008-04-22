@@ -32,15 +32,16 @@
 *****************************************************************************/
 #ifndef __GLUI_COLLAPSIBLE_H
 #define __GLUI_COLLAPSIBLE_H
-
+#include <GL/glui/glui_commondefs.h>
+#include <GL/glui/glui_container.h>
 
 class GLUIAPI GLUI_Collapsible : public GLUI_Container
 {
     public  :
         GLUI_Collapsible(const char *name,
                    GLUI_orientation orient=GLUI_vertical);
-        void  open               ( void );
-        void  close              ( void );
+        void  open               (  bool recurse=false );
+        void  close              (  bool recurse=false );
 
     protected :
         bool            is_open;
