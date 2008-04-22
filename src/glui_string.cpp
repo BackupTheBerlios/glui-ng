@@ -108,7 +108,7 @@ void GLUI_Text::draw()
   while( *p != '\0' )  {
     glutBitmapCharacter( font, *p );
 #warning remove
-    glFlush();
+    GLUI_debug::Instance()->FlushGL();
     p++;
   }
   glPopMatrix();

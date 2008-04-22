@@ -137,8 +137,7 @@ void    GLUI_Checkbox::draw()
             else
                 glui->std_bitmaps.draw( GLUI_STDBITMAP_CHECKBOX_OFF_DIS, 0, 0 );
         }
-
-	glFlush();
+	GLUI_debug::Instance()->FlushGL();
 }
 
 /**************************** GLUI_Checkbox::draw_active_area() **************/

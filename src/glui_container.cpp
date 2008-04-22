@@ -257,9 +257,7 @@ void GLUI_Container::translate_and_draw (void)
 
 
   glPopMatrix();
-    if (DEBUG && glui->get_buffer_mode() == GLUI_Main::buffer_front) {
-	  glFlush();
-  }
+  GLUI_debug::Instance()->FlushGL();
 
 }
 
