@@ -243,16 +243,17 @@ void GLUI_Container::translate_and_draw (void)
   draw();
   node = dynamic_cast<GLUI_Control*>(first_child());
   while( node ) {
-      if (orientation == GLUI_horizontal )
-      {
-          glTranslatef( (float)node->Width() + x_off, 0.0, 0.0);
-      }
-      else
-      {
-          glTranslatef( 0.0, (float) node->Height() + y_off, 0.0);
-      }
-    node->translate_and_draw();
-    node = dynamic_cast<GLUI_Control*>(node->next());
+
+	  node->translate_and_draw();
+	  if (orientation == GLUI_horizontal )
+	  {
+		  glTranslatef( (float)node->Width() + x_off, 0.0, 0.0);
+	  }
+	  else
+	  {
+		  glTranslatef( 0.0, (float) node->Height() + y_off, 0.0);
+	  }
+	  node = dynamic_cast<GLUI_Control*>(node->next());
   }
 
 

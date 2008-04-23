@@ -97,7 +97,7 @@ clean:
 	rm -fr doc/doxygen
 	make -C tests $@
 
-DIST = glui-2.35
+DIST = glui-experiments2.35
 
 doc:
 	doxygen doc/doxygen.cfg

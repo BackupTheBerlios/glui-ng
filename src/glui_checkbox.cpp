@@ -33,6 +33,8 @@
 *****************************************************************************/
 
 #include "glui_internal_control.h"
+#include "GL/glui/glui_main.h"
+#include "GL/glui/glui_checkbox.h"
 
 /****************************** GLUI_Checkbox::GLUI_Checkbox() **********/
 
@@ -124,7 +126,7 @@ int    GLUI_Checkbox::key_handler( unsigned char key,int modifiers )
 void    GLUI_Checkbox::draw()
 {
     GLUI_DRAWINGSENTINAL_IDIOM
-
+//glui->draw_raised_box( 0, 0, 19, 19 );
         if ( int_val != 0 ) {
             if ( enabled )
                 glui->std_bitmaps.draw( GLUI_STDBITMAP_CHECKBOX_ON, 0, 0 );
@@ -137,6 +139,9 @@ void    GLUI_Checkbox::draw()
             else
                 glui->std_bitmaps.draw( GLUI_STDBITMAP_CHECKBOX_OFF_DIS, 0, 0 );
         }
+#warning "fix this : hardcoded value, replace this code with real opengl call"
+#warning "and create a toogle button class for checkbox"
+	glTranslatef( 13.5, 12.0, 0.0);
 	GLUI_debug::Instance()->FlushGL();
 }
 
