@@ -11,6 +11,7 @@
   calls its GLUI_CB callback with its ID.
 */
 #include <GL/glui/glui_container.h>
+#include <GL/glui/glui_button.h>
 class GLUIAPI GLUI_Button : public GLUI_Container
 {
 public:

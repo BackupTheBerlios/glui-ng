@@ -36,12 +36,15 @@
 #include "GL/glui/glui_main.h"
 #include "GL/glui/glui_checkbox.h"
 
+
+#warning "there is missize computation in this"
 /****************************** GLUI_Checkbox::GLUI_Checkbox() **********/
 
 GLUI_Checkbox::GLUI_Checkbox( GLUI_Node *parent,
                               const char *name, int *value_ptr,
                               int id,
-                              GLUI_CB cb ): GLUI_Container(name)
+                              GLUI_CB cb ): GLUI_Container(name),
+	button(this, "button")
 {
   common_init();
 
@@ -141,7 +144,7 @@ void    GLUI_Checkbox::draw()
         }
 #warning "fix this : hardcoded value, replace this code with real opengl call"
 #warning "and create a toogle button class for checkbox"
-	glTranslatef( 13.5, 12.0, 0.0);
+	glTranslatef( 13.5, 0.0, 0.0);
 	GLUI_debug::Instance()->FlushGL();
 }
 

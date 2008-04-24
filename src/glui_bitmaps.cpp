@@ -39,8 +39,10 @@ FIXME: upload the images to a texture.  This will allow them to be:
 #include "glui_internal.h"
 #include <cassert>
 
-/************ Image Bitmap arrays **********/
+#warning "create a real bitmap class that can be used as a control"
 
+/************ Image Bitmap arrays **********/
+#warning "this has nothing to do here, should be moved in the appropriate class"
 extern unsigned char glui_img_checkbox_0[];
 extern unsigned char glui_img_checkbox_1[];
 extern unsigned char glui_img_radiobutton_0[];

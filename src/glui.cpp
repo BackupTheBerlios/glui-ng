@@ -1060,6 +1060,33 @@ GLUI_Main::GLUI_Main( const char *text, long flags, int x, int y, int parent_win
 
 void      GLUI_Main::draw_raised_box( int x, int y, int w, int h )
 {
+/*	float Vertices[8][3] = { {  0.0,   0.0, 0.0},
+		                     {  0.0,     h, 0.0},
+							 {    w,     h, 0.0},
+							 {    w,   0.0, 0.0},
+							 {  0.5,   0.5, 0.5},
+							 {  0.5, h-0.5, 0.5},
+							 {w-0.5, h-0.5, 0.5},
+							 {w-0.5,   0.5, 0.5}};
+	int Colors[8][3] ;
+	for (int i=0; i<8; i++)
+	{
+		memcpy(Colors[i], bkgd_color, sizeof(bkgd_color));
+	}
+
+//glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_COLOR_ARRAY);
+
+	glColorPointer(8, GL_INT, 0, Colors);
+	glVertexPointer(8, GL_FLOAT, 0, Vertices);
+	glDrawArrays(GL_TRIANGLES, 0, 8);
+
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_COLOR_ARRAY);
+	GLUI_debug::Instance()->FlushGL();
+	*/
   w = w+x;
   h = h+y;
 
@@ -1091,6 +1118,34 @@ void      GLUI_Main::draw_raised_box( int x, int y, int w, int h )
 
 void      GLUI_Main::draw_lowered_box( int x, int y, int w, int h )
 {
+	/*
+	float Vertices[8][3] = { {  0.0,   0.0,  0.0},
+		                     {  0.0,     h,  0.0},
+							 {    w,     h,  0.0},
+							 {    w,   0.0,  0.0},
+							 {  0.5,   0.5, -0.5},
+							 {  0.5, h-0.5, -0.5},
+							 {w-0.5, h-0.5, -0.5},
+							 {w-0.5,   0.5, -0.5}};
+	int Colors[8][3] ;
+	for (int i=0; i<8; i++)
+	{
+		memcpy(Colors[i], bkgd_color, sizeof(bkgd_color));
+	}
+
+//glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_COLOR_ARRAY);
+
+	glColorPointer(3, GL_INT, 0, Colors);
+	glVertexPointer(3, GL_FLOAT, 0, Vertices);
+	glDrawArrays(GL_TRIANGLES, 0, 1);
+	GLUI_debug::Instance()->FlushGL();
+
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_COLOR_ARRAY);
+*/
   w = w+x;
   h = h+y;
 
@@ -1982,4 +2037,4 @@ void GLUI_Master_Object::glui_setIdleFuncIfNecessary( void )
         glutIdleFunc( glui_idle_func );
     else
         glutIdleFunc( NULL );
-}
+

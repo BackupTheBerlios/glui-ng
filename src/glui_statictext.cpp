@@ -59,10 +59,12 @@ void    GLUI_StaticText::draw( )
 
   erase_text();
   glColor3ubv( Color );
-  glRasterPos2i(0,0); //glRasterPos store the color and translate
-                      //we don't need to translate since this is the
-                      //role of the container
+  glPushMatrix();
+  glRasterPos3f(0.0, (float)this->Height(), 0.0);
+  //glRasterPos store the color and translate, since glut drawing routine use
+  //y axis up, we need to translate down before drawing
   GLUI_Text::draw();
+  glPopMatrix();
 }
 
 
