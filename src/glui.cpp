@@ -1060,33 +1060,45 @@ GLUI_Main::GLUI_Main( const char *text, long flags, int x, int y, int parent_win
 
 void      GLUI_Main::draw_raised_box( int x, int y, int w, int h )
 {
-/*	float Vertices[8][3] = { {  0.0,   0.0, 0.0},
-		                     {  0.0,     h, 0.0},
-							 {    w,     h, 0.0},
-							 {    w,   0.0, 0.0},
-							 {  0.5,   0.5, 0.5},
-							 {  0.5, h-0.5, 0.5},
-							 {w-0.5, h-0.5, 0.5},
-							 {w-0.5,   0.5, 0.5}};
-	int Colors[8][3] ;
-	for (int i=0; i<8; i++)
-	{
-		memcpy(Colors[i], bkgd_color, sizeof(bkgd_color));
-	}
+	GLfloat Vertices[8][3] = { {  0.0,   0.0, 0.0}, //0
+							   {  0.0,     h, 0.0}, //1
+							   {    w,     h, 0.0}, //2
+							   {    w,   0.0, 0.0}, //3
+							   {  0.5,   0.5, 0.5}, //4
+							   {  0.5, h-0.5, 0.5}, //5
+							   {w-0.5, h-0.5, 0.5}, //6
+							   {w-0.5,   0.5, 0.5}}; //7
+	GLubyte indices[] = {	0, 4, 7, 3,		//top slope
+						4, 7, 6, 5,		//front
+						7, 3, 2, 6,		//right slope
+						6, 2, 1, 5,		//bottom slope
+						5, 4, 0, 1,		//left slope
+						0, 3, 2, 1  };	//bottom
+
+	GLint Colors[] = {            0,            0,            0,
+						0,            0,            0,
+						0,            0,            0,
+						0,            0,            0,
+						bkgd_color[0],bkgd_color[1],bkgd_color[2],
+						bkgd_color[0],bkgd_color[1],bkgd_color[2],
+						bkgd_color[0],bkgd_color[1],bkgd_color[2],
+						bkgd_color[0],bkgd_color[1],bkgd_color[2]};
+
 
 //glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
 
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_COLOR_ARRAY);
 
-	glColorPointer(8, GL_INT, 0, Colors);
-	glVertexPointer(8, GL_FLOAT, 0, Vertices);
-	glDrawArrays(GL_TRIANGLES, 0, 8);
+	glColorPointer(3, GL_INT, 0, Colors);
+	glVertexPointer(3, GL_FLOAT, 0, Vertices);
+	//go through our index array and draw our vertex array
+	glDrawElements(GL_QUADS, 24, GL_UNSIGNED_BYTE, indices);
 
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_COLOR_ARRAY);
 	GLUI_debug::Instance()->FlushGL();
-	*/
+	/*
   w = w+x;
   h = h+y;
 
@@ -1109,7 +1121,7 @@ void      GLUI_Main::draw_raised_box( int x, int y, int w, int h )
   glColor3d( .5, .5, .5 );
   glBegin( GL_LINE_STRIP );
   glVertex2i( w-1, y+1 );  glVertex2i( w-1, h-1 );  glVertex2i( x+1, h-1 );
-  glEnd();
+  glEnd();*/
 }
 
 
@@ -2037,4 +2049,5 @@ void GLUI_Master_Object::glui_setIdleFuncIfNecessary( void )
         glutIdleFunc( glui_idle_func );
     else
         glutIdleFunc( NULL );
+}
 
