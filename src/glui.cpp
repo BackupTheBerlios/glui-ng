@@ -234,6 +234,8 @@ void glui_reshape_func(int w,int h )
 
 void glui_keyboard_func(unsigned char key, int x, int y)
 {
+	#error "since we now use Y axis up, the mouse event that has been recorded Yaxis down, Y event position = Window_size - Yevent_position"
+
   GLUI              *glui;
   int                current_window;
   GLUI_Glut_Window  *glut_window;
@@ -273,6 +275,8 @@ void glui_keyboard_func(unsigned char key, int x, int y)
 
 void glui_special_func(int key, int x, int y)
 {
+	#error "since we now use Y axis up, the mouse event that has been recorded Yaxis down, Y event position = Window_size - Yevent_position"
+
   GLUI              *glui;
   int                current_window;
   GLUI_Glut_Window  *glut_window;
@@ -312,6 +316,7 @@ void glui_special_func(int key, int x, int y)
 /********************************************** glui_mouse_func() ********/
 
 void glui_mouse_func(int button, int state, int x, int y)
+#error "since we now use Y axis up, the mouse event that has been recorded Yaxis down, Y event position = Window_size - Yevent_position"
 {
   GLUI              *glui;
   int                current_window;
@@ -344,6 +349,7 @@ void glui_mouse_func(int button, int state, int x, int y)
 void glui_motion_func(int x, int y)
 {
   GLUI *glui;
+#error "since we now use Y axis up, the mouse event that has been recorded Yaxis down, Y event position = Window_size - Yevent_position"
 
   glui = GLUI_Master.find_glui_by_window_id( glutGetWindow() );
 
@@ -360,6 +366,7 @@ void glui_motion_func(int x, int y)
 void glui_passive_motion_func(int x, int y)
 {
   GLUI *glui;
+#error "since we now use Y axis up, the mouse event that has been recorded Yaxis down, Y event position = Window_size - Yevent_position"
 
   glui = GLUI_Master.find_glui_by_window_id( glutGetWindow() );
 
@@ -549,6 +556,7 @@ void    GLUI_Main::display( void )
   glClear( GL_COLOR_BUFFER_BIT ); // | GL_DEPTH_BUFFER_BIT );
 
   set_ortho_projection();
+#error "remove this and use upward Y axis, this is simplier"
   LoadIdentityYAxisDown();
 
   // Recursively draw the main panel
