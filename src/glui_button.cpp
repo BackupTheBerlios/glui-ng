@@ -41,7 +41,7 @@ GLUI_Button::GLUI_Button( GLUI_Node *parent, const char *name,
   user_id     = id;
   callback    = cb;
   currently_inside = false; 
-  
+  this->resizeable == AdaptThisToFitChilds;
   parent->add_control( this );
 }
 
@@ -103,71 +103,16 @@ int    GLUI_Button::key_handler( unsigned char key,int modifiers )
 
 void    GLUI_Button::draw()
 {
-  if (currently_inside) draw_pressed();
-  else {
-    glui->draw_raised_box( 0, 0, w, h );
-    //draw_text( 0 );
-  }
+	if (currently_inside)
+	{
+		glui->draw_lowered_box( 0, 0, w, h );
+	}
+	else
+	{
+		glui->draw_raised_box( 0, 0, w, h );
+	}
+	glTranslatef( this->x_off_left, this->y_off_bot, 1.1);
 }
 
-
-/************************************** GLUI_Button::draw_pressed() ******/
-
-void   GLUI_Button::draw_pressed( void )
-{
-  glColor3f( 0.0, 0.0, 0.0 );
-
-  //draw_text( 1 );
-
-  glBegin( GL_LINE_LOOP );
-  glVertex2i( 0, 0 );         glVertex2i( w, 0 );
-  glVertex2i( w, h );         glVertex2i( 0, h );
-  glEnd();
-
-  glBegin( GL_LINE_LOOP );
-  glVertex2i( 1, 1 );         glVertex2i( w-1, 1 );
-  glVertex2i( w-1, h-1 );     glVertex2i( 1, h-1 );
-  glEnd();
-}
-
-
-/**************************************** GLUI_Button::draw_text() **********/
-
-/*void     GLUI_Button::draw_text( int sunken )
-{
-  int string_width;
-
-  glColor3ubv( glui->bkgd_color );
-  glDisable( GL_CULL_FACE );
-  glBegin( GL_QUADS );
-  glVertex2i( 2, 2 );         glVertex2i( w-2, 2 );
-  glVertex2i( w-2, h-2 );     glVertex2i( 2, h-2 );
-  glEnd();
-
-  glColor3ub( 0,0,0 );
-  
-  string_width = _glutBitmapWidthString( glui->font,
-					 this->name.c_str() );
-  if ( NOT sunken ) {
-    draw_name( MAX((w-string_width),0)/2, 13);
-  }
-  else {
-    draw_name( MAX((w-string_width),0)/2 + 1, 13 + 1);
-  }
-
-  if ( active ) {
-    glEnable( GL_LINE_STIPPLE );
-    glLineStipple( 1, 0x5555 );
-    
-    glColor3f( 0., 0., 0. );
-    
-    glBegin( GL_LINE_LOOP );
-    glVertex2i( 3, 3 );         glVertex2i( w-3, 3 );
-    glVertex2i( w-3, h-3 );     glVertex2i( 3, h-3 );
-    glEnd();
-    
-    glDisable( GL_LINE_STIPPLE );
-  }
-}*/
 
 

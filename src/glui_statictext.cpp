@@ -60,7 +60,7 @@ void    GLUI_StaticText::draw( )
   erase_text();
   glColor3ubv( Color );
   glPushMatrix();
-  glRasterPos3f(0.0, (float)this->Height(), 0.0);
+  glRasterPos3f(0.0, 0.0, 0.1);
   //glRasterPos store the color and translate, since glut drawing routine use
   //y axis up, we need to translate down before drawing
   GLUI_Text::draw();

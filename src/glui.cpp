@@ -513,10 +513,13 @@ void    GLUI_Main::display( void )
   glutSetWindow( glut_window_id );
   
   // Set up OpenGL state for widget drawing
-  glDisable( GL_DEPTH_TEST );
+  glEnable( GL_DEPTH_TEST );
+  //glDisable( GL_DEPTH_TEST );
   glCullFace( GL_BACK );
   glDisable( GL_CULL_FACE );
-  glDisable( GL_LIGHTING );
+  //glEnable( GL_LIGHTING );
+  glDisable(GL_LIGHTING);
+
   set_current_draw_buffer();
 
   // This function is used as a special place to do 'safe' processing,
@@ -546,9 +549,10 @@ void    GLUI_Main::display( void )
 		        bkgd_color[1] / 255.0f,
 		        bkgd_color[2] / 255.0f,
 		        1.0f );
-  glClear( GL_COLOR_BUFFER_BIT ); // | GL_DEPTH_BUFFER_BIT );
+  glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
   set_ortho_projection();
+
   LoadIdentityYAxisDown();
 
   // Recursively draw the main panel
@@ -1064,16 +1068,16 @@ void      GLUI_Main::draw_raised_box( int x, int y, int w, int h )
 							   {  0.0,     h, 0.0}, //1
 							   {    w,     h, 0.0}, //2
 							   {    w,   0.0, 0.0}, //3
-							   {  0.5,   0.5, 0.5}, //4
-							   {  0.5, h-0.5, 0.5}, //5
-							   {w-0.5, h-0.5, 0.5}, //6
-							   {w-0.5,   0.5, 0.5}}; //7
-	GLubyte indices[] = {	0, 4, 7, 3,		//top slope
+							   {  1.0,   1.0, 1.0}, //4
+							   {  1.0, h-1.0, 1.0}, //5
+							   {w-1.0, h-1.0, 1.0}, //6
+							   {w-1.0,   1.0, 1.0}}; //7
+	GLubyte indices[] = {
 						4, 7, 6, 5,		//front
+						0, 4, 7, 3,		//top slope
 						7, 3, 2, 6,		//right slope
 						6, 2, 1, 5,		//bottom slope
-						5, 4, 0, 1,		//left slope
-						0, 3, 2, 1  };	//bottom
+						5, 4, 0, 1};	//left slope
 
 	GLint Colors[] = {            0,            0,            0,
 						0,            0,            0,
@@ -1085,7 +1089,6 @@ void      GLUI_Main::draw_raised_box( int x, int y, int w, int h )
 						bkgd_color[0],bkgd_color[1],bkgd_color[2]};
 
 
-//glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
 
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_COLOR_ARRAY);
@@ -1093,44 +1096,17 @@ void      GLUI_Main::draw_raised_box( int x, int y, int w, int h )
 	glColorPointer(3, GL_INT, 0, Colors);
 	glVertexPointer(3, GL_FLOAT, 0, Vertices);
 	//go through our index array and draw our vertex array
-	glDrawElements(GL_QUADS, 24, GL_UNSIGNED_BYTE, indices);
+	glDrawElements(GL_QUADS, 20, GL_UNSIGNED_BYTE, indices);
 
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_COLOR_ARRAY);
 	GLUI_debug::Instance()->FlushGL();
-	/*
-  w = w+x;
-  h = h+y;
-
-  glColor3ubv( bkgd_color );
-  glBegin( GL_LINE_LOOP );
-  glVertex2i( x+1, y+1 );  glVertex2i( w-1, y+1 );
-  glVertex2i( w-1, h-1 );  glVertex2i( x+1, h-1 );
-  glEnd();
-
-  glColor3d( 1.0, 1.0, 1.0 );
-  glBegin( GL_LINE_STRIP );
-  glVertex2i( x, h );  glVertex2i( x, y );  glVertex2i( w, y );
-  glEnd();
-
-  glColor3d( 0.0, 0.0, 0.0 );
-  glBegin( GL_LINE_STRIP );
-  glVertex2i( w, y );  glVertex2i( w, h );  glVertex2i( x, h );
-  glEnd();
-
-  glColor3d( .5, .5, .5 );
-  glBegin( GL_LINE_STRIP );
-  glVertex2i( w-1, y+1 );  glVertex2i( w-1, h-1 );  glVertex2i( x+1, h-1 );
-  glEnd();*/
 }
 
 
 /************************************ GLUI_Main::draw_lowered_box() **********/
-/* Not quite perfect...      **/
-
 void      GLUI_Main::draw_lowered_box( int x, int y, int w, int h )
 {
-	/*
 	float Vertices[8][3] = { {  0.0,   0.0,  0.0},
 		                     {  0.0,     h,  0.0},
 							 {    w,     h,  0.0},
@@ -1139,48 +1115,33 @@ void      GLUI_Main::draw_lowered_box( int x, int y, int w, int h )
 							 {  0.5, h-0.5, -0.5},
 							 {w-0.5, h-0.5, -0.5},
 							 {w-0.5,   0.5, -0.5}};
-	int Colors[8][3] ;
-	for (int i=0; i<8; i++)
-	{
-		memcpy(Colors[i], bkgd_color, sizeof(bkgd_color));
-	}
+		GLubyte indices[] = {
+						4, 7, 6, 5,		//front
+						0, 4, 7, 3,		//top slope
+						7, 3, 2, 6,		//right slope
+						6, 2, 1, 5,		//bottom slope
+						5, 4, 0, 1};	//left slope
 
-//glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
+	GLint Colors[] = {            0,            0,            0,
+						0,            0,            0,
+						0,            0,            0,
+						0,            0,            0,
+						bkgd_color[0],bkgd_color[1],bkgd_color[2],
+						bkgd_color[0],bkgd_color[1],bkgd_color[2],
+						bkgd_color[0],bkgd_color[1],bkgd_color[2],
+						bkgd_color[0],bkgd_color[1],bkgd_color[2]};
+
 
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_COLOR_ARRAY);
-
 	glColorPointer(3, GL_INT, 0, Colors);
 	glVertexPointer(3, GL_FLOAT, 0, Vertices);
-	glDrawArrays(GL_TRIANGLES, 0, 1);
-	GLUI_debug::Instance()->FlushGL();
+	//go through our index array and draw our vertex array
+	glDrawElements(GL_QUADS, 20, GL_UNSIGNED_BYTE, indices);
 
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_COLOR_ARRAY);
-*/
-  w = w+x;
-  h = h+y;
-
-  glColor3ubv( bkgd_color );
-  glBegin( GL_LINE_LOOP );
-  glVertex2i( x+1, y+1 );         glVertex2i( w-1, y+1 );
-  glVertex2i( w-1, h-1 );     glVertex2i( x+1, h-1 );
-  glEnd();
-
-  glColor3d( 0.0, 0.0, 0.0 );
-  glBegin( GL_LINE_STRIP );
-  glVertex2i( x, h );  glVertex2i( x, y );  glVertex2i( w, y );
-  glEnd();
-
-  glColor3d( 1.0, 1.0, 1.0 );
-  glBegin( GL_LINE_STRIP );
-  glVertex2i( w, y );  glVertex2i( w, h );  glVertex2i( x, h );
-  glEnd();
-
-  glColor3d( .5, .5, .5 );
-  glBegin( GL_LINE_STRIP );
-  glVertex2i( w-1, y+1 );  glVertex2i( w-1, h-1 );  glVertex2i( x+1, h-1 );
-  glEnd();
+	GLUI_debug::Instance()->FlushGL();
 }
 
 
@@ -1884,10 +1845,10 @@ void  GLUI_Main::LoadIdentityYAxisDown()
   glLoadIdentity();
 
   /*** Rotate image so y increases upwards, contrary to OpenGL axes ***/
-  glTranslatef( (float) win_w/2.0, (float) win_h/2.0, 0.0 );
-  glRotatef( 180.0, 0.0, 1.0, 0.0 );
-  glRotatef( 180.0, 0.0, 0.0, 1.0 );
-  glTranslatef( (float) -win_w/2.0, (float) -win_h/2.0, 0.0 );
+  //glTranslatef( (float) win_w/2.0, (float) win_h/2.0, 0.0 );
+  //glRotatef( 180.0, 0.0, 1.0, 0.0 );
+  //glRotatef( 180.0, 0.0, 0.0, 1.0 );
+  //glTranslatef( (float) -win_w/2.0, (float) -win_h/2.0, 0.0 );
 
 }
 
