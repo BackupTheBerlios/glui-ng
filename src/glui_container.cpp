@@ -91,14 +91,14 @@ void GLUI_Container::update_size( void )
 {
     GLUI_Node* node;
     GLUI_Control* child;
-    if ( this->resizeable == PercentOfParent ||
+    if ( this->resizeable == PercentOfParent || //fixed size computed from parent
          this->resizeable == FixedSize //we have a fixed size
        )
     {
+#warning "this has to be tested and improved"
         int FillSpaceCount=0;
         int width = x_off_left + x_off_right;
         int height = y_off_top  + y_off_bot;
-
 
         GLUI_Control::update_size();
         node = this->first_child();
@@ -109,21 +109,32 @@ void GLUI_Container::update_size( void )
                  (child->get_resize_policy() != FillSpace)
                )
             {
-
                 child->update_size();
+
                 if (orientation == GLUI_horizontal )
                 {
-                    width += child->Width() + x_off;
-                    height = max<int> (this->Height(), child->Height());
+                    width += child->Width();
+                    height = max<int> (height, child->Height() + y_off_top  + y_off_bot);
                 }
                 else
                 {
-                    width = max<int> (this->Width(), child->Width());
-                    height += child->Height() + y_off;
+                    width = max<int> (width, child->Width() + x_off_left + x_off_right);
+                    height += child->Height();
                 }
 
             }
             node = node->next();
+			if (node != NULL)
+			{
+                if (orientation == GLUI_horizontal )
+                {
+                    width += x_off;
+                }
+                else
+                {
+                    height += y_off;
+                }
+			}
         }
         if (FillSpaceCount)
         {
@@ -178,16 +189,27 @@ void GLUI_Container::update_size( void )
 
                 if (orientation == GLUI_horizontal )
                 {
-                    width += child->Width() + x_off;
-                    height = max<int> (this->Height(), child->Height());
+                    width += child->Width();
+                    height = max<int> (height, child->Height() + y_off_top  + y_off_bot);
                 }
                 else
                 {
-                    width = max<int> (this->Width(), child->Width());
-                    height += child->Height() + y_off;
+                    width = max<int> (width, child->Width() + x_off_left + x_off_right);
+                    height += child->Height() ;
                 }
             }
             node = node->next();
+			if (node != NULL)
+			{
+                if (orientation == GLUI_horizontal )
+                {
+                    width += x_off;
+                }
+                else
+                {
+                    height += y_off;
+                }
+			}
         }
         this->w = width;
         this->h = height;
@@ -238,22 +260,40 @@ void GLUI_Container::translate_and_draw (void)
 
   glMatrixMode( GL_MODELVIEW );
   glPushMatrix();
-  glTranslatef( 0.5, 0.5, 0.5 );
 
-  draw();
-  node = dynamic_cast<GLUI_Control*>(first_child());
-  while( node ) {
+  draw();  //we're allready positioned to (0,0,0) of current widget, so just draw
 
-	  node->translate_and_draw();
-	  if (orientation == GLUI_horizontal )
-	  {
-		  glTranslatef( (float)node->Width() + x_off, 0.0, 0.0);
+  //now postion for the next child
+  glTranslatef( x_off_left, y_off_bot, 0.5 );
+
+  if (orientation == GLUI_horizontal )
+  {
+	  node = dynamic_cast<GLUI_Control*>(first_child());
+	  while( node ) {
+		  node->translate_and_draw();
+		  glTranslatef( (float)node->Width(), 0.0, 0.0);
+		  node = dynamic_cast<GLUI_Control*>(node->next());
+		  if (node != NULL)
+		  {
+			  glTranslatef( (float)x_off, 0.0, 0.0);
+		  }
 	  }
-	  else
-	  {
-		  glTranslatef( 0.0, (float) node->Height() + y_off, 0.0);
+  }
+  else
+  {
+	  //we display childs in reverse order to have them stacked top to bottom
+	  node = dynamic_cast<GLUI_Control*>(last_child());
+	  while( node ) {
+
+		  node->translate_and_draw();
+
+		  glTranslatef( 0.0, (float) node->Height(), 0.0);
+		  node = dynamic_cast<GLUI_Control*>(node->prev());
+		  if (node != NULL)
+		  {
+			  glTranslatef( 0.0, (float)y_off, 0.0);
+		  }
 	  }
-	  node = dynamic_cast<GLUI_Control*>(node->next());
   }
 
 

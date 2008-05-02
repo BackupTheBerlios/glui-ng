@@ -169,7 +169,7 @@ void GLUI_StdBitmaps::draw(int i, int x, int y) const
 	if (bitmaps[i].pixels != NULL ) 
 	{
 		glPixelStorei(GL_UNPACK_ALIGNMENT,1);
-		glRasterPos2f(0.5f+x, 0.5f+y+bitmaps[i].h);
+		glRasterPos2f(0.5f+x, 0.5f+y);
 		glDrawPixels( 
 			bitmaps[i].w, bitmaps[i].h,
 			GL_RGB, GL_UNSIGNED_BYTE, bitmaps[i].pixels); 

@@ -59,12 +59,10 @@ void    GLUI_StaticText::draw( )
 
   erase_text();
   glColor3ubv( Color );
-  glPushMatrix();
   glRasterPos3f(0.0, 0.0, 0.1);
   //glRasterPos store the color and translate, since glut drawing routine use
   //y axis up, we need to translate down before drawing
   GLUI_Text::draw();
-  glPopMatrix();
 }
 
 
@@ -101,6 +99,7 @@ void    GLUI_StaticText::erase_text( void )
   glVertex2i( 0,0 );   glVertex2i( w, 0 );  glVertex2i( w, h );  
   glVertex2i( 0, 0 );  glVertex2i( w, h );  glVertex2i( 0, h );   
   glEnd();
+  GLUI_debug::Instance()->FlushGL();
 }
 
 

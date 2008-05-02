@@ -53,7 +53,8 @@ GLUI_FileBrowser::GLUI_FileBrowser( GLUI_Node *parent,
 {
   common_init();
 
-  set_name( const_cast<char*>(name) );
+#warning "use title panel class"
+//  set_name( const_cast<char*>(name) );
   user_id    = id;
   int_val    = type;
   callback   = cb;

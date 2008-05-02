@@ -30,6 +30,7 @@
   3. This notice may not be removed or altered from any source distribution.
 
 *****************************************************************************/
+#warning "add a title panel class"
 
 #include "glui_internal_control.h"
 GLUI_Panel::GLUI_Panel(GLUI* theglui, GLUI_Node *parent, const char *name,
@@ -44,7 +45,6 @@ GLUI_Panel::GLUI_Panel(GLUI* theglui, GLUI_Node *parent, const char *name,
 	  parent->add_control( this );
 	}
   glui       = theglui;
-  title = new GLUI_StaticText(this, name);
 }
 
 GLUI_Panel::GLUI_Panel( GLUI_Node *parent, const char *name, int type):
@@ -57,12 +57,10 @@ GLUI_Panel::GLUI_Panel( GLUI_Node *parent, const char *name, int type):
 	{
 	  parent->add_control( this );
 	}
-  title = new GLUI_StaticText(this, name);
 }
 
 GLUI_Panel::~GLUI_Panel()
 {
-	delete title;
 }
 
 /****************************** GLUI_Panel::draw() **********/
@@ -115,7 +113,7 @@ void    GLUI_Panel::draw( )
             //  glEnd();
         }
         else if ( int_val == GLUI_PANEL_EMBOSSED ) {
-            if ( parent_node == NULL || *title == "" ) {
+            if ( parent_node == NULL ) {
                 top = 0;
             }
             else {
@@ -141,7 +139,7 @@ void    GLUI_Panel::draw( )
             glEnd();
 
             // Only display text in embossed panel
-            if ( parent_node != NULL && *title != "" ) { // Only  draw non-null strings
+            if ( parent_node != NULL ) {
                 int left = 7, height=GLUI_PANEL_NAME_DROP+1;
 
 
@@ -149,26 +147,15 @@ void    GLUI_Panel::draw( )
                     glColor3ubv(glui->bkgd_color);
                 glDisable( GL_CULL_FACE );
                 glBegin( GL_QUADS );
-                glVertex2i( left-3, 0 );               glVertex2i( left+title->w+3, 0 );
-                glVertex2i( left+title->w+3, height );  glVertex2i( left-3, height );
+                glVertex2i( left-3, 0 );               glVertex2i( left+w+3, 0 );
+                glVertex2i( left+3, height );  glVertex2i( left-3, height );
                 glEnd();
 
-                title->draw();
             }
         }
 
     glLineWidth( 1.0 );
 
-}
-
-/****************************** GLUI_Panel::set_name() **********/
-
-void    GLUI_Panel::set_name( char *new_name )
-{
-  *(dynamic_cast<std::string*>(title))=new_name;
-
-  update_size();
-  glutPostRedisplay();
 }
 
 
@@ -192,20 +179,20 @@ int GLUI_Panel::min_w()
     if ( NOT glui )
         return 0;
 
-    return x_off_left + x_off_right + title->w;
+    return x_off_left + x_off_right ;
 }
 
-int GLUI_Panel::min_h() { return y_off_top  + y_off_bot + title->h; }
+int GLUI_Panel::min_h() { return y_off_top  + y_off_bot ; }
 
 
 void   GLUI_Panel::update_size( void )
 {
-  if ( *title != "" AND int_val == GLUI_PANEL_EMBOSSED ) {
+  if ( int_val == GLUI_PANEL_EMBOSSED ) {
     this->y_off_top = GLUI_YOFF + 8;
   }
   else {
     this->y_off_top = GLUI_YOFF;
   }
   GLUI_Container::update_size();
-  w = max<int>(title->w + 16,w) ;
+  w = max<int>( this->x_off_right + this->x_off_left,w) ;
 }

@@ -53,7 +53,7 @@ protected:
         live_type      = GLUI_LIVE_INT;   /* This control has an 'int' live var */
     }
 	GLUI_StaticText* text;
-	GLUI_Button button;
+//	GLUI_Button button;
 };
 
 #endif

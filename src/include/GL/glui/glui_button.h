@@ -63,7 +63,9 @@ class GLUIAPI GLUI_TextButton : public GLUI_Button
                  int id=-1, GLUI_CB cb=GLUI_CB() ) :
 			GLUI_Button(parent, name, id, cb),
 			text(this, "text")
-	           {}
+	           {
+				   this->resizeable == AdaptThisToFitChilds;
+			   }
 
 	private:
 //		void draw_text( int sunken );

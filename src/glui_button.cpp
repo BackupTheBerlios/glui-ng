@@ -41,7 +41,7 @@ GLUI_Button::GLUI_Button( GLUI_Node *parent, const char *name,
   user_id     = id;
   callback    = cb;
   currently_inside = false; 
-  this->resizeable == AdaptThisToFitChilds;
+  this->resizeable = AdaptThisToFitChilds;
   parent->add_control( this );
 }
 
@@ -111,7 +111,7 @@ void    GLUI_Button::draw()
 	{
 		glui->draw_raised_box( 0, 0, w, h );
 	}
-	glTranslatef( this->x_off_left, this->y_off_bot, 1.1);
+	glTranslatef( 0.0, 0.0, 1.1);
 }
 
 

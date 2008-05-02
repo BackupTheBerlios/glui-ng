@@ -34,7 +34,6 @@ public:
 	~GLUI_Panel();
 
     void draw( void );
-    void set_name( char *text );
     void set_type( int new_type );
 
     void update_size( void );
@@ -49,7 +48,6 @@ protected:
         alignment    = GLUI_ALIGN_CENTER;
         can_activate = false;
     };
-	GLUI_StaticText* title;
 
 };
 

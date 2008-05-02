@@ -43,8 +43,8 @@
 GLUI_Checkbox::GLUI_Checkbox( GLUI_Node *parent,
                               const char *name, int *value_ptr,
                               int id,
-                              GLUI_CB cb ): GLUI_Container(name),
-	button(this, "button")
+                              GLUI_CB cb ): GLUI_Container(name)
+//	button(this, "button")
 {
   common_init();
 
@@ -55,9 +55,10 @@ GLUI_Checkbox::GLUI_Checkbox( GLUI_Node *parent,
   parent->add_control( this );
   this->resizeable = AdaptThisToFitChilds;
   this->orientation = GLUI_horizontal;
-
-  this->x_off_left = 40;
-  this->y_off_top  = 9;
+#warning "fix this : hardcoded value, replace this code with real opengl call"
+#warning "and create a toogle button class for checkbox"
+  this->x_off_left = 15;
+  this->y_off_bot  = 2;
   text = new GLUI_StaticText(this, "text" );
   text->set_text(name);
   init_live();
@@ -142,9 +143,7 @@ void    GLUI_Checkbox::draw()
             else
                 glui->std_bitmaps.draw( GLUI_STDBITMAP_CHECKBOX_OFF_DIS, 0, 0 );
         }
-#warning "fix this : hardcoded value, replace this code with real opengl call"
-#warning "and create a toogle button class for checkbox"
-	glTranslatef( 13.5, 0.0, 0.0);
+
 	GLUI_debug::Instance()->FlushGL();
 }
 

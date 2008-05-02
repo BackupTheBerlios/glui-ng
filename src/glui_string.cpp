@@ -107,7 +107,6 @@ void GLUI_Text::draw()
   glColor3ubv( Color );
   while( *p != '\0' )  {
     glutBitmapCharacter( font, *p );
-#warning remove
     GLUI_debug::Instance()->FlushGL();
     p++;
   }
