@@ -61,7 +61,9 @@ public:
 		buffer_back=2   ///< Double buffering: postpone updates until next redraw.
 	};
 	static buffer_mode_t get_buffer_mode() {
-        if ( 0 ==  strcmp(getenv("GLUI_BUFFER_MODE"), "buffer_front") ) return buffer_front;
+		char* bufferModeEnv = getenv("GLUI_BUFFER_MODE");
+        if ( bufferModeEnv != NULL &&
+				0 ==  strcmp(bufferModeEnv, "buffer_front") ) return buffer_front;
         else return buffer_back;
     }
 
