@@ -238,7 +238,7 @@ void GLUI_Container::translate_and_draw (void)
 
   glMatrixMode( GL_MODELVIEW );
   glPushMatrix();
-  glTranslatef( 0.5, 0.5, 0.0 );
+  glTranslatef( 0.5, 0.5, 0.5 );
 
   draw();
   node = dynamic_cast<GLUI_Control*>(first_child());

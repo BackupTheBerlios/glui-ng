@@ -69,6 +69,7 @@ GLUI_Panel::~GLUI_Panel()
 
 void    GLUI_Panel::draw( )
 {
+
     int top;
     GLUI_DRAWINGSENTINAL_IDIOM
 
@@ -89,30 +90,29 @@ void    GLUI_Panel::draw( )
             glVertex2i( w, h );
             glEnd();
 
-            /** ORIGINAL RAISED PANEL METHOD - A LITTLE TOO HIGH **
-              glLineWidth(1.0);
-              glBegin( GL_LINES );
-              glColor3f( 1.0, 1.0, 1.0 );
-              glVertex2i( 1, 1 );    glVertex2i( w-2, 1 );
-              glVertex2i( 1, 1 );    glVertex2i( 1, h-2 );
+            // ORIGINAL RAISED PANEL METHOD - A LITTLE TOO HIGH **
+            //  glLineWidth(1.0);
+            //  glBegin( GL_LINES );
+            //  glColor3f( 1.0, 1.0, 1.0 );
+            //  glVertex2i( 1, 1 );    glVertex2i( w-2, 1 );
+            //  glVertex2i( 1, 1 );    glVertex2i( 1, h-2 );
 
-              glColor3f( .5, .5, .5 );
-              glVertex2i( w-1, 1 );    glVertex2i( w-1, h-1 );
-              glVertex2i( 1, h-1 );    glVertex2i( w-1, h-1 );
+            //  glColor3f( .5, .5, .5 );
+            //  glVertex2i( w-1, 1 );    glVertex2i( w-1, h-1 );
+            //  glVertex2i( 1, h-1 );    glVertex2i( w-1, h-1 );
 
-              glColor3f( 0.0, 0.0, 0.0 );
-              glVertex2i( 0, h );    glVertex2i( w, h );
-              glVertex2i( w, 0 );    glVertex2i( w, h );
-              glEnd();
+            //  glColor3f( 0.0, 0.0, 0.0 );
+            //  glVertex2i( 0, h );    glVertex2i( w, h );
+            //  glVertex2i( w, 0 );    glVertex2i( w, h );
+            //  glEnd();
 
-              -- Touch up the lines a bit (needed in some opengl implementations
-              glBegin( GL_POINTS );
-              glColor3f( .5, .5, .5 );
-              glVertex2i( w-1, h-1 );
-              glColor3f( 0.0, 0.0, 0.0 );
-              glVertex2i( w, h );
-              glEnd();
-             **/
+            //  -- Touch up the lines a bit (needed in some opengl implementations
+            //  glBegin( GL_POINTS );
+            //  glColor3f( .5, .5, .5 );
+            //  glVertex2i( w-1, h-1 );
+            //  glColor3f( 0.0, 0.0, 0.0 );
+            //  glVertex2i( w, h );
+            //  glEnd();
         }
         else if ( int_val == GLUI_PANEL_EMBOSSED ) {
             if ( parent_node == NULL || *title == "" ) {
@@ -140,8 +140,8 @@ void    GLUI_Panel::draw( )
             glVertex2i( 0, h-1 );
             glEnd();
 
-            /**** Only display text in embossed panel ****/
-            if ( parent_node != NULL && *title != "" ) { /* Only  draw non-null strings */
+            // Only display text in embossed panel
+            if ( parent_node != NULL && *title != "" ) { // Only  draw non-null strings
                 int left = 7, height=GLUI_PANEL_NAME_DROP+1;
 
 
