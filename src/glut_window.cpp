@@ -53,6 +53,7 @@
 #include <GL/glui/MasterObject.h>
 #include <GL/glui/debug.h>
 #include <GL/glui/themes.h>
+#include <GL/glui/drawinghelpers.h>
 using namespace GLUI;
 
 GlutWindow::GlutWindow(Display* display, Window parent,
@@ -122,9 +123,64 @@ int GlutWindow::AddEvent (::XEvent event)
 {
     if (Expose == event.type)
     {
+        debug::Instance()->print( __FILE__, __LINE__,
+                "display\n");
+        int       win_w, win_h;
+
+        // SUBTLE: on freeGLUT, the correct window is always already set.
+        // But older versions of GLUT need this call, or else subwindows
+        // don't update properly when resizing or damage-painting.
+        glutSetWindow( this->GlutWindowId );
+
+        // Set up OpenGL state for widget drawing
+        glEnable( GL_DEPTH_TEST );
+        //glDisable( GL_DEPTH_TEST );
+        glCullFace( GL_BACK );
+        glDisable( GL_CULL_FACE );
+        //glEnable( GL_LIGHTING );
+        glDisable(GL_LIGHTING);
+
+        this->SetCurrentDrawBuffer();
+
+        //update sizes and positions
+        this->update_size();
+        this->pack(0, 0);
+
+
+        // Check here if the window needs resizing
+        win_w = glutGet( GLUT_WINDOW_WIDTH );
+        win_h = glutGet( GLUT_WINDOW_HEIGHT );
+        if ( win_w != this->Width() || win_h != this->Height() ) {
+            glutReshapeWindow( this->Width(), this->Height() );
+            return 0;
+        }
+
+        //    Draw GLUI window
+        glClearColor( theme::Instance()->bkgd_color[0] / 255.0f,
+                theme::Instance()->bkgd_color[1] / 255.0f,
+                theme::Instance()->bkgd_color[2] / 255.0f,
+                1.0f );
+        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+        this->set_ortho_projection();
+
+        glMatrixMode( GL_MODELVIEW );
+        glLoadIdentity();
+
+        // Recursively draw the main panel
+        this->translate_and_draw();
+        switch (drawinghelpers::get_buffer_mode()) {
+            case drawinghelpers::buffer_front: // Make sure drawing gets to screen
+                glFlush();
+                break;
+            case drawinghelpers::buffer_back: // Bring back buffer to front
+                glutSwapBuffers();
+                break;
+        }
         glutPostRedisplay();
+        return 0;
     }
-    if (DestroyNotify == event.type)
+    else if (DestroyNotify == event.type)
     {
         Node* child = first_child();
         Control* control = dynamic_cast<Control*>(child);
@@ -134,7 +190,32 @@ int GlutWindow::AddEvent (::XEvent event)
             control =  dynamic_cast<Control*>(next());
         }
         delete this;
+        return 0;
     }
+    else if (ResizeRequest == event.type)
+    {
+        ::XResizeRequestEvent *theEvent = (::XResizeRequestEvent*) &event;
+        CurrentSize.size.w = theEvent->width;
+        CurrentSize.size.h = theEvent->height;
+
+        this->pack(0, 0);
+
+        if ( theEvent->width  != CurrentSize.size.w ||
+             theEvent->height != CurrentSize.size.h ) {
+            glutReshapeWindow( CurrentSize.size.w, CurrentSize.size.h );
+        }
+        else {
+        }
+
+        glViewport( 0, 0, CurrentSize.size.w, CurrentSize.size.h);
+
+        debug::Instance()->print( __FILE__, __LINE__,
+                "%d: %d\n", glutGetWindow(), this->flags );
+
+        glutPostRedisplay();
+        return 0;
+    }
+    return EINVAL;
 }
 
 
@@ -145,66 +226,15 @@ int GlutWindow::AddEvent (::XEvent event)
 
 void GlutWindow::display_func (void)
 {
+    XResizeRequestEvent event = {
+        .type   = Expose,
+    };
     debug::Instance()->print (__FILE__, __LINE__, "display func\n");
     GlutWindow* win= MasterObject::Instance()->FindWindow(glutGetWindow ());
 
     if (win)
     {
-        debug::Instance()->print( __FILE__, __LINE__,
-                "display\n");
-        int       win_w, win_h;
-
-        // SUBTLE: on freeGLUT, the correct window is always already set.
-        // But older versions of GLUT need this call, or else subwindows
-        // don't update properly when resizing or damage-painting.
-        glutSetWindow( win->GlutWindowId );
-
-        // Set up OpenGL state for widget drawing
-        glEnable( GL_DEPTH_TEST );
-        //glDisable( GL_DEPTH_TEST );
-        glCullFace( GL_BACK );
-        glDisable( GL_CULL_FACE );
-        //glEnable( GL_LIGHTING );
-        glDisable(GL_LIGHTING);
-
-        win->SetCurrentDrawBuffer();
-
-        //update sizes and positions
-        win->update_size();
-        win->pack(0, 0);
-
-
-        // Check here if the window needs resizing
-        win_w = glutGet( GLUT_WINDOW_WIDTH );
-        win_h = glutGet( GLUT_WINDOW_HEIGHT );
-        if ( win_w != win->Width() || win_h != win->Height() ) {
-            glutReshapeWindow( win->Width(), win->Height() );
-            return;
-        }
-
-        //    Draw GLUI window
-        glClearColor( theme::Instance()->bkgd_color[0] / 255.0f,
-                theme::Instance()->bkgd_color[1] / 255.0f,
-                theme::Instance()->bkgd_color[2] / 255.0f,
-                1.0f );
-        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-        set_ortho_projection();
-
-        glMatrixMode( GL_MODELVIEW );
-        glLoadIdentity();
-
-        // Recursively draw the main panel
-        win`->translate_and_draw();
-        switch (get_buffer_mode()) {
-            case buffer_front: /* Make sure drawing gets to screen */
-                glFlush();
-                break;
-            case buffer_back: /* Bring back buffer to front */
-                glutSwapBuffers();
-                break;
-        }
-
+        glut_window->AddEvent(event);
     }
 }
 
@@ -214,13 +244,11 @@ void GlutWindow::display_func (void)
 
 void GlutWindow::reshape_func (int w, int h)
 {
-#warning "send an event to glui->Get_main_panel()->AddEvent(ResizeRequest)"
-    //	XResizeRequestEvent event = {
-    //		.type   = ResizeRequest,
-    //		.width  = w,
-    //		.height = h
-    //	};
-    //	glui->Get_main_panel()->AddEvent((XEvent) event);
+    XResizeRequestEvent event = {
+        .type   = ResizeRequest,
+        .width  = w,
+        .height = h
+    };
 
 
     debug::Instance()->print (__FILE__, __LINE__, "glui_reshape_func(): %d  w/h: %d/%d\n", glutGetWindow (), w, h);
@@ -229,32 +257,7 @@ void GlutWindow::reshape_func (int w, int h)
     GlutWindow* glut_window = MasterObject::Instance()->FindWindow(glutGetWindow ());
     if (glut_window)
     {
-        if (glut_window->glut_reshape_CB)
-            glut_window->glut_reshape_CB (w, h);
-
-        /***  Now send reshape events to all subwindows  ***/
-        glui = (GLUI *) MasterObject::Instance()->gluis.first_child ();
-        while (glui)
-        {
-            if ((glui->flags & GLUI_SUBWINDOW) && glui->parent_window == current_window)
-            {
-                glutSetWindow (glui->get_glut_window_id ());
-                glui->reshape (w, h);
-                /*      glui->check_subwindow_position();          */
-            }
-            glui = (GLUI *) glui->next ();
-        }
-    }
-    else
-    {
-        /***  A standalone GLUI window  ***/
-
-        glui = MasterObject::Instance()->find_glui_by_window_id (current_window);
-
-        if (glui)
-        {
-            glui->reshape (w, h);
-        }
+        glut_window->AddEvent(event);
     }
 }
 
@@ -262,53 +265,7 @@ void GlutWindow::reshape_func (int w, int h)
 
 
 
-
-
-/****************************** GLUI_Main::reshape() **************/
-
-void    GLUI_Main::reshape( int reshape_w, int reshape_h )
-{
-    int new_w, new_h;
-
-    pack_controls();
-
-    new_w = main_panel->w;/* + 1;          */
-    new_h = main_panel->h;/* + 1;          */
-
-    if ( reshape_w != new_w || reshape_h != new_h ) {
-        this->w = new_w;
-        this->h = new_h;
-
-        glutReshapeWindow( new_w, new_h );
-    }
-    else {
-    }
-
-    if ( this->flags & GLUI_SUBWINDOW ) {
-        check_subwindow_position();
-
-        /***** if ( this->flags & GLUI_SUBWINDOW_LEFT ) {
-          }
-          else if ( this->flags & GLUI_SUBWINDOW_LEFT ) {
-          }
-          else if ( this->flags & GLUI_SUBWINDOW_LEFT ) {
-          }
-          else if ( this->flags & GLUI_SUBWINDOW_RIGHT ) {
-          }
-         ****/
-    }
-
-    glViewport( 0, 0, new_w, new_h );
-
-    debug::Instance()->print( __FILE__, __LINE__,
-            "%d: %d\n", glutGetWindow(), this->flags );
-
-    glutPostRedisplay();
-}
-
-
-
-
+#error "continue modification from here"
 
 /********************************************** glui_keyboard_func() ********/
 

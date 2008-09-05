@@ -28,21 +28,28 @@
 #include <GL/glui/themes.h>
 namespace GLUI
 {
-	class drawinghelpers
-	{
-		public :
-			static void draw_raised_box( int x, int y, int w, int h );
-			static void draw_lowered_box( int x, int y, int w, int h );
-			static void         draw_box_inwards_outline(int enabled, int x_min, int x_max,
-					int y_min, int y_max );
-			static void         draw_box(int enabled, int x_min, int x_max, int y_min, int y_max,
-					float r, float g, float b );
-			static void         draw_bkgd_box( int x_min, int x_max, int y_min, int y_max );
-			static void         draw_emboss_box( int x_min, int x_max,int y_min,int y_max);
+    class drawinghelpers
+    {
+        public : //data types
+            enum buffer_mode_t
+            {
+                buffer_front=1, ///< Draw updated controls directly to screen.
+                buffer_back=2   ///< Double buffering: postpone updates until next redraw.
+            };
+        public :
+            static void draw_raised_box( int x, int y, int w, int h );
+            static void draw_lowered_box( int x, int y, int w, int h );
+            static void         draw_box_inwards_outline(int enabled, int x_min, int x_max,
+                    int y_min, int y_max );
+            static void         draw_box(int enabled, int x_min, int x_max, int y_min, int y_max,
+                    float r, float g, float b );
+            static void         draw_bkgd_box( int x_min, int x_max, int y_min, int y_max );
+            static void         draw_emboss_box( int x_min, int x_max,int y_min,int y_max);
 
-			static void         draw_active_box(int active,  int x_min, int x_max, int y_min, int y_max );
-			static void         set_to_bkgd_color( void );
-	};
+            static void         draw_active_box(int active,  int x_min, int x_max, int y_min, int y_max );
+            static void         set_to_bkgd_color( void );
+            static buffer_mode_t get_buffer_mode();
+    };
 
 }
 

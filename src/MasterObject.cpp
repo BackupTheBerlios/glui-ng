@@ -1032,31 +1032,7 @@ void  GLUI_Master_Object::set_left_button_glut_menu_control(
 }
 
 
-/******************************* GLUI_Main::set_ortho_projection() **********/
 
-void  GLUI_Main::set_ortho_projection( void )
-{
-  int win_h, win_w;
-
-  win_w = glutGet( GLUT_WINDOW_WIDTH );
-  win_h = glutGet( GLUT_WINDOW_HEIGHT );
-
-  glMatrixMode( GL_PROJECTION );
-  glLoadIdentity();
-  /*  gluOrtho2D( 0.0, (float) win_w, 0.0, (float) win_h );          */
-  glOrtho( 0.0, (float)win_w, 0.0, (float) win_h, -1000.0, 1000.0 );
-  glMatrixMode( GL_MODELVIEW );
-
-
-}
-
-
-/******************************* GLUI_Main::set_viewport() **********/
-
-void  GLUI_Main::set_viewport( void )
-{
-  glViewport( 0, 0, main_panel->w, main_panel->h );
-}
 
 
 /***************** GLUI_Master_Object::get_main_gfx_viewport() ***********/
@@ -1127,6 +1103,7 @@ void           GLUI_Master_Object::auto_set_viewport( void )
 
 
 /***************************************** GLUI::show() **********************/
+#error "move this to glut window class, define MAP and UNMAP API"
 
 void            GLUI::show( void )
 {
@@ -1142,7 +1119,7 @@ void            GLUI::show( void )
 
 
 /***************************************** GLUI::hide() **********************/
-
+#error "move this to glut window class, define MAP and UNMAP API"
 void            GLUI::hide( void )
 {
   int orig_window;

@@ -41,30 +41,14 @@ namespace GLUI
 
 		/*********** Friend functions **********/
 
-		public:
-		/********** our data types *************/
-		enum buffer_mode_t {
-			buffer_front=1, ///< Draw updated controls directly to screen.
-			buffer_back=2   ///< Double buffering: postpone updates until next redraw.
-		};
-		static buffer_mode_t get_buffer_mode() {
-			char* bufferModeEnv = getenv("BUFFER_MODE");
-			if ( bufferModeEnv != NULL &&
-					0 ==  strcmp(bufferModeEnv, "buffer_front") ) return buffer_front;
-			else return buffer_back;
-		}
-
 		protected:
 		/*** Variables ***/
 		int           main_gfx_window_id;
 		int           mouse_button_down;
-		int           glut_window_id;
-		int           top_level_glut_window_id;
 		Control *active_control;
 		Control *mouse_over_control;
 		Panel   *main_panel;
 		int           curr_cursor;
-		int           w, h;
 		long          flags;
 		bool          closing;
 		int           parent_window;
@@ -102,7 +86,6 @@ namespace GLUI
 		void            *font;
 		int              curr_modifiers;
 
-		void         adjust_glut_xy( int &x, int &y ) { y = h-y; }
 		void         activate_control( Control *control, int how );
 		void         align_controls( Control *control );
 		void         deactivate_current_control( void );
@@ -131,7 +114,6 @@ namespace GLUI
 		void         set_ortho_projection();
 		static void  LoadIdentityYAxisDown();
 		void         set_viewport();
-		int          get_glut_window_id( void ) { return glut_window_id; } /* JVK */
 	};
 }
 

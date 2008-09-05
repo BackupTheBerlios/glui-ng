@@ -31,121 +31,121 @@
 
 namespace GLUI
 {
-	class LiveVariables;
-	class _Window;
+    class LiveVariables;
+    class _Window;
 
-	class GLUIAPI Control : public Node, public EventHandler
-	{
-		public : //types
-			enum SizePolicy {
-				FixedSize,
-				PercentOfParent,
-				FillSpace,
-				AdaptThisToFitChilds,
-			};
+    class GLUIAPI Control : public Node, public EventHandler
+    {
+        public : //types
+            enum SizePolicy {
+                FixedSize,
+                PercentOfParent,
+                FillSpace,
+                AdaptThisToFitChilds,
+            };
 
-			struct Size {
-				struct {
-					int w;
-					int h;
-				} size;
-				struct {
-					char w;
-					char h;
-				} percent;
-				Size(int w, int h) {this->size.w=w; this->size.h=h; }
-				Size() {this->size.w=0; this->size.h=0;}
-				bool operator!=(const Size &other) const
-				{ return (this->size.w != other.size.w) ||
-					(this->size.h != other.size.h);
-				}
-				bool operator>(const Size &other) const
-				{return (this->size.w > other.size.w) &&
-					(this->size.h > other.size.h);
-				}
-			};
+            struct Size {
+                struct {
+                    int w;
+                    int h;
+                } size;
+                struct {
+                    char w;
+                    char h;
+                } percent;
+                Size(int w, int h) {this->size.w=w; this->size.h=h; }
+                Size() {this->size.w=0; this->size.h=0;}
+                bool operator!=(const Size &other) const
+                { return (this->size.w != other.size.w) ||
+                    (this->size.h != other.size.h);
+                }
+                bool operator>(const Size &other) const
+                {return (this->size.w > other.size.w) &&
+                    (this->size.h > other.size.h);
+                }
+            };
 
-			enum Alignement {
-				CENTER,
-				RIGHT,
-				LEFT,
-			};
-
-
-
-		public:
-			int            Width() const  {return CurrentSize.size.w;}
-			int            Height() const {return CurrentSize.size.h;}
-
-			/** Onscreen coordinates */
-			int             x_abs, y_abs;
-
-			/** "activation" for tabbing between controls. */
-			int             active_type; ///< "CONTROL_ACTIVE_..."
-			bool            active;       ///< If true, we've got the focus
-			bool            can_activate; ///< If false, remove from tab order.
-			bool            spacebar_mouse_click; ///< Spacebar simulates click.
-
-			int             alignment;
-			bool            enabled;    /**< Is this control grayed out? */
+            enum Alignement {
+                CENTER,
+                RIGHT,
+                LEFT,
+            };
 
 
-		public:
 
-			virtual void pack (int x, int y);
-			virtual void update_size( void );
-			virtual void idle( void )            { }
-			virtual int  mouse_over( int state, int x, int y ) { return false; }
+        public:
+            int            Width() const  {return CurrentSize.size.w;}
+            int            Height() const {return CurrentSize.size.h;}
 
-			virtual void enable( void );
-			virtual void disable( void );
-			virtual void activate( int how )     { active = true; }
-			virtual void deactivate( void )     { active = false; }
+            /** Onscreen coordinates */
+            int             x_abs, y_abs;
 
-			virtual void draw(void)=0;
-			virtual void translate_and_draw( void );
-			virtual int AddEvent (::XEvent event);
+            /** "activation" for tabbing between controls. */
+            int             active_type; ///< "CONTROL_ACTIVE_..."
+            bool            active;       ///< If true, we've got the focus
+            bool            can_activate; ///< If false, remove from tab order.
+            bool            spacebar_mouse_click; ///< Spacebar simulates click.
 
-
-			virtual int         set_size( Size sz, Size min=Size(0,0) );
-			void         set_alignment( Alignement align );
-			void         set_resize_policy( SizePolicy policy) { resizeable = policy; }
-			SizePolicy   get_resize_policy( void ) { return resizeable;}
+            int             alignment;
+            bool            enabled;    /**< Is this control grayed out? */
 
 
-			virtual bool needs_idle( void ) const;
-			virtual bool wants_tabs() const      { return false; }
-			int  add_control( Node *control ); //<prevent adding subsequent controls, nodes still allowed
+        public:
 
-			Control(const char* name)
-				: Node(name)
-			{
+            virtual void pack (int x, int y);
+            virtual void update_size( void );
+            virtual void idle( void )            { }
+            virtual int  mouse_over( int state, int x, int y ) { return false; }
 
-				x_abs          = GLUI_XOFF;
-				y_abs          = GLUI_YOFF;
-				active         = false;
-				enabled        = true;
-				Min            = Size(0, 0);
-				CurrentSize    = Min;
-				active_type    = GLUI_CONTROL_ACTIVE_MOUSEDOWN;
-				alignment      = LEFT;
-				can_activate   = true;         /* By default, you can activate a control */
-				spacebar_mouse_click = true;    /* Does spacebar simulate a mouse click? */
-				resizeable     = FixedSize;
-				handler = NULL;
-			}
+            virtual void enable( void );
+            virtual void disable( void );
+            virtual void activate( int how )     { active = true; }
+            virtual void deactivate( void )     { active = false; }
 
-			virtual ~Control();
+            virtual void draw(void)=0;
+            virtual void translate_and_draw( void );
+            virtual int AddEvent (::XEvent event);
 
-		protected: //methods
-			Control();
-		protected: //variables
-			_Window *OwnerWindow;
-			SizePolicy resizeable;
-			Size CurrentSize;
-			Size Min;
-			EventHandler* handler;
-	};
+
+            virtual int         set_size( Size sz, Size min=Size(0,0) );
+            void         set_alignment( Alignement align );
+            void         set_resize_policy( SizePolicy policy) { resizeable = policy; }
+            SizePolicy   get_resize_policy( void ) { return resizeable;}
+
+
+            virtual bool needs_idle( void ) const;
+            virtual bool wants_tabs() const      { return false; }
+            int  add_control( Node *control ); //<prevent adding subsequent controls, nodes still allowed
+
+            Control(const char* name)
+                : Node(name)
+            {
+
+                x_abs          = GLUI_XOFF;
+                y_abs          = GLUI_YOFF;
+                active         = false;
+                enabled        = true;
+                Min            = Size(0, 0);
+                CurrentSize    = Min;
+                active_type    = GLUI_CONTROL_ACTIVE_MOUSEDOWN;
+                alignment      = LEFT;
+                can_activate   = true;         /* By default, you can activate a control */
+                spacebar_mouse_click = true;    /* Does spacebar simulate a mouse click? */
+                resizeable     = FixedSize;
+                handler = NULL;
+            }
+
+            virtual ~Control();
+
+        protected: //methods
+            Control();
+        protected: //variables
+            _Window *OwnerWindow;
+            SizePolicy resizeable;
+            Size CurrentSize;
+            Size Min;
+            EventHandler* handler;
+    };
 
 }
 #endif

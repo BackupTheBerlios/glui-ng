@@ -200,5 +200,12 @@ void   drawinghelpers::draw_emboss_box(int x_min,int x_max,int y_min,int y_max)
   glEnd();
 }
 
-
+////////// drawinghelpers::get_buffer_mode() //////////////
+#warning "move get_buffer_mode to window class since it belongs more there"
+drawinghelpers::buffer_mode_t drawinghelpers::get_buffer_mode() {
+    char* bufferModeEnv = getenv("BUFFER_MODE");
+    if ( bufferModeEnv != NULL &&
+            0 ==  strcmp(bufferModeEnv, "buffer_front") ) return buffer_front;
+    else return buffer_back;
+}
 

@@ -26,45 +26,61 @@
 
 */
 
-namespace GLUI
+inline operator _Display::Display*()
+{
+    return disp;
+}
+
+
+_Window::_Window()
+{
+}
+
+int _Window::AddEvent(XEvent event)
+{
+}
+
+inline operator== (::Window window)
 {
 
-	namespace _Display
-	{
-		inline operator ::Display*()
-		{
-			return disp;
-		}
-	}
+}
 
-	namespace _Window
-	{
+int _Window::set_current_draw_buffer( void )
+{
+    /* Save old buffer */
+    GLint state;
+    glGetIntegerv( GL_DRAW_BUFFER, &state );
+    /* Switch to new buffer */
+    switch (get_buffer_mode()) {
+        case buffer_front: glDrawBuffer(GL_FRONT); break;
+        case buffer_back:  glDrawBuffer(GL_BACK);  break; /* might not be needed... */
+    }
+    return (int)state;
+}
 
-		_Window()
-		{
-		}
 
-		int AddEvent(XEvent event)
-		{
-		}
+/******************************* GLUI_Main::set_ortho_projection() **********/
 
-		inline operator== (::Window window)
-		{
-			
-        }
+void  _Window::set_ortho_projection( void )
+{
+  int win_h, win_w;
 
-        int _Window::set_current_draw_buffer( void )
-        {
-            /* Save old buffer */
-            GLint state;
-            glGetIntegerv( GL_DRAW_BUFFER, &state );
-            /* Switch to new buffer */
-            switch (get_buffer_mode()) {
-                case buffer_front: glDrawBuffer(GL_FRONT); break;
-                case buffer_back:  glDrawBuffer(GL_BACK);  break; /* might not be needed... */
-            }
-            return (int)state;
-        }
-	}
+  win_w = glutGet( GLUT_WINDOW_WIDTH );
+  win_h = glutGet( GLUT_WINDOW_HEIGHT );
 
+  glMatrixMode( GL_PROJECTION );
+  glLoadIdentity();
+  /*  gluOrtho2D( 0.0, (float) win_w, 0.0, (float) win_h );          */
+  glOrtho( 0.0, (float)win_w, 0.0, (float) win_h, -1000.0, 1000.0 );
+  glMatrixMode( GL_MODELVIEW );
+
+
+}
+
+
+/******************************* GLUI_Main::set_viewport() **********/
+
+void  _Window::set_viewport( void )
+{
+  glViewport( 0, 0, main_panel->w, main_panel->h );
 }

@@ -93,6 +93,8 @@ namespace GLUI
             virtual int AddEvent (::XEvent event);
         public :  //operators
             bool operator== (::Window window);
+            void  set_ortho_projection( void );
+            void  set_viewport( void );
         protected :
             _Window();
 
