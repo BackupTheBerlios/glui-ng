@@ -42,19 +42,19 @@ CPPFLAGS += -I/usr/X11R6/include
 GLUI_HEADERS = $(shell find include -type f)
 
 #######################################
+GLUI_SRC = $(shell find  -maxdepth 1 -regex '.*\.cpp\|.*\.c')
+GLUI_OBJS = $(addprefix GENERATED/,$(addsuffix .o,$(basename ${GLUI_SRC})))
 
-GLUI_OBJS = glui_container.o glui_string.o glui.o glui_bitmap_img_data.o glui_bitmaps.o glui_button.o glui_edittext.o glui_commandline.o glui_checkbox.o glui_node.o glui_radio.o glui_statictext.o glui_panel.o glui_separator.o glui_spinner.o glui_control.o glui_splitter.o glui_translation.o glui_rotation.o glui_mouse_iaction.o glui_listbox.o glui_rollout.o glui_window.o arcball.o algebra3.o quaternion.o viewmodel.o glui_tree.o glui_textbox.o glui_scrollbar.o glui_list.o glui_filebrowser.o glui_debug.o glui_collapsible.o todo.o
+GLUI_LIB = GENERATED/lib/libglui.a
 
-GLUI_LIB = lib/libglui.a
+GLUI_EXAMPLES = GENERATED/bin/example1
+GLUI_EXAMPLES+= GENERATED/bin/example2
+GLUI_EXAMPLES+= GENERATED/bin/example3
+GLUI_EXAMPLES+= GENERATED/bin/example4
+GLUI_EXAMPLES+= GENERATED/bin/example5
+#GLUI_EXAMPLES+= GENERATED/bin/example6
 
-GLUI_EXAMPLES = bin/example1
-GLUI_EXAMPLES+= bin/example2
-GLUI_EXAMPLES+= bin/example3
-GLUI_EXAMPLES+= bin/example4
-GLUI_EXAMPLES+= bin/example5
-#GLUI_EXAMPLES+= bin/example6
-
-GLUI_TOOLS = bin/ppm2array
+GLUI_TOOLS = GENERATED/bin/ppm2array
 
 .PHONY: all setup examples tools clean depend doc doc-pdf doc-dist dist tests
 
@@ -64,17 +64,18 @@ tests :
 	make -C tests $@
 
 setup:
-	mkdir -p bin
-	mkdir -p lib
+	mkdir -p GENERATED
+	mkdir -p GENERATED/bin
+	mkdir -p GENERATED/lib
 
 examples: $(GLUI_EXAMPLES)
 
 tools: $(GLUI_TOOLS)
 
-bin/ppm2array: tools/ppm2array.cpp tools/ppm.cpp
+GENERATED/bin/ppm2array: tools/ppm2array.cpp tools/ppm.cpp
 	$(CXX) $(CPPFLAGS) -o $@ $^
 
-bin/%: example/%.cpp $(GLUI_LIB)
+GENERATED/bin/%: example/%.cpp $(GLUI_LIB)
 	$(CXX) $(CPPFLAGS) -o $@ $<  $(LIBGLUI) $(LIBGLUT) $(LIBGL) $(LIBS)
 
 $(GLUI_LIB): $(GLUI_OBJS)
@@ -82,18 +83,21 @@ $(GLUI_LIB): $(GLUI_OBJS)
 
 ${GLUI_OBJS}: ${GLUI_HEADERS}
 
-.cpp.o: ${GLUI_HEADERS}
+GENERATED/%.o: %.cpp ${GLUI_HEADERS}
 	@echo "    [CXX] $<"
-	@$(CXX) $(CPPFLAGS) -c $<
+	@$(CXX) $(CPPFLAGS) -c $< -o $@
 
-.c.o: ${GLUI_HEADERS}
-	$(CXX) $(CPPFLAGS) -c $<
+GENERATED/%.o: %.c ${GLUI_HEADERS}
+	@echo "    [CC ] $<"
+	$(CXX) $(CPPFLAGS) -c $< -o $@
+
 
 docs:
 	doxygen doc/doxygen.cfg
 
 clean:
-	rm -f *.o $(GLUI_LIB) $(GLUI_EXAMPLES) $(GLUI_TOOLS) 
+	rm -rf GENERATED
+	rm -f $(GLUI_LIB) $(GLUI_EXAMPLES) $(GLUI_TOOLS)
 	rm -fr doc/doxygen
 	make -C tests $@
 
@@ -113,7 +117,7 @@ doc-dist:
 	rm -Rf $(DIST)
 	
 dist: clean
-	mkdir -p $(DIST) 
+	mkdir -p $(DIST)
 	cp --parents \
 		`find -type f -name "*.cpp"` \
 		`find -type f -name "*.c"` \

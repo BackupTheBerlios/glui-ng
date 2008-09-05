@@ -1,0 +1,36 @@
+export TAGS=tags,/usr/include/GL/tags
+export VIM_SERVER=glui
+export VIM_SESSION=" "
+unalias vi
+alias vis='gvim --servername ${VIM_SERVER}'
+
+function vi() {
+	if echo $@ | grep "\.h$"; then
+		vim_server=${VIM_SERVER}_headers
+	else
+		vim_server=${VIM_SERVER}_sources
+	fi
+	gvim --servername ${vim_server} --remote-send ":tab new $@
+	" || gvim --servername ${vim_server} $@
+}
+
+function savesession() {
+	RETURN=$'\n'
+	if [ -n "$1" ]; then
+		gvim --servername ${VIM_SERVER}_sources --remote-send ":mks! $1_sources$RETURN"
+		gvim --servername ${VIM_SERVER}_headers --remote-send ":mks! $1_headers$RETURN"
+	else
+		echo "provide session file as \$1"
+	fi
+}
+
+function restoresession() {
+	if [ -n "$1" ]; then
+		gvim --servername ${VIM_SERVER}_sources  -S $1_sources
+		gvim --servername ${VIM_SERVER}_headers  -S $1_headers
+	else
+		echo "provide session file as \$1"
+	fi
+}
+
+pushd src

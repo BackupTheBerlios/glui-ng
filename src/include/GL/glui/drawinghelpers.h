@@ -1,0 +1,49 @@
+#ifndef __GLUI_DRAWINGHELPERS_H
+#define __GLUI_DRAWINGHELPERS_H
+
+/*
+
+  drawinghelpers.h : the top level widget, in glut
+
+  GLUI User Interface Toolkit
+  Copyright (c) 2008 MALET Jean-Luc
+
+  This software is provided 'as-is', without any express or implied
+  warranty. In no event will the authors be held liable for any damages
+  arising from the use of this software.
+
+  Permission is granted to anyone to use this software for any purpose,
+  including commercial applications, and to alter it and redistribute it
+  freely, subject to the following restrictions:
+
+  1. The origin of this software must not be misrepresented; you must not
+  claim that you wrote the original software. If you use this software
+  in a product, an acknowledgment in the product documentation would be
+  appreciated but is not required.
+  2. Altered source versions must be plainly marked as such, and must not be
+  misrepresented as being the original software.
+  3. This notice may not be removed or altered from any source distribution.
+
+*/
+#include <GL/glui/themes.h>
+namespace GLUI
+{
+	class drawinghelpers
+	{
+		public :
+			static void draw_raised_box( int x, int y, int w, int h );
+			static void draw_lowered_box( int x, int y, int w, int h );
+			static void         draw_box_inwards_outline(int enabled, int x_min, int x_max,
+					int y_min, int y_max );
+			static void         draw_box(int enabled, int x_min, int x_max, int y_min, int y_max,
+					float r, float g, float b );
+			static void         draw_bkgd_box( int x_min, int x_max, int y_min, int y_max );
+			static void         draw_emboss_box( int x_min, int x_max,int y_min,int y_max);
+
+			static void         draw_active_box(int active,  int x_min, int x_max, int y_min, int y_max );
+			static void         set_to_bkgd_color( void );
+	};
+
+}
+
+#endif //__GLUI_DRAWINGHELPERS_H

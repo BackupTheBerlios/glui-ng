@@ -1,0 +1,233 @@
+/****************************************************************************
+
+  GLUI User Interface Toolkit
+  ---------------------------
+
+  control.cpp - top-level Control class
+
+
+  --------------------------------------------------
+
+  Copyright (c) 1998 Paul Rademacher
+
+WWW:    http://sourceforge.net/projects/glui/
+Forums: http://sourceforge.net/forum/?group_id=92496
+
+This software is provided 'as-is', without any express or implied
+warranty. In no event will the authors be held liable for any damages
+arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not
+claim that you wrote the original software. If you use this software
+in a product, an acknowledgment in the product documentation would be
+appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be
+misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
+
+ *****************************************************************************/
+
+#include <GL/glui/internal_control.h>
+#include <GL/glui/event_handler.h>
+#include <GL/glui/debug.h>
+#include <GL/glui/control.h>
+#include <GL/gl.h>
+#include <GL/glui/window.h>
+using namespace GLUI;
+
+int _glui_draw_border_only = 0;
+
+/*************************** Drawing Utility routines *********************/
+
+
+/* Control::translate_and_draw() ********/
+void Control::translate_and_draw()
+{
+
+    glMatrixMode( GL_MODELVIEW );
+    glPushMatrix();
+    draw();
+    glPopMatrix();
+    debug::Instance()->FlushGL();
+}
+
+
+
+int  Control::add_control( Node *control )
+{
+    Control *child;
+    child = static_cast<Control*>(control);
+    if ( NULL != child)
+    {
+        return -1;
+    }
+    return ((Node*)this)->add_control(control);
+} //prevent adding subsequent controls
+
+/**************************** Little Utility Routines ********************/
+
+/**** Control::enable() ****************/
+
+void Control::enable()
+{
+    Control *node;
+
+    enabled = true;
+    ::XEvent EventToForward;
+    EventToForward.xexpose.type=Expose;
+    EventToForward.xexpose.send_event=true;
+    EventToForward.xexpose.x = x_abs;
+    EventToForward.xexpose.y = y_abs;
+    EventToForward.xexpose.width = this->Width();
+    EventToForward.xexpose.height = this->Height();
+    OwnerWindow->AddEvent(EventToForward);
+
+    /*** Now recursively enable all buttons below it ***/
+    node = (Control*) first_child();
+    while(node)
+    {
+        node->enable();
+        node = (Control*) node->next();
+    }
+}
+
+
+/***** Control::disable() ****************/
+
+void Control::disable()
+{
+    Control *node;
+
+    enabled = false;
+
+    //ask for redisplay of window
+    ::XEvent EventToForward;
+    EventToForward.xexpose.type=Expose;
+    EventToForward.xexpose.send_event=true;
+    EventToForward.xexpose.x = x_abs;
+    EventToForward.xexpose.y = y_abs;
+    EventToForward.xexpose.width = this->Width();
+    EventToForward.xexpose.height = this->Height();
+    OwnerWindow->AddEvent(EventToForward);
+
+
+    /*** Now recursively disable all buttons below it ***/
+    node = (Control*) first_child();
+    while(node) {
+        node->disable();
+        node = (Control*) node->next();
+    }
+}
+
+int Control::AddEvent(::XEvent event)
+{
+    if (event.xany.type == Expose)
+        OwnerWindow->AddEvent(event);
+
+}
+
+void Control::pack (int x, int y)
+{
+    this->x_abs = x;
+    this->y_abs = y;
+}
+
+void Control::update_size( void )
+{
+
+    if (this->resizeable == PercentOfParent)
+    {
+        Control* par= dynamic_cast<Control*>(this->parent());
+        if (par)
+        {
+            this->CurrentSize.size.w = par->Width() * this->CurrentSize.percent.w / 100;
+            this->CurrentSize.size.h = par->Height() * this->CurrentSize.percent.h / 100;
+            if (Min > CurrentSize)
+            {
+                CurrentSize = Min;
+            }
+        }
+    }
+    else if (this->resizeable == FixedSize ||
+            this->resizeable == FillSpace)
+    {
+        return; //nothing to do since we already have a fixed size
+    }
+}
+/******* Control::set_w() **************/
+int Control::set_size( Size sz, Size min)
+{
+    Size dontchange(0, 0);
+    if (dontchange != min)
+    {
+        this->Min = min;
+    }
+    if (sz > this->Min)
+    {
+        this->CurrentSize = sz;
+    }
+    else
+    {
+        return EINVAL;
+    }
+    update_size();
+    ::XEvent EventToForward;
+    EventToForward.xexpose.type=Expose;
+    EventToForward.xexpose.send_event=true;
+    EventToForward.xexpose.x = x_abs;
+    EventToForward.xexpose.y = y_abs;
+    EventToForward.xexpose.width = this->Width();
+    EventToForward.xexpose.height = this->Height();
+    OwnerWindow->AddEvent(EventToForward);
+}
+
+
+
+/***** Control::set_alignment() ******/
+
+void Control::set_alignment(Alignement new_align)
+{
+    alignment = new_align;
+
+    ::XEvent EventToForward;
+    EventToForward.xexpose.type=Expose;
+    EventToForward.xexpose.send_event=true;
+    EventToForward.xexpose.x = x_abs;
+    EventToForward.xexpose.y = y_abs;
+    EventToForward.xexpose.width = this->Width();
+    EventToForward.xexpose.height = this->Height();
+    OwnerWindow->AddEvent(EventToForward);
+}
+
+
+/***** Control::needs_idle() *********/
+/* This method gets overloaded by specific classes, e.g. Spinner.            */
+/* It returns whether or not a control needs to receive an idle event or not */
+/* For example, a spinner only needs idle events when the user is holding    */
+/* the mouse down in one of the arrows.  Otherwise, don't waste cycles       */
+/* and OpenGL context switching by calling its idle.                         */
+
+bool Control::needs_idle() const
+{
+    return false;
+}
+
+
+/********* Control::~Control() **********/
+
+Control::~Control()
+{
+    Control *item = (Control*) this->first_child();
+
+    while (item)
+    {
+        Control *tmp = item;
+        item = (Control*) item->next();
+        delete tmp;
+    }
+}
+
