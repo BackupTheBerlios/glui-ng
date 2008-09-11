@@ -251,7 +251,7 @@ void Container::pack (int x, int y)
 void Container::translate_and_draw (void)
 {
   Control *node;
-  debug::Instance()->print( __FILE__, __LINE__,
+  debug::Instance()->print( __FILE__, __LINE__, _level,
           "%s %s \n",__func__,
           dynamic_cast<Node*>(this)->whole_tree());
 
@@ -358,3 +358,221 @@ int Container::add_control(Node *control )
 	}
 
 }
+
+
+int Container::AddEvent (::XEvent* event)
+{
+    ::XMotionEvent* motion = (::XMotionEvent*) event;
+    bool forward_to_child = false;
+    if ( // check for event that should be droped
+            ( event->type == KeyPress &&
+              (DoNotPropagateMask & KeyPressMask) )                                  ||
+            ( event->type == KeyRelease &&
+              ( DoNotPropagateMask & KeyReleaseMask ) )                              ||
+            ( event->type == ButtonPress &&
+              ( DoNotPropagateMask & ButtonPressMask ) )                             ||
+            ( event->type == ButtonRelease &&
+              ( DoNotPropagateMask & ButtonReleaseMask ))                            ||
+            ( event->type == EnterNotify &&
+              ( DoNotPropagateMask & EnterWindowMask ))                              ||
+            ( event->type == LeaveNotify &&
+              ( DoNotPropagateMask & LeaveWindowMask ))                              ||
+            ( event->type == FocusIn &&
+              ( DoNotPropagateMask & FocusChangeMask ))                              ||
+            ( event->type == FocusOut &&
+              ( DoNotPropagateMask & FocusChangeMask ))                              ||
+            ( event->type == KeymapNotify &&
+              ( DoNotPropagateMask & KeymapStateMask ))                              ||
+            ( event->type == Expose &&
+              ( DoNotPropagateMask & ExposureMask ))                                 ||
+            ( event->type == GraphicsExpose &&
+              ( DoNotPropagateMask & ExposureMask))                                  ||
+            ( event->type == NoExpose &&
+              ( DoNotPropagateMask & ExposureMask))                                  ||
+            ( event->type == VisibilityNotify &&
+              ( DoNotPropagateMask & VisibilityChangeMask))                          ||
+            ( event->type == CreateNotify &&
+              ( DoNotPropagateMask & SubstructureNotifyMask))                        ||
+            ( event->type == DestroyNotify &&
+              ( DoNotPropagateMask & (StructureNotifyMask|SubstructureNotifyMask) )) ||
+            ( event->type == UnmapNotify &&
+              ( DoNotPropagateMask &  (StructureNotifyMask|SubstructureNotifyMask) ))||
+            ( event->type == MapNotify &&
+              ( DoNotPropagateMask & (StructureNotifyMask|SubstructureNotifyMask) )) ||
+            ( event->type == MapRequest &&
+              ( DoNotPropagateMask & SubstructureRedirectMask ))                     ||
+            ( event->type == ReparentNotify &&
+              ( DoNotPropagateMask & (StructureNotifyMask|SubstructureNotifyMask) )) ||
+            ( event->type == ConfigureNotify &&
+              ( DoNotPropagateMask & (StructureNotifyMask|SubstructureNotifyMask) )) ||
+            ( event->type == ConfigureRequest &&
+              ( DoNotPropagateMask & StructureNotifyMask))                           ||
+            ( event->type == GravityNotify &&
+              ( DoNotPropagateMask & (StructureNotifyMask|SubstructureNotifyMask) )) ||
+            ( event->type == ResizeRequest &&
+              ( DoNotPropagateMask & ResizeRedirectMask ))                           ||
+            ( event->type == CirculateNotify &&
+              ( DoNotPropagateMask & (StructureNotifyMask|SubstructureNotifyMask) )) ||
+            ( event->type == CirculateRequest &&
+              ( DoNotPropagateMask & SubstructureRedirectMask ))                     ||
+            ( event->type == PropertyNotify &&
+              ( DoNotPropagateMask & PropertyChangeMask ))                           ||
+            //( event->type == SelectionClear &&
+            //  ( DoNotPropagateMask & ))                                              ||
+            //( event->type == SelectionRequest &&
+            //  ( DoNotPropagateMask & ))                                              ||
+            //( event->type == SelectionNotify &&
+            //  ( DoNotPropagateMask & ))                                              ||
+            //( event->type == ColormapNotify &&
+            //  ( DoNotPropagateMask & StructureNotifyMask ))                          ||
+            //( event->type == ClientMessage &&
+            //  ( DoNotPropagateMask & ))                                              ||
+            //( event->type == MappingNotify &&
+            //  ( DoNotPropagateMask & ))                                              ||
+            ( event->type == MotionNotify  &&
+              ( ( DoNotPropagateMask & PointerMotionMask )                                          ||
+                ( DoNotPropagateMask & PointerMotionHintMask  )                                     ||
+                ( (motion->state & Button1Mask) && ( DoNotPropagateMask & Button1MotionMask ))      ||
+                ( (motion->state & Button1Mask) && ( DoNotPropagateMask & Button2MotionMask ))      ||
+                ( (motion->state & Button1Mask) && ( DoNotPropagateMask & Button3MotionMask ))      ||
+                ( (motion->state & Button1Mask) && ( DoNotPropagateMask & Button4MotionMask ))      ||
+                ( (motion->state & Button1Mask) && ( DoNotPropagateMask & Button5MotionMask ))      ||
+                ( DoNotPropagateMask & ButtonMotionMask )
+              )
+            )
+        )
+            {
+                //this event is masked and shall not be propagated
+                return 0;
+            }
+    //this event is not masked and then shall be propagated to relevent widget
+    Node* current_node = first_child();
+    while (current_node)
+    {
+#warning "update this using tree list creation"
+// purpose : when an event is created, use the opengl selection mechanism to know what object shall handle the event
+// then create a list containing all parent (parent can have multiple childrens but only one parent is allowed per child)
+// then use this list to propagate the event rather than the following algorithm
+        Control* current_control = dynamic_cast<Control*>(current_node);
+        if (current_control)
+        {
+            //event that contain position information
+            switch(event->type)
+            {
+                case KeyPress :
+                case KeyRelease :
+                    {
+                    ::XKeyEvent *evt = (::XKeyEvent*) event;
+                    UpdateRelativePosition(&evt->x, &evt->y,
+                            current_control->x_abs, current_control->y_abs,
+                            current_control->Width(), current_control->Height());
+                    }
+                    break;
+                case ButtonPress :
+                case ButtonRelease :
+                    {
+                    ::XButtonEvent *evt = (::XButtonEvent*) event;
+                    UpdateRelativePosition(&evt->x, &evt->y,
+                            current_control->x_abs, current_control->y_abs,
+                            current_control->Width(), current_control->Height());
+                    }
+                    break;
+                case MotionNotify:
+                    {
+                    ::XMotionEvent *evt = (::XMotionEvent*) event;
+                    UpdateRelativePosition(&evt->x, &evt->y,
+                            current_control->x_abs, current_control->y_abs,
+                            current_control->Width(), current_control->Height());
+                    }
+                    break;
+                case EnterNotify :
+                case LeaveNotify:
+                    {
+                    ::XCrossingEvent *evt = (::XCrossingEvent*) event;
+                    UpdateRelativePosition(&evt->x, &evt->y,
+                            current_control->x_abs, current_control->y_abs,
+                            current_control->Width(), current_control->Height());
+                    }
+                    break;
+                case Expose:
+                    {
+                    ::XExposeEvent *evt = (::XExposeEvent*) event;
+                    UpdateRelativePosition(&evt->x, &evt->y,
+                            current_control->x_abs, current_control->y_abs,
+                            current_control->Width(), current_control->Height());
+                    }
+                    break;
+                case GraphicsExpose :
+                    {
+                    ::XGraphicsExposeEvent *evt = (::XGraphicsExposeEvent*) event;
+                    UpdateRelativePosition(&evt->x, &evt->y,
+                            current_control->x_abs, current_control->y_abs,
+                            current_control->Width(), current_control->Height());
+                    }
+                    break;
+                case GravityNotify:
+                    {
+                    ::XGravityEvent *evt = (::XGravityEvent*) event;
+                    UpdateRelativePosition(&evt->x, &evt->y,
+                            current_control->x_abs, current_control->y_abs,
+                            current_control->Width(), current_control->Height());
+                    }
+                    break;
+                case ReparentNotify:
+                    {
+                    ::XReparentEvent *evt = (::XReparentEvent*) event;
+                    UpdateRelativePosition(&evt->x, &evt->y,
+                            current_control->x_abs, current_control->y_abs,
+                            current_control->Width(), current_control->Height());
+                    }
+                    break;
+                case ConfigureNotify:
+                    {
+                    ::XConfigureEvent *evt = (::XConfigureEvent*) event;
+                    UpdateRelativePosition(&evt->x, &evt->y,
+                            current_control->x_abs, current_control->y_abs,
+                            current_control->Width(), current_control->Height());
+                    }
+                    break;
+                case ConfigureRequest:
+                    {
+                    ::XConfigureRequestEvent *evt = (::XConfigureRequestEvent*) event;
+                    UpdateRelativePosition(&evt->x, &evt->y,
+                            current_control->x_abs, current_control->y_abs,
+                            current_control->Width(), current_control->Height());
+                    }
+                    break;
+            }
+
+            //other event that are sent without pointer position information
+            // => forward them without modification
+            //if (    event->type == FocusIn          ||
+            //        event->type == FocusOut         ||
+            //        event->type == KeymapNotify     ||
+            //        event->type == NoExpose         ||
+            //        event->type == VisibilityNotify ||
+            //        event->type == CreateNotify     ||
+            //        event->type == DestroyNotify    ||
+            //        event->type == UnmapNotify      ||
+            //        event->type == MapNotify        ||
+            //        event->type == MapRequest       ||
+            //        event->type == ResizeRequest    ||
+            //        event->type == CirculateNotify  ||
+            //        event->type == CirculateRequest ||
+            //        event->type == PropertyNotify   ||
+            //        event->type == SelectionClear   ||
+            //        event->type == SelectionRequest ||
+            //        event->type == SelectionNotify  ||
+            //        event->type == ColormapNotify   ||
+            //        event->type == ClientMessage    ||
+            //        event->type == MappingNotify
+            //   )
+
+            current_control->AddEvent(event);
+        }
+        current_node = current_node->next();
+    }
+
+}
+
+

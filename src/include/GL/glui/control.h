@@ -77,7 +77,7 @@ namespace GLUI
             int            Width() const  {return CurrentSize.size.w;}
             int            Height() const {return CurrentSize.size.h;}
 
-            /** Onscreen coordinates */
+            /** Onscreen coordinates Y axis up as in OGL */
             int             x_abs, y_abs;
 
             /** "activation" for tabbing between controls. */
@@ -104,7 +104,7 @@ namespace GLUI
 
             virtual void draw(void)=0;
             virtual void translate_and_draw( void );
-            virtual int AddEvent (::XEvent event);
+            virtual int AddEvent (::XEvent* event);
 
 
             virtual int         set_size( Size sz, Size min=Size(0,0) );
@@ -145,6 +145,7 @@ namespace GLUI
             Size CurrentSize;
             Size Min;
             EventHandler* handler;
+            long EventMask;
     };
 
 }

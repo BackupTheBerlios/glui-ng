@@ -84,7 +84,7 @@ void Control::enable()
     EventToForward.xexpose.y = y_abs;
     EventToForward.xexpose.width = this->Width();
     EventToForward.xexpose.height = this->Height();
-    OwnerWindow->AddEvent(EventToForward);
+    OwnerWindow->AddEvent(&EventToForward);
 
     /*** Now recursively enable all buttons below it ***/
     node = (Control*) first_child();
@@ -112,7 +112,7 @@ void Control::disable()
     EventToForward.xexpose.y = y_abs;
     EventToForward.xexpose.width = this->Width();
     EventToForward.xexpose.height = this->Height();
-    OwnerWindow->AddEvent(EventToForward);
+    OwnerWindow->AddEvent(&EventToForward);
 
 
     /*** Now recursively disable all buttons below it ***/
@@ -123,19 +123,21 @@ void Control::disable()
     }
 }
 
-int Control::AddEvent(::XEvent event)
+int Control::AddEvent(::XEvent *event)
 {
-    if (event.xany.type == Expose)
+    if (event->xany.type == Expose)
         OwnerWindow->AddEvent(event);
 
 }
 
+#warning "use ::XConfigureRequestEvent instead for the api"
 void Control::pack (int x, int y)
 {
     this->x_abs = x;
     this->y_abs = y;
 }
 
+#warning "use ::XResizeRequestEvent instead for the api"
 void Control::update_size( void )
 {
 
@@ -182,7 +184,7 @@ int Control::set_size( Size sz, Size min)
     EventToForward.xexpose.y = y_abs;
     EventToForward.xexpose.width = this->Width();
     EventToForward.xexpose.height = this->Height();
-    OwnerWindow->AddEvent(EventToForward);
+    OwnerWindow->AddEvent(&EventToForward);
 }
 
 
@@ -200,7 +202,7 @@ void Control::set_alignment(Alignement new_align)
     EventToForward.xexpose.y = y_abs;
     EventToForward.xexpose.width = this->Width();
     EventToForward.xexpose.height = this->Height();
-    OwnerWindow->AddEvent(EventToForward);
+    OwnerWindow->AddEvent(&EventToForward);
 }
 
 

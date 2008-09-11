@@ -48,7 +48,7 @@ Button::Button( Node *parent, const char *name,
 #warning "register on KeyPress, KeyRelease, ButtonPress, ButtonRelease, EnterNotify, LeaveNotify, MotionNotify"
 }
 
-int Button::AddEvent (::XEvent event)
+int Button::AddEvent (::XEvent *event)
 {
     EventInterpreter::AddEvent(event);
     ::XEvent EventToForward;
@@ -64,7 +64,7 @@ int Button::AddEvent (::XEvent event)
     if (GetStatus() & EventInterpreter::click )
     {
         value.SetVal(true);
-        OwnerWindow->AddEvent(EventToForward);
+        OwnerWindow->AddEvent(&EventToForward);
     }
 
 

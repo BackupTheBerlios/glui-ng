@@ -46,7 +46,7 @@ namespace GLUI
 			static debug* Instance();
 
 			~debug();
-			int print(const char* file, int line, const char* format,...);
+			int print(const char* file, int line, int level, const char* format,...);
 			void FlushGL(void);
 
 		private:

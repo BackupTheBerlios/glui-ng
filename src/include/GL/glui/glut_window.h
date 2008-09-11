@@ -121,8 +121,14 @@ namespace GLUI
                     unsigned int border_width,
                     unsigned long border,
                     unsigned long background );
-            virtual int AddEvent (::XEvent event);
+            virtual int AddEvent (::XEvent* event);
             long unsigned int GetGlutWindowId();
+
+        public: //event handlers
+            int AddEvent(::XResizeRequestEvent* event);
+            int AddEvent(::XExposeEvent* event);
+            int AddEvent(::XDestroyWindowEvent* event);
+            int AddEvent(::XKeyEvent* event);
 
         protected: //methods
 

@@ -43,19 +43,19 @@ using namespace GLUI;
 
 debug::debug()
 {
-  use_debug = getenv("GLUI_ENABLE_DEBUG");
-  if (use_debug != NULL)
-  {
-      buf = new char[ISIZE];
-  }
+    use_debug = getenv("GLUI_ENABLE_DEBUG");
+    if (use_debug != NULL)
+    {
+        buf = new char[ISIZE];
+    }
 }
 
 debug::~debug()
 {
-  if ( use_debug != NULL ) delete buf;
+    if ( use_debug != NULL ) delete buf;
 }
 
-int debug::print(const char* file, int line, const char* format,...)
+int debug::print(const char* file, int line, int level, const char* format,...)
 {
 
     if (use_debug != NULL )

@@ -119,145 +119,157 @@ GlutWindow::GlutWindow(Display *display, Window parent,
 {
 }
 
-int GlutWindow::AddEvent (::XEvent event)
+int GlutWindow::AddEvent (::XEvent *event)
 {
-    if (Expose == event.type)
+    switch (event->type)
     {
-        debug::Instance()->print( __FILE__, __LINE__,
-                "display\n");
-        int       win_w, win_h;
-
-        // SUBTLE: on freeGLUT, the correct window is always already set.
-        // But older versions of GLUT need this call, or else subwindows
-        // don't update properly when resizing or damage-painting.
-        glutSetWindow( this->GlutWindowId );
-
-        // Set up OpenGL state for widget drawing
-        glEnable( GL_DEPTH_TEST );
-        //glDisable( GL_DEPTH_TEST );
-        glCullFace( GL_BACK );
-        glDisable( GL_CULL_FACE );
-        //glEnable( GL_LIGHTING );
-        glDisable(GL_LIGHTING);
-
-        this->SetCurrentDrawBuffer();
-
-        //update sizes and positions
-        this->update_size();
-        this->pack(0, 0);
-
-
-        // Check here if the window needs resizing
-        win_w = glutGet( GLUT_WINDOW_WIDTH );
-        win_h = glutGet( GLUT_WINDOW_HEIGHT );
-        if ( win_w != this->Width() || win_h != this->Height() ) {
-            glutReshapeWindow( this->Width(), this->Height() );
-            return 0;
-        }
-
-        //    Draw GLUI window
-        glClearColor( theme::Instance()->bkgd_color[0] / 255.0f,
-                theme::Instance()->bkgd_color[1] / 255.0f,
-                theme::Instance()->bkgd_color[2] / 255.0f,
-                1.0f );
-        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-        this->set_ortho_projection();
-
-        glMatrixMode( GL_MODELVIEW );
-        glLoadIdentity();
-
-        // Recursively draw the main panel
-        this->translate_and_draw();
-        switch (drawinghelpers::get_buffer_mode()) {
-            case drawinghelpers::buffer_front: // Make sure drawing gets to screen
-                glFlush();
-                break;
-            case drawinghelpers::buffer_back: // Bring back buffer to front
-                glutSwapBuffers();
-                break;
-        }
-        glutPostRedisplay();
-        return 0;
+        case Expose : return AddEvent((::XExposeEvent*) event);
+        case DestroyNotify :  return AddEvent((::XDestroyWindowEvent*) event);
+        case ResizeRequest: return AddEvent((::XResizeRequestEvent*) event);
     }
-    else if (DestroyNotify == event.type)
-    {
-        Node* child = first_child();
-        Control* control = dynamic_cast<Control*>(child);
-        while (control)
-        {
-            control->AddEvent(event);
-            control =  dynamic_cast<Control*>(next());
-        }
-        delete this;
-        return 0;
-    }
-    else if (ResizeRequest == event.type)
-    {
-        ::XResizeRequestEvent *theEvent = (::XResizeRequestEvent*) &event;
-        CurrentSize.size.w = theEvent->width;
-        CurrentSize.size.h = theEvent->height;
 
-        this->pack(0, 0);
-
-        if ( theEvent->width  != CurrentSize.size.w ||
-             theEvent->height != CurrentSize.size.h ) {
-            glutReshapeWindow( CurrentSize.size.w, CurrentSize.size.h );
-        }
-        else {
-        }
-
-        glViewport( 0, 0, CurrentSize.size.w, CurrentSize.size.h);
-
-        debug::Instance()->print( __FILE__, __LINE__,
-                "%d: %d\n", glutGetWindow(), this->flags );
-
-        glutPostRedisplay();
-        return 0;
-    }
     return EINVAL;
 }
+
+int GlutWindow::AddEvent(::XExposeEvent *event)
+{
+    debug::Instance()->print( __FILE__, __LINE__, _level,
+            "display\n");
+    int       win_w, win_h;
+
+    // SUBTLE: on freeGLUT, the correct window is always already set.
+    // But older versions of GLUT need this call, or else subwindows
+    // don't update properly when resizing or damage-painting.
+    glutSetWindow( this->GlutWindowId );
+
+    // Set up OpenGL state for widget drawing
+    glEnable( GL_DEPTH_TEST );
+    //glDisable( GL_DEPTH_TEST );
+    glCullFace( GL_BACK );
+    glDisable( GL_CULL_FACE );
+    //glEnable( GL_LIGHTING );
+    glDisable(GL_LIGHTING);
+
+    this->SetCurrentDrawBuffer();
+
+    //update sizes and positions
+    this->update_size();
+    this->pack(0, 0);
+
+
+    // Check here if the window needs resizing
+    win_w = glutGet( GLUT_WINDOW_WIDTH );
+    win_h = glutGet( GLUT_WINDOW_HEIGHT );
+    if ( win_w != this->Width() || win_h != this->Height() ) {
+        glutReshapeWindow( this->Width(), this->Height() );
+        return 0;
+    }
+
+    //    Draw GLUI window
+    glClearColor( theme::Instance()->bkgd_color[0] / 255.0f,
+            theme::Instance()->bkgd_color[1] / 255.0f,
+            theme::Instance()->bkgd_color[2] / 255.0f,
+            1.0f );
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+    this->set_ortho_projection();
+
+    glMatrixMode( GL_MODELVIEW );
+    glLoadIdentity();
+
+    // Recursively draw the main panel
+    this->translate_and_draw();
+    switch (drawinghelpers::get_buffer_mode()) {
+        case drawinghelpers::buffer_front: // Make sure drawing gets to screen
+            glFlush();
+            break;
+        case drawinghelpers::buffer_back: // Bring back buffer to front
+            glutSwapBuffers();
+            break;
+    }
+    glutPostRedisplay();
+    return 0;
+}
+
+int GlutWindow::AddEvent(::XDestroyWindowEvent *event)
+{
+    Node* child = first_child();
+    while (child)
+    {
+        Node* next = child->next();
+        delete child;
+        child = next;
+    }
+    delete this;
+    return 0;
+}
+
+
+
+int GlutWindow::AddEvent(::XResizeRequestEvent *event)
+{
+    ::XResizeRequestEvent *theEvent = (::XResizeRequestEvent*) &event;
+    CurrentSize.size.w = theEvent->width;
+    CurrentSize.size.h = theEvent->height;
+
+    this->pack(0, 0);
+
+    if ( theEvent->width  != CurrentSize.size.w ||
+            theEvent->height != CurrentSize.size.h ) {
+        glutReshapeWindow( CurrentSize.size.w, CurrentSize.size.h );
+    }
+    else {
+    }
+
+    glViewport( 0, 0, CurrentSize.size.w, CurrentSize.size.h);
+
+    debug::Instance()->print( __FILE__, __LINE__, _level,
+            "%d: %d\n", glutGetWindow(), this->flags );
+
+    glutPostRedisplay();
+    return 0;
+}
+
 
 
 
 
 
 /********************************************** glui_display_func() ********/
-
+#warning "reput y axis up on event"
 void GlutWindow::display_func (void)
 {
-    XResizeRequestEvent event = {
-        .type   = Expose,
-    };
-    debug::Instance()->print (__FILE__, __LINE__, "display func\n");
+    ::XExposeEvent event;
+        event.type   = Expose;
+
+    debug::Instance()->print (__FILE__, __LINE__, 0 , "display func\n");
     GlutWindow* win= MasterObject::Instance()->FindWindow(glutGetWindow ());
 
     if (win)
     {
-        glut_window->AddEvent(event);
+        win->AddEvent(&event);
     }
 }
 
 
 
 /********************************************** glui_reshape_func() ********/
-
+#warning "reput y axis up on event"
 void GlutWindow::reshape_func (int w, int h)
 {
-    XResizeRequestEvent event = {
-        .type   = ResizeRequest,
-        .width  = w,
-        .height = h
-    };
+    ::XResizeRequestEvent event;
+        event.type   = ResizeRequest;
+        event.width  = w;
+        event.height = h;
 
 
-    debug::Instance()->print (__FILE__, __LINE__, "glui_reshape_func(): %d  w/h: %d/%d\n", glutGetWindow (), w, h);
+    debug::Instance()->print (__FILE__, __LINE__, 0, "glui_reshape_func(): %d  w/h: %d/%d\n", glutGetWindow (), w, h);
 
     /***  First check if this is main glut window ***/
     GlutWindow* glut_window = MasterObject::Instance()->FindWindow(glutGetWindow ());
     if (glut_window)
     {
-        glut_window->AddEvent(event);
+        glut_window->AddEvent(&event);
     }
 }
 
@@ -266,52 +278,35 @@ void GlutWindow::reshape_func (int w, int h)
 
 
 #error "continue modification from here"
-
+#warning "factorise
 /********************************************** glui_keyboard_func() ********/
-
+#warning "reput y axis up on event"
 void GlutWindow::keyboard_func (unsigned char key, int x, int y)
 {
 
     int win_w = glutGet (GLUT_WINDOW_WIDTH);
     int win_h = glutGet (GLUT_WINDOW_HEIGHT);
     y = win_h - y;
+    ::XKeyEvent event;
+    event.type=KeyPress;
+    event.keycode=key;
+    event.x=x;
+    event.y=y;
 
-    current_window = glutGetWindow ();
+    int current_window = glutGetWindow ();
     GlutWindow* glut_window = MasterObject::Instance()->FindWindow(glutGetWindow());
 
-    debug::Instance ()->print (__FILE__, __LINE__, "key: %d\n", current_window);
+    debug::Instance ()->print (__FILE__, __LINE__, 0, "key: %d\n", current_window);
 
     if (glut_window)
-    {		       /**  Was event in a GLUT window?  **/
-        if (MasterObject::Instance()->active_control_glui && MasterObject::Instance()->active_control)
-        {
-            glutSetWindow (glut_window->GlutWindowId);
-
-            MasterObject::Instance()->active_control_glui->keyboard (key, x, y);
-            finish_drawing ();
-
-        }
-        else
-        {
-            if (glut_window->glut_keyboard_CB)
-                glut_window->glut_keyboard_CB (key, x, y);
-        }
-    }
-    else
-    {	   /***  Nope, event was in a standalone GLUI window  **/
-        glui = MasterObject::Instance()->find_glui_by_window_id (glutGetWindow ());
-
-        if (glui)
-        {
-            glui->keyboard (key, x, y);
-            finish_drawing ();
-        }
+    {
+        glut_window->AddEvent(&event);
     }
 }
 
 
 /************************************************ glui_special_func() ********/
-
+#warning "reput y axis up on event"
 void GlutWindow::special_func (int key, int x, int y)
 {
 
@@ -319,7 +314,7 @@ void GlutWindow::special_func (int key, int x, int y)
     int win_h = glutGet (GLUT_WINDOW_HEIGHT);
     y = win_h - y;
 
-    current_window = glutGetWindow ();
+    int current_window = glutGetWindow ();
     GlutWindow* glut_window = MasterObject::Instance()->FindWindow(glutGetWindow());
 
     if (glut_window) /**  Was event in a GLUT window?  **/
@@ -352,14 +347,14 @@ void GlutWindow::special_func (int key, int x, int y)
 }
 
 /********************************************** glui_mouse_func() ********/
-
+#warning "reput y axis up on event"
 void GlutWindow::mouse_func (int button, int state, int x, int y)
 {
     int win_w = glutGet (GLUT_WINDOW_WIDTH);
     int win_h = glutGet (GLUT_WINDOW_HEIGHT);
     y = win_h - y;
 
-    current_window = glutGetWindow ();
+    int current_window = glutGetWindow ();
     GlutWindow *glut_window = MasterObject::Instance()->FindWindow(glutGetWindow());
 
     if (glut_window)
@@ -385,7 +380,7 @@ void GlutWindow::mouse_func (int button, int state, int x, int y)
 
 
 /********************************************** glui_motion_func() ********/
-
+#warning "reput y axis up on event"
 void GlutWindow::motion_func (int x, int y)
 {
     GLUI *glui;
@@ -405,7 +400,7 @@ void GlutWindow::motion_func (int x, int y)
 
 
 /**************************************** glui_passive_motion_func() ********/
-
+#warning "reput y axis up on event"
 void GlutWindow::passive_motion_func (int x, int y)
 {
     GLUI *glui;
@@ -424,7 +419,7 @@ void GlutWindow::passive_motion_func (int x, int y)
 
 
 /********************************************** glui_entry_func() ********/
-
+#warning "reput y axis up on event"
 void GlutWindow::entry_func (int state)
 {
     GLUI *glui;
@@ -441,7 +436,7 @@ void GlutWindow::entry_func (int state)
 
 
 /****************************** GLUI_Main::entry() **************/
-
+#warning "reput y axis up on event"
 void    GLUI_Main::entry(int state)
 {
     /*if ( NOT active_control || ( active_control && ( active_control->type == GLUI_CONTROL_EDITTEXT
@@ -450,12 +445,12 @@ void    GLUI_Main::entry(int state)
 }
 
 /******************************************** glui_visibility_func() ********/
-
+#warning "reput y axis up on event"
 void GlutWindow::visibility_func (int state)
 {
     GLUI *glui;
 
-    debug::Instance ()->print (__FILE__, __LINE__, "IN GLUI VISIBILITY()\n");
+    debug::Instance ()->print (__FILE__, __LINE__, _level, "IN GLUI VISIBILITY()\n");
     /*  fflush( stdout );          */
 
     glui = MasterObject::Instance()->find_glui_by_window_id (glutGetWindow ());
@@ -469,13 +464,13 @@ void GlutWindow::visibility_func (int state)
 
 /********************************************** glui_idle_func() ********/
 /* Send idle event to each glui, then to the main window            */
-
+#warning "reput y axis up on event"
 void GlutWindow::idle_func (void)
 {
     GlutWindow* win = MasterObject::Instance()->FindWindow(glutGetWindow());
     while (glui)
     {
-        debug::Instance()->print( __FILE__, __LINE__,
+        debug::Instance()->print( __FILE__, __LINE__, _level,
                 "IDLE \t" );
 
         if ( active_control != NULL ) {

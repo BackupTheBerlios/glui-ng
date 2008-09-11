@@ -34,7 +34,7 @@ namespace GLUI
 			  */
 			Button( Node *parent, const char *name,
 					int id=-1, CB cb=CB() );
-			virtual int AddEvent(::XEvent event);
+			virtual int AddEvent(::XEvent *event);
 
 		protected:
 			void draw_pressed( void );

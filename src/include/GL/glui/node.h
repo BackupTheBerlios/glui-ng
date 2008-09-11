@@ -47,8 +47,11 @@ namespace GLUI
 			const char* whole_tree(int start=1);
 			const char* NodeName;
 
+            int level() { return _level;}
+
 
 		protected:
+            int _level;   //node level, used for debug purpose
 			Node();
 			Node *parent_node;
 			Node *child_head;

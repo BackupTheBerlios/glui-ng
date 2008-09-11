@@ -24,7 +24,7 @@ namespace GLUI
 		public: //variables
 			LiveInt value;
 		public: //methods
-			int AddEvent (::XEvent event);
+			int AddEvent (::XEvent *event);
 
 			void update_size( void );
 

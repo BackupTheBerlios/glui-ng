@@ -36,7 +36,7 @@ namespace GLUI
 	class EventHandler
 	{
 		public : //methods
-			virtual int AddEvent(::XEvent event) = 0;
+			virtual int AddEvent(::XEvent *event) = 0;
 	};
 
 	class EventInterpreter : public EventHandler
@@ -54,7 +54,7 @@ namespace GLUI
 			};
 		public:
 			EventInterpreter (int eventCount=10);
-			virtual int AddEvent(::XEvent event);
+			virtual int AddEvent(::XEvent *event);
 			int GetStatus();
 		private:
 			int status;

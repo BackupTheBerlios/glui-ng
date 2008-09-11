@@ -72,7 +72,7 @@ Checkbox::~Checkbox()
     delete text;
 }
 
-int Checkbox::AddEvent (::XEvent event)
+int Checkbox::AddEvent (::XEvent *event)
 {
     EventInterpreter::AddEvent(event);
     ::XEvent EventToForward;
@@ -86,7 +86,7 @@ int Checkbox::AddEvent (::XEvent event)
     if (GetStatus() & EventInterpreter::click )
     {
         value.SetVal(!value.GetVal());
-        OwnerWindow->AddEvent(EventToForward);
+        OwnerWindow->AddEvent(&EventToForward);
     }
     //ask for redisplay of window
 

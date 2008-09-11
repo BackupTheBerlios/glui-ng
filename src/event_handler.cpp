@@ -51,12 +51,12 @@ EventInterpreter::EventInterpreter (int eventCount)
 }
 
 
-int EventInterpreter::AddEvent(::XEvent event)
+int EventInterpreter::AddEvent(::XEvent *event)
 {
-#warning "TODO NOW!"
-    eventQueue = eventQueue->next;
+#warning "TODO NOW! create test first!"
+/*    eventQueue = eventQueue->next;
     eventQueue->Xevent = event;
-    switch (event.type)
+    switch (event->type)
     {
         case KeyPress:
         case KeyRelease :
@@ -93,6 +93,7 @@ int EventInterpreter::AddEvent(::XEvent event)
         case MappingNotify :
         default: ;
     }
+    */
 }
 
 int  EventInterpreter::GetStatus()

@@ -90,7 +90,7 @@ namespace GLUI
         public :
             _Window(const char *name,
                     Container::orientation orient=Container::vertical);
-            virtual int AddEvent (::XEvent event);
+            virtual int AddEvent (::XEvent *event);
         public :  //operators
             bool operator== (::Window window);
             void  set_ortho_projection( void );

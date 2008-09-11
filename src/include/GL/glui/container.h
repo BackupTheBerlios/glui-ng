@@ -64,14 +64,17 @@ namespace GLUI
             void set_orientation( orientation new_orientation);
             virtual void align( void );
             int  add_control( Node *control );
-            virtual int AddEvent (::XEvent event);
+            virtual int AddEvent (::XEvent* event);
 
         protected :
             orientation CurrOrientation;
             int              total_child_w;
 
         protected : //internal API
-            void Container::check_size_constency( void );
+            void check_size_constency( void );
+            int UpdateRelativePosition (int *x, int *y, int widget_x, int widget_y, int widget_w, int widget_h);
+                //<update the absolute x and y of an event to provide relative to the widget, return 0 if the
+                //event is inside widget, 1 if not
 
             ///data :
         protected :
@@ -80,6 +83,7 @@ namespace GLUI
             int             x_off_left, x_off_right; // right and left inner margin
             int             contain_x, contain_y;
             int             contain_w, contain_h;
+            long            DoNotPropagateMask;
             /* if this is a container control (e.g.,
                radiogroup or panel) this indicated dimensions
                of inner area in which controls reside */
@@ -90,6 +94,21 @@ namespace GLUI
     inline void Container::set_orientation( orientation new_orientation)
     {
         CurrOrientation = new_orientation;
+    }
+
+    inline int Container::UpdateRelativePosition(int *x, int *y, int widget_x, int widget_y, int widget_w, int widget_h)
+    {
+        if (*x > widget_x &&
+                *x < (widget_x + widget_w) &&
+                *y > widget_y &&
+                *y < (widget_y + widget_h)
+           )
+        {
+            *x = *x - widget_x;
+            *y = *y - widget_y;
+            return 0;
+        }
+        return 1; //default value
     }
 
 };
