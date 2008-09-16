@@ -129,6 +129,11 @@ namespace GLUI
             int AddEvent(::XExposeEvent* event);
             int AddEvent(::XDestroyWindowEvent* event);
             int AddEvent(::XKeyEvent* event);
+            int AddEvent(::XButtonEvent* event);
+            int AddEvent(::XMotionEvent* event);
+            int AddEvent(::XCrossingEvent* event);
+            int AddEvent(::XMapEvent* event);
+            int AddEvent(::XUnmapEvent* event);
 
         protected: //methods
 
@@ -145,8 +150,10 @@ namespace GLUI
             static void entry_func(int);
 
         protected: //variables
-
+            unsigned int KeyModifierState;
             long unsigned int GlutWindowId;
+        protected: //defines
+            enum _KeyModifierShift { KeyModifierShift=8 }; //256 first chars are already used in keyboard functions of glut
     };
 
 

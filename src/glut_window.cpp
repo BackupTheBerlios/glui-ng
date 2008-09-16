@@ -106,7 +106,7 @@ GlutWindow::GlutWindow(Display* display, Window parent,
     glutPassiveMotionFunc (passive_motion_func);
     glutEntryFunc (entry_func);
     glutVisibilityFunc (visibility_func);
-    //glutIdleFunc (idle_func);	// FIXME!  100% CPU usage!
+    glutIdleFunc (NULL);
 
 }
 
@@ -130,6 +130,31 @@ int GlutWindow::AddEvent (::XEvent *event)
 
     return EINVAL;
 }
+
+int GlutWindow::AddEvent(::XResizeRequestEvent *event)
+{
+    ::XResizeRequestEvent *theEvent = (::XResizeRequestEvent*) &event;
+    CurrentSize.size.w = theEvent->width;
+    CurrentSize.size.h = theEvent->height;
+
+    this->pack(0, 0);
+
+    if ( theEvent->width  != CurrentSize.size.w ||
+            theEvent->height != CurrentSize.size.h ) {
+        glutReshapeWindow( CurrentSize.size.w, CurrentSize.size.h );
+    }
+    else {
+    }
+
+    glViewport( 0, 0, CurrentSize.size.w, CurrentSize.size.h);
+
+    debug::Instance()->print( __FILE__, __LINE__, _level,
+            "%d: %d\n", glutGetWindow(), this->flags );
+
+    glutPostRedisplay();
+    return 0;
+}
+
 
 int GlutWindow::AddEvent(::XExposeEvent *event)
 {
@@ -205,29 +230,42 @@ int GlutWindow::AddEvent(::XDestroyWindowEvent *event)
 }
 
 
-
-int GlutWindow::AddEvent(::XResizeRequestEvent *event)
+int GlutWindow::AddEvent(::XKeyEvent* event)
 {
-    ::XResizeRequestEvent *theEvent = (::XResizeRequestEvent*) &event;
-    CurrentSize.size.w = theEvent->width;
-    CurrentSize.size.h = theEvent->height;
+    Container::AddEvent((::XEvent*) event);
+}
 
-    this->pack(0, 0);
 
-    if ( theEvent->width  != CurrentSize.size.w ||
-            theEvent->height != CurrentSize.size.h ) {
-        glutReshapeWindow( CurrentSize.size.w, CurrentSize.size.h );
-    }
-    else {
-    }
+int GlutWindow::AddEvent(::XButtonEvent* event)
+{
+    Container::AddEvent((::XEvent*) event);
+}
 
-    glViewport( 0, 0, CurrentSize.size.w, CurrentSize.size.h);
 
-    debug::Instance()->print( __FILE__, __LINE__, _level,
-            "%d: %d\n", glutGetWindow(), this->flags );
+int GlutWindow::AddEvent(::XMotionEvent* event)
+{
+    Container::AddEvent((::XEvent*) event);
+}
 
-    glutPostRedisplay();
-    return 0;
+
+int GlutWindow::AddEvent(::XCrossingEvent* event)
+{
+    Container::AddEvent((::XEvent*) event);
+}
+
+
+int GlutWindow::AddEvent(::XMapEvent* event)
+{
+    ::XExposeEvent expose;
+    expose.type = Expose;
+    Container::AddEvent((::XEvent*) event);
+    this->AddEvent(&expose);
+}
+
+
+int GlutWindow::AddEvent(::XUnmapEvent* event)
+{
+    Container::AddEvent((::XEvent*) event);
 }
 
 
@@ -277,7 +315,6 @@ void GlutWindow::reshape_func (int w, int h)
 
 
 
-#error "continue modification from here"
 #warning "factorise
 /********************************************** glui_keyboard_func() ********/
 #warning "reput y axis up on event"
@@ -289,7 +326,7 @@ void GlutWindow::keyboard_func (unsigned char key, int x, int y)
     y = win_h - y;
     ::XKeyEvent event;
     event.type=KeyPress;
-    event.keycode=key;
+    event.keycode=key; //first 256 char are reserved for non modifier keys
     event.x=x;
     event.y=y;
 
@@ -300,6 +337,7 @@ void GlutWindow::keyboard_func (unsigned char key, int x, int y)
 
     if (glut_window)
     {
+        event.state=glut_window->KeyModifierState;
         glut_window->AddEvent(&event);
     }
 }
@@ -313,36 +351,28 @@ void GlutWindow::special_func (int key, int x, int y)
     int win_w = glutGet (GLUT_WINDOW_WIDTH);
     int win_h = glutGet (GLUT_WINDOW_HEIGHT);
     y = win_h - y;
+    ::XKeyEvent event;
+    event.type = KeyPress;
+    event.keycode = key << KeyModifierShift ; //first 256 char are reserved for non modifier keys
+    event.x = x;
+    event.y = y;
+
+
 
     int current_window = glutGetWindow ();
     GlutWindow* glut_window = MasterObject::Instance()->FindWindow(glutGetWindow());
 
-    if (glut_window) /**  Was event in a GLUT window?  **/
+    if (glut_window)
     {
-        if (MasterObject::Instance()->active_control_glui && MasterObject::Instance()->active_control)
-        {
-            glutSetWindow (MasterObject::Instance()->active_control_glui->get_glut_window_id ());
+            int glutModifiers = glutGetModifiers();
+            glut_window->KeyModifierState &= ! ( ControlMask | ShiftMask | Mod1Mask );
+            if ( glutModifiers | GLUT_ACTIVE_SHIFT ) glut_window->KeyModifierState | ShiftMask;
+            if ( glutModifiers | GLUT_ACTIVE_CTRL  ) glut_window->KeyModifierState | ControlMask;
+            if ( glutModifiers | GLUT_ACTIVE_ALT   ) glut_window->KeyModifierState | Mod1Mask;
 
-            MasterObject::Instance()->active_control_glui->special (key, x, y);
-            finish_drawing ();
+            event.state=glut_window->KeyModifierState;
+            glut_window->AddEvent(&event);
 
-            glutSetWindow (current_window);
-        }
-        else
-        {
-            if (glut_window->glut_special_CB)
-                glut_window->glut_special_CB (key, x, y);
-        }
-    }
-    else		   /***  Nope, event was in a standalone GLUI window  **/
-    {
-        glui = MasterObject::Instance()->find_glui_by_window_id (glutGetWindow ());
-
-        if (glui)
-        {
-            glui->special (key, x, y);
-            finish_drawing ();
-        }
     }
 }
 
@@ -352,29 +382,38 @@ void GlutWindow::mouse_func (int button, int state, int x, int y)
 {
     int win_w = glutGet (GLUT_WINDOW_WIDTH);
     int win_h = glutGet (GLUT_WINDOW_HEIGHT);
+
     y = win_h - y;
+    ::XButtonEvent event;
+    event.type =
+
+    event.x=x;
+    event.y=y;
+
 
     int current_window = glutGetWindow ();
     GlutWindow *glut_window = MasterObject::Instance()->FindWindow(glutGetWindow());
 
     if (glut_window)
-    {		       /**  Was event in a GLUT window?  **/
-        if (MasterObject::Instance()->active_control_glui != NULL)
-            MasterObject::Instance()->active_control_glui->deactivate_current_control ();
-
-        if (glut_window->glut_mouse_CB)
-            glut_window->glut_mouse_CB (button, state, x, y);
-        finish_drawing ();
-    }
-    else
-    {		       /**  Nope - event was in a GLUI standalone window  **/
-        glui = MasterObject::Instance()->find_glui_by_window_id (glutGetWindow ());
-        if (glui)
+    {
+        if (state == GLUT_DOWN)
         {
-            glui->passive_motion (0, 0);
-            glui->mouse (button, state, x, y);
-            finish_drawing ();
+            event.type = ButtonPress;
+            glut_window->KeyModifierState |= (Button1Mask << ( button - Button1 ) );
         }
+        else
+        {
+            event.type = ButtonRelease;
+            glut_window->KeyModifierState &= ! (Button1Mask << ( button - Button1 ) );
+        }
+        int glutModifiers = glutGetModifiers();
+        glut_window->KeyModifierState &= ! ( ControlMask | ShiftMask | Mod1Mask );
+        if ( glutModifiers | GLUT_ACTIVE_SHIFT ) glut_window->KeyModifierState | ShiftMask;
+        if ( glutModifiers | GLUT_ACTIVE_CTRL  ) glut_window->KeyModifierState | ControlMask;
+        if ( glutModifiers | GLUT_ACTIVE_ALT   ) glut_window->KeyModifierState | Mod1Mask;
+
+        event.state=glut_window->KeyModifierState;
+        glut_window->AddEvent(&event);
     }
 }
 
@@ -383,19 +422,25 @@ void GlutWindow::mouse_func (int button, int state, int x, int y)
 #warning "reput y axis up on event"
 void GlutWindow::motion_func (int x, int y)
 {
-    GLUI *glui;
-    int win_w = glutGet (GLUT_WINDOW_WIDTH);
+        int win_w = glutGet (GLUT_WINDOW_WIDTH);
     int win_h = glutGet (GLUT_WINDOW_HEIGHT);
+
     y = win_h - y;
+    ::XMotionEvent event;
+    event.type = MotionNotify;
 
-    glui = MasterObject::Instance()->find_glui_by_window_id (glutGetWindow ());
+    event.x=x;
+    event.y=y;
 
-    if (glui)
+
+    int current_window = glutGetWindow ();
+    GlutWindow *glut_window = MasterObject::Instance()->FindWindow(glutGetWindow());
+
+    if (glut_window)
     {
-        glui->motion (x, y);
-        finish_drawing ();
+        event.state=glut_window->KeyModifierState;
+        glut_window->AddEvent(&event);
     }
-
 }
 
 
@@ -403,18 +448,7 @@ void GlutWindow::motion_func (int x, int y)
 #warning "reput y axis up on event"
 void GlutWindow::passive_motion_func (int x, int y)
 {
-    GLUI *glui;
-    int win_w = glutGet (GLUT_WINDOW_WIDTH);
-    int win_h = glutGet (GLUT_WINDOW_HEIGHT);
-    y = win_h - y;
-
-    glui = MasterObject::Instance()->find_glui_by_window_id (glutGetWindow ());
-
-    if (glui)
-    {
-        glui->passive_motion (x, y);
-        finish_drawing ();
-    }
+    motion_func (x,y);
 }
 
 
@@ -422,51 +456,73 @@ void GlutWindow::passive_motion_func (int x, int y)
 #warning "reput y axis up on event"
 void GlutWindow::entry_func (int state)
 {
-    GLUI *glui;
-
-    glui = MasterObject::Instance()->find_glui_by_window_id (glutGetWindow ());
-
-    if (glui)
+    ::XCrossingEvent event;
+    if ( state == GLUT_LEFT )
     {
-        glui->entry (state);
+        event.type = EnterNotify;
     }
+    else
+    {
+        event.type = LeaveNotify;
+    }
+#warning "complete the structure with other information"
+
+
+    int current_window = glutGetWindow ();
+    GlutWindow *glut_window = MasterObject::Instance()->FindWindow(glutGetWindow());
+
+    if (glut_window)
+    {
+        event.state=glut_window->KeyModifierState;
+        glut_window->AddEvent(&event);
+    }
+
 }
 
 
 
-
-/****************************** GLUI_Main::entry() **************/
-#warning "reput y axis up on event"
-void    GLUI_Main::entry(int state)
-{
-    /*if ( NOT active_control || ( active_control && ( active_control->type == GLUI_CONTROL_EDITTEXT
-      || active_control->type == GLUI_CONTROL_SPINNER) ) )*/
-    glutSetCursor( GLUT_CURSOR_LEFT_ARROW );
-}
 
 /******************************************** glui_visibility_func() ********/
 #warning "reput y axis up on event"
 void GlutWindow::visibility_func (int state)
 {
-    GLUI *glui;
+    ::XMapEvent mapevent;
+    ::XUnmapEvent unmapevent;
 
-    debug::Instance ()->print (__FILE__, __LINE__, _level, "IN GLUI VISIBILITY()\n");
+    mapevent.type = MapNotify;
+    unmapevent.type = UnmapNotify;
+    #warning "complete the structure with other information"
+
+
+    debug::Instance ()->print (__FILE__, __LINE__, 0, "IN GLUI VISIBILITY()\n");
     /*  fflush( stdout );          */
 
-    glui = MasterObject::Instance()->find_glui_by_window_id (glutGetWindow ());
+    int current_window = glutGetWindow ();
+    GlutWindow *glut_window = MasterObject::Instance()->FindWindow(glutGetWindow());
 
-    if (glui)
+    if (glut_window)
     {
-        glui->visibility (state);
+        if ( state == GLUT_VISIBLE )
+        {
+            glut_window->AddEvent(&mapevent);
+        }
+        else
+        {
+            glut_window->AddEvent(&unmapevent);
+        }
     }
+
+
 }
 
 
 /********************************************** glui_idle_func() ********/
 /* Send idle event to each glui, then to the main window            */
+/*
 #warning "reput y axis up on event"
 void GlutWindow::idle_func (void)
 {
+#warning "don't know what to do with that"
     GlutWindow* win = MasterObject::Instance()->FindWindow(glutGetWindow());
     while (glui)
     {
@@ -474,12 +530,12 @@ void GlutWindow::idle_func (void)
                 "IDLE \t" );
 
         if ( active_control != NULL ) {
-            /* First we check if the control actually needs the idle right now.
-               Otherwise, let's avoid wasting cycles and OpenGL context switching */
+            // First we check if the control actually needs the idle right now.
+            // Otherwise, let's avoid wasting cycles and OpenGL context switching
 
             if ( active_control->needs_idle() ) {
-                /*** Set the current glut window to the glui window */
-                /*** But don't change the window if we're already at that window ***/
+                // Set the current glut window to the glui window
+                // But don't change the window if we're already at that window
 
                 if ( GlutWindowId > 0 && glutGetWindow() != GlutWindowId ) {
                     glutSetWindow( GlutWindowId );
@@ -496,38 +552,29 @@ void GlutWindow::idle_func (void)
 
     if (MasterObject::Instance()->glut_idle_CB)
     {
-        /*** We set the current glut window before calling the user's
-          idle function, even though glut explicitly says the window id is
-          undefined in an idle callback.  ***/
+        // We set the current glut window before calling the user's
+        //idle function, even though glut explicitly says the window id is
+        //undefined in an idle callback.
 
-        /** Check what the current window is first ***/
+        // Check what the current window is first
 
-        /*** Arbitrarily set the window id to the main gfx window of the
-          first glui window ***/
-        /*   int current_window, new_window;          */
-        /*   current_window = glutGetWindow();          */
-        /*   if (MasterObject::Instance()->gluis.first_child() != NULL ) {          */
-        /*      new_window = ((GLUI_Main*)MasterObject::Instance()->gluis.first_child())-> */
-        /*   main_gfx_window_id;          */
-        /*   if ( new_window > 0 && new_window != old_window ) {          */
-        /*   --- Window is changed only if its not already the current window --- */
-        /*  glutSetWindow( new_window );          */
-        /* }          */
-        /*}          */
+        // Arbitrarily set the window id to the main gfx window of the
+        //first glui window
+        //   int current_window, new_window;
+        //   current_window = glutGetWindow();
+        //   if (MasterObject::Instance()->gluis.first_child() != NULL ) {
+        //      new_window = ((GLUI_Main*)MasterObject::Instance()->gluis.first_child())->
+        //   main_gfx_window_id;
+        //   if ( new_window > 0 && new_window != old_window ) {
+        //   --- Window is changed only if its not already the current window ---
+        //  glutSetWindow( new_window );
+        // }
+        //}
 
         MasterObject::Instance()->glut_idle_CB ();
     }
 }
+*/
 /****************************** GLUI_Main::idle() **************/
 
-void    GLUI_Main::idle(void)
-{
-    /*** Pass the idle event onto the active control, if any ***/
-
-}
-
-int  GLUI_Main::needs_idle( void )
-{
-    return active_control != NULL && active_control->needs_idle();
-}
 

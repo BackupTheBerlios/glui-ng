@@ -89,7 +89,7 @@ GENERATED/%.o: %.cpp ${GLUI_HEADERS}
 
 GENERATED/%.o: %.c ${GLUI_HEADERS}
 	@echo "    [CC ] $<"
-	$(CXX) $(CPPFLAGS) -c $< -o $@
+	@$(CXX) $(CPPFLAGS) -c $< -o $@
 
 
 docs:
