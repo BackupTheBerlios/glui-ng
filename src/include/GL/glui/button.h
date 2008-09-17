@@ -68,7 +68,6 @@ namespace GLUI
 		CurrentSize.size.h            = GLUI_BUTTON_SIZE;
 		CurrentSize.size.w            = 100;
 		alignment    = Control::CENTER;
-		can_activate = true;
 	}
 
 

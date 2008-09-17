@@ -20,7 +20,6 @@ namespace GLUI
 
 		protected:
 			void common_init() {
-				can_activate  = false;
 			}
 
 			void erase_text( void );

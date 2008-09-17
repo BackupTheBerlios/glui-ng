@@ -51,6 +51,18 @@ Container::Container(const char *name ,
     x_off_right    = GLUI_XOFF;
 }
 
+Container::~Container()
+{
+    Control *item = (Control*) this->first_child();
+
+    while (item)
+    {
+        Control *tmp = item;
+        item = (Control*) item->next();
+        delete tmp;
+    }
+
+}
 
 inline void Container::check_size_constency( void )
 {
@@ -350,16 +362,18 @@ int Container::add_control(Node *control )
 {
 	Control *child;
 
-	control->link_this_to_parent_last( this );
-	child = static_cast<Control*>(control);
+	child = dynamic_cast<Control*>(control);
 	if ( NULL != child)
 	{
+        control->link_this_to_parent_last( this );
 		child->enabled = this->enabled;
+        return 0;
 	}
-
+    return -1;
 }
 
-
+#warning "TODO : implement the DoNotPropagateMask update mechanism?"
+#warning "TODO : split this function into inline functions"
 int Container::AddEvent (::XEvent* event)
 {
     ::XMotionEvent* motion = (::XMotionEvent*) event;
@@ -568,11 +582,25 @@ int Container::AddEvent (::XEvent* event)
             //        event->type == MappingNotify
             //   )
 
-            current_control->AddEvent(event);
+
+#warning "add EventMask code in this before propagating"
+            return current_control->AddEvent(event);
         }
         current_node = current_node->next();
     }
 
 }
 
+int Container::Activate()
+{
+    #warning "TODO : use FocusIn or FocusOut events for this feature"
+    #warning "TODO : store the focussed child into focussed pointer of Control"
+}
 
+int Control::AddEvent (::XKeyEvent* event)
+{
+#warning "TODO : if key is tab or backtab or this control don't support..."
+    //... FocusIn through tab then send the event to the next sibling
+    //    if there is no sibling return an error
+    //
+}

@@ -58,6 +58,8 @@ namespace GLUI
         public :
             Container(const char *name,
                     orientation orient=vertical);
+            virtual ~Container();
+
             virtual void update_size( void ); //<recursively update all control sizes
             virtual void pack ( int x, int y); //<recursively update positions
             virtual void translate_and_draw (void);  //<draw with the right size and position
@@ -65,6 +67,7 @@ namespace GLUI
             virtual void align( void );
             int  add_control( Node *control );
             virtual int AddEvent (::XEvent* event);
+            virtual int Activate(); //< activate the current control
 
         protected :
             orientation CurrOrientation;

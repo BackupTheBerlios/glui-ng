@@ -69,25 +69,6 @@ GLUI_Node   *GLUI_Node::first_sibling( void )
     return parent_node->child_head;
 }
 
-
-/******************************************** GLUI_Node::next() ********/
-/* Returns next sibling in 'this' node's sibling list                  */
-
-GLUI_Node    *GLUI_Node::next( void )
-{
-  return next_sibling;
-}
-
-
-/******************************************** GLUI_Node::prev() ********/
-/* Returns prev sibling in 'this' node's sibling list                  */
-
-GLUI_Node    *GLUI_Node::prev( void )
-{
-  return prev_sibling;
-}
-
-
 /********************************************* GLUI_Node::last() *******/
 /* Returns last sibling in 'this' node's sibling list                  */
 
@@ -98,6 +79,32 @@ GLUI_Node   *GLUI_Node::last_sibling( void )
   else
     return parent_node->child_tail;
 }
+
+/******************************************** GLUI_Node::prev() ********/
+/* Returns prev sibling in 'this' node's sibling list                  */
+
+GLUI_Node    *GLUI_Node::prev( void )
+{
+  return prev_sibling;
+}
+
+
+/******************************************** GLUI_Node::next() ********/
+/* Returns next sibling in 'this' node's sibling list                  */
+
+GLUI_Node    *GLUI_Node::next( void )
+{
+  return next_sibling;
+}
+
+/************************************ GLUI_Node::add_control() **************/
+
+int GLUI_Node::add_control( GLUI_Node *child )
+{
+	child->link_this_to_parent_last( this );
+	return true;
+}
+
 
 
 /*************************** GLUI_Node::link_this_to_parent_last() *******/

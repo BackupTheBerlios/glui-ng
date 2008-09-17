@@ -66,15 +66,50 @@ GlutWindow::GlutWindow(Display* display, Window parent,
         unsigned long valuemask,
         XSetWindowAttributes *attributes )
 {
+    _GlutWindow(display, parent, x, y,
+        width, height, border_width, depth,
+        _class, visual, valuemask,
+        attributes );
+}
+
+GlutWindow::GlutWindow(Display *display, Window parent,
+        int x, int y,
+        unsigned int width, unsigned int height,
+        unsigned int border_width,
+        unsigned long border,
+        unsigned long background )
+{
+    _GlutWindow(display, parent,
+        x, y,
+        width, height,
+        border_width,
+        24, //int depth,
+        InputOutputWin, //class_type _class,
+        NULL, //Visual *visual,
+        0, //unsigned long valuemask,
+        NULL); // XSetWindowAttributes *attributes )
+}
+
+int GlutWindow::_GlutWindow(Display* display, Window parent,
+        int x, int y,
+        unsigned int width, unsigned int height,
+        unsigned int border_width,
+        int depth,
+        class_type _class,
+        Visual *visual,
+        unsigned long valuemask,
+        XSetWindowAttributes *attributes )
+{
 
     if ( parent == NULL ) {  /* not a subwindow, creating a new top-level window */
         int old_glut_window = glutGetWindow();
 
-        glutInitWindowSize( 100, 100 );
+        glutInitWindowSize( width, height);
         if ( x >= 0 || y >= 0 )
             glutInitWindowPosition( x, y );
         glutInitDisplayMode( GLUT_RGB | GLUT_DOUBLE );
         this->GlutWindowId = glutCreateWindow(" ");
+
 
         if ( old_glut_window > 0 )
             glutSetWindow( old_glut_window );
@@ -87,14 +122,18 @@ GlutWindow::GlutWindow(Display* display, Window parent,
         int old_glut_window = glutGetWindow();
         GlutWindow* win= MasterObject::Instance()->FindWindow(parent);
 
-        GlutWindowId = glutCreateSubWindow(win->GetGlutWindowId(), 0,0, 100, 100);
+        GlutWindowId = glutCreateSubWindow(win->GetWindowId(), x, y, width, height);
         win->add_control(this);
 
         if ( old_glut_window > 0 )
             glutSetWindow( old_glut_window );
 
     }
-    MasterObject::Instance()->Register(this);
+    int rc = MasterObject::Instance()->add_control(this);
+    if (rc)
+    {
+        throw rc;
+    }
 
     //init glut callbacks
     glutDisplayFunc (display_func);
@@ -110,15 +149,12 @@ GlutWindow::GlutWindow(Display* display, Window parent,
 
 }
 
-GlutWindow::GlutWindow(Display *display, Window parent,
-        int x, int y,
-        unsigned int width, unsigned int height,
-        unsigned int border_width,
-        unsigned long border,
-        unsigned long background )
+GetWindowId::~GetWindowId()
 {
+#warning "Todo : delete childs. close the window"
 }
 
+///////////////////////////////////////////////////////////////////////////////
 int GlutWindow::AddEvent (::XEvent *event)
 {
     switch (event->type)
@@ -141,6 +177,7 @@ int GlutWindow::AddEvent(::XResizeRequestEvent *event)
 
     if ( theEvent->width  != CurrentSize.size.w ||
             theEvent->height != CurrentSize.size.h ) {
+        glutSetWindow
         glutReshapeWindow( CurrentSize.size.w, CurrentSize.size.h );
     }
     else {
@@ -218,6 +255,7 @@ int GlutWindow::AddEvent(::XExposeEvent *event)
 
 int GlutWindow::AddEvent(::XDestroyWindowEvent *event)
 {
+#warning "USE container destructor"
     Node* child = first_child();
     while (child)
     {

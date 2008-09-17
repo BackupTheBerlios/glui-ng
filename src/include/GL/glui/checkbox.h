@@ -57,7 +57,6 @@ namespace GLUI
 	inline void Checkbox::common_init(void) {
 		CurrentSize.size.w              = 100;
 		CurrentSize.size.h              = 13;
-		can_activate   = true;
 	}
 
 

@@ -55,40 +55,6 @@ namespace GLUI
     typedef long unsigned int WindowId;
 
 
-    class MasterObject
-    {
-
-        public:
-            static void Register(GlutWindow* win);
-            static void DeRegister(GlutWindow* win);
-            static MasterObject* Instance();
-            GlutWindow*      FindWindow( WindowId window_id );
-
-            Node     gluis;
-            Control *active_control;
-
-            //void           get_viewport_area( int *x, int *y, int *w, int *h );
-            //void           auto_set_viewport();
-            //void           close_all();
-            //void           sync_live_all();
-            //void           reshape();
-            //float          get_version() { return GLUI_VERSION; }
-
-            //void glui_setIdleFuncIfNecessary(void);
-
-
-        private:
-            ~MasterObject();
-            MasterObject();
-            static MasterObject* TheInstance;
-            static int ClientCount;
-
-            Node     glut_windows;
-
-            void (*glut_idle_CB)(void);
-            void          add_cb_to_glut_window(int window,int cb_type,void *cb);
-    };
-
 
     class GlutDisplay: public _Display
     {
@@ -122,7 +88,7 @@ namespace GLUI
                     unsigned long border,
                     unsigned long background );
             virtual int AddEvent (::XEvent* event);
-            long unsigned int GetGlutWindowId();
+            WindowId GetWindowId();
 
         public: //event handlers
             int AddEvent(::XResizeRequestEvent* event);
@@ -138,6 +104,15 @@ namespace GLUI
         protected: //methods
 
             GlutWindow();
+            int _GlutWindow(Display* display, Window parent,
+                    int x, int y,
+                    unsigned int width, unsigned int height,
+                    unsigned int border_width,
+                    int depth,
+                    class_type _class,
+                    Visual *visual,
+                    unsigned long valuemask,
+                    XSetWindowAttributes *attributes );
             /*********** Pointers to GLUT callthrough functions *****/
             static void keyboard_func(unsigned char, int, int);
             static void special_func(int, int, int);

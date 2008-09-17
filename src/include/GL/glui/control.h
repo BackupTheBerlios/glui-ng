@@ -80,14 +80,11 @@ namespace GLUI
             /** Onscreen coordinates Y axis up as in OGL */
             int             x_abs, y_abs;
 
-            /** "activation" for tabbing between controls. */
-            int             active_type; ///< "CONTROL_ACTIVE_..."
-            bool            active;       ///< If true, we've got the focus
-            bool            can_activate; ///< If false, remove from tab order.
-            bool            spacebar_mouse_click; ///< Spacebar simulates click.
+            virtual int Activate(); //< activate the current control return 0 if activated, !=0 on error (can't activate)
 
             int             alignment;
-            bool            enabled;    /**< Is this control grayed out? */
+            bool            enabled;    //< Is this control grayed out?
+            unsigned long   EventMask;  //<mask used to inform containers about what type of event is wanted
 
 
         public:
@@ -104,7 +101,10 @@ namespace GLUI
 
             virtual void draw(void)=0;
             virtual void translate_and_draw( void );
+
+            //event interfaces
             virtual int AddEvent (::XEvent* event);
+            virtual int AddEvent (::XKeyEvent* event);
 
 
             virtual int         set_size( Size sz, Size min=Size(0,0) );
@@ -115,7 +115,7 @@ namespace GLUI
 
             virtual bool needs_idle( void ) const;
             virtual bool wants_tabs() const      { return false; }
-            int  add_control( Node *control ); //<prevent adding subsequent controls, nodes still allowed
+            int  add_control( Node *control ); //<prevent adding subsequent controls
 
             Control(const char* name)
                 : Node(name)
@@ -127,10 +127,7 @@ namespace GLUI
                 enabled        = true;
                 Min            = Size(0, 0);
                 CurrentSize    = Min;
-                active_type    = GLUI_CONTROL_ACTIVE_MOUSEDOWN;
                 alignment      = LEFT;
-                can_activate   = true;         /* By default, you can activate a control */
-                spacebar_mouse_click = true;    /* Does spacebar simulate a mouse click? */
                 resizeable     = FixedSize;
                 handler = NULL;
             }
@@ -140,12 +137,14 @@ namespace GLUI
         protected: //methods
             Control();
         protected: //variables
+            static Control* focussed;
             _Window *OwnerWindow;
             SizePolicy resizeable;
             Size CurrentSize;
             Size Min;
             EventHandler* handler;
             long EventMask;
+            bool            active;       ///< If true, we've got the focus
     };
 
 }

@@ -41,6 +41,45 @@ using namespace GLUI;
 
 int _glui_draw_border_only = 0;
 
+
+///////////////////////////////////////////////////////////////////////
+int Container::Activate()
+{
+#warning "TODO : use FocusIn or FocusOut events for this feature"
+}
+
+///////////////////////////////////////////////////////////////////////
+#warning "use ::XConfigureRequestEvent instead for the api"
+void Control::pack (int x, int y)
+{
+    this->x_abs = x;
+    this->y_abs = y;
+}
+
+////////////////////////////////////////////////////////////////////////
+#warning "use ::XResizeRequestEvent instead for the api"
+void Control::update_size( void )
+{
+
+    if (this->resizeable == PercentOfParent)
+    {
+        Control* par= dynamic_cast<Control*>(this->parent());
+        if (par)
+        {
+            this->CurrentSize.size.w = par->Width() * this->CurrentSize.percent.w / 100;
+            this->CurrentSize.size.h = par->Height() * this->CurrentSize.percent.h / 100;
+            if (Min > CurrentSize)
+            {
+                CurrentSize = Min;
+            }
+        }
+    }
+    else if (this->resizeable == FixedSize ||
+            this->resizeable == FillSpace)
+    {
+        return; //nothing to do since we already have a fixed size
+    }
+}
 /*************************** Drawing Utility routines *********************/
 
 
@@ -59,14 +98,9 @@ void Control::translate_and_draw()
 
 int  Control::add_control( Node *control )
 {
-    Control *child;
-    child = static_cast<Control*>(control);
-    if ( NULL != child)
-    {
-        return -1;
-    }
-    return ((Node*)this)->add_control(control);
-} //prevent adding subsequent controls
+    //prevent adding subsequent controls
+    return -1;
+}
 
 /**************************** Little Utility Routines ********************/
 
@@ -130,36 +164,16 @@ int Control::AddEvent(::XEvent *event)
 
 }
 
-#warning "use ::XConfigureRequestEvent instead for the api"
-void Control::pack (int x, int y)
+
+int Control::AddEvent (::XKeyEvent* event)
 {
-    this->x_abs = x;
-    this->y_abs = y;
+#warning "TODO : if key is tab or backtab or this control don't support..."
+    //... FocusIn through tab then send the event to the next sibling
+    //    if there is no sibling return an error, if control is desactivated,
+    //    do the same
 }
 
-#warning "use ::XResizeRequestEvent instead for the api"
-void Control::update_size( void )
-{
 
-    if (this->resizeable == PercentOfParent)
-    {
-        Control* par= dynamic_cast<Control*>(this->parent());
-        if (par)
-        {
-            this->CurrentSize.size.w = par->Width() * this->CurrentSize.percent.w / 100;
-            this->CurrentSize.size.h = par->Height() * this->CurrentSize.percent.h / 100;
-            if (Min > CurrentSize)
-            {
-                CurrentSize = Min;
-            }
-        }
-    }
-    else if (this->resizeable == FixedSize ||
-            this->resizeable == FillSpace)
-    {
-        return; //nothing to do since we already have a fixed size
-    }
-}
 /******* Control::set_w() **************/
 int Control::set_size( Size sz, Size min)
 {
@@ -223,13 +237,6 @@ bool Control::needs_idle() const
 
 Control::~Control()
 {
-    Control *item = (Control*) this->first_child();
-
-    while (item)
-    {
-        Control *tmp = item;
-        item = (Control*) item->next();
-        delete tmp;
-    }
+    if (foccussed == this) foccussed = NULL;
 }
 

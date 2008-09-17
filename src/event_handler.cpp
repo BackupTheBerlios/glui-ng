@@ -149,16 +149,6 @@ active_control->key_handler (key, curr_modifiers);
 }
 
 
-void special (int key, int x, int y)
-{
-curr_modifiers = glutGetModifiers ();
-
-// Pass the keystroke onto the active control, if any
-if (active_control != NULL)
-active_control->special_handler (key, glutGetModifiers ());
-}
-
-
 
 #warning "use opengl selection function to distribute events"
 #warning "this imply that each widget has to pass back event to parent"
