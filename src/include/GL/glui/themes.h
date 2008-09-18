@@ -43,4 +43,23 @@ namespace GLUI
 
 }
 
+
+//IDEA :
+//a theme shall be provided as a plugin, this plugin contain a C entry with the name
+//GLUICLASS_new(), that is used to allocate a widget of the class GLUICLASS
+//example Button_new(), CheckBox_new()....
+//all container widgets that have child shall use theme->GLUICLASS_new() instead of new GLUICLASS
+//
+//IDEA :
+//the pointers to GLUICLASS_new() are always defined, if no entry can be resolved into the plugin
+//the default builtin widget is used.
+//
+//IDEA :
+//theme shall be singleton patern, the constructor shall use GLUI_THEME environment variable
+//
+//HOWTO write a theme :
+//a theme is a set of widgets that derivate from the base widgets of this library, like this you're
+//allowed to override your custom methods like drawing methods... the theme interface is only a set
+//of C functions that call your constructor and return a pointer to the object or NULL on error.
+
 #endif //__GLUI_THEMES_H

@@ -95,6 +95,10 @@ namespace GLUI
             bool operator== (::Window window);
             void  set_ortho_projection( void );
             void  set_viewport( void );
+            virtual XMapWindow()=0;
+            virtual XMapRaised()=0;
+            virtual XMapSubwindows()=0;
+
         protected :
             _Window();
 
