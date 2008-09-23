@@ -113,8 +113,6 @@ namespace GLUI
             SizePolicy   get_resize_policy( void ) { return resizeable;}
 
 
-            virtual bool needs_idle( void ) const;
-            virtual bool wants_tabs() const      { return false; }
             int  add_control( Node *control ); //<prevent adding subsequent controls
 
             Control(const char* name)
@@ -143,7 +141,6 @@ namespace GLUI
             Size CurrentSize;
             Size Min;
             EventHandler* handler;
-            long EventMask;
             bool            active;       ///< If true, we've got the focus
     };
 

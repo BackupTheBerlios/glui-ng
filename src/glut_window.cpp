@@ -56,7 +56,40 @@
 #include <GL/glui/drawinghelpers.h>
 using namespace GLUI;
 
-GlutWindow::GlutWindow(Display* display, Window parent,
+///////////////////////////////////////////////////////////////////////
+void  GlutWindow::XMapWindow()
+{
+  glutSetWindow(GlutWindowId);
+  glutShowWindow();
+}
+
+void XMapRaised()
+{
+#warning "TODO"
+}
+
+void XMapSubwindows()
+{
+#warning "TODO"
+}
+
+///////////////////////////////////////////////////////////////////////
+void GlutWindow::XUnmapWindow( void )
+{
+  this->focussed = NULL;
+  glutSetWindow(GlutWindowId);
+  glutHideWindow();
+}
+
+void XUnmapSubwindows()
+{
+#warning "TODO"
+}
+
+
+
+//////////////////////////////////////////////////////////////////////
+GlutWindow::GlutWindow(Display* display, WindowId parent,
         int x, int y,
         unsigned int width, unsigned int height,
         unsigned int border_width,
@@ -72,7 +105,7 @@ GlutWindow::GlutWindow(Display* display, Window parent,
         attributes );
 }
 
-GlutWindow::GlutWindow(Display *display, Window parent,
+GlutWindow::GlutWindow(Display *display, WindowId parent,
         int x, int y,
         unsigned int width, unsigned int height,
         unsigned int border_width,
@@ -90,7 +123,9 @@ GlutWindow::GlutWindow(Display *display, Window parent,
         NULL); // XSetWindowAttributes *attributes )
 }
 
-int GlutWindow::_GlutWindow(Display* display, Window parent,
+#warning "TODO: copy constructor using WindowId, throw EINVAL if already registered"
+
+int GlutWindow::_GlutWindow(Display* display, WindowId parent,
         int x, int y,
         unsigned int width, unsigned int height,
         unsigned int border_width,
@@ -100,8 +135,9 @@ int GlutWindow::_GlutWindow(Display* display, Window parent,
         unsigned long valuemask,
         XSetWindowAttributes *attributes )
 {
+    GlutWindow* win= MasterObject::Instance()->FindWindow(parent);
 
-    if ( parent == NULL ) {  /* not a subwindow, creating a new top-level window */
+    if ( win == NULL ) {  // not a subwindow, creating a new top-level window
         int old_glut_window = glutGetWindow();
 
         glutInitWindowSize( width, height);
@@ -117,10 +153,9 @@ int GlutWindow::_GlutWindow(Display* display, Window parent,
             glutSetWindow(GlutWindowId);
 
     }
-    else /* *is* a subwindow */
+    else // *is* a subwindow
     {
         int old_glut_window = glutGetWindow();
-        GlutWindow* win= MasterObject::Instance()->FindWindow(parent);
 
         GlutWindowId = glutCreateSubWindow(win->GetWindowId(), x, y, width, height);
         win->add_control(this);
@@ -149,7 +184,7 @@ int GlutWindow::_GlutWindow(Display* display, Window parent,
 
 }
 
-GetWindowId::~GetWindowId()
+GlutWindow::~GlutWindow()
 {
 #warning "Todo : delete childs. close the window"
 }
@@ -177,7 +212,7 @@ int GlutWindow::AddEvent(::XResizeRequestEvent *event)
 
     if ( theEvent->width  != CurrentSize.size.w ||
             theEvent->height != CurrentSize.size.h ) {
-        glutSetWindow
+        glutSetWindow( this->GlutWindowId );
         glutReshapeWindow( CurrentSize.size.w, CurrentSize.size.h );
     }
     else {

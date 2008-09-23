@@ -72,7 +72,7 @@ namespace GLUI
                 InputWin = InputOnly,
             };
         public:
-            GlutWindow(Display* display, Window parent,
+            GlutWindow(Display* display, WindowId parent,
                     int x, int y,
                     unsigned int width, unsigned int height,
                     unsigned int border_width,
@@ -81,14 +81,23 @@ namespace GLUI
                     Visual *visual,
                     unsigned long valuemask,
                     XSetWindowAttributes *attributes );
-            GlutWindow(Display *display, Window parent,
+            GlutWindow(Display *display, WindowId parent,
                     int x, int y,
                     unsigned int width, unsigned int height,
                     unsigned int border_width,
                     unsigned long border,
                     unsigned long background );
+            virtual ~GlutWindow();
             virtual int AddEvent (::XEvent* event);
             WindowId GetWindowId();
+
+        public: //XMethods
+            virtual void XMapWindow();
+            virtual void XMapRaised();
+            virtual void XMapSubwindows();
+            virtual void XUnmapWindow();
+            virtual void XUnmapSubwindows();
+
 
         public: //event handlers
             int AddEvent(::XResizeRequestEvent* event);

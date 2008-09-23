@@ -220,23 +220,10 @@ void Control::set_alignment(Alignement new_align)
 }
 
 
-/***** Control::needs_idle() *********/
-/* This method gets overloaded by specific classes, e.g. Spinner.            */
-/* It returns whether or not a control needs to receive an idle event or not */
-/* For example, a spinner only needs idle events when the user is holding    */
-/* the mouse down in one of the arrows.  Otherwise, don't waste cycles       */
-/* and OpenGL context switching by calling its idle.                         */
-
-bool Control::needs_idle() const
-{
-    return false;
-}
-
-
 /********* Control::~Control() **********/
 
 Control::~Control()
 {
-    if (foccussed == this) foccussed = NULL;
+    if (focussed == this) focussed = NULL;
 }
 

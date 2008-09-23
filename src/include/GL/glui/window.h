@@ -95,9 +95,14 @@ namespace GLUI
             bool operator== (::Window window);
             void  set_ortho_projection( void );
             void  set_viewport( void );
-            virtual XMapWindow()=0;
-            virtual XMapRaised()=0;
-            virtual XMapSubwindows()=0;
+            virtual void XMapWindow()=0;
+            virtual void XMapRaised()=0;
+            virtual void XMapSubwindows()=0;
+            virtual void XUnmapWindow()=0;
+            virtual void XUnmapSubwindows()=0;
+
+
+            void SetViewport(void);
 
         protected :
             _Window();
@@ -105,6 +110,11 @@ namespace GLUI
             long flags;
             int  SetCurrentDrawBuffer( void );
     };
+
+    inline void _Window::SetViewport()
+    {
+        glViewport( 0, 0, this->Width(), this->Height() );
+    }
 
 
 }
@@ -117,7 +127,6 @@ namespace GLUI
 #else
 #include <GL/glui/glut_window.h>
 #endif
-
 
 
 #endif //__GLUI_WINDOW_H
