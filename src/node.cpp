@@ -31,12 +31,12 @@
 
 *****************************************************************************/
 
-#include "GL/glui.h"
-#include "glui_internal.h"
+#include <GL/glui/node.h>
+#include <GL/glui/debug.h>
+using namespace GLUI;
+/********************************************* Node::Node() *******/
 
-/********************************************* GLUI_Node::GLUI_Node() *******/
-
-GLUI_Node::GLUI_Node()
+Node::Node()
 : 
     parent_node(NULL),
     child_head(NULL),
@@ -44,10 +44,10 @@ GLUI_Node::GLUI_Node()
     next_sibling(NULL),
     prev_sibling(NULL)
 {
-    level = 0;
+    _level = 0;
 }
 
-GLUI_Node::GLUI_Node(const char* name)
+Node::Node(const char* name)
 {
     NodeName = name;
     parent_node = NULL;
@@ -55,13 +55,13 @@ GLUI_Node::GLUI_Node(const char* name)
     child_tail = NULL;
     next_sibling = NULL;
     prev_sibling = NULL;
-    level = 0;
+    _level = 0;
 }
 
-/********************************************* GLUI_Node::first() *******/
+/********************************************* Node::first() *******/
 /* Returns first sibling in 'this' node's sibling list                  */
 
-GLUI_Node   *GLUI_Node::first_sibling( void )
+Node   *Node::first_sibling( void )
 {
   if ( parent_node == NULL )  
     return this;           /* root node has no siblings */
@@ -69,10 +69,10 @@ GLUI_Node   *GLUI_Node::first_sibling( void )
     return parent_node->child_head;
 }
 
-/********************************************* GLUI_Node::last() *******/
+/********************************************* Node::last() *******/
 /* Returns last sibling in 'this' node's sibling list                  */
 
-GLUI_Node   *GLUI_Node::last_sibling( void )
+Node   *Node::last_sibling( void )
 {
   if ( parent_node == NULL )
     return this;            /* root node has no siblings */
@@ -80,26 +80,26 @@ GLUI_Node   *GLUI_Node::last_sibling( void )
     return parent_node->child_tail;
 }
 
-/******************************************** GLUI_Node::prev() ********/
+/******************************************** Node::prev() ********/
 /* Returns prev sibling in 'this' node's sibling list                  */
 
-GLUI_Node    *GLUI_Node::prev( void )
+Node    *Node::prev( void )
 {
   return prev_sibling;
 }
 
 
-/******************************************** GLUI_Node::next() ********/
+/******************************************** Node::next() ********/
 /* Returns next sibling in 'this' node's sibling list                  */
 
-GLUI_Node    *GLUI_Node::next( void )
+Node    *Node::next( void )
 {
   return next_sibling;
 }
 
-/************************************ GLUI_Node::add_control() **************/
+/************************************ Node::add_control() **************/
 
-int GLUI_Node::add_control( GLUI_Node *child )
+int Node::add_control( Node *child )
 {
 	child->link_this_to_parent_last( this );
 	return true;
@@ -107,10 +107,10 @@ int GLUI_Node::add_control( GLUI_Node *child )
 
 
 
-/*************************** GLUI_Node::link_this_to_parent_last() *******/
+/*************************** Node::link_this_to_parent_last() *******/
 /* Links as last child of parent                                         */
 
-void   GLUI_Node::link_this_to_parent_last( GLUI_Node *new_parent )
+void   Node::link_this_to_parent_last( Node *new_parent )
 {
     if ( new_parent->child_tail == NULL ) {   /* parent has no children */
         new_parent->child_head = this;
@@ -121,14 +121,14 @@ void   GLUI_Node::link_this_to_parent_last( GLUI_Node *new_parent )
     }
     new_parent->child_tail = this;
     this->parent_node                    = new_parent;
-    this->level = parent_node->level()+1;
+    this->_level = parent_node->level()+1;
 }
 
 
-/*************************** GLUI_Node::link_this_to_parent_first() *******/
+/*************************** Node::link_this_to_parent_first() *******/
 /* Links as first child of parent                                         */
 
-void   GLUI_Node::link_this_to_parent_first( GLUI_Node *new_parent )
+void   Node::link_this_to_parent_first( Node *new_parent )
 {
     if ( new_parent->child_head == NULL ) {   /* parent has no children */
         new_parent->child_tail               = this;
@@ -139,12 +139,12 @@ void   GLUI_Node::link_this_to_parent_first( GLUI_Node *new_parent )
     }
     new_parent->child_head               = this;
     this->parent_node                    = new_parent;
-    this->level = parent_node->level()+1;
+    this->_level = parent_node->level()+1;
 }
 
-/**************************** GLUI_Node::link_this_to_sibling_next() *****/
+/**************************** Node::link_this_to_sibling_next() *****/
 
-void   GLUI_Node::link_this_to_sibling_next( GLUI_Node *sibling )
+void   Node::link_this_to_sibling_next( Node *sibling )
 {
   if ( sibling->next_sibling == NULL ) {    /* node has no next sibling */
     sibling->next_sibling  = this;
@@ -163,13 +163,13 @@ void   GLUI_Node::link_this_to_sibling_next( GLUI_Node *sibling )
   }
 
   this->parent_node = sibling->parent_node;
-  this->level = parent_node->level()+1;
+  this->_level = parent_node->level()+1;
 }
 
 
-/**************************** GLUI_Node::link_this_to_sibling_prev() *****/
+/**************************** Node::link_this_to_sibling_prev() *****/
 
-void   GLUI_Node::link_this_to_sibling_prev( GLUI_Node *sibling )
+void   Node::link_this_to_sibling_prev( Node *sibling )
 {
   if ( sibling->prev_sibling == NULL ) {    /* node has no prev sibling */
     sibling->prev_sibling  = this;
@@ -188,12 +188,12 @@ void   GLUI_Node::link_this_to_sibling_prev( GLUI_Node *sibling )
   }
 
   this->parent_node = sibling->parent_node;
-  this->level = parent_node->level()+1;
+  this->_level = parent_node->level()+1;
 }
 
-/**************************************** GLUI_Node::unlink() **************/
+/**************************************** Node::unlink() **************/
 
-void   GLUI_Node::unlink( void )
+void   Node::unlink( void )
 {
   /* Unlink from prev sibling */
   if ( this->prev_sibling != NULL ) {
@@ -211,7 +211,7 @@ void   GLUI_Node::unlink( void )
     this->parent_node->child_tail = this->prev_sibling;
   }
 
-  this->level = 0;
+  this->_level = 0;
   this->parent_node  = NULL;
   this->next_sibling = NULL;
   this->prev_sibling = NULL;
@@ -219,25 +219,24 @@ void   GLUI_Node::unlink( void )
   this->child_tail   = NULL;
 }
 
-/**************************************** GLUI_Node::dump() **************/
+/**************************************** Node::dump() **************/
 
-void GLUI_Node::dump( FILE *out, const char *name )
+void Node::dump( FILE *out, const char *name )
 {
-	GLUI_debug::Instance()->print( __FILE__, __LINE__,
-
-			"GLUI_node: %s\n", name );
-	GLUI_debug::Instance()->print( __FILE__, __LINE__,
+	debug::Instance()->print( __FILE__, __LINE__, _level,
+			"node: %s\n", name );
+	debug::Instance()->print( __FILE__, __LINE__, _level,
 			"   parent: %p     child_head: %p    child_tail: %p\n",
 			(void *) parent_node,
 			(void *) child_head,
 			(void *) child_tail );
-	GLUI_debug::Instance()->print( __FILE__, __LINE__,
+	debug::Instance()->print( __FILE__, __LINE__, _level,
 			"   next: %p       prev: %p\n",
 			(void *) next_sibling,
 			(void *) prev_sibling );
 }
 
-const char* GLUI_Node::whole_tree(int start)
+const char* Node::whole_tree(int start)
 {
     static std::string tree;
     if (start) {

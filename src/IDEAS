@@ -3,3 +3,6 @@
 	- mutex (livevariables)
 	- getime (generation d'evenement)
 	- sleep (forcer un redisplay apres un certain temps)
+
+- render whole scene into vertex array to have fast redisplay without recomputing
+  whole scene

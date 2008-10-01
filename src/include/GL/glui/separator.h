@@ -7,22 +7,26 @@
 /*                                                          */
 /************************************************************/
 #include <GL/glui/Control.h>
-#define GLUI_SEPARATOR_HEIGHT           8
 namespace GLUI
 {
 	class GLUIAPI Separator : public Control
 	{
+        public: //enums/constants
+            static const int default_height = 8;
 		public:
 			void draw( void );
 
 			Separator( Node *parent, const char* name );
 
 		protected:
-			void common_init() {
-				w            = 100;
-				h            = GLUI_SEPARATOR_HEIGHT;
-				can_activate = false;
-			}
+			void common_init();
 	};
+
+    ///////////////////INLINES///////
+    inline void Separator::common_init()
+    {
+        CurrentSize.size.w            = 100;
+        CurrentSize.size.h            = default_height;
+    }
 }
 #endif

@@ -3,7 +3,7 @@
   GLUI User Interface Toolkit
   ---------------------------
 
-     glui_separator.cpp - GLUI_Separator control class
+     glui_separator.cpp - Separator control class
 
 
           --------------------------------------------------
@@ -31,34 +31,34 @@
 
 *****************************************************************************/
 
-#include "glui_internal_control.h"
+#include <GL/glui/separator.h>
+#include <math.h>
+using namespace GLUI;
+/****************************** Separator::Separator() **********/
 
-/****************************** GLUI_Separator::GLUI_Separator() **********/
-
-GLUI_Separator::GLUI_Separator( GLUI_Node *parent, const char* name )
-     :    GLUI_Control(name)
+Separator::Separator( Node *parent, const char* name )
+     :    Control(name)
 
 {
   common_init();
   parent->add_control( this );
 }
 
-/****************************** GLUI_Separator::draw() **********/
+/****************************** Separator::draw() **********/
 
-void    GLUI_Separator::draw( )
+void    Separator::draw( )
 {
 
-    GLUI_DRAWINGSENTINAL_IDIOM
-        GLUI_Control* par;
+        Control* par;
 
     int width, indent;
 
-    par = dynamic_cast<GLUI_Control*>(parent());
+    par = dynamic_cast<Control*>(parent());
     if ( par != NULL ) {
-        width = par->w;
+        width = par->Width();
     }
     else {
-        width = this->w;
+        width = this->Width();
     }
 
     indent = (int) floor(width * .05);
@@ -66,12 +66,12 @@ void    GLUI_Separator::draw( )
     glLineWidth( 1.0 );
     glBegin( GL_LINES );
     glColor3f( .5, .5, .5 );
-    glVertex2i( indent,       GLUI_SEPARATOR_HEIGHT/2-1 );
-    glVertex2i( width-indent, GLUI_SEPARATOR_HEIGHT/2-1 );
+    glVertex2i( indent,       CurrentSize.size.h/2-1 );
+    glVertex2i( width-indent, CurrentSize.size.h/2-1 );
 
     glColor3f( 1., 1., 1. );
-    glVertex2i( indent,       GLUI_SEPARATOR_HEIGHT/2 );
-    glVertex2i( width-indent, GLUI_SEPARATOR_HEIGHT/2 );
+    glVertex2i( indent,       CurrentSize.size.h/2 );
+    glVertex2i( width-indent, CurrentSize.size.h/2 );
     glEnd();
 
 

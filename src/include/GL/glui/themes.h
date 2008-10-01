@@ -37,6 +37,7 @@ namespace GLUI
 		public : //variables
 			unsigned char    bkgd_color[3];
 			float            bkgd_color_f[3];
+            //font             DefaultFont;
 		private : //methods
 			theme( void );
 	};

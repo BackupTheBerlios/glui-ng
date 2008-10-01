@@ -2,7 +2,7 @@
   GLUI User Interface Toolkit
   ---------------------------
 
-     glui_splittercolumn.cpp - GLUI_Splitter control class
+     glui_splittercolumn.cpp - Splitter control class
 
 
           --------------------------------------------------
@@ -31,31 +31,30 @@
 
 *****************************************************************************/
 
-#include "glui_internal_control.h"
+#include <GL/glui/splitter.h>
+using namespace GLUI;
+/******************************** Splitter::Splitter() ************/
 
-/******************************** GLUI_Splitter::GLUI_Splitter() ************/
-
-GLUI_Splitter::GLUI_Splitter( GLUI_Node *parent, const char* name, int draw_bar )
-    : GLUI_Container (name),
+Splitter::Splitter( Node *parent, const char* name, bool draw_bar )
+    : Container (name),
       first_panel (this, "first_panel"),
       second_panel (this, "second_panel"),
       separator    (this, "separator")
 {
   common_init();
-  int_val = draw_bar; /* Whether to draw vertical bar or not */
+  draw_separator = draw_bar;
 
   parent->add_control( this );
 }
 
 /*
-void  GLUI_Splitter::draw (void)
+void  Splitter::draw (void)
 {
   int   panel_x, panel_y, panel_w, panel_h, panel_x_off, panel_y_off;
   int   y_diff;
-  GLUI_Control* curr_parent = dynamic_cast<GLUI_Control*>(parent());
+  Control* curr_parent = dynamic_cast<Control*>(parent());
 
   if ( int_val == 1 ) {  // Draw a vertical bar 
-    GLUI_DRAWINGSENTINAL_IDIOM
     
     if ( curr_parent != NULL ) {
       get_this_column_dims(&panel_x, &panel_y, &panel_w, &panel_h, 

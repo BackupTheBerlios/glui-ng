@@ -28,12 +28,32 @@
 
 *****************************************************************************/
 
-#include "GL/glui.h"
+#include <GL/glui/text.h>
+#include <GL/glui/debug.h>
+
+//implement X11 font API
+#warning "TODO : rename this class into FONT, don't derivate from std::string..."
+//               implement << operator to draw the text with the selected font
+#warning "TODO : http://www.tronche.com/gui/x/xlib/graphics/font-metrics/"
+#warning "TODO : http://www.tronche.com/gui/x/xlib/graphics/font-metrics/XListFonts.html"
+#warning "TODO : add default font into theme class"
+
+using namespace GLUI;
 
 #ifdef _MSC_VER
 #define vsnprintf _vsnprintf
 #endif
+//////////////////////////////////////////////////////////////////////////////
+inline Text::Text (void* newfont, const std::string txt) :
+    std::string(txt)
+{
+    memset(char_widths, -1, sizeof(char_widths)); /* JVK */
+    font           = GLUT_BITMAP_HELVETICA_12;
+    memset(Color, 0, sizeof(Color));
+};
 
+
+//////////////////////////////////////////////////////////////////////////////
  std::string& glui_format_str( std::string& str, const char* fmt, ...)
 {
   const size_t ISIZE = 128;
@@ -62,20 +82,20 @@
 
 /****************************** Text ***************************/
 
-/*************** GLUI_Text::set_font() **********/
+/*************** Text::set_font() **********/
 
-void GLUI_Text::set_font(void *new_font)
+void Text::set_font(void *new_font)
 {
   font = new_font;
 }
 
 /*************************************** glutBitmapStringWidth **********/
-int GLUI_Text::char_width( char c  )
+int Text::char_width( char c  )
 {
   return  glutBitmapWidth( font, c );
 }
 
-int GLUI_Text::graph_Width( )
+int Text::graph_Width( )
 {
   const char *p = this->c_str();
   int  width = 0;
@@ -90,7 +110,7 @@ int GLUI_Text::graph_Width( )
 
 /*************************************** glutBitmapStringLength **********/
 
-int GLUI_Text::graph_Length( )
+int Text::graph_Length( )
 {
     return glutBitmapLength( font, (const unsigned char*)this->c_str() );
 }
@@ -100,23 +120,23 @@ int GLUI_Text::graph_Length( )
 /* Displays the contents of a string using GLUT's bitmap character function */
 /* Does not handle newlines                                             */
 
-void GLUI_Text::draw()
+void Text::draw()
 {
   const char *p = this->c_str();
   glPushMatrix();
   glColor3ubv( Color );
   while( *p != '\0' )  {
     glutBitmapCharacter( font, *p );
-    GLUI_debug::Instance()->FlushGL();
+    debug::Instance()->FlushGL();
     p++;
   }
   glPopMatrix();
 }
 
 
-/*************** GLUI_Text::get_font() **********/
+/*************** Text::get_font() **********/
 
-void *GLUI_Text::get_font( void ) const
+void *Text::get_font( void ) const
 {
   /*** Does this control have its own font? ***/
   if ( this->font != NULL )
@@ -127,11 +147,11 @@ void *GLUI_Text::get_font( void ) const
 }
 
 
-/************* GLUI_Text::draw_name() ***********/
+/************* Text::draw_name() ***********/
 /* This draws the name of the control as either black (if enabled), or       */
 /* embossed if disabled.                                                     */
 /*
-void GLUI_Text::draw_name(int x, int y)
+void Text::draw_name(int x, int y)
 {
   if ( enabled )
   {
@@ -157,19 +177,19 @@ void GLUI_Text::draw_name(int x, int y)
 // something like a flag field with all the current options like embossed,
 // color, bold, underline, size, stroked, double stroke, italics....
 
-GLUI_Text& GLUI_Text::operator=(GLUI_Text& copy)
+Text& Text::operator=(Text& copy)
 {
     *(dynamic_cast<std::string*>(this)) = *(dynamic_cast<std::string*>(&copy));
     this->set_font(copy.get_font());
     return *this;
 }
 
-GLUI_Text& GLUI_Text::operator=(std::string& str)
+Text& Text::operator=(std::string& str)
 {
     *(dynamic_cast<std::string*>(this)) = str;
 }
 
-GLUI_Text& GLUI_Text::operator=(const std::string& str)
+Text& Text::operator=(const std::string& str)
 {
     *(dynamic_cast<std::string*>(this)) = str;
 }

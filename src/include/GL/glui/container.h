@@ -47,15 +47,11 @@ namespace GLUI
 {
     class GLUIAPI Container : public Control
     {
-        public :
-            enum orientation
-            {
-                horizontal,
-                vertical,
-                useparent
-            };
+        public : //enums
+            enum orientation{ horizontal, vertical, useparent};
+            enum alignement{ left, center, right };
 
-        public :
+        public : //methods
             Container(const char *name,
                     orientation orient=vertical);
             virtual ~Container();
@@ -69,18 +65,16 @@ namespace GLUI
             virtual int AddEvent (::XEvent* event);
             virtual int Activate(); //< activate the current control
 
-        protected :
-            orientation CurrOrientation;
-            int              total_child_w;
-
         protected : //internal API
             void check_size_constency( void );
             int UpdateRelativePosition (int *x, int *y, int widget_x, int widget_y, int widget_w, int widget_h);
                 //<update the absolute x and y of an event to provide relative to the widget, return 0 if the
                 //event is inside widget, 1 if not
 
-            ///data :
-        protected :
+         protected : //variables
+            orientation CurrOrientation;
+            int              total_child_w;
+
             int             x_off, y_off;            // offset between childs elements
             int             y_off_top, y_off_bot;    // top and bottom margin inside the control
             int             x_off_left, x_off_right; // right and left inner margin

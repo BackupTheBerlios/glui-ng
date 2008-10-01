@@ -23,12 +23,7 @@ namespace GLUI
 	class GLUIAPI Panel : public Container
 	{
 		public: //types enums
-			enum panelType
-			{
-				NONE,
-				EMBOSSED,
-				RAISED,
-			};
+			enum panelType {none, embossed, raised};
 		public:
 
 			/**
@@ -41,7 +36,7 @@ namespace GLUI
 			  NONE causes the panel's outline to be invisible.
 			  */
 			Panel( Node *parent, const char *name,
-					panelType type=EMBOSSED);
+					panelType type=embossed);
 			~Panel();
 
 			void draw( void );
@@ -52,15 +47,23 @@ namespace GLUI
 			int min_h();
 		protected:
 			Panel( const char *name ) : Container(name) {}
-			void common_init( void ) {
-				w            = 300;
-				h            = GLUI_DEFAULT_CONTROL_HEIGHT + 7;
-				int_val      = EMBOSSED;
-				alignment    = GLUI_ALIGN_CENTER;
-				can_activate = false;
-			};
+			void common_init( void );
+
+        protected : //variables
+            panelType val;
 
 	};
+
+
+    ////////////INLINE
+    inline void Panel::common_init( void )
+    {
+        CurrentSize.size.w            = 300;
+        CurrentSize.size.h            = GLUI_DEFAULT_CONTROL_HEIGHT + 7;
+        val                           = embossed;
+        alignment                     = Container::center;
+    };
+
 
 }
 #endif

@@ -32,7 +32,9 @@
 *****************************************************************************/
 #ifndef __GLUI_SPLITTER_H
 #define __GLUI_SPLITTER_H
-#include <GL/glui.h>
+#include <GL/glui/container.h>
+#include <GL/glui/panel.h>
+#include <GL/glui/separator.h>
 
 
 /************************************************************/
@@ -42,32 +44,37 @@
 /************************************************************/
 
 /**
- A GLUI_Splitter object devide the drawing area into 2 container
+ A Splitter object devide the drawing area into 2 container
  separated by an optional bar.
  The Layout can be either vertical or horizontal (default)
 */
-class GLUIAPI GLUI_Splitter : public GLUI_Container
+namespace GLUI
 {
-public:
+    class GLUIAPI Splitter : public Container
+    {
+        public:
+            Splitter( Node *parent, const char* name, bool draw_bar = true );
+            Panel *GetFirstPanel() {return &first_panel;}
+            Panel *GetSecondPanel() {return &second_panel;}
+            void draw() {} //<nothing done here, all is done by translate_and_draw
 
-    GLUI_Splitter( GLUI_Node *parent, const char* name, int draw_bar = true );
+        protected: //variables
+            Panel first_panel;
+            Panel second_panel;
+            Separator separator;
+            bool draw_separator;
 
-    GLUI_Panel *GetFirstPanel() {return &first_panel;}
-    GLUI_Panel *GetSecondPanel() {return &second_panel;}
-	void draw() {} //<nothing done here, all is done by translate_and_draw
+        protected: //methods
+            void common_init();
+    };
 
-protected:
-    GLUI_Panel first_panel;
-    GLUI_Panel second_panel;
-    GLUI_Separator separator;
-
-    void common_init() {
-        set_orientation(GLUI_horizontal);
-        w            = 0;
-        h            = 0;
-        int_val      = 0;
-        can_activate = false;
+    //////////inlines
+    void Splitter::common_init()
+    {
+        set_orientation(horizontal);
+        CurrentSize.size.w     = 0;
+        CurrentSize.size.h     = 0;
     }
-};
 
-#endif //__GLUI_SPLITTER_H
+}
+#endif //__SPLITTER_H

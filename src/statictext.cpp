@@ -3,7 +3,7 @@
   GLUI User Interface Toolkit
   ---------------------------
 
-     glui_statictext.cpp - GLUI_StaticText Control
+     glui_statictext.cpp - StaticText Control
 
 
           --------------------------------------------------
@@ -31,75 +31,64 @@
 
 *****************************************************************************/
 
-#include "glui_internal_control.h"
+#include <GL/glui/statictext.h>
+#include <GL/glui/debug.h>
+#include <GL/glui/drawinghelpers.h>
+#include <GL/glui/window.h>
 
-/****************************** GLUI_StaticText::GLUI_StaticText() **********/
-GLUI_StaticText::GLUI_StaticText( GLUI_Node *parent, const char *name )
-    :    GLUI_Control(name), GLUI_Text(GLUT_BITMAP_HELVETICA_12)
+using namespace GLUI;
+///////////////////////////////////////////////////////////////////////////////
+StaticText::StaticText( Node *parent, const char *name )
+    :    Control(name)
 
 {
-  GLUI_Control* ctrl;
-  common_init();
+  Control* ctrl;
   parent->add_control( this );
-  ctrl = dynamic_cast<GLUI_Control*>(this);
-  if (ctrl)
-	{
-		set_font(ctrl->glui->font);
-	}
+  ctrl = (Control*)this;
+#warning "TODO"
+  //set_font(theme::Instance()->font);
 }
 
-/****************************** GLUI_StaticText::draw() **********/
+///////////////////////////////////////////////////////////////////////////////
 
-void    GLUI_StaticText::draw( )
+void    StaticText::draw( )
 {
 
-    GLUI_DRAWINGSENTINAL_IDIOM
-  if ( NOT can_draw() )
-    return;
-
-  erase_text();
+    drawinghelpers::draw_box(Width(), Height(), NULL); //erase text
   glColor3ubv( Color );
   glRasterPos3f(0.0, 0.0, 0.1);
   //glRasterPos store the color and translate, since glut drawing routine use
   //y axis up, we need to translate down before drawing
-  GLUI_Text::draw();
+  Text::draw();
 }
 
 
-/****************************** GLUI_StaticText::set_text() **********/
+///////////////////////////////////////////////////////////////////////////////
 
-void    GLUI_StaticText::set_text(const char *text )
+void    StaticText::set_text(const char *text )
 {
-  *(dynamic_cast<std::string*>(this)) = text;
-  glutPostRedisplay();
+    *(dynamic_cast<std::string*>(this)) = text;
+
+    ::XEvent EventToForward;
+    //ask for redisplay of window
+    EventToForward.xexpose.type=Expose;
+    EventToForward.xexpose.send_event=true;
+    EventToForward.xexpose.x = x_abs;
+    EventToForward.xexpose.y = y_abs;
+    EventToForward.xexpose.width = this->Width();
+    EventToForward.xexpose.height = this->Height();
+
+
+    OwnerWindow->AddEvent(&EventToForward);
 }
 
 
-/************************************ GLUI_StaticText::update_size() **********/
+///////////////////////////////////////////////////////////////////////////////
 
-void   GLUI_StaticText::update_size( void )
+void   StaticText::update_size( void )
 {
-	w = GLUI_Text::graph_Length( );
-	h = GLUI_Text::graph_Width( );
-}
-
-
-
-
-/****************************** GLUI_StaticText::erase_text() **********/
-
-void    GLUI_StaticText::erase_text( void )
-{
-  if ( NOT can_draw() )
-    return;
-
-  set_to_bkgd_color();
-  glDisable( GL_CULL_FACE );
-  glBegin( GL_TRIANGLES );
-  glVertex2i( 0,0 );   glVertex2i( w, 0 );  glVertex2i( w, h );  
-  glVertex2i( 0, 0 );  glVertex2i( w, h );  glVertex2i( 0, h );   
-  glEnd();
-  GLUI_debug::Instance()->FlushGL();
+	CurrentSize.size.w = Text::graph_Length( );
+	CurrentSize.size.h = Text::graph_Width( );
 }
 
 

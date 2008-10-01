@@ -3,9 +3,8 @@
 #include <GL/glui/debug.h>
 
 using namespace GLUI;
-/************************************ drawinghelpers::draw_raised_box() **********/
-
-void      drawinghelpers::draw_raised_box( int x, int y, int w, int h )
+/////////////////////////////////////////////////////////////////////////
+void      drawinghelpers::draw_raised_box( int w, int h )
 {
 	GLfloat Vertices[8][3] = { {  0.0,   0.0, 0.0}, //0
 							   {  0.0,     h, 0.0}, //1
@@ -47,8 +46,8 @@ void      drawinghelpers::draw_raised_box( int x, int y, int w, int h )
 }
 
 
-/************************************ drawinghelpers::draw_lowered_box() **********/
-void      drawinghelpers::draw_lowered_box( int x, int y, int w, int h )
+/////////////////////////////////////////////////////////////////////////////
+void      drawinghelpers::draw_lowered_box( int w, int h )
 {
 	float Vertices[8][3] = { {  0.0,   0.0,  0.0},
 		                     {  0.0,     h,  0.0},
@@ -87,14 +86,14 @@ void      drawinghelpers::draw_lowered_box( int x, int y, int w, int h )
 	debug::Instance()->FlushGL();
 }
 
-/********** drawinghelpers::set_to_bkgd_color() ********/
+/////////////////////////////////////////////////////////////////////////////
 
 void drawinghelpers::set_to_bkgd_color( void )
 {
   glColor3ubv( theme::Instance()->bkgd_color );
 }
 
-/******** drawinghelpers::draw_box_inwards_outline() ********/
+/////////////////////////////////////////////////////////////////////////////
 
 void drawinghelpers::draw_box_inwards_outline(int enabled, int x_min, int x_max, int y_min, int y_max )
 {
@@ -122,37 +121,48 @@ void drawinghelpers::draw_box_inwards_outline(int enabled, int x_min, int x_max,
 }
 
 
-/******* drawinghelpers::draw_box() **********/
+/////////////////////////////////////////////////////////////////////////////
 
-void drawinghelpers::draw_box(int enabled, int x_min, int x_max, int y_min, int y_max, float r, float g, float b)
+void drawinghelpers::draw_box(int w, int h, GLint *color_array)
 {
-  if ( r == 1.0 && g == 1.0 && b == 1.0 && (! enabled) ) {
-    draw_bkgd_box( x_min, x_max, y_min, y_max );
-    return;
-  }
+    GLfloat Vertices[4][3] = { {  0.0,   0.0, 0.0}, //0
+        {  0.0,     h, 0.0}, //1
+        {    w,     h, 0.0}, //2
+        {    w,   0.0, 0.0}}; //3
+    GLubyte indices[] = { 0, 1, 2, 3};
 
-  glColor3f( r, g, b );
-  glBegin( GL_QUADS );
-  glVertex2i( x_min, y_min );       glVertex2i( x_max, y_min );
-  glVertex2i( x_max, y_max );       glVertex2i( x_min, y_max );
-  glEnd();
+    GLint Colors[] = {
+        theme::Instance()->bkgd_color[0],theme::Instance()->bkgd_color[1],theme::Instance()->bkgd_color[2], //0
+        theme::Instance()->bkgd_color[0],theme::Instance()->bkgd_color[1],theme::Instance()->bkgd_color[2], //1
+        theme::Instance()->bkgd_color[0],theme::Instance()->bkgd_color[1],theme::Instance()->bkgd_color[2], //2
+        theme::Instance()->bkgd_color[0],theme::Instance()->bkgd_color[1],theme::Instance()->bkgd_color[2], //3
+    };
+
+
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_COLOR_ARRAY);
+
+    if (color_array)
+    {
+        glColorPointer(3, GL_INT, 0, color_array);
+    }
+    else
+    {
+        glColorPointer(3, GL_INT, 0, Colors);
+    }
+    glVertexPointer(3, GL_FLOAT, 0, Vertices);
+    //go through our index array and draw our vertex array
+    glDrawElements(GL_QUADS, 4, GL_UNSIGNED_BYTE, indices);
+
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glDisableClientState(GL_COLOR_ARRAY);
+    debug::Instance()->FlushGL();
 }
 
 
-/******* drawinghelpers::draw_bkgd_box() **********/
 
-void drawinghelpers::draw_bkgd_box( int x_min, int x_max, int y_min, int y_max )
-{
-  set_to_bkgd_color();
-
-  glBegin( GL_QUADS );
-  glVertex2i( x_min, y_min );       glVertex2i( x_max, y_min );
-  glVertex2i( x_max, y_max );       glVertex2i( x_min, y_max );
-  glEnd();
-}
-
-
-/**** drawinghelpers::draw_active_area() ********/
+/////////////////////////////////////////////////////////////////////////////
 
 void drawinghelpers::draw_active_box( int active, int x_min, int x_max, int y_min, int y_max )
 {
@@ -174,7 +184,7 @@ void drawinghelpers::draw_active_box( int active, int x_min, int x_max, int y_mi
 }
 
 
-/**** drawinghelpers::draw_emboss_box() ********/
+/////////////////////////////////////////////////////////////////////////////
 
 void   drawinghelpers::draw_emboss_box(int x_min,int x_max,int y_min,int y_max)
 {
@@ -200,7 +210,7 @@ void   drawinghelpers::draw_emboss_box(int x_min,int x_max,int y_min,int y_max)
   glEnd();
 }
 
-////////// drawinghelpers::get_buffer_mode() //////////////
+/////////////////////////////////////////////////////////////////////////////
 #warning "move get_buffer_mode to window class since it belongs more there"
 drawinghelpers::buffer_mode_t drawinghelpers::get_buffer_mode() {
     char* bufferModeEnv = getenv("BUFFER_MODE");

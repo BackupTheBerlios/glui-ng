@@ -45,6 +45,7 @@
 
 #include <GL/glui/container.h>
 #include <X11/Xlib.h>
+#include <GL/gl.h>
 
 #undef RootWindow
 #undef DefaultScreen

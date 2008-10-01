@@ -76,11 +76,11 @@ void   Button::draw()
 {
     if (GetStatus() & EventInterpreter::buttonpressed)
     {
-        drawinghelpers::draw_lowered_box( 0, 0, CurrentSize.size.w, CurrentSize.size.h );
+        drawinghelpers::draw_lowered_box( CurrentSize.size.w, CurrentSize.size.h );
     }
     else
     {
-        drawinghelpers::draw_raised_box( 0, 0, CurrentSize.size.w, CurrentSize.size.h );
+        drawinghelpers::draw_raised_box( CurrentSize.size.w, CurrentSize.size.h );
     }
     glTranslatef( 0.0, 0.0, 1.1);
 }

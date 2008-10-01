@@ -2,8 +2,6 @@
 #ifndef __GLUI_COMMONDEFS_H
 #define __GLUI_COMMONDEFS_H
 
-#include <GL/gl.h>
-
 /* GLUI API shared library export/import declarations. */
 #if defined(_WIN32)
 # ifdef GLUI_BUILDING_LIB

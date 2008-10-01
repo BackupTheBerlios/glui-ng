@@ -5,8 +5,8 @@
 /*               StaticText class                           */
 /*                                                          */
 /************************************************************/
-#include <GL/glui/text.h>
 #include <GL/glui/control.h>
+#include <GL/glui/text.h>
 namespace GLUI
 {
 	class GLUIAPI StaticText : public Control, public Text
@@ -19,10 +19,7 @@ namespace GLUI
 			StaticText(Node *parent, const char *name);
 
 		protected:
-			void common_init() {
-			}
 
-			void erase_text( void );
 	};
 }
 #endif

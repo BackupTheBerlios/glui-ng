@@ -37,13 +37,11 @@ namespace GLUI
                 buffer_back=2   ///< Double buffering: postpone updates until next redraw.
             };
         public :
-            static void draw_raised_box( int x, int y, int w, int h );
-            static void draw_lowered_box( int x, int y, int w, int h );
+            static void draw_raised_box( int w, int h );
+            static void draw_lowered_box( int w, int h );
             static void         draw_box_inwards_outline(int enabled, int x_min, int x_max,
                     int y_min, int y_max );
-            static void         draw_box(int enabled, int x_min, int x_max, int y_min, int y_max,
-                    float r, float g, float b );
-            static void         draw_bkgd_box( int x_min, int x_max, int y_min, int y_max );
+            static void         draw_box(int w, int h, GLint *color_array);
             static void         draw_emboss_box( int x_min, int x_max,int y_min,int y_max);
 
             static void         draw_active_box(int active,  int x_min, int x_max, int y_min, int y_max );

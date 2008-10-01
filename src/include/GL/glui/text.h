@@ -3,6 +3,8 @@
 #include <stdarg.h>
 #include <cstring>
 #include <string>
+#include <GL/glui/commondefs.h>
+#include <GL/gl.h>
 
 /************************************************************/
 /*                                                          */
@@ -23,7 +25,7 @@ namespace GLUI
 
             int          char_width( char c );
 
-            Text (void* newfont, const std::string txt="");
+            Text (const std::string txt="");
 
             //operators
             Text& operator=( Text& copy);
@@ -31,7 +33,6 @@ namespace GLUI
             Text& operator=(const std::string& str);
 
         protected:
-            Text() {}
             GLubyte Color[3];
             void           *font;       /**< Our glutbitmap font */
             int          char_widths[CHAR_WIDTH_HASH_SIZE][2]; /* Character width hash table */
@@ -40,13 +41,6 @@ namespace GLUI
 
     };
 
-    inline Text::Text (void* newfont, const std::string txt) :
-        std::string(txt)
-    {
-        memset(char_widths, -1, sizeof(char_widths)); /* JVK */
-        font           = newfont;
-        memset(Color, 0, sizeof(Color));
-    };
 
 }
 #endif
