@@ -91,9 +91,8 @@ namespace GLUI
         public :
             _Window(const char *name,
                     Container::orientation orient=Container::vertical);
-            virtual int AddEvent (::XEvent *event);
+            virtual int AddEvent (::XEvent *event)=0;
         public :  //operators
-            bool operator== (::Window window);
             void  set_ortho_projection( void );
             void  set_viewport( void );
             virtual void XMapWindow()=0;
@@ -110,6 +109,8 @@ namespace GLUI
 
             long flags;
             int  SetCurrentDrawBuffer( void );
+            void  SetOrthoProjection( void );
+
     };
 
     inline void _Window::SetViewport()

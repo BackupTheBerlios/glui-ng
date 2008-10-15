@@ -74,8 +74,8 @@ namespace GLUI
 
 
         public:
-            int            Width() const  {return CurrentSize.size.w;}
-            int            Height() const {return CurrentSize.size.h;}
+            virtual int    Width() const  {return CurrentSize.size.w;}
+            virtual int    Height() const {return CurrentSize.size.h;}
 
             /** Onscreen coordinates Y axis up as in OGL */
             int             x_abs, y_abs;

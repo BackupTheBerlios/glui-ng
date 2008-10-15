@@ -13,6 +13,12 @@
 /************************************************************/
 namespace GLUI
 {
+    /** Size of the character width hash table for faster lookups.
+      Make sure to keep this a power of two to avoid the slow divide.
+      This is also a speed/memory tradeoff; 128 is enough for low ASCII.
+      */
+#define CHAR_WIDTH_HASH_SIZE 128
+
     class GLUIAPI Text : public std::string
     {
         public:
@@ -34,8 +40,9 @@ namespace GLUI
 
         protected:
             GLubyte Color[3];
-            void           *font;       /**< Our glutbitmap font */
-            int          char_widths[CHAR_WIDTH_HASH_SIZE][2]; /* Character width hash table */
+            void           *font;       //< Our glutbitmap font
+            int          char_widths[CHAR_WIDTH_HASH_SIZE][2]; // Character width hash table
+            int tests;
 
             int flags;
 

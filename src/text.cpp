@@ -31,6 +31,9 @@
 #include <GL/glui/text.h>
 #include <GL/glui/debug.h>
 
+#warning "TODO : remove glut dependency"
+#include <GL/glut.h>
+
 //implement X11 font API
 #warning "TODO : rename this class into FONT, don't derivate from std::string..."
 //               implement << operator to draw the text with the selected font
@@ -44,10 +47,11 @@ using namespace GLUI;
 #define vsnprintf _vsnprintf
 #endif
 //////////////////////////////////////////////////////////////////////////////
-inline Text::Text (void* newfont, const std::string txt) :
+Text::Text (const std::string txt) :
     std::string(txt)
 {
     memset(char_widths, -1, sizeof(char_widths)); /* JVK */
+    tests =0;
     font           = GLUT_BITMAP_HELVETICA_12;
     memset(Color, 0, sizeof(Color));
 };

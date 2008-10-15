@@ -32,6 +32,7 @@
 *****************************************************************************/
 
 #include <GL/glui/separator.h>
+#include <GL/gl.h>
 #include <math.h>
 using namespace GLUI;
 /****************************** Separator::Separator() **********/

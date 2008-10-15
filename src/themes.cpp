@@ -40,6 +40,6 @@ theme::theme()
 
 theme* theme::Instance()
 {
-	static theme;
-	return &theme;
+	static theme TheTheme;
+	return &TheTheme;
 }

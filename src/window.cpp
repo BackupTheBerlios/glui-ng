@@ -26,34 +26,31 @@
 
 */
 
-inline operator _Display::Display*()
+#include <GL/glui/window.h>
+#include <GL/glui/drawinghelpers.h>
+#include <GL/gl.h>
+using namespace GLUI;
+
+_Display::operator ::Display*()
 {
     return disp;
 }
 
-
-_Window::_Window()
+_Window::_Window() :
+    Container("window")
 {
 }
 
-int _Window::AddEvent(XEvent event)
-{
-}
 
-inline operator== (::Window window)
-{
-
-}
-
-int _Window::set_current_draw_buffer( void )
+int _Window::SetCurrentDrawBuffer( void )
 {
     /* Save old buffer */
     GLint state;
     glGetIntegerv( GL_DRAW_BUFFER, &state );
     /* Switch to new buffer */
-    switch (get_buffer_mode()) {
-        case buffer_front: glDrawBuffer(GL_FRONT); break;
-        case buffer_back:  glDrawBuffer(GL_BACK);  break; /* might not be needed... */
+    switch (drawinghelpers::get_buffer_mode()) {
+        case drawinghelpers::buffer_front: glDrawBuffer(GL_FRONT); break;
+        case drawinghelpers::buffer_back:  glDrawBuffer(GL_BACK);  break; /* might not be needed... */
     }
     return (int)state;
 }
@@ -61,26 +58,18 @@ int _Window::set_current_draw_buffer( void )
 
 /******************************* GLUI_Main::set_ortho_projection() **********/
 
-void  _Window::set_ortho_projection( void )
+void  _Window::SetOrthoProjection( void )
 {
-  int win_h, win_w;
 
-  win_w = glutGet( GLUT_WINDOW_WIDTH );
-  win_h = glutGet( GLUT_WINDOW_HEIGHT );
 
-  glMatrixMode( GL_PROJECTION );
-  glLoadIdentity();
-  /*  gluOrtho2D( 0.0, (float) win_w, 0.0, (float) win_h );          */
-  glOrtho( 0.0, (float)win_w, 0.0, (float) win_h, -1000.0, 1000.0 );
-  glMatrixMode( GL_MODELVIEW );
+    glMatrixMode( GL_PROJECTION );
+    glLoadIdentity();
+    /*  gluOrtho2D( 0.0, (float) win_w, 0.0, (float) win_h );          */
+    glOrtho( 0.0, (float)this->Width(), 0.0, (float)this->Height(), -1000.0, 1000.0 );
+    glMatrixMode( GL_MODELVIEW );
 
 
 }
 
 
-/******************************* GLUI_Main::set_viewport() **********/
 
-void  _Window::set_viewport( void )
-{
-  glViewport( 0, 0, main_panel->w, main_panel->h );
-}

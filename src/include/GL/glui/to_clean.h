@@ -73,11 +73,6 @@
 
 
 
-/** Size of the character width hash table for faster lookups.
-  Make sure to keep this a power of two to avoid the slow divide.
-  This is also a speed/memory tradeoff; 128 is enough for low ASCII.
-*/
-#define CHAR_WIDTH_HASH_SIZE 128
 
 
 #endif //__GLUI_TO_CLEAN_H
