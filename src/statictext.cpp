@@ -79,7 +79,7 @@ void    StaticText::set_text(const char *text )
     EventToForward.xexpose.height = this->Height();
 
 
-    OwnerWindow->AddEvent(&EventToForward);
+    Control::AddEvent(&EventToForward);
 }
 
 

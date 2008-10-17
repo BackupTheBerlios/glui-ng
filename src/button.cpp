@@ -64,7 +64,7 @@ int Button::AddEvent (::XEvent *event)
     if (GetStatus() & EventInterpreter::click )
     {
         value.SetVal(true);
-        OwnerWindow->AddEvent(&EventToForward);
+        Control::AddEvent(&EventToForward);
     }
 
 

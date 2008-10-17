@@ -98,7 +98,7 @@ Node    *Node::next( void )
 }
 
 /************************************ Node::add_control() **************/
-
+#warning "redesign this... why doing up then down call....?"
 int Node::add_control( Node *child )
 {
 	child->link_this_to_parent_last( this );

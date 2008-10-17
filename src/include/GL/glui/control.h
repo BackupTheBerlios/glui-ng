@@ -53,8 +53,16 @@ namespace GLUI
                     char w;
                     char h;
                 } percent;
-                Size(int w, int h) {this->size.w=w; this->size.h=h; }
-                Size() {this->size.w=0; this->size.h=0;}
+                Size(int w, int h)
+                    {this->size.w=w; this->size.h=h;
+                     percent.w = 0; percent.h = 0; }
+                Size(float percent_w, float percent_h)
+                    {   percent.w = percent_w * 100;
+                        percent.h = percent_h *100;
+                        this->size.w=0; this->size.h=0; }
+                Size()
+                    {this->size.w=0; this->size.h=0;
+                     percent.w = 0; percent.h = 0; }
                 bool operator!=(const Size &other) const
                 { return (this->size.w != other.size.w) ||
                     (this->size.h != other.size.h);
@@ -111,38 +119,28 @@ namespace GLUI
             void         set_alignment( Alignement align );
             void         set_resize_policy( SizePolicy policy) { resizeable = policy; }
             SizePolicy   get_resize_policy( void ) { return resizeable;}
+            _Window* GetOwnerWindow();
 
 
             int  add_control( Node *control ); //<prevent adding subsequent controls
 
-            Control(const char* name)
-                : Node(name)
-            {
-
-                x_abs          = GLUI_XOFF;
-                y_abs          = GLUI_YOFF;
-                active         = false;
-                enabled        = true;
-                Min            = Size(0, 0);
-                CurrentSize    = Min;
-                alignment      = LEFT;
-                resizeable     = FixedSize;
-                handler = NULL;
-            }
-
+            Control(const char* name);
             virtual ~Control();
 
         protected: //methods
             Control();
         protected: //variables
             static Control* focussed;
-            _Window *OwnerWindow;
             SizePolicy resizeable;
             Size CurrentSize;
             Size Min;
             EventHandler* handler;
             bool            active;       ///< If true, we've got the focus
     };
+
+
+
+
 
 }
 #endif

@@ -39,11 +39,14 @@ misrepresented as being the original software.
 #include <GL/glui/window.h>
 using namespace GLUI;
 
+
+Control*  Control::focussed = NULL;
+
 int _glui_draw_border_only = 0;
 
 
 ///////////////////////////////////////////////////////////////////////
-int Container::Activate()
+int Control::Activate()
 {
 #warning "TODO : use FocusIn or FocusOut events for this feature"
 }
@@ -118,7 +121,11 @@ void Control::enable()
     EventToForward.xexpose.y = y_abs;
     EventToForward.xexpose.width = this->Width();
     EventToForward.xexpose.height = this->Height();
-    OwnerWindow->AddEvent(&EventToForward);
+    _Window* win = GetOwnerWindow();
+    if ( win != NULL)
+    {
+        win->AddEvent(&EventToForward);
+    }
 
     /*** Now recursively enable all buttons below it ***/
     node = (Control*) first_child();
@@ -146,7 +153,11 @@ void Control::disable()
     EventToForward.xexpose.y = y_abs;
     EventToForward.xexpose.width = this->Width();
     EventToForward.xexpose.height = this->Height();
-    OwnerWindow->AddEvent(&EventToForward);
+    _Window* win = GetOwnerWindow();
+    if ( win != NULL)
+    {
+        win->AddEvent(&EventToForward);
+    }
 
 
     /*** Now recursively disable all buttons below it ***/
@@ -160,7 +171,13 @@ void Control::disable()
 int Control::AddEvent(::XEvent *event)
 {
     if (event->xany.type == Expose)
-        OwnerWindow->AddEvent(event);
+    {
+        _Window* win = GetOwnerWindow();
+        if ( win != NULL)
+        {
+            win->AddEvent(event);
+        }
+    }
 
 }
 
@@ -198,7 +215,11 @@ int Control::set_size( Size sz, Size min)
     EventToForward.xexpose.y = y_abs;
     EventToForward.xexpose.width = this->Width();
     EventToForward.xexpose.height = this->Height();
-    OwnerWindow->AddEvent(&EventToForward);
+    _Window* win = GetOwnerWindow();
+    if ( win != NULL)
+    {
+        win->AddEvent(&EventToForward);
+    }
 }
 
 
@@ -216,7 +237,30 @@ void Control::set_alignment(Alignement new_align)
     EventToForward.xexpose.y = y_abs;
     EventToForward.xexpose.width = this->Width();
     EventToForward.xexpose.height = this->Height();
-    OwnerWindow->AddEvent(&EventToForward);
+    _Window* win = GetOwnerWindow();
+    if ( win != NULL)
+    {
+        win->AddEvent(&EventToForward);
+    }
+}
+
+////////////////////////////////////////////////////////
+// go up until either parent is NULL or found a window
+// in the tree....
+_Window* Control::GetOwnerWindow()
+{
+    Container* current;
+    current = dynamic_cast<Container*>(this->parent_node);
+    while (current != NULL)
+    {
+        _Window* win = dynamic_cast<_Window*>(current);
+        if (win != NULL )
+        {
+            return win;
+        }
+        current = dynamic_cast<Container*>(current->parent());
+    }
+    return NULL;
 }
 
 
@@ -227,3 +271,16 @@ Control::~Control()
     if (focussed == this) focussed = NULL;
 }
 
+Control::Control(const char* name) : Node(name)
+{
+
+    x_abs          = GLUI_XOFF;
+    y_abs          = GLUI_YOFF;
+    active         = false;
+    enabled        = true;
+    Min            = Size(0, 0);
+    CurrentSize    = Min;
+    alignment      = LEFT;
+    resizeable     = FixedSize;
+    handler        = NULL;
+}

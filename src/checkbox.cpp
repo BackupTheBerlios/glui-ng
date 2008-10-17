@@ -86,7 +86,7 @@ int Checkbox::AddEvent (::XEvent *event)
     if (GetStatus() & EventInterpreter::click )
     {
         value.SetVal(!value.GetVal());
-        OwnerWindow->AddEvent(&EventToForward);
+        Control::AddEvent(&EventToForward);
     }
     //ask for redisplay of window
 

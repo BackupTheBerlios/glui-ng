@@ -365,7 +365,7 @@ int Container::add_control(Node *control )
 	child = dynamic_cast<Control*>(control);
 	if ( NULL != child)
 	{
-        control->link_this_to_parent_last( this );
+        Node::add_control(control);
 		child->enabled = this->enabled;
         return 0;
 	}
@@ -470,6 +470,7 @@ int Container::AddEvent (::XEvent* event)
         Control* current_control = dynamic_cast<Control*>(current_node);
         if (current_control)
         {
+            int rc= 0;
             //event that contain position information
             switch(event->type)
             {
@@ -477,7 +478,7 @@ int Container::AddEvent (::XEvent* event)
                 case KeyRelease :
                     {
                     ::XKeyEvent *evt = (::XKeyEvent*) event;
-                    UpdateRelativePosition(&evt->x, &evt->y,
+                    rc = UpdateRelativePosition(&evt->x, &evt->y,
                             current_control->x_abs, current_control->y_abs,
                             current_control->Width(), current_control->Height());
                     }
@@ -486,7 +487,7 @@ int Container::AddEvent (::XEvent* event)
                 case ButtonRelease :
                     {
                     ::XButtonEvent *evt = (::XButtonEvent*) event;
-                    UpdateRelativePosition(&evt->x, &evt->y,
+                    rc = UpdateRelativePosition(&evt->x, &evt->y,
                             current_control->x_abs, current_control->y_abs,
                             current_control->Width(), current_control->Height());
                     }
@@ -494,7 +495,7 @@ int Container::AddEvent (::XEvent* event)
                 case MotionNotify:
                     {
                     ::XMotionEvent *evt = (::XMotionEvent*) event;
-                    UpdateRelativePosition(&evt->x, &evt->y,
+                    rc = UpdateRelativePosition(&evt->x, &evt->y,
                             current_control->x_abs, current_control->y_abs,
                             current_control->Width(), current_control->Height());
                     }
@@ -503,7 +504,7 @@ int Container::AddEvent (::XEvent* event)
                 case LeaveNotify:
                     {
                     ::XCrossingEvent *evt = (::XCrossingEvent*) event;
-                    UpdateRelativePosition(&evt->x, &evt->y,
+                    rc = UpdateRelativePosition(&evt->x, &evt->y,
                             current_control->x_abs, current_control->y_abs,
                             current_control->Width(), current_control->Height());
                     }
@@ -511,7 +512,7 @@ int Container::AddEvent (::XEvent* event)
                 case Expose:
                     {
                     ::XExposeEvent *evt = (::XExposeEvent*) event;
-                    UpdateRelativePosition(&evt->x, &evt->y,
+                    rc = UpdateRelativePosition(&evt->x, &evt->y,
                             current_control->x_abs, current_control->y_abs,
                             current_control->Width(), current_control->Height());
                     }
@@ -519,7 +520,7 @@ int Container::AddEvent (::XEvent* event)
                 case GraphicsExpose :
                     {
                     ::XGraphicsExposeEvent *evt = (::XGraphicsExposeEvent*) event;
-                    UpdateRelativePosition(&evt->x, &evt->y,
+                    rc = UpdateRelativePosition(&evt->x, &evt->y,
                             current_control->x_abs, current_control->y_abs,
                             current_control->Width(), current_control->Height());
                     }
@@ -527,7 +528,7 @@ int Container::AddEvent (::XEvent* event)
                 case GravityNotify:
                     {
                     ::XGravityEvent *evt = (::XGravityEvent*) event;
-                    UpdateRelativePosition(&evt->x, &evt->y,
+                    rc = UpdateRelativePosition(&evt->x, &evt->y,
                             current_control->x_abs, current_control->y_abs,
                             current_control->Width(), current_control->Height());
                     }
@@ -535,7 +536,7 @@ int Container::AddEvent (::XEvent* event)
                 case ReparentNotify:
                     {
                     ::XReparentEvent *evt = (::XReparentEvent*) event;
-                    UpdateRelativePosition(&evt->x, &evt->y,
+                    rc = UpdateRelativePosition(&evt->x, &evt->y,
                             current_control->x_abs, current_control->y_abs,
                             current_control->Width(), current_control->Height());
                     }
@@ -543,7 +544,7 @@ int Container::AddEvent (::XEvent* event)
                 case ConfigureNotify:
                     {
                     ::XConfigureEvent *evt = (::XConfigureEvent*) event;
-                    UpdateRelativePosition(&evt->x, &evt->y,
+                    rc = UpdateRelativePosition(&evt->x, &evt->y,
                             current_control->x_abs, current_control->y_abs,
                             current_control->Width(), current_control->Height());
                     }
@@ -551,7 +552,7 @@ int Container::AddEvent (::XEvent* event)
                 case ConfigureRequest:
                     {
                     ::XConfigureRequestEvent *evt = (::XConfigureRequestEvent*) event;
-                    UpdateRelativePosition(&evt->x, &evt->y,
+                    rc = UpdateRelativePosition(&evt->x, &evt->y,
                             current_control->x_abs, current_control->y_abs,
                             current_control->Width(), current_control->Height());
                     }
@@ -583,8 +584,11 @@ int Container::AddEvent (::XEvent* event)
             //   )
 
 
+            if ( rc == 0 )
+            {
 #warning "add EventMask code in this before propagating"
-            return current_control->AddEvent(event);
+                return current_control->AddEvent(event);
+            }
         }
         current_node = current_node->next();
     }
@@ -597,10 +601,12 @@ int Container::Activate()
     #warning "TODO : store the focussed child into focussed pointer of Control"
 }
 
-int Control::AddEvent (::XKeyEvent* event)
-{
 #warning "TODO : if key is tab or backtab or this control don't support..."
+/*
+int Container::AddEvent (::XKeyEvent* event)
+{
     //... FocusIn through tab then send the event to the next sibling
     //    if there is no sibling return an error
     //
 }
+*/

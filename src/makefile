@@ -47,13 +47,6 @@ GLUI_OBJS = $(addprefix GENERATED/,$(addsuffix .o,$(basename ${GLUI_SRC})))
 
 GLUI_LIB = GENERATED/lib/libglui.a
 
-GLUI_EXAMPLES = GENERATED/bin/example1
-GLUI_EXAMPLES+= GENERATED/bin/example2
-GLUI_EXAMPLES+= GENERATED/bin/example3
-GLUI_EXAMPLES+= GENERATED/bin/example4
-GLUI_EXAMPLES+= GENERATED/bin/example5
-#GLUI_EXAMPLES+= GENERATED/bin/example6
-
 GLUI_TOOLS = GENERATED/bin/ppm2array
 
 .PHONY: all setup examples tools clean depend doc doc-pdf doc-dist dist tests
@@ -68,7 +61,8 @@ setup:
 	mkdir -p GENERATED/bin
 	mkdir -p GENERATED/lib
 
-examples: $(GLUI_EXAMPLES)
+examples:
+	make -C example $@
 
 tools: $(GLUI_TOOLS)
 
@@ -97,7 +91,7 @@ docs:
 
 clean:
 	rm -rf GENERATED
-	rm -f $(GLUI_LIB) $(GLUI_EXAMPLES) $(GLUI_TOOLS)
+	rm -f $(GLUI_LIB) $(GLUI_TOOLS)
 	rm -fr doc/doxygen
 	make -C tests $@
 
