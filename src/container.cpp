@@ -260,7 +260,7 @@ void Container::pack (int x, int y)
 
 }
 
-void Container::translate_and_draw (void)
+int Container::AddEvent (::XExposeEvent* event)
 {
   Control *node;
   debug::Instance()->print( __FILE__, __LINE__, _level,
@@ -279,7 +279,7 @@ void Container::translate_and_draw (void)
   {
 	  node = dynamic_cast<Control*>(first_child());
 	  while( node ) {
-		  node->translate_and_draw();
+		  node->AddEvent(event);
 		  glTranslatef( (float)node->Width(), 0.0, 0.0);
 		  node = dynamic_cast<Control*>(node->next());
 		  if (node != NULL)
@@ -294,7 +294,7 @@ void Container::translate_and_draw (void)
 	  node = dynamic_cast<Control*>(last_child());
 	  while( node ) {
 
-		  node->translate_and_draw();
+		  node->AddEvent(event);
 
 		  glTranslatef( 0.0, (float) node->Height(), 0.0);
 		  node = dynamic_cast<Control*>(node->prev());
@@ -376,6 +376,12 @@ int Container::add_control(Node *control )
 #warning "TODO : split this function into inline functions"
 int Container::AddEvent (::XEvent* event)
 {
+    if ( event->type == Expose )
+    {
+        update_size();
+        pack(this->x_abs, this->y_abs);
+        return AddEvent((::XExposeEvent*) event);
+    }
     ::XMotionEvent* motion = (::XMotionEvent*) event;
     bool forward_to_child = false;
     if ( // check for event that should be droped

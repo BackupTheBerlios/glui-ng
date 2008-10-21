@@ -32,7 +32,7 @@
 namespace GLUI
 {
     class LiveVariables;
-    class _Window;
+    class Container;
 
     class GLUIAPI Control : public Node, public EventHandler
     {
@@ -108,10 +108,10 @@ namespace GLUI
             virtual void deactivate( void )     { active = false; }
 
             virtual void draw(void)=0;
-            virtual void translate_and_draw( void );
 
             //event interfaces
             virtual int AddEvent (::XEvent* event);
+            virtual int AddEvent (::XExposeEvent* event);
             virtual int AddEvent (::XKeyEvent* event);
 
 
@@ -119,8 +119,6 @@ namespace GLUI
             void         set_alignment( Alignement align );
             void         set_resize_policy( SizePolicy policy) { resizeable = policy; }
             SizePolicy   get_resize_policy( void ) { return resizeable;}
-            _Window* GetOwnerWindow();
-
 
             int  add_control( Node *control ); //<prevent adding subsequent controls
 

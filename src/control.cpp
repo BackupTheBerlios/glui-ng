@@ -86,16 +86,6 @@ void Control::update_size( void )
 /*************************** Drawing Utility routines *********************/
 
 
-/* Control::translate_and_draw() ********/
-void Control::translate_and_draw()
-{
-
-    glMatrixMode( GL_MODELVIEW );
-    glPushMatrix();
-    draw();
-    glPopMatrix();
-    debug::Instance()->FlushGL();
-}
 
 
 
@@ -121,10 +111,10 @@ void Control::enable()
     EventToForward.xexpose.y = y_abs;
     EventToForward.xexpose.width = this->Width();
     EventToForward.xexpose.height = this->Height();
-    _Window* win = GetOwnerWindow();
-    if ( win != NULL)
+    Container* cont  = dynamic_cast<Container*>(GetRootNode());
+    if ( cont != NULL)
     {
-        win->AddEvent(&EventToForward);
+        cont->AddEvent(&EventToForward);
     }
 
     /*** Now recursively enable all buttons below it ***/
@@ -153,10 +143,10 @@ void Control::disable()
     EventToForward.xexpose.y = y_abs;
     EventToForward.xexpose.width = this->Width();
     EventToForward.xexpose.height = this->Height();
-    _Window* win = GetOwnerWindow();
-    if ( win != NULL)
+    Container* cont  = dynamic_cast<Container*>(GetRootNode());
+    if ( cont != NULL)
     {
-        win->AddEvent(&EventToForward);
+        cont->AddEvent(&EventToForward);
     }
 
 
@@ -168,15 +158,22 @@ void Control::disable()
     }
 }
 
+int Control::AddEvent(::XExposeEvent *event)
+{
+    //we have been exposed, redraw ourself
+    glMatrixMode( GL_MODELVIEW );
+    glPushMatrix();
+    draw();
+    glPopMatrix();
+    debug::Instance()->FlushGL();
+}
+
+
 int Control::AddEvent(::XEvent *event)
 {
     if (event->xany.type == Expose)
     {
-        _Window* win = GetOwnerWindow();
-        if ( win != NULL)
-        {
-            win->AddEvent(event);
-        }
+        return AddEvent((::XExposeEvent*) event);
     }
 
 }
@@ -215,10 +212,10 @@ int Control::set_size( Size sz, Size min)
     EventToForward.xexpose.y = y_abs;
     EventToForward.xexpose.width = this->Width();
     EventToForward.xexpose.height = this->Height();
-    _Window* win = GetOwnerWindow();
-    if ( win != NULL)
+    Container* cont  = dynamic_cast<Container*>(GetRootNode());
+    if ( cont != NULL)
     {
-        win->AddEvent(&EventToForward);
+        cont->AddEvent(&EventToForward);
     }
 }
 
@@ -237,30 +234,11 @@ void Control::set_alignment(Alignement new_align)
     EventToForward.xexpose.y = y_abs;
     EventToForward.xexpose.width = this->Width();
     EventToForward.xexpose.height = this->Height();
-    _Window* win = GetOwnerWindow();
-    if ( win != NULL)
+    Container* cont  = dynamic_cast<Container*>(GetRootNode());
+    if ( cont != NULL)
     {
-        win->AddEvent(&EventToForward);
+        cont->AddEvent(&EventToForward);
     }
-}
-
-////////////////////////////////////////////////////////
-// go up until either parent is NULL or found a window
-// in the tree....
-_Window* Control::GetOwnerWindow()
-{
-    Container* current;
-    current = dynamic_cast<Container*>(this->parent_node);
-    while (current != NULL)
-    {
-        _Window* win = dynamic_cast<_Window*>(current);
-        if (win != NULL )
-        {
-            return win;
-        }
-        current = dynamic_cast<Container*>(current->parent());
-    }
-    return NULL;
 }
 
 

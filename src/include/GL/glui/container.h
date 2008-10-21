@@ -58,11 +58,12 @@ namespace GLUI
 
             virtual void update_size( void ); //<recursively update all control sizes
             virtual void pack ( int x, int y); //<recursively update positions
-            virtual void translate_and_draw (void);  //<draw with the right size and position
             void set_orientation( orientation new_orientation);
             virtual void align( void );
             int  add_control( Node *control );
+
             virtual int AddEvent (::XEvent* event);
+            virtual int AddEvent (::XExposeEvent* event);
             virtual int Activate(); //< activate the current control
 
         protected : //internal API

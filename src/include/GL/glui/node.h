@@ -33,6 +33,7 @@ namespace GLUI
 			Node *first_child()   { return child_head; }
 			Node *last_child()    { return child_tail; }
 			Node *parent()        { return parent_node; }
+            Node *GetRootNode();
 
 			/** Link in a new child control */
 			virtual int  add_control( Node *control );

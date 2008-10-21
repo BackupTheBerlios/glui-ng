@@ -275,7 +275,7 @@ int GlutWindow::AddEvent(::XExposeEvent *event)
     glLoadIdentity();
 
     // Recursively draw the main panel
-    this->translate_and_draw();
+    this->AddEvent(event);
     switch (drawinghelpers::get_buffer_mode()) {
         case drawinghelpers::buffer_front: // Make sure drawing gets to screen
             glFlush();

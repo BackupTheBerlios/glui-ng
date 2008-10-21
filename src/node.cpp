@@ -97,6 +97,20 @@ Node    *Node::next( void )
   return next_sibling;
 }
 
+///////////////////////////////////////////////////////////////////////
+// returns root node or NULL if already the root node
+Node* Node::GetRootNode()
+{
+    Node* current = this->parent_node;
+    while (current != NULL && current->parent() != NULL)
+    {
+        current = current->parent();
+    }
+    return current;
+}
+
+
+
 /************************************ Node::add_control() **************/
 #warning "redesign this... why doing up then down call....?"
 int Node::add_control( Node *child )
