@@ -63,22 +63,52 @@ namespace GLUI
             int  add_control( Node *control );
 
             virtual int AddEvent (::XEvent* event);
+            virtual int AddEvent (::XKeyEvent* event);
+            virtual int AddEvent (::XButtonEvent* event);
+            virtual int AddEvent (::XMotionEvent* event);
+            virtual int AddEvent (::XCrossingEvent* event);
+            virtual int AddEvent (::XFocusChangeEvent* event);
+            virtual int AddEvent (::XKeymapEvent* event);
             virtual int AddEvent (::XExposeEvent* event);
+            virtual int AddEvent (::XGraphicsExposeEvent* event);
+            virtual int AddEvent (::XNoExposeEvent* event);
+            virtual int AddEvent (::XVisibilityEvent* event);
+            virtual int AddEvent (::XCreateWindowEvent* event);
+            virtual int AddEvent (::XDestroyWindowEvent* event);
+            virtual int AddEvent (::XUnmapEvent* event);
+            virtual int AddEvent (::XMapEvent* event);
+            virtual int AddEvent (::XMapRequestEvent* event);
+            virtual int AddEvent (::XReparentEvent* event);
+            virtual int AddEvent (::XConfigureEvent* event);
+            virtual int AddEvent (::XGravityEvent* event);
+            virtual int AddEvent (::XResizeRequestEvent* event);
+            virtual int AddEvent (::XConfigureRequestEvent* event);
+            virtual int AddEvent (::XCirculateEvent* event);
+            virtual int AddEvent (::XCirculateRequestEvent* event);
+            virtual int AddEvent (::XPropertyEvent* event);
+            virtual int AddEvent (::XSelectionClearEvent* event);
+            virtual int AddEvent (::XSelectionRequestEvent* event);
+            virtual int AddEvent (::XSelectionEvent* event);
+            virtual int AddEvent (::XColormapEvent* event);
+            virtual int AddEvent (::XClientMessageEvent* event);
+            virtual int AddEvent (::XMappingEvent* event);
+            virtual int AddEvent (::XErrorEvent* event);
+
+
+
+
+
             virtual int Activate(); //< activate the current control
 
         protected : //internal API
             void check_size_constency( void );
-            int UpdateRelativePosition (int *x, int *y, int widget_x, int widget_y, int widget_w, int widget_h);
-                //<update the absolute x and y of an event to provide relative to the widget, return 0 if the
-                //event is inside widget, 1 if not
+            Control* FindChildWidget(int x, int y);
 
          protected : //variables
             orientation CurrOrientation;
             int              total_child_w;
 
-            int             x_off, y_off;            // offset between childs elements
-            int             y_off_top, y_off_bot;    // top and bottom margin inside the control
-            int             x_off_left, x_off_right; // right and left inner margin
+
             int             contain_x, contain_y;
             int             contain_w, contain_h;
             long            DoNotPropagateMask;
@@ -94,19 +124,24 @@ namespace GLUI
         CurrOrientation = new_orientation;
     }
 
-    inline int Container::UpdateRelativePosition(int *x, int *y, int widget_x, int widget_y, int widget_w, int widget_h)
+    inline Control* Container::FindChildWidget(int x, int y)
     {
-        if (*x > widget_x &&
-                *x < (widget_x + widget_w) &&
-                *y > widget_y &&
-                *y < (widget_y + widget_h)
-           )
+        Node* current_node = first_child();
+        while (current_node)
         {
-            *x = *x - widget_x;
-            *y = *y - widget_y;
-            return 0;
+            Control* current_control = dynamic_cast<Control*>(current_node);
+            if (current_control)
+            {
+                if (x > current_control->x &&
+                        x < (current_control->x + current_control->Width()) &&
+                        y > current_control->y &&
+                        y < (current_control->y + current_control->Height())
+                   )
+                    return current_control;
+            }
+            current_node = current_node->next();
         }
-        return 1; //default value
+        return NULL;
     }
 
 };

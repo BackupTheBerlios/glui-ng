@@ -82,11 +82,11 @@ namespace GLUI
 
 
         public:
-            virtual int    Width() const  {return CurrentSize.size.w;}
-            virtual int    Height() const {return CurrentSize.size.h;}
+            virtual int    Width() const;
+            virtual int    Height() const;
 
-            /** Onscreen coordinates Y axis up as in OGL */
-            int             x_abs, y_abs;
+            /** relative coordinates Y axis up as in OGL */
+            int             x, y;
 
             virtual int Activate(); //< activate the current control return 0 if activated, !=0 on error (can't activate)
 
@@ -127,6 +127,7 @@ namespace GLUI
 
         protected: //methods
             Control();
+            void GetAbsPosition(int* x, int* y);
         protected: //variables
             static Control* focussed;
             SizePolicy resizeable;
@@ -134,10 +135,30 @@ namespace GLUI
             Size Min;
             EventHandler* handler;
             bool            active;       ///< If true, we've got the focus
+            int             y_off_top, y_off_bot;    // top and bottom margin inside the control
+            int             x_off_left, x_off_right; // right and left inner margin
     };
 
 
+    inline int Control::Width() const
+    {
+        return CurrentSize.size.w + x_off_left + x_off_right;
+    }
+    inline int Control::Height() const
+    {
+        return CurrentSize.size.h + y_off_top + y_off_bot;
+    }
 
+    inline void Control::GetAbsPosition(int* x, int* y)
+    {
+        Control* parent=dynamic_cast<Control*>(this->parent_node);
+        while (parent)
+        {
+            x += parent->x;
+            y += parent->y;
+            parent=dynamic_cast<Control*>(parent->parent());
+        }
+    }
 
 
 }

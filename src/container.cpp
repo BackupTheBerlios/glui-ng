@@ -44,11 +44,7 @@ Container::Container(const char *name ,
 {
     CurrOrientation = orient;
     x_off          = GLUI_XOFF;
-    y_off          = GLUI_YOFF;
-    y_off_top      = GLUI_YOFF;
-    y_off_bot      = GLUI_YOFF;
-    x_off_left     = GLUI_XOFF;
-    x_off_right    = GLUI_XOFF;
+
 }
 
 Container::~Container()
@@ -79,13 +75,13 @@ inline void Container::check_size_constency( void )
         {
           if (CurrOrientation == horizontal )
                 {
-                    width += child->Width() + x_off;
+                    width += child->Width() ;
                     height = max<int> (this->Height(), child->Height());
                 }
                 else
                 {
                     width = max<int> (this->Width(), child->Width());
-                    height += child->Height() + y_off;
+                    height += child->Height();
                 }
         }
         node = node->next();
@@ -97,6 +93,7 @@ inline void Container::check_size_constency( void )
 
 }
 
+#error "le pading entre fils doit etre calcule directement dans le fils et pas dans le pere. il n'y a donc pas de padding calcule dans le pere"
 #warning "split this in inline functions"
 void Container::update_size( void )
 {
@@ -108,8 +105,8 @@ void Container::update_size( void )
     {
 #warning "this has to be tested and improved"
         int FillSpaceCount=0;
-        int width = x_off_left + x_off_right;
-        int height = y_off_top  + y_off_bot;
+        int width = 0;
+        int height = 0;
 
         Control::update_size();
         node = this->first_child();
@@ -125,27 +122,16 @@ void Container::update_size( void )
                 if (CurrOrientation == horizontal )
                 {
                     width += child->Width();
-                    height = max<int> (height, child->Height() + y_off_top  + y_off_bot);
+                    height = max<int> (height, child->Height());
                 }
                 else
                 {
-                    width = max<int> (width, child->Width() + x_off_left + x_off_right);
+                    width = max<int> (width, child->Width());
                     height += child->Height();
                 }
 
             }
             node = node->next();
-			if (node != NULL)
-			{
-                if (CurrOrientation == horizontal )
-                {
-                    width += x_off;
-                }
-                else
-                {
-                    height += y_off;
-                }
-			}
         }
         if (FillSpaceCount)
         {
@@ -187,8 +173,8 @@ void Container::update_size( void )
         //this is to ensure that scalable childs will go to min size
         this->CurrentSize.size.w = 0;
         this->CurrentSize.size.h = 0;
-        int width = x_off_left + x_off_right;
-        int height = y_off_top  + y_off_bot;
+        int width = 0;
+        int height = 0;
 
         //parse all childs updating their size firt
         while (NULL != node)
@@ -201,26 +187,15 @@ void Container::update_size( void )
                 if (CurrOrientation == horizontal )
                 {
                     width += child->Width();
-                    height = max<int> (height, child->Height() + y_off_top  + y_off_bot);
+                    height = max<int> (height, child->Height() );
                 }
                 else
                 {
-                    width = max<int> (width, child->Width() + x_off_left + x_off_right);
+                    width = max<int> (width, child->Width());
                     height += child->Height() ;
                 }
             }
             node = node->next();
-			if (node != NULL)
-			{
-                if (CurrOrientation == horizontal )
-                {
-                    width += x_off;
-                }
-                else
-                {
-                    height += y_off;
-                }
-			}
         }
         this->CurrentSize.size.w = width;
         this->CurrentSize.size.h = height;
@@ -233,25 +208,26 @@ void Container::pack (int x, int y)
     Node* node;
     Control* child;
     node = this->first_child();
-    int x_offset = x_off_left;
-    int y_offset = y_off_top;
 
-    this->x_abs = x;
-    this->y_abs = y;
+    this->x = x;
+    this->y = y;
+
+    int x_offset = 0;
+    int y_offset = 0;
 
     while (NULL != node)
     {
         child = dynamic_cast<Control*>(node);
         if ( NULL != child)
         {
-            child->pack(this->x_abs + x_offset, this->y_abs + y_offset);
+            child->pack(x_offset, y_offset);
             if (CurrOrientation == horizontal )
             {
-                x_offset += child->Width() + x_off;
+                x_offset += child->Width();
             }
             else
             {
-               y_offset += child->Height() + y_off;
+               y_offset += child->Height();
             }
         }
         node = node->next();
@@ -262,53 +238,39 @@ void Container::pack (int x, int y)
 
 int Container::AddEvent (::XExposeEvent* event)
 {
-  Control *node;
-  debug::Instance()->print( __FILE__, __LINE__, _level,
-          "%s %s \n",__func__,
-          dynamic_cast<Node*>(this)->whole_tree());
+    Control *node;
+    debug::Instance()->print( __FILE__, __LINE__, _level,
+            "%s %s \n",__func__,
+            dynamic_cast<Node*>(this)->whole_tree());
 
-  glMatrixMode( GL_MODELVIEW );
-  glPushMatrix();
+    glMatrixMode( GL_MODELVIEW );
+    glPushMatrix();
 
-  draw();  //we're allready positioned to (0,0,0) of current widget, so just draw
+    draw();  //we're allready positioned to (0,0,0) of current widget, so just draw
 
-  //now postion for the next child
-  glTranslatef( x_off_left, y_off_bot, 0.5 );
-
-  if (CurrOrientation == horizontal )
-  {
-	  node = dynamic_cast<Control*>(first_child());
-	  while( node ) {
-		  node->AddEvent(event);
-		  glTranslatef( (float)node->Width(), 0.0, 0.0);
-		  node = dynamic_cast<Control*>(node->next());
-		  if (node != NULL)
-		  {
-			  glTranslatef( (float)x_off, 0.0, 0.0);
-		  }
-	  }
-  }
-  else
-  {
-	  //we display childs in reverse order to have them stacked top to bottom
-	  node = dynamic_cast<Control*>(last_child());
-	  while( node ) {
-
-		  node->AddEvent(event);
-
-		  glTranslatef( 0.0, (float) node->Height(), 0.0);
-		  node = dynamic_cast<Control*>(node->prev());
-		  if (node != NULL)
-		  {
-			  glTranslatef( 0.0, (float)y_off, 0.0);
-		  }
-	  }
-  }
-
-
-  glPopMatrix();
-  debug::Instance()->FlushGL();
-
+    if (CurrOrientation == horizontal )
+    {
+        node = dynamic_cast<Control*>(first_child());
+        while( node )
+        {
+            node->AddEvent(event);
+            glTranslatef( (float)node->Width(), 0.0, 0.0);
+            node = dynamic_cast<Control*>(node->next());
+        }
+    }
+    else
+    {
+        //we display childs in reverse order to have them stacked top to bottom
+        node = dynamic_cast<Control*>(last_child());
+        while( node )
+        {
+            node->AddEvent(event);
+            glTranslatef( 0.0, (float) node->Height(), 0.0);
+            node = dynamic_cast<Control*>(node->prev());
+        }
+    }
+    glPopMatrix();
+    debug::Instance()->FlushGL();
 }
 
 
@@ -374,8 +336,38 @@ int Container::add_control(Node *control )
 
 #warning "TODO : implement the DoNotPropagateMask update mechanism?"
 #warning "TODO : split this function into inline functions"
+#error "la gestion de la propagation doit se faire dans les fonctions surchargees directement au lieu de cette grosse fonction"
 int Container::AddEvent (::XEvent* event)
 {
+    switch ( event->type )
+    {
+        case KeyPress : return AddEvent((::XKeyEvent*) event);
+        case KeyRelease: return AddEvent((::XKeyEvent*) event);
+        case ButtonPress: ;
+        case ButtonRelease: ;
+    }
+}
+
+int AddEvent (::XKeyEvent* event)
+{
+    if ((event->type == KeyPress && (DoNotPropagateMask & KeyPressMask)) ||
+        (event->type == KeyRelease &&  ( DoNotPropagateMask & KeyReleaseMask ))
+       )
+        return 0;
+    Control* child = FindChildWidget(event->x, event->y);
+    if (child)
+    {
+        event->x = event->x - child->x;
+        event->y = event->y - child->y;
+        return child->AddEvent((::XEvent*) event);
+    }
+    //the event is for this widget and not a child
+    return 0;
+
+}
+
+
+
     if ( event->type == Expose )
     {
         update_size();
@@ -385,10 +377,6 @@ int Container::AddEvent (::XEvent* event)
     ::XMotionEvent* motion = (::XMotionEvent*) event;
     bool forward_to_child = false;
     if ( // check for event that should be droped
-            ( event->type == KeyPress &&
-              (DoNotPropagateMask & KeyPressMask) )                                  ||
-            ( event->type == KeyRelease &&
-              ( DoNotPropagateMask & KeyReleaseMask ) )                              ||
             ( event->type == ButtonPress &&
               ( DoNotPropagateMask & ButtonPressMask ) )                             ||
             ( event->type == ButtonRelease &&
@@ -480,15 +468,7 @@ int Container::AddEvent (::XEvent* event)
             //event that contain position information
             switch(event->type)
             {
-                case KeyPress :
-                case KeyRelease :
-                    {
-                    ::XKeyEvent *evt = (::XKeyEvent*) event;
-                    rc = UpdateRelativePosition(&evt->x, &evt->y,
-                            current_control->x_abs, current_control->y_abs,
-                            current_control->Width(), current_control->Height());
-                    }
-                    break;
+
                 case ButtonPress :
                 case ButtonRelease :
                     {

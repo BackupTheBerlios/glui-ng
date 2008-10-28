@@ -117,6 +117,7 @@ void Control::enable()
         cont->AddEvent(&EventToForward);
     }
 
+#warning "this has nothing todo here, move to container class"
     /*** Now recursively enable all buttons below it ***/
     node = (Control*) first_child();
     while(node)
@@ -150,6 +151,7 @@ void Control::disable()
     }
 
 
+#warning "this has nothing todo here, move to container class"
     /*** Now recursively disable all buttons below it ***/
     node = (Control*) first_child();
     while(node) {
@@ -261,4 +263,8 @@ Control::Control(const char* name) : Node(name)
     alignment      = LEFT;
     resizeable     = FixedSize;
     handler        = NULL;
+    y_off_top      = GLUI_YOFF;
+    y_off_bot      = GLUI_YOFF;
+    x_off_left     = GLUI_XOFF;
+    x_off_right    = GLUI_XOFF;
 }
