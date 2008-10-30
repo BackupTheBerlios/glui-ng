@@ -103,6 +103,8 @@ namespace GLUI
         protected : //internal API
             void check_size_constency( void );
             Control* FindChildWidget(int x, int y);
+            int BroadcastEvent(::XEvent* event, int EventType, long mask_check);
+            int ForwardEvent(::XEvent* event, int* eventX, int* eventY, int EventType, long mask_check);
 
          protected : //variables
             orientation CurrOrientation;
