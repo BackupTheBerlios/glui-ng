@@ -240,43 +240,7 @@ void Container::pack (int x, int y)
 
 }
 
-////////////////////////////////////////////////////////////////////////////////////////
-int Container::AddEvent (::XExposeEvent* event)
-{
-    Control *node;
-    debug::Instance()->print( __FILE__, __LINE__, _level,
-            "%s %s \n",__func__,
-            dynamic_cast<Node*>(this)->whole_tree());
 
-    glMatrixMode( GL_MODELVIEW );
-    glPushMatrix();
-
-    draw();  //we're allready positioned to (0,0,0) of current widget, so just draw
-
-    if (CurrOrientation == horizontal )
-    {
-        node = dynamic_cast<Control*>(first_child());
-        while( node )
-        {
-            node->AddEvent(event);
-            glTranslatef( (float)node->Width(), 0.0, 0.0);
-            node = dynamic_cast<Control*>(node->next());
-        }
-    }
-    else
-    {
-        //we display childs in reverse order to have them stacked top to bottom
-        node = dynamic_cast<Control*>(last_child());
-        while( node )
-        {
-            node->AddEvent(event);
-            glTranslatef( 0.0, (float) node->Height(), 0.0);
-            node = dynamic_cast<Control*>(node->prev());
-        }
-    }
-    glPopMatrix();
-    debug::Instance()->FlushGL();
-}
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -341,30 +305,64 @@ int Container::add_control(Node *control )
 
 ////////////////////////////////////////////////////////////////////////////////////////
 #warning "TODO : implement the DoNotPropagateMask update mechanism?"
-#warning "TODO : split this function into inline functions"
-#error "la gestion de la propagation doit se faire dans les fonctions surchargees directement au lieu de cette grosse fonction"
+#warning "TODO : move to control class"
 int Container::AddEvent (::XEvent* event)
 {
+    #warning "update this using tree list creation"
+// purpose : when an event is created, use the opengl selection mechanism to know what object shall handle the event
+// then create a list containing all parent (parent can have multiple childrens but only one parent is allowed per child)
+// then use this list to propagate the event rather than the following algorithm
+
     switch ( event->type )
     {
         case KeyPress : return AddEvent((::XKeyEvent*) event);
         case KeyRelease: return AddEvent((::XKeyEvent*) event);
-        case ButtonPress: ;
-        case ButtonRelease: ;
+        case ButtonPress: return AddEvent((::XButtonEvent*) event);
+        case ButtonRelease: return AddEvent((::XButtonEvent*) event);
+        case MotionNotify: return AddEvent((::XMotionEvent*) event);
+        case EnterNotify: return AddEvent((::XCrossingEvent*) event);
+        case LeaveNotify: return AddEvent((::XCrossingEvent*) event);
+        case FocusIn: return AddEvent((::XFocusChangeEvent*) event);
+        case FocusOut: return AddEvent((::XFocusChangeEvent*) event);
+        case KeymapNotify: return AddEvent((::XKeymapEvent*) event);
+        case Expose: return AddEvent((::XExposeEvent*) event);
+        case GraphicsExpose: return AddEvent((::XGraphicsExposeEvent*) event);
+        case NoExpose: return AddEvent((::XNoExposeEvent*) event);
+        case VisibilityNotify: return AddEvent((::XVisibilityEvent*) event);
+        case CreateNotify: return AddEvent((::XCreateWindowEvent*) event);
+        case DestroyNotify: return AddEvent((::XDestroyWindowEvent*) event);
+        case UnmapNotify: return AddEvent((::XUnmapEvent*) event);
+        case MapNotify: return AddEvent((::XMapEvent*) event);
+        case MapRequest: return AddEvent((::XMapRequestEvent*) event);
+        case ReparentNotify: return AddEvent((::XReparentEvent*) event);
+        case ConfigureNotify: return AddEvent((::XConfigureEvent*) event);
+        case ConfigureRequest: return AddEvent((::XConfigureRequestEvent*) event);
+        case GravityNotify: return AddEvent((::XGravityEvent*) event);
+        case ResizeRequest: return AddEvent((::XResizeRequestEvent*) event);
+        case CirculateNotify: return AddEvent((::XCirculateEvent*) event);
+        case CirculateRequest: return AddEvent((::XCirculateRequestEvent*) event);
+        case PropertyNotify: return AddEvent((::XPropertyEvent*) event);
+        case SelectionClear: return AddEvent((::XSelectionClearEvent*) event);
+        case SelectionRequest: return AddEvent((::XSelectionRequestEvent*) event);
+        case SelectionNotify: return AddEvent((::XSelectionEvent*) event);
+        case ColormapNotify: return AddEvent((::XColormapEvent*) event);
+        case ClientMessage: return AddEvent((::XClientMessageEvent*) event);
+        case MappingNotify: return AddEvent((::XMappingEvent*) event);
+
+        default : return BroadcastEvent(event, LASTEvent, NoEventMask);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
-#error "the following code does not work logically"
 int Container::AddEvent (::XKeyEvent* event)
 {
-    return Container::ForwardEvent((::XEvent*) event, &event->x, &event->y, KeyPress, KeyPressMask) ||
+    return Container::ForwardEvent((::XEvent*) event, &event->x, &event->y, KeyPress, KeyPressMask) &&
         Container::ForwardEvent((::XEvent*) event, &event->x, &event->y, KeyRelease, KeyReleaseMask);
 }
 ////////////////////////////////////////////////////////////////////////////////////////
 int Container::AddEvent (::XButtonEvent* event)
 {
-    return Container::ForwardEvent((::XEvent*) event, &event->x, &event->y, ButtonPress, ButtonPressMask) ||
+    return Container::ForwardEvent((::XEvent*) event, &event->x, &event->y, ButtonPress, ButtonPressMask) &&
         Container::ForwardEvent((::XEvent*) event, &event->x, &event->y, ButtonRelease, ButtonReleaseMask);
 }
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -396,14 +394,14 @@ int Container::AddEvent (::XMotionEvent* event)
 ////////////////////////////////////////////////////////////////////////////////////////////
 int Container::AddEvent (::XCrossingEvent* event)
 {
-   return Container::ForwardEvent((::XEvent*) event, &event->x, &event->y, EnterNotify, EnterWindowMask) ||
+   return Container::ForwardEvent((::XEvent*) event, &event->x, &event->y, EnterNotify, EnterWindowMask) &&
         Container::ForwardEvent((::XEvent*) event, &event->x, &event->y, LeaveNotify, LeaveWindowMask);
 
 }
 ////////////////////////////////////////////////////////////////////////////////////////////
 int Container::AddEvent (::XFocusChangeEvent* event)
 {
-    return BroadcastEvent((::XEvent*) event, FocusIn, FocusChangeMask) ||
+    return BroadcastEvent((::XEvent*) event, FocusIn, FocusChangeMask) &&
         BroadcastEvent((::XEvent*) event, FocusOut, FocusChangeMask);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -414,7 +412,39 @@ int Container::AddEvent (::XKeymapEvent* event)
 ///////////////////////////////////////////////////////////////////////////////////////////
 int Container::AddEvent (::XExposeEvent* event)
 {
-    return Container::ForwardEvent((::XEvent*) event, &event->x, &event->y, Expose, ExposureMask);
+    Control *node;
+    debug::Instance()->print( __FILE__, __LINE__, _level,
+            "%s %s \n",__func__,
+            dynamic_cast<Node*>(this)->whole_tree());
+
+    glMatrixMode( GL_MODELVIEW );
+    glPushMatrix();
+
+    draw();  //we're allready positioned to (0,0,0) of current widget, so just draw
+
+    if (CurrOrientation == horizontal )
+    {
+        node = dynamic_cast<Control*>(first_child());
+        while( node )
+        {
+            node->AddEvent(event);
+            glTranslatef( (float)node->Width(), 0.0, 0.0);
+            node = dynamic_cast<Control*>(node->next());
+        }
+    }
+    else
+    {
+        //we display childs in reverse order to have them stacked top to bottom
+        node = dynamic_cast<Control*>(last_child());
+        while( node )
+        {
+            node->AddEvent(event);
+            glTranslatef( 0.0, (float) node->Height(), 0.0);
+            node = dynamic_cast<Control*>(node->prev());
+        }
+    }
+    glPopMatrix();
+    debug::Instance()->FlushGL();
 }
 ///////////////////////////////////////////////////////////////////////////////////////////
 int Container::AddEvent (::XGraphicsExposeEvent* event)
@@ -459,17 +489,12 @@ int Container::AddEvent (::XMapRequestEvent* event)
 //////////////////////////////////////////////////////////////////////////////////////////
 int Container::AddEvent (::XReparentEvent* event)
 {
-    return BroadcastEvent((::XEvent*) event, ReparentNotify, StructureNotifyMask|SubstructureNotifyMask);
+    return ForwardEvent((::XEvent*) event, &event->x, &event->y, ReparentNotify, StructureNotifyMask|SubstructureNotifyMask);
 }
 //////////////////////////////////////////////////////////////////////////////////////////
 int Container::AddEvent (::XConfigureEvent* event)
 {
-    return BroadcastEvent((::XEvent*) event, ConfigureNotify, StructureNotifyMask|SubstructureNotifyMask);
-}
-///////////////////////////////////////////////////////////////////////////////////////////
-int Container::AddEvent (::XGravityEvent* event)
-{
-    return BroadcastEvent((::XEvent*) event, ConfigureRequest, StructureNotifyMask);
+    return ForwardEvent((::XEvent*) event, &event->x, &event->y, ConfigureNotify, StructureNotifyMask|SubstructureNotifyMask);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////
 int Container::AddEvent (::XGravityEvent* event)
@@ -477,130 +502,75 @@ int Container::AddEvent (::XGravityEvent* event)
    return Container::ForwardEvent((::XEvent*) event, &event->x, &event->y, GravityNotify, StructureNotifyMask|SubstructureNotifyMask);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////
-
-
-    if ( event->type == Expose )
-    {
-        update_size();
-        pack(this->x_abs, this->y_abs);
-        return AddEvent((::XExposeEvent*) event);
-    }
-    ::XMotionEvent* motion = (::XMotionEvent*) event;
-    bool forward_to_child = false;
-    if ( // check for event that should be droped
-            ( event->type == ResizeRequest &&
-              ( DoNotPropagateMask & ResizeRedirectMask ))                           ||
-            ( event->type == CirculateNotify &&
-              ( DoNotPropagateMask & (StructureNotifyMask|SubstructureNotifyMask) )) ||
-            ( event->type == CirculateRequest &&
-              ( DoNotPropagateMask & SubstructureRedirectMask ))                     ||
-            ( event->type == PropertyNotify &&
-              ( DoNotPropagateMask & PropertyChangeMask ))                           ||
-            //( event->type == SelectionClear &&
-            //  ( DoNotPropagateMask & ))                                              ||
-            //( event->type == SelectionRequest &&
-            //  ( DoNotPropagateMask & ))                                              ||
-            //( event->type == SelectionNotify &&
-            //  ( DoNotPropagateMask & ))                                              ||
-            //( event->type == ColormapNotify &&
-            //  ( DoNotPropagateMask & StructureNotifyMask ))                          ||
-            //( event->type == ClientMessage &&
-            //  ( DoNotPropagateMask & ))                                              ||
-            //( event->type == MappingNotify &&
-            //  ( DoNotPropagateMask & ))                                              ||
-
-        )
-            {
-                //this event is masked and shall not be propagated
-                return 0;
-            }
-    //this event is not masked and then shall be propagated to relevent widget
-    Node* current_node = first_child();
-    while (current_node)
-    {
-#warning "update this using tree list creation"
-// purpose : when an event is created, use the opengl selection mechanism to know what object shall handle the event
-// then create a list containing all parent (parent can have multiple childrens but only one parent is allowed per child)
-// then use this list to propagate the event rather than the following algorithm
-        Control* current_control = dynamic_cast<Control*>(current_node);
-        if (current_control)
-        {
-            int rc= 0;
-            //event that contain position information
-            switch(event->type)
-            {
-
-                case ReparentNotify:
-                    {
-                    ::XReparentEvent *evt = (::XReparentEvent*) event;
-                    rc = UpdateRelativePosition(&evt->x, &evt->y,
-                            current_control->x_abs, current_control->y_abs,
-                            current_control->Width(), current_control->Height());
-                    }
-                    break;
-                case ConfigureNotify:
-                    {
-                    ::XConfigureEvent *evt = (::XConfigureEvent*) event;
-                    rc = UpdateRelativePosition(&evt->x, &evt->y,
-                            current_control->x_abs, current_control->y_abs,
-                            current_control->Width(), current_control->Height());
-                    }
-                    break;
-                case ConfigureRequest:
-                    {
-                    ::XConfigureRequestEvent *evt = (::XConfigureRequestEvent*) event;
-                    rc = UpdateRelativePosition(&evt->x, &evt->y,
-                            current_control->x_abs, current_control->y_abs,
-                            current_control->Width(), current_control->Height());
-                    }
-                    break;
-            }
-
-            //other event that are sent without pointer position information
-            // => forward them without modification
-            //if (    event->type == FocusIn          ||
-            //        event->type == FocusOut         ||
-            //        event->type == KeymapNotify     ||
-            //        event->type == NoExpose         ||
-            //        event->type == VisibilityNotify ||
-            //        event->type == CreateNotify     ||
-            //        event->type == DestroyNotify    ||
-            //        event->type == UnmapNotify      ||
-            //        event->type == MapNotify        ||
-            //        event->type == MapRequest       ||
-            //        event->type == ResizeRequest    ||
-            //        event->type == CirculateNotify  ||
-            //        event->type == CirculateRequest ||
-            //        event->type == PropertyNotify   ||
-            //        event->type == SelectionClear   ||
-            //        event->type == SelectionRequest ||
-            //        event->type == SelectionNotify  ||
-            //        event->type == ColormapNotify   ||
-            //        event->type == ClientMessage    ||
-            //        event->type == MappingNotify
-            //   )
-
-
-            if ( rc == 0 )
-            {
-#warning "add EventMask code in this before propagating"
-                return current_control->AddEvent(event);
-            }
-        }
-        current_node = current_node->next();
-    }
-
+int Container::AddEvent (::XResizeRequestEvent* event)
+{
+    return BroadcastEvent((::XEvent*) event, ResizeRequest, ResizeRedirectMask);
+}
+///////////////////////////////////////////////////////////////////////////////////////////
+int Container::AddEvent (::XConfigureRequestEvent* event)
+{
+   return ForwardEvent((::XEvent*) event, &event->x, &event->y, ConfigureRequest, NoEventMask);
+}
+///////////////////////////////////////////////////////////////////////////////////////////
+int Container::AddEvent (::XCirculateEvent* event)
+{
+    return BroadcastEvent((::XEvent*) event, CirculateNotify, StructureNotifyMask|SubstructureNotifyMask);
+}
+///////////////////////////////////////////////////////////////////////////////////////////
+int Container::AddEvent (::XCirculateRequestEvent* event)
+{
+    return BroadcastEvent((::XEvent*) event, CirculateRequest, SubstructureRedirectMask);
+}
+///////////////////////////////////////////////////////////////////////////////////////////
+int Container::AddEvent (::XPropertyEvent* event)
+{
+    return BroadcastEvent((::XEvent*) event, PropertyNotify, PropertyChangeMask);
+}
+///////////////////////////////////////////////////////////////////////////////////////////
+int Container::AddEvent (::XSelectionClearEvent* event)
+{
+    return BroadcastEvent((::XEvent*) event, SelectionClear, NoEventMask);
+}
+///////////////////////////////////////////////////////////////////////////////////////////
+int Container::AddEvent (::XSelectionRequestEvent* event)
+{
+    return BroadcastEvent((::XEvent*) event, SelectionRequest, NoEventMask);
+}
+///////////////////////////////////////////////////////////////////////////////////////////
+int Container::AddEvent (::XSelectionEvent* event)
+{
+    return BroadcastEvent((::XEvent*) event, SelectionNotify, NoEventMask);
+}
+///////////////////////////////////////////////////////////////////////////////////////////
+int Container::AddEvent (::XColormapEvent* event)
+{
+    return BroadcastEvent((::XEvent*) event, ColormapNotify, NoEventMask);
+}
+///////////////////////////////////////////////////////////////////////////////////////////
+int Container::AddEvent (::XClientMessageEvent* event)
+{
+    return BroadcastEvent((::XEvent*) event, ClientMessage, NoEventMask);
+}
+///////////////////////////////////////////////////////////////////////////////////////////
+int Container::AddEvent (::XMappingEvent* event)
+{
+    return BroadcastEvent((::XEvent*) event, MappingNotify, NoEventMask);
+}
+///////////////////////////////////////////////////////////////////////////////////////////
+int Container::AddEvent (::XErrorEvent* event)
+{
+    return BroadcastEvent((::XEvent*) event, 0, NoEventMask);
 }
 //////////////////////////////////////////////////////////////////////////////////////////
 int Container::BroadcastEvent(::XEvent* event, int type, long mask_check)
 {
-    if (event->type != type) return EINVAL;   //check if event is correct
+    if (LASTEvent != type && event->type != type) return EINVAL;   //check if event is correct
     if (DoNotPropagateMask & mask_check) return 0; // check if event is masked
 
     //now broadcast to all childs
     Control* child = dynamic_cast<Control*>(first_child());
     int rc=0;
-    while (child && rc == 0)
+    while (child != NULL && rc == 0)
     {
         rc = child->AddEvent(event);
         Control* child = dynamic_cast<Control*>(child->next());
@@ -610,13 +580,13 @@ int Container::BroadcastEvent(::XEvent* event, int type, long mask_check)
 }
 ////////////////////////////////////////////////////////////////////////////////////////////
 //
-int Container::ForwardEvent(::XEvent* event, int* eventX, int* eventY, int EventType, long mask_check);
+int Container::ForwardEvent(::XEvent* event, int* eventX, int* eventY, int EventType, long mask_check)
 {
     if (event->type != EventType) return EINVAL;
     if (DoNotPropagateMask & mask_check) return 0;
 
-    Control* child = FindChildWidget(eventX, eventY);
-    if (child)
+    Control* child = FindChildWidget(*eventX, *eventY);
+    if (child != NULL)
     {
         eventX = eventX - child->x;
         eventY = eventY - child->y;
