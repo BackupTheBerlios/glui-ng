@@ -55,8 +55,8 @@ int Control::Activate()
 #warning "use ::XConfigureRequestEvent instead for the api"
 void Control::pack (int x, int y)
 {
-    this->x_abs = x;
-    this->y_abs = y;
+    //this->x_abs = x;
+    //this->y_abs = y;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -107,8 +107,7 @@ void Control::enable()
     ::XEvent EventToForward;
     EventToForward.xexpose.type=Expose;
     EventToForward.xexpose.send_event=true;
-    EventToForward.xexpose.x = x_abs;
-    EventToForward.xexpose.y = y_abs;
+    GetAbsPosition(this, &EventToForward.xexpose.x, &EventToForward.xexpose.y );
     EventToForward.xexpose.width = this->Width();
     EventToForward.xexpose.height = this->Height();
     Container* cont  = dynamic_cast<Container*>(GetRootNode());
@@ -140,8 +139,7 @@ void Control::disable()
     ::XEvent EventToForward;
     EventToForward.xexpose.type=Expose;
     EventToForward.xexpose.send_event=true;
-    EventToForward.xexpose.x = x_abs;
-    EventToForward.xexpose.y = y_abs;
+    GetAbsPosition(this, &EventToForward.xexpose.x, &EventToForward.xexpose.y );
     EventToForward.xexpose.width = this->Width();
     EventToForward.xexpose.height = this->Height();
     Container* cont  = dynamic_cast<Container*>(GetRootNode());
@@ -206,17 +204,17 @@ int Control::set_size( Size sz, Size min)
     {
         return EINVAL;
     }
-    update_size();
     ::XEvent EventToForward;
     EventToForward.xexpose.type=Expose;
     EventToForward.xexpose.send_event=true;
-    EventToForward.xexpose.x = x_abs;
-    EventToForward.xexpose.y = y_abs;
+    GetAbsPosition(this, &EventToForward.xexpose.x, &EventToForward.xexpose.y );
     EventToForward.xexpose.width = this->Width();
     EventToForward.xexpose.height = this->Height();
     Container* cont  = dynamic_cast<Container*>(GetRootNode());
     if ( cont != NULL)
     {
+        cont->update_size();
+        cont->pack (0, 0);
         cont->AddEvent(&EventToForward);
     }
 }
@@ -232,8 +230,7 @@ void Control::set_alignment(Alignement new_align)
     ::XEvent EventToForward;
     EventToForward.xexpose.type=Expose;
     EventToForward.xexpose.send_event=true;
-    EventToForward.xexpose.x = x_abs;
-    EventToForward.xexpose.y = y_abs;
+    GetAbsPosition(this, &EventToForward.xexpose.x, &EventToForward.xexpose.y );
     EventToForward.xexpose.width = this->Width();
     EventToForward.xexpose.height = this->Height();
     Container* cont  = dynamic_cast<Container*>(GetRootNode());
@@ -254,8 +251,6 @@ Control::~Control()
 Control::Control(const char* name) : Node(name)
 {
 
-    x_abs          = GLUI_XOFF;
-    y_abs          = GLUI_YOFF;
     active         = false;
     enabled        = true;
     Min            = Size(0, 0);
@@ -267,4 +262,6 @@ Control::Control(const char* name) : Node(name)
     y_off_bot      = GLUI_YOFF;
     x_off_left     = GLUI_XOFF;
     x_off_right    = GLUI_XOFF;
+    x              = 0;
+    y              = 0;
 }

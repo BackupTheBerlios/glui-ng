@@ -1,3 +1,11 @@
+#warning "hide x, y, y_off_top... into private"
+// expose them through inline API
+// do pack on setting of x, y, offset, size, orientation, alignement
+// same for update_size
+
+#warning "rewrite size computation algorythm, do it in 2 pass"
+// first pass : parse down fixed size widget
+// second pass : parse up variable size widget
 #warning "create an image button widget"
 #warning "create a live variable class"
 #warning "create toggle button"

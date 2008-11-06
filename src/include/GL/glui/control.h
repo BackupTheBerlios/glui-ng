@@ -57,8 +57,8 @@ namespace GLUI
                     {this->size.w=w; this->size.h=h;
                      percent.w = 0; percent.h = 0; }
                 Size(float percent_w, float percent_h)
-                    {   percent.w = percent_w * 100;
-                        percent.h = percent_h *100;
+                    {   percent.w = (char) (percent_w * 100);
+                        percent.h = (char) (percent_h * 100);
                         this->size.w=0; this->size.h=0; }
                 Size()
                     {this->size.w=0; this->size.h=0;
@@ -84,9 +84,15 @@ namespace GLUI
         public:
             virtual int    Width() const;
             virtual int    Height() const;
+            int  YOffTop() const;
+            int  YOffBot() const;
+            int  XOffLeft() const;
+            int  XOffRight() const;
+            int  X() const;
+            int  Y() const;
 
-            /** relative coordinates Y axis up as in OGL */
-            int             x, y;
+            int SetMargins(int top, int bottom, int left, int right);
+
 
             virtual int Activate(); //< activate the current control return 0 if activated, !=0 on error (can't activate)
 
@@ -124,19 +130,21 @@ namespace GLUI
 
             Control(const char* name);
             virtual ~Control();
+            virtual void GetAbsPosition(Control* CtrlToFind, int* x, int* y);
 
         protected: //methods
             Control();
-            void GetAbsPosition(int* x, int* y);
         protected: //variables
             static Control* focussed;
             SizePolicy resizeable;
             Size CurrentSize;
             Size Min;
             EventHandler* handler;
-            bool            active;       ///< If true, we've got the focus
-            int             y_off_top, y_off_bot;    // top and bottom margin inside the control
-            int             x_off_left, x_off_right; // right and left inner margin
+            bool active;       ///< If true, we've got the focus
+                        /** relative coordinates Y axis up as in OGL */
+            int             x, y;         //relative position from parent
+            int  y_off_top, y_off_bot;    // top and bottom margin inside the control
+            int  x_off_left, x_off_right; // right and left inner margin
     };
 
 
@@ -149,14 +157,42 @@ namespace GLUI
         return CurrentSize.size.h + y_off_top + y_off_bot;
     }
 
-    inline void Control::GetAbsPosition(int* x, int* y)
+    inline int  Control::YOffTop() const {return y_off_top;}
+    inline int  Control::YOffBot() const {return y_off_bot;}
+    inline int  Control::XOffLeft() const {return x_off_left;}
+    inline int  Control::XOffRight() const {return x_off_right;}
+    inline int  Control::X() const {return x;}
+    inline int  Control::Y() const {return y;}
+
+
+
+    inline int Control::SetMargins(int top, int bottom, int left, int right)
     {
-        Control* parent=dynamic_cast<Control*>(this->parent_node);
-        while (parent)
+        y_off_top = top;
+        y_off_bot = bottom;
+        x_off_left = left;
+        x_off_right = right;
+        Control* cont  = dynamic_cast<Control*>(GetRootNode());
+        if ( cont != NULL)
         {
-            x += parent->x;
-            y += parent->y;
-            parent=dynamic_cast<Control*>(parent->parent());
+            cont->update_size();
+            cont->pack (0, 0);
+        }
+
+    }
+
+
+    inline void Control::GetAbsPosition( Control* CtrlToFind, int* x, int* y)
+    {
+        if (CtrlToFind == this)
+        {
+            *x = 0;
+            *y = 0;
+        }
+        Control* parent=dynamic_cast<Control*>(this->parent_node);
+        if (parent != NULL)
+        {
+            parent->GetAbsPosition(this,x,y);
         }
     }
 

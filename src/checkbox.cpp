@@ -78,7 +78,7 @@ int Checkbox::AddEvent (::XEvent *event)
     ::XEvent EventToForward;
     EventToForward.xexpose.type=Expose;
     EventToForward.xexpose.send_event=true;
-    GetAbsPosition( &EventToForward.xexpose.x, &EventToForward.xexpose.y );
+    GetAbsPosition(this, &EventToForward.xexpose.x, &EventToForward.xexpose.y );
     EventToForward.xexpose.width = this->Width();
     EventToForward.xexpose.height = this->Height();
 

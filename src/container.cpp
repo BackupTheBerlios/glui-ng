@@ -44,12 +44,14 @@ Container::Container(const char *name ,
 
 {
     CurrOrientation = orient;
-
+    resizeable = AdaptThisToFitChilds;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
 Container::~Container()
 {
+#warning "to check"
+    /*
     Control *item = (Control*) this->first_child();
 
     while (item)
@@ -58,6 +60,7 @@ Container::~Container()
         item = (Control*) item->next();
         delete tmp;
     }
+    */
 
 }
 
@@ -78,11 +81,11 @@ inline void Container::check_size_constency( void )
           if (CurrOrientation == horizontal )
                 {
                     width += child->Width() ;
-                    height = max<int> (this->Height(), child->Height());
+                    height = max<int> (this->CurrentSize.size.h, child->Height());
                 }
                 else
                 {
-                    width = max<int> (this->Width(), child->Width());
+                    width = max<int> (this->CurrentSize.size.w, child->Width());
                     height += child->Height();
                 }
         }
@@ -251,7 +254,7 @@ void Container::align()
     int  orig_y_abs;
     Container* par;
 
-    GetAbsPosition( &orig_x_abs, &orig_y_abs);
+    GetAbsPosition(this, &orig_x_abs, &orig_y_abs);
 
     /* Fix alignment bug relating to columns              */
     /*return;              */
@@ -384,8 +387,8 @@ int Container::AddEvent (::XMotionEvent* event)
     Control* child = FindChildWidget(event->x, event->y);
     if (child)
     {
-        event->x = event->x - child->x;
-        event->y = event->y - child->y;
+        event->x = event->x - child->X();
+        event->y = event->y - child->Y();
         return child->AddEvent((::XEvent*) event);
     }
     //the event is for this widget and not a child
@@ -420,6 +423,7 @@ int Container::AddEvent (::XExposeEvent* event)
     glMatrixMode( GL_MODELVIEW );
     glPushMatrix();
 
+    pack (x, y);
     draw();  //we're allready positioned to (0,0,0) of current widget, so just draw
 
     if (CurrOrientation == horizontal )
@@ -588,8 +592,8 @@ int Container::ForwardEvent(::XEvent* event, int* eventX, int* eventY, int Event
     Control* child = FindChildWidget(*eventX, *eventY);
     if (child != NULL)
     {
-        eventX = eventX - child->x;
-        eventY = eventY - child->y;
+        eventX = eventX - child->X();
+        eventY = eventY - child->Y();
         return child->AddEvent(event);
     }
     //the event is for this widget and not a child

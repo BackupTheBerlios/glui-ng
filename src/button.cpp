@@ -55,7 +55,7 @@ int Button::AddEvent (::XEvent *event)
     //ask for redisplay of window
     EventToForward.xexpose.type=Expose;
     EventToForward.xexpose.send_event=true;
-    GetAbsPosition( &EventToForward.xexpose.x, &EventToForward.xexpose.y );
+    GetAbsPosition(this, &EventToForward.xexpose.x, &EventToForward.xexpose.y );
     EventToForward.xexpose.width = this->Width();
     EventToForward.xexpose.height = this->Height();
 
@@ -81,7 +81,7 @@ void   Button::draw()
     {
         drawinghelpers::draw_raised_box( CurrentSize.size.w, CurrentSize.size.h );
     }
-    glTranslatef( 0.0, 0.0, 1.1);
+    glTranslatef( 0.0, 0.0, level());
 }
 
 

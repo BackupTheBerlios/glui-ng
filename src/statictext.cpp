@@ -73,8 +73,7 @@ void    StaticText::set_text(const char *text )
     //ask for redisplay of window
     EventToForward.xexpose.type=Expose;
     EventToForward.xexpose.send_event=true;
-    EventToForward.xexpose.x = x_abs;
-    EventToForward.xexpose.y = y_abs;
+    GetAbsPosition(this, &EventToForward.xexpose.x, &EventToForward.xexpose.y );
     EventToForward.xexpose.width = this->Width();
     EventToForward.xexpose.height = this->Height();
 

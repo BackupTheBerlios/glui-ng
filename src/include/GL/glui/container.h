@@ -60,7 +60,7 @@ namespace GLUI
             virtual void pack ( int x, int y); //<recursively update positions
             void set_orientation( orientation new_orientation);
             virtual void align( void );
-            int  add_control( Node *control );
+            virtual int  add_control( Node *control );
 
             virtual int AddEvent (::XEvent* event);
             virtual int AddEvent (::XKeyEvent* event);
@@ -94,7 +94,7 @@ namespace GLUI
             virtual int AddEvent (::XMappingEvent* event);
             virtual int AddEvent (::XErrorEvent* event);
 
-
+            virtual void GetAbsPosition(Control* CtrlToFind, int* x, int* y);
 
 
 
@@ -108,12 +108,12 @@ namespace GLUI
 
          protected : //variables
             orientation CurrOrientation;
-            int              total_child_w;
+            int         total_child_w;
 
 
-            int             contain_x, contain_y;
-            int             contain_w, contain_h;
-            long            DoNotPropagateMask;
+            int         contain_x, contain_y;
+            int         contain_w, contain_h;
+            long        DoNotPropagateMask;
             /* if this is a container control (e.g.,
                radiogroup or panel) this indicated dimensions
                of inner area in which controls reside */
@@ -124,6 +124,13 @@ namespace GLUI
     inline void Container::set_orientation( orientation new_orientation)
     {
         CurrOrientation = new_orientation;
+        Container* cont  = dynamic_cast<Container*>(GetRootNode());
+        if ( cont != NULL)
+        {
+            cont->update_size();
+            cont->pack (0, 0);
+        }
+
     }
 
     inline Control* Container::FindChildWidget(int x, int y)
@@ -134,10 +141,10 @@ namespace GLUI
             Control* current_control = dynamic_cast<Control*>(current_node);
             if (current_control)
             {
-                if (x > current_control->x &&
-                        x < (current_control->x + current_control->Width()) &&
-                        y > current_control->y &&
-                        y < (current_control->y + current_control->Height())
+                if (x > current_control->X() &&
+                        x < (current_control->X() + current_control->Width()) &&
+                        y > current_control->Y() &&
+                        y < (current_control->Y() + current_control->Height())
                    )
                     return current_control;
             }
@@ -145,6 +152,44 @@ namespace GLUI
         }
         return NULL;
     }
+
+
+    inline void Container::GetAbsPosition(Control* CtrlToFind, int* x, int* y)
+    {
+        if (CtrlToFind == this)
+        {
+            *x = 0;
+            *y = 0;
+            return Control::GetAbsPosition(CtrlToFind, x, y);
+        }
+        //get relative position among childs
+        Control* sibling = dynamic_cast<Control*>(first_child());
+        while (sibling != NULL && CtrlToFind != sibling)
+        {
+           if (CurrOrientation == horizontal )
+            {
+                *x += sibling->Width();
+            }
+            else
+            {
+               *y += sibling->Height();
+            }
+            sibling = dynamic_cast<Control*>(sibling->next());
+        }
+        if (CtrlToFind != sibling)
+        {
+            *x = 0;
+            *y = 0;
+            return;
+        }
+        Control* parent=dynamic_cast<Control*>(this->parent_node);
+        if (parent != NULL)
+        {
+            parent->GetAbsPosition(this,x,y);
+        }
+    }
+
+
 
 };
 #endif //__GLUI_CONTAINER_H

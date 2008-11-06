@@ -102,6 +102,7 @@ Node    *Node::next( void )
 Node* Node::GetRootNode()
 {
     Node* current = this->parent_node;
+    if(current == NULL) return this;
     while (current != NULL && current->parent() != NULL)
     {
         current = current->parent();

@@ -48,7 +48,7 @@ GLUI_HEADERS = $(shell find ../include -type f)
 GLUI_LIB = ../GENERATED/lib/libglui.a
 
 #GLUI_TESTS = checkbox statictext button horizontallayout textbutton
-GLUI_TESTS = ContainerEventTest
+GLUI_TESTS = SizeComputationTest PackingTest ContainerEventTest
 
 
 .PHONY: all setup examples tools clean depend doc doc-pdf doc-dist dist
