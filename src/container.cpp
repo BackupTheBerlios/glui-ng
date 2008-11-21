@@ -592,8 +592,8 @@ int Container::ForwardEvent(::XEvent* event, int* eventX, int* eventY, int Event
     Control* child = FindChildWidget(*eventX, *eventY);
     if (child != NULL)
     {
-        eventX = eventX - child->X();
-        eventY = eventY - child->Y();
+        *eventX = *eventX - child->X();
+        *eventY = *eventY - child->Y();
         return child->AddEvent(event);
     }
     //the event is for this widget and not a child
