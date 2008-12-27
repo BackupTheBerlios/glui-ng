@@ -6,7 +6,7 @@
 /*               Separator class                            */
 /*                                                          */
 /************************************************************/
-#include <GL/glui/Control.h>
+#include <GL/glui/control.h>
 namespace GLUI
 {
 	class GLUIAPI Separator : public Control

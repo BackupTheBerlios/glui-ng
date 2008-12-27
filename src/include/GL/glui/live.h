@@ -72,7 +72,7 @@ namespace GLUI
 		protected :
 			float* value[GLUI_DEF_MAX_ARRAY];
 	};*/
-};
+}
 
 
 #endif//__GLUI_LIVE_H

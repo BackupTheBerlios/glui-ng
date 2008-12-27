@@ -62,7 +62,7 @@ namespace GLUI
         CurrentSize.size.h            = GLUI_DEFAULT_CONTROL_HEIGHT + 7;
         val                           = embossed;
         alignment                     = Container::center;
-    };
+    }
 
 
 }

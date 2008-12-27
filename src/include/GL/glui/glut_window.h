@@ -69,7 +69,7 @@ namespace GLUI
         public:
             enum class_type {
                 InputOutputWin = InputOutput,
-                InputWin = InputOnly,
+                InputWin = InputOnly
             };
         public:
             GlutWindow(Display* display, WindowId parent,
