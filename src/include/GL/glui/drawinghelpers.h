@@ -26,8 +26,11 @@
 
 */
 #include <GL/glui/themes.h>
+
+
 namespace GLUI
 {
+    class Control;
     class drawinghelpers
     {
         public : //data types
@@ -47,6 +50,7 @@ namespace GLUI
             static void         draw_active_box(int active,  int x_min, int x_max, int y_min, int y_max );
             static void         set_to_bkgd_color( void );
             static buffer_mode_t get_buffer_mode();
+            static void         PostRedisplay(Control* ctrl);
     };
 
 }

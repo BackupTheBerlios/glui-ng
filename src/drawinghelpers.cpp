@@ -2,7 +2,7 @@
 #include <GL/glui/drawinghelpers.h>
 #include <GL/glui/debug.h>
 #include <string.h>
-
+#include <GL/glui/container.h>
 
 using namespace GLUI;
 /////////////////////////////////////////////////////////////////////////
@@ -220,4 +220,20 @@ drawinghelpers::buffer_mode_t drawinghelpers::get_buffer_mode() {
             0 ==  strcmp(bufferModeEnv, "buffer_front") ) return buffer_front;
     else return buffer_back;
 }
+
+/////////////////////////////////////////////////////////////////////////////
+void          drawinghelpers::PostRedisplay(Control* ctrl)
+{
+        ::XEvent EventToForward;
+    //ask for redisplay of window
+    EventToForward.xexpose.type=Expose;
+    EventToForward.xexpose.send_event=true;
+    GetAbsPosition(ctrl, &EventToForward.xexpose.x, &EventToForward.xexpose.y );
+    EventToForward.xexpose.width = ctrl->Width();
+    EventToForward.xexpose.height = ctrl->Height();
+    Container* cont  = dynamic_cast<Container*>(GetRootNode());
+    if ( cont != NULL)
+    {
+        cont->AddEvent(&EventToForward);
+    }
 
