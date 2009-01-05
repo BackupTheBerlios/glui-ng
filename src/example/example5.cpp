@@ -44,7 +44,7 @@ int   curr_string = 0;
 GLUI *glui, *glui2;
 GLUI_Spinner    *light0_spinner, *light1_spinner;
 GLUI_RadioGroup *radio;
-GLUI_Panel      *obj_panel;
+GLUI_Rollout      *obj_panel;
 
 /********** User IDs for callbacks ********/
 #define LIGHT0_ENABLED_ID    200
@@ -172,6 +172,7 @@ void myGlutIdle( void )
                                        application  */
 
   glutPostRedisplay();
+  usleep(100);
 }
 
 /***************************************** myGlutMouse() **********/
@@ -458,31 +459,25 @@ int main(int argc, char* argv[])
   glui2 = GLUI_Master.create_glui_subwindow( main_window, 
                                              GLUI_SUBWINDOW_BOTTOM );
   glui2->set_main_gfx_window( main_window );
+  glui2->Get_main_panel()->set_orientation(GLUI_horizontal);
 
   GLUI_Rotation *view_rot = new GLUI_Rotation(glui2, "Objects", view_rotate );
   view_rot->set_spin( 1.0 );
-  new GLUI_Column( glui2, false );
   GLUI_Rotation *sph_rot = new GLUI_Rotation(glui2, "Sphere", sphere_rotate );
   sph_rot->set_spin( .98 );
-  new GLUI_Column( glui2, false );
   GLUI_Rotation *tor_rot = new GLUI_Rotation(glui2, "Torus", torus_rotate );
   tor_rot->set_spin( .98 );
-  new GLUI_Column( glui2, false );
   GLUI_Rotation *lights_rot = new GLUI_Rotation(glui2, "Blue Light", lights_rotation );
   lights_rot->set_spin( .82 );
-  new GLUI_Column( glui2, false );
   GLUI_Translation *trans_xy = 
     new GLUI_Translation(glui2, "Objects XY", GLUI_TRANSLATION_XY, obj_pos );
   trans_xy->set_speed( .005 );
-  new GLUI_Column( glui2, false );
   GLUI_Translation *trans_x = 
     new GLUI_Translation(glui2, "Objects X", GLUI_TRANSLATION_X, obj_pos );
   trans_x->set_speed( .005 );
-  new GLUI_Column( glui2, false );
   GLUI_Translation *trans_y = 
     new GLUI_Translation( glui2, "Objects Y", GLUI_TRANSLATION_Y, &obj_pos[1] );
   trans_y->set_speed( .005 );
-  new GLUI_Column( glui2, false );
   GLUI_Translation *trans_z = 
     new GLUI_Translation( glui2, "Objects Z", GLUI_TRANSLATION_Z, &obj_pos[2] );
   trans_z->set_speed( .005 );

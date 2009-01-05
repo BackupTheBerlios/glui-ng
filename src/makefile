@@ -1,13 +1,17 @@
 .SUFFIXES: .cpp
 
+#comment this for verbose make
+MAKEFLAGS+= -s
+
 #for sgi   -- comment out the lines below to use on HP
 #CC=CC -g0 -o32
 #CC=gcc
 
 # Compiler options
-OPTS=-g
-OPTS=-O0
-#OPTS=-O2
+OPTS+=-g
+OPTS+=-O0
+#OPTS+=-O2
+OPTS+=-DDEBUG=1
 
 UNAME = $(shell uname)
 
@@ -18,7 +22,7 @@ endif
 
 #######################################
 
-CPPFLAGS += -I./ -I./include
+CPPFLAGS += -I./ -I./include $(OPTS)
 
 LIBGLUI = -L./lib -lglui
 LIBGL   = -lGLU -lGL
@@ -38,54 +42,63 @@ LIBS    = -lXmu -lXext -lX11 -lXi -lm
 LIBGLUT   = -L/usr/X11R6/lib -lglut
 CPPFLAGS += -I/usr/X11R6/include
 
+GLUI_HEADERS = $(shell find include -type f)
+
 #######################################
+GLUI_SRC = $(shell find  -maxdepth 1 -regex '.*\.cpp\|.*\.c')
+GLUI_OBJS = $(addprefix GENERATED/,$(addsuffix .o,$(basename ${GLUI_SRC})))
 
-GLUI_OBJS = glui_add_controls.o glui_string.o glui.o glui_bitmap_img_data.o glui_bitmaps.o glui_button.o glui_edittext.o glui_commandline.o glui_checkbox.o glui_node.o glui_radio.o glui_statictext.o glui_panel.o glui_separator.o glui_spinner.o glui_control.o glui_column.o glui_translation.o glui_rotation.o glui_mouse_iaction.o glui_listbox.o glui_rollout.o glui_window.o arcball.o algebra3.o quaternion.o viewmodel.o glui_treepanel.o glui_tree.o glui_textbox.o glui_scrollbar.o glui_list.o glui_filebrowser.o
+GLUI_LIB = GENERATED/lib/libglui.a
 
-GLUI_LIB = lib/libglui.a
+GLUI_TOOLS = GENERATED/bin/ppm2array
 
-GLUI_EXAMPLES = bin/example1 bin/example2 bin/example3 bin/example4 bin/example5 bin/example6
+.PHONY: all setup examples tools clean depend doc doc-pdf doc-dist dist tests
 
-GLUI_TOOLS = bin/ppm2array
+all: setup $(GLUI_LIB) examples tools tests
 
-.PHONY: all setup examples tools clean depend doc doc-pdf doc-dist dist
-
-all: setup $(GLUI_LIB) examples tools
+tests :
+	make -C tests $@
 
 setup:
-	mkdir -p bin
-	mkdir -p lib
+	mkdir -p GENERATED
+	mkdir -p GENERATED/bin
+	mkdir -p GENERATED/lib
 
-examples: $(GLUI_EXAMPLES)
+examples:
+	make -C example $@
 
 tools: $(GLUI_TOOLS)
 
-bin/ppm2array: tools/ppm2array.cpp tools/ppm.cpp
+GENERATED/bin/ppm2array: tools/ppm2array.cpp tools/ppm.cpp
 	$(CXX) $(CPPFLAGS) -o $@ $^
 
-bin/%: example/%.cpp $(GLUI_LIB)
+GENERATED/bin/%: example/%.cpp $(GLUI_LIB)
 	$(CXX) $(CPPFLAGS) -o $@ $<  $(LIBGLUI) $(LIBGLUT) $(LIBGL) $(LIBS)
 
 $(GLUI_LIB): $(GLUI_OBJS)
 	ar -r $(GLUI_LIB) $(GLUI_OBJS)
 
-.cpp.o:
-	$(CXX) $(CPPFLAGS) -c $<
+${GLUI_OBJS}: ${GLUI_HEADERS}
 
-.c.o:
-	$(CXX) $(CPPFLAGS) -c $<
+GENERATED/%.o: %.cpp ${GLUI_HEADERS}
+	echo "    [CXX] $<"
+	$(CXX) $(CPPFLAGS) -c $< -o $@
+
+GENERATED/%.o: %.c ${GLUI_HEADERS}
+	echo "    [CC ] $<"
+	$(CXX) $(CPPFLAGS) -c $< -o $@
+
 
 docs:
 	doxygen doc/doxygen.cfg
 
 clean:
-	rm -f *.o $(GLUI_LIB) $(GLUI_EXAMPLES) $(GLUI_TOOLS) 
+	rm -rf GENERATED
+	rm -f $(GLUI_LIB) $(GLUI_TOOLS)
 	rm -fr doc/doxygen
+	make -C tests $@
 
-depend:
-	makedepend -Y./include `find -name "*.cpp"` `find -name "*.c"`
-
-DIST = glui-2.35
+DIST = glui-experiments2.35
 
 doc:
 	doxygen doc/doxygen.cfg
@@ -101,7 +114,7 @@ doc-dist:
 	rm -Rf $(DIST)
 	
 dist: clean
-	mkdir -p $(DIST) 
+	mkdir -p $(DIST)
 	cp --parents \
 		`find -type f -name "*.cpp"` \
 		`find -type f -name "*.c"` \
@@ -118,44 +131,3 @@ dist: clean
 	rm -Rf $(DIST)
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
-
-./algebra3.o: algebra3.h glui_internal.h
-./arcball.o: arcball.h glui_internal.h algebra3.h quaternion.h
-./glui_button.o: ./include/GL/glui.h glui_internal.h
-./glui_checkbox.o: ./include/GL/glui.h glui_internal.h
-./glui_column.o: ./include/GL/glui.h glui_internal.h
-./glui_control.o: ./include/GL/glui.h glui_internal.h
-./glui_edittext.o: ./include/GL/glui.h glui_internal.h
-./glui_listbox.o: ./include/GL/glui.h glui_internal.h
-./glui_mouse_iaction.o: ./include/GL/glui.h glui_internal.h
-./glui_node.o: ./include/GL/glui.h glui_internal.h
-./glui_panel.o: ./include/GL/glui.h glui_internal.h
-./glui_radio.o: ./include/GL/glui.h glui_internal.h
-./glui_rollout.o: ./include/GL/glui.h glui_internal.h
-./glui_rotation.o: ./include/GL/glui.h arcball.h glui_internal.h algebra3.h
-./glui_rotation.o: quaternion.h
-./glui_separator.o: ./include/GL/glui.h glui_internal.h
-./glui_spinner.o: ./include/GL/glui.h glui_internal.h
-./glui_translation.o: ./include/GL/glui.h glui_internal.h algebra3.h
-./glui_window.o: ./include/GL/glui.h glui_internal.h
-./quaternion.o: quaternion.h algebra3.h glui_internal.h
-./viewmodel.o: viewmodel.h algebra3.h ./include/GL/glui.h
-./glui_bitmaps.o: ./include/GL/glui.h glui_internal.h
-./glui_statictext.o: ./include/GL/glui.h glui_internal.h
-./glui.o: ./include/GL/glui.h glui_internal.h
-./glui_add_controls.o: ./include/GL/glui.h glui_internal.h
-./glui_commandline.o: ./include/GL/glui.h glui_internal.h
-./glui_list.o: ./include/GL/glui.h glui_internal.h
-./glui_scrollbar.o: ./include/GL/glui.h glui_internal.h
-./glui_string.o: ./include/GL/glui.h
-./glui_textbox.o: ./include/GL/glui.h glui_internal.h
-./glui_tree.o: ./include/GL/glui.h glui_internal.h
-./glui_treepanel.o: ./include/GL/glui.h
-./example/example1.o: ./include/GL/glui.h
-./example/example2.o: ./include/GL/glui.h
-./example/example3.o: ./include/GL/glui.h
-./example/example4.o: ./include/GL/glui.h
-./example/example5.o: ./include/GL/glui.h
-./example/example6.o: ./include/GL/glui.h
-./tools/ppm2array.o: ./tools/ppm.hpp
-./glui_filebrowser.o: ./include/GL/glui.h glui_internal.h

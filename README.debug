@@ -1,0 +1,7 @@
+setting the following environment variables will help debugging
+
+GLUI_BUFFER_MODE=buffer_front : use simple buffering algorithm
+               (ie write to front buffer instead of back buffer +switch)
+GLUI_SYNC=true : activate flush,
+               require buffer_front to be set in GLUI_BUFFER_MODE
+

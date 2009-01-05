@@ -67,18 +67,18 @@ const char commandline[] =
   "users can recall previous commands.\n";
 
 const char gstring[] = 
-  "GLUI_String\n"
+  "std::string\n"
   "\n"
   "The GLUI string class used to be wrapper class around \n"
   "a fixed 300 char buffer.\n"
-  "Now GLUI_String is just a typedef for std::string.\n"
+  "Now std::string is just a typedef for std::string.\n"
   "\n"
   "One new function has been introduced, which is a sprintf() equivalent\n"
-  "for std::string/GLUI_String.\n"
+  "for std::string/std::string.\n"
   "\n"
-  "  glui_format_str(GLUI_String& str, const char *format_str, ...);\n"
+  "  glui_format_str(std::string& str, const char *format_str, ...);\n"
   "\n"
-  "Other than the fact that it takes a GLUI_String as the first argument,\n"
+  "Other than the fact that it takes a std::string as the first argument,\n"
   "it works just like sprintf().\n";
 
 const char list[] =
@@ -157,7 +157,7 @@ const char text_box[] =
 
 void control_cb(int control) {
   int item;
-  GLUI_String text;
+  std::string text;
   std::string file_name;
   FILE  *file;
   char c;
@@ -270,6 +270,7 @@ void textbox_cb(GLUI_Control *control) {
 
 /**************************************** main() ********************/
 
+#warning "fix Columns here"
 int main(int argc, char* argv[])
 {
   glutInit(&argc, argv);
@@ -278,25 +279,24 @@ int main(int argc, char* argv[])
   main_window = edit->get_glut_window_id();
   GLUI_Panel *ep = new GLUI_Panel(edit,"",true);
   new GLUI_StaticText(ep,"Widget Information:");
-  hah = new GLUI_List(ep,true,1,control_cb);
+  hah = new GLUI_List(ep,"hah", true,1,control_cb);
   hah->add_item(0,"GLUI 2.3");
   hah->add_item(1,"TextBox");
   hah->add_item(2,"Scrollbar");
-  hah->add_item(3,"GLUI_String");
+  hah->add_item(3,"std::string");
   hah->add_item(4,"CommandLine");
   hah->add_item(5,"Tree");
   hah->add_item(6,"List");
   hah->add_item(7,"FileBrowser");
   new GLUI_StaticText(ep,"Open Text File:");
   fb = new GLUI_FileBrowser(ep, "", false, 7, control_cb);
-  fb->set_h(180);
-  hah->set_h(180);
-  new GLUI_Column(ep,false); 
+  fb->set_size(GLUI_Control::Size(ep->w, 180));
+  hah->set_size(GLUI_Control::Size(ep->w, 180));
+  //new GLUI_Column(ep,false);
 
-  moo = new GLUI_TextBox(ep,true,1,textbox_cb);
+  moo = new GLUI_TextBox(ep, "moo", true,1,textbox_cb);
   moo->set_text(general);
-  moo->set_h(400);
-  moo->set_w(410);
+  moo->set_size(GLUI_Control::Size(410, 400));
   moo->disable();
   enable_textbox=0;
   new GLUI_Checkbox(ep, "Enable text box:",&enable_textbox,12,control_cb);
@@ -306,16 +306,16 @@ int main(int argc, char* argv[])
   bedit = new GLUI_EditText(ep, "New Branch Name:");
   new GLUI_Checkbox(ep, "Display Numbers", &num_display);
   new GLUI_StaticText(ep, "Number format:");
-  GLUI_RadioGroup *rg = new GLUI_RadioGroup(ep, &num_format);
+  GLUI_RadioGroup *rg = new GLUI_RadioGroup(ep,"rg", &num_format);
   new GLUI_RadioButton(rg, "Level Only");
   new GLUI_RadioButton(rg, "Hierarchal");
   new GLUI_Button(ep, "Update Format", 11, control_cb); 
-  new GLUI_Column(ep);
+  //new GLUI_Column(ep);
   new GLUI_Button(ep, "Add Branch", 2, control_cb); 
   new GLUI_Button(ep, "Del Branch", 3, control_cb);
   new GLUI_Button(ep, "Up Branch", 4, control_cb); 
   new GLUI_Button(ep, "Goto Root", 5, control_cb);
-  new GLUI_Column(ep);
+  //new GLUI_Column(ep);
   new GLUI_Button(ep, "Descend to Leaf", 6, control_cb); 
   new GLUI_Button(ep, "Next Branch", 8, control_cb); 
   new GLUI_Button(ep, "Expand All", 9, control_cb); 

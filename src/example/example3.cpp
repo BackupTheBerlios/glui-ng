@@ -125,12 +125,12 @@ void pointer_cb( GLUI_Control* control )
     
     cmd_line = new GLUI_CommandLine( 
       cmd_line_glui, "Command (try 'exit'):", NULL, -1, pointer_cb );
-    cmd_line->set_w( 400 );  /** Widen 'command line' control **/
+    cmd_line->set_size( GLUI_Control::Size(50,400) );  /** Widen 'command line' control **/
 
     GLUI_Panel *panel = new GLUI_Panel(cmd_line_glui,"", GLUI_PANEL_NONE);
-    new GLUI_Button(panel, "Clear History", CMD_HIST_RESET_ID, pointer_cb);
-    new GLUI_Column(panel, false);
-    new GLUI_Button(panel, "Close", CMD_CLOSE_ID, pointer_cb);
+    GLUI_Splitter* split = new GLUI_Splitter(panel, "split");
+    new GLUI_Button(split->GetFirstPanel(), "Clear History", CMD_HIST_RESET_ID, pointer_cb);
+    new GLUI_Button(split->GetSecondPanel(), "Close", CMD_CLOSE_ID, pointer_cb);
     
     cmd_line_glui->set_main_gfx_window( main_window );
 
@@ -215,6 +215,7 @@ void myGlutIdle( void )
   counter++;
    
   glui->sync_live();
+  usleep(100);
 
 }
 
@@ -370,7 +371,7 @@ int main(int argc, char* argv[])
   /***** Control for the object type *****/
 
   GLUI_Panel *type_panel = new GLUI_Panel( obj_panel, "Type" );
-  radio = new GLUI_RadioGroup(type_panel,&obj_type,4,control_cb);
+  radio = new GLUI_RadioGroup(type_panel,"radio", &obj_type,4,control_cb);
   new GLUI_RadioButton( radio, "Sphere" );
   new GLUI_RadioButton( radio, "Torus" );
   new GLUI_RadioButton( radio, "Teapot" );
@@ -387,9 +388,9 @@ int main(int argc, char* argv[])
   scale_spinner->set_float_limits( .2f, 4.0 );
   scale_spinner->set_alignment( GLUI_ALIGN_RIGHT );
 
-  new GLUI_Separator( obj_panel );
+  new GLUI_Separator( obj_panel, "separator" );
   edittext = new GLUI_EditText( obj_panel, "Text:", text );
-  edittext->set_w( 150 );
+  edittext->set_size( GLUI_Control::Size(150, obj_panel->h) );
 
   /******** Add some controls for lights ********/
 

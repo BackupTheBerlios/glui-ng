@@ -1,0 +1,8 @@
+- pour pouvoir utiliser la selection via OGL : faire la selection OGL -> on connait la widget a qui envoyer -> faire une liste des widgets, parcourir cette liste jusqu`a la widget en question (cela resoud le pb de widgets desactivees, ou de groupes de widgets desactivees, ou de widgets containers qui doivent filtrer les evenements)
+- diverses functions que l'on doit avoir (os dependant -> wrappers)
+	- mutex (livevariables)
+	- getime (generation d'evenement)
+	- sleep (forcer un redisplay apres un certain temps)
+
+- render whole scene into vertex array to have fast redisplay without recomputing
+  whole scene
