@@ -41,7 +41,7 @@ namespace GLUI
                 FixedSize,
                 PercentOfParent,
                 FillSpace,
-                AdaptThisToFitChilds,
+                AdaptThisToFitChilds
             };
 
             struct Size {
@@ -76,7 +76,7 @@ namespace GLUI
             enum Alignement {
                 CENTER,
                 RIGHT,
-                LEFT,
+                LEFT
             };
 
 
@@ -178,6 +178,7 @@ namespace GLUI
             cont->update_size();
             cont->pack (0, 0);
         }
+        return 0;
 
     }
 

@@ -37,7 +37,7 @@ misrepresented as being the original software.
 #include <GL/glui/checkbox.h>
 #include <GL/glui/statictext.h>
 #include <GL/glui/bitmaps.h>
-#include <GL/glui/masterobject.h>
+#include <GL/glui/MasterObject.h>
 #include <GL/glui/debug.h>
 #include <GL/glui/internal_control.h>
 #include <GL/glui/window.h>

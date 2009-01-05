@@ -50,7 +50,7 @@ namespace GLUI
 				drag        = 0x0008,
 				drop        = 0x0010,
 				keypressed  = 0x0020, //pressed then released key
-				buttonpressed= 0x0080,
+				buttonpressed= 0x0080
 			};
 		public:
 			EventInterpreter (int eventCount=10);

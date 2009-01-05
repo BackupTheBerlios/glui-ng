@@ -54,7 +54,7 @@ Text::Text (const std::string txt) :
     tests =0;
     font           = GLUT_BITMAP_HELVETICA_12;
     memset(Color, 0, sizeof(Color));
-};
+}
 
 
 //////////////////////////////////////////////////////////////////////////////

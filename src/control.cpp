@@ -55,8 +55,8 @@ int Control::Activate()
 #warning "use ::XConfigureRequestEvent instead for the api"
 void Control::pack (int x, int y)
 {
-    //this->x_abs = x;
-    //this->y_abs = y;
+    this->x = x;
+    this->y = y;
 }
 
 ////////////////////////////////////////////////////////////////////////

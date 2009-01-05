@@ -70,6 +70,10 @@ int main(int argc, char* argv[])
     leef1b2.set_size(Control::Size(10,30)); //position 0x 20y size 10 30
     leef2b2.set_size(Control::Size(10,10)); //position 0x 50y size 10 10
 
+    assert( leefb1.X() == 0 && leefb1.Y() == 0 );
+    assert( leef1b2.X() == 0 && leef1b2.Y() == 0 );
+    assert( leef2b2.X() == 0 && leef2b2.Y() == leef1b2.Height() );
+
     int x, y;
     branch1.GetAbsPosition(&branch1, &x, &y);
     assert( x==0 && y==0);

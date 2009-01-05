@@ -77,11 +77,11 @@ namespace GLUI
 		text(this, "text")
 	{
 		this->resizeable == AdaptThisToFitChilds;
-	};
+	}
 
 	inline void TextButton::SetText(char* newtext)
 	{
 		text.set_text(newtext);
-	};
+	}
 }
 #endif

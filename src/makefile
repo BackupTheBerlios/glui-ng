@@ -1,5 +1,8 @@
 .SUFFIXES: .cpp
 
+#comment this for verbose make
+MAKEFLAGS+= -s
+
 #for sgi   -- comment out the lines below to use on HP
 #CC=CC -g0 -o32
 #CC=gcc
@@ -78,12 +81,12 @@ $(GLUI_LIB): $(GLUI_OBJS)
 ${GLUI_OBJS}: ${GLUI_HEADERS}
 
 GENERATED/%.o: %.cpp ${GLUI_HEADERS}
-	@echo "    [CXX] $<"
-	@$(CXX) $(CPPFLAGS) -c $< -o $@
+	echo "    [CXX] $<"
+	$(CXX) $(CPPFLAGS) -c $< -o $@
 
 GENERATED/%.o: %.c ${GLUI_HEADERS}
-	@echo "    [CC ] $<"
-	@$(CXX) $(CPPFLAGS) -c $< -o $@
+	echo "    [CC ] $<"
+	$(CXX) $(CPPFLAGS) -c $< -o $@
 
 
 docs:

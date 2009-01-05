@@ -1,6 +1,8 @@
 #include <GL/gl.h>
 #include <GL/glui/drawinghelpers.h>
 #include <GL/glui/debug.h>
+#include <string.h>
+
 
 using namespace GLUI;
 /////////////////////////////////////////////////////////////////////////
