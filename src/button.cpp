@@ -51,19 +51,11 @@ Button::Button( Node *parent, const char *name,
 int Button::AddEvent (::XEvent *event)
 {
     EventInterpreter::AddEvent(event);
-    ::XEvent EventToForward;
-    //ask for redisplay of window
-    EventToForward.xexpose.type=Expose;
-    EventToForward.xexpose.send_event=true;
-    GetAbsPosition(this, &EventToForward.xexpose.x, &EventToForward.xexpose.y );
-    EventToForward.xexpose.width = this->Width();
-    EventToForward.xexpose.height = this->Height();
-
 
     if (GetStatus() & EventInterpreter::click )
     {
         value.SetVal(true);
-        Control::AddEvent(&EventToForward);
+        drawinghelpers::PostRedisplay(this);
     }
 
 

@@ -104,17 +104,7 @@ void Control::enable()
     Control *node;
 
     enabled = true;
-    ::XEvent EventToForward;
-    EventToForward.xexpose.type=Expose;
-    EventToForward.xexpose.send_event=true;
-    GetAbsPosition(this, &EventToForward.xexpose.x, &EventToForward.xexpose.y );
-    EventToForward.xexpose.width = this->Width();
-    EventToForward.xexpose.height = this->Height();
-    Container* cont  = dynamic_cast<Container*>(GetRootNode());
-    if ( cont != NULL)
-    {
-        cont->AddEvent(&EventToForward);
-    }
+    drawinghelpers::PostRedisplay(this);
 
 #warning "this has nothing todo here, move to container class"
     /*** Now recursively enable all buttons below it ***/
@@ -135,19 +125,7 @@ void Control::disable()
 
     enabled = false;
 
-    //ask for redisplay of window
-    ::XEvent EventToForward;
-    EventToForward.xexpose.type=Expose;
-    EventToForward.xexpose.send_event=true;
-    GetAbsPosition(this, &EventToForward.xexpose.x, &EventToForward.xexpose.y );
-    EventToForward.xexpose.width = this->Width();
-    EventToForward.xexpose.height = this->Height();
-    Container* cont  = dynamic_cast<Container*>(GetRootNode());
-    if ( cont != NULL)
-    {
-        cont->AddEvent(&EventToForward);
-    }
-
+    drawinghelpers::PostRedisplay(this);
 
 #warning "this has nothing todo here, move to container class"
     /*** Now recursively disable all buttons below it ***/
@@ -204,18 +182,13 @@ int Control::set_size( Size sz, Size min)
     {
         return EINVAL;
     }
-    ::XEvent EventToForward;
-    EventToForward.xexpose.type=Expose;
-    EventToForward.xexpose.send_event=true;
-    GetAbsPosition(this, &EventToForward.xexpose.x, &EventToForward.xexpose.y );
-    EventToForward.xexpose.width = this->Width();
-    EventToForward.xexpose.height = this->Height();
-    Container* cont  = dynamic_cast<Container*>(GetRootNode());
+
     if ( cont != NULL)
     {
         cont->update_size();
         cont->pack (0, 0);
-        cont->AddEvent(&EventToForward);
+        drawinghelpers::PostRedisplay(this);
+
     }
 }
 
@@ -227,17 +200,8 @@ void Control::set_alignment(Alignement new_align)
 {
     alignment = new_align;
 
-    ::XEvent EventToForward;
-    EventToForward.xexpose.type=Expose;
-    EventToForward.xexpose.send_event=true;
-    GetAbsPosition(this, &EventToForward.xexpose.x, &EventToForward.xexpose.y );
-    EventToForward.xexpose.width = this->Width();
-    EventToForward.xexpose.height = this->Height();
-    Container* cont  = dynamic_cast<Container*>(GetRootNode());
-    if ( cont != NULL)
-    {
-        cont->AddEvent(&EventToForward);
-    }
+    drawinghelpers::PostRedisplay(this);
+
 }
 
 

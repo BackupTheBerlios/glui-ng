@@ -31,7 +31,7 @@
 
 *****************************************************************************/
 #include <GL/glui/collapsible.h>
-#include <GL/glut.h>
+#include <GL/glui/drawinghelpers.h>
 
 using namespace GLUI;
 
@@ -45,20 +45,15 @@ Collapsible::Collapsible(const char *name,
 
 void    Collapsible::open( bool recurse )
 {
-	if ( is_open )
-		return;
-	is_open = true;
-
-	glutPostRedisplay();
-
-	this->CurrentSize.size.h = Toggle->Height() + Content->Height();
-
-
 	Collapsible*    ctrl;
 	Node*           node;
+
+
 	if ( is_open )
 		return;
 	is_open = true;
+
+	this->CurrentSize.size.h = Toggle->Height() + Content->Height();
 
 	if (recurse)
 	{
@@ -73,7 +68,7 @@ void    Collapsible::open( bool recurse )
 			node=node->next();
 		}
 	}
-	glutPostRedisplay();
+    drawinghelpers::PostRedisplay(this);
 
 }
 
@@ -105,6 +100,6 @@ void    Collapsible::close( bool recurse )
 			node=node->next();
 		}
 	}
-	glutPostRedisplay();
+    drawinghelpers::PostRedisplay(this);
 
 }
