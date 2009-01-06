@@ -24,7 +24,7 @@ CPPFLAGS += -I../ -I../include $(OPTS)
 
 LIBGLUI = -L../lib -lglui
 LIBGL   = -lGLU -lGL
-LIBS    = -lXmu -lXext -lX11 -lXi -lm
+LIBS    = -lXext -lX11  -lm
 
 # One of the following options only...
 

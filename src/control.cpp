@@ -33,6 +33,7 @@ misrepresented as being the original software.
 
 #include <GL/glui/internal_control.h>
 #include <GL/glui/event_handler.h>
+#include <GL/glui/drawinghelpers.h>
 #include <GL/glui/debug.h>
 #include <GL/glui/control.h>
 #include <GL/gl.h>
@@ -183,6 +184,7 @@ int Control::set_size( Size sz, Size min)
         return EINVAL;
     }
 
+    Container* cont  = dynamic_cast<Container*>(GetRootNode());
     if ( cont != NULL)
     {
         cont->update_size();
