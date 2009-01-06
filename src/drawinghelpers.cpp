@@ -228,12 +228,14 @@ void          drawinghelpers::PostRedisplay(Control* ctrl)
     //ask for redisplay of window
     EventToForward.xexpose.type=Expose;
     EventToForward.xexpose.send_event=true;
-    GetAbsPosition(ctrl, &EventToForward.xexpose.x, &EventToForward.xexpose.y );
+    ctrl->GetAbsPosition(ctrl, &EventToForward.xexpose.x, &EventToForward.xexpose.y );
     EventToForward.xexpose.width = ctrl->Width();
     EventToForward.xexpose.height = ctrl->Height();
-    Container* cont  = dynamic_cast<Container*>(GetRootNode());
+    Container* cont  = dynamic_cast<Container*>(ctrl->GetRootNode());
     if ( cont != NULL)
     {
         cont->AddEvent(&EventToForward);
     }
+}
+
 
