@@ -88,12 +88,12 @@ void  GlutWindow::XMapWindow()
   glutShowWindow();
 }
 
-void XMapRaised()
+void GlutWindow::XMapRaised()
 {
 #warning "TODO"
 }
 
-void XMapSubwindows()
+void GlutWindow::XMapSubwindows()
 {
 #warning "TODO"
 }
@@ -106,7 +106,7 @@ void GlutWindow::XUnmapWindow( void )
   glutHideWindow();
 }
 
-void XUnmapSubwindows()
+void GlutWindow::XUnmapSubwindows()
 {
 #warning "TODO"
 }
@@ -295,7 +295,7 @@ int GlutWindow::AddEvent(::XExposeEvent *event)
             1.0f );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-    this->set_ortho_projection();
+    this->SetOrthoProjection();
 
     glMatrixMode( GL_MODELVIEW );
     glLoadIdentity();

@@ -159,7 +159,7 @@ namespace GLUI
         //nothing to do, this is done by xexpose event;
     }
 
-    inline void GlutWindow::GetWindowId()
+    inline WindowId GlutWindow::GetWindowId()
     {
         return GlutWindowId;
     }
