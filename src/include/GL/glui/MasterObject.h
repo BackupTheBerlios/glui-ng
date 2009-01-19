@@ -26,9 +26,13 @@ namespace GLUI
             virtual int  add_control( Node *window );
 
         private:
-            ~MasterObject();
             MasterObject();
     };
+
+    inline MasterObject::MasterObject()
+    {
+        throw("USE OF DEFAULT MasterObject Constructor");
+    }
 
 }
 

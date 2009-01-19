@@ -43,25 +43,32 @@
   This entire approach seems to be superceded by the "subwindow" flavor
   of GLUI.
   */
-
 #include <GL/glui/window.h>
 namespace GLUI
 {
     class GlutDisplay;
     class GlutWindow;
 
-    typedef GlutWindow GLUIWindow;
-    typedef GlutDisplay Display;
-    typedef long unsigned int WindowId;
+#define GLUIWindow GlutWindow
+#define Display GlutDisplay
 
+    class GlutScreen: public _Screen
+    {
+        public :
+            virtual int Depth();
+            virtual WindowId RootWindow();
+    };
 
 
     class GlutDisplay: public _Display
     {
         public :
             GlutDisplay(char* name);
+            virtual _Screen* DefaultScreen();
         private:
             GlutDisplay();
+        private: //datas
+            GlutScreen defaultscreen;
     };
 
     class GlutWindow : public _Window
@@ -90,6 +97,7 @@ namespace GLUI
             virtual ~GlutWindow();
             virtual int AddEvent (::XEvent* event);
             WindowId GetWindowId();
+            virtual void draw();
 
         public: //XMethods
             virtual void XMapWindow();
@@ -136,6 +144,7 @@ namespace GLUI
         protected: //variables
             unsigned int KeyModifierState;
             long unsigned int GlutWindowId;
+            bool mapped;
         protected: //defines
             enum _KeyModifierShift { KeyModifierShift=8 }; //256 first chars are already used in keyboard functions of glut
     };
@@ -143,7 +152,17 @@ namespace GLUI
 
     inline GlutDisplay::GlutDisplay(char* name)
     {
-        disp = NULL;
     }
+
+    inline void GlutWindow::draw()
+    {
+        //nothing to do, this is done by xexpose event;
+    }
+
+    inline void GlutWindow::GetWindowId()
+    {
+        return GlutWindowId;
+    }
+
 }
 #endif //__GLUI_GLUT_WINDOW_H

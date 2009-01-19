@@ -65,24 +65,22 @@ namespace GLUI
 {
     class _Window;
 
-
+    typedef long unsigned int WindowId;
 
     class _Screen
     {
         public :
             virtual int Depth()               =0;
-            virtual _Window* RootWindow()     =0;
+            virtual WindowId RootWindow()     =0;
     };
 
     class _Display
     {
         public :
-            operator ::Display*();
             virtual _Screen* DefaultScreen()  =0;
             int DefaultVisual();
         protected :
             _Display();
-            ::Display* disp;
     };
 
 
@@ -118,15 +116,24 @@ namespace GLUI
         glViewport( 0, 0, this->Width(), this->Height() );
     }
 
+    inline _Display::_Display()
+    {
+    }
 
 }
+
+
+
 //now select automatically the window class according to the
 //window manager we use
 #ifdef __USE_XLIB
+#warning "using Xlib"
 #include <GL/glui/x11_window.h>
 #elif  __USE_WIN32
+#warning "using win32"
 #include <GL/glui/win32_window.h>
 #else
+#warning "using glut"
 #include <GL/glui/glut_window.h>
 #endif
 

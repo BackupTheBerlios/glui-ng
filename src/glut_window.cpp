@@ -56,6 +56,31 @@
 #include <GL/glui/drawinghelpers.h>
 using namespace GLUI;
 
+
+///////////////////////////////////////////////////////////////////////
+int GlutScreen::Depth()
+{
+#warning "implement real Depth check"
+    return 24;
+}
+
+//////////////////////////////////////////////////////////////////////
+WindowId GlutScreen::RootWindow()
+{
+     return 0;
+}
+
+///////////////////////////////////////////////////////////////////////
+_Screen* GlutDisplay::DefaultScreen()
+{
+    return     &defaultscreen;
+}
+
+///////////////////////////////////////////////////////////////////////
+//
+
+
+
 ///////////////////////////////////////////////////////////////////////
 void  GlutWindow::XMapWindow()
 {
@@ -136,6 +161,7 @@ int GlutWindow::_GlutWindow(Display* display, WindowId parent,
         XSetWindowAttributes *attributes )
 {
     GlutWindow* win= MasterObject::Instance()->FindWindow(parent);
+    mapped = false;
 
     if ( win == NULL ) {  // not a subwindow, creating a new top-level window
         int old_glut_window = glutGetWindow();

@@ -31,10 +31,10 @@
 #include <GL/gl.h>
 using namespace GLUI;
 
-_Display::operator ::Display*()
+/*_Display::operator ::Display*()
 {
     return disp;
-}
+}*/
 
 _Window::_Window() :
     Container("window")

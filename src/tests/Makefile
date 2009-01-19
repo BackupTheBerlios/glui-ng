@@ -49,7 +49,7 @@ GLUI_LIB = ../GENERATED/lib/libglui.a
 
 #GLUI_TESTS = checkbox statictext button horizontallayout textbutton
 GLUI_TESTS = SizeComputationTest PackingTest ContainerEventTest
-
+GLUI_TESTS+= GlutWindowTest
 
 .PHONY: all setup examples tools clean depend doc doc-pdf doc-dist dist
 
@@ -64,13 +64,16 @@ tools: $(GLUI_TOOLS)
 
 
 ${GLUI_TESTS}: $(addsuffix .cpp,${GLUI_TESTS}) $(GLUI_LIB)
+	echo "    [EXE] $(addsuffix .cpp,$@)"
 	$(CXX) $(CPPFLAGS) -o $@ $(addsuffix .cpp,$@)  $(GLUI_LIB) $(LIBGLUT) $(LIBGL) $(LIBS)
 
 
 .cpp.o: ${GLUI_HEADERS}
+	echo "    [CXX] $<"
 	$(CXX) $(CPPFLAGS) -c $<
 
 .c.o: ${GLUI_HEADERS}
+	echo "    [CC ] $<"
 	$(CXX) $(CPPFLAGS) -c $<
 
 
