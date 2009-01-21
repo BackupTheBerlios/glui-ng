@@ -117,7 +117,7 @@ Node* Node::GetRootNode()
 int Node::add_control( Node *child )
 {
 	child->link_this_to_parent_last( this );
-	return true;
+	return 0;
 }
 
 

@@ -79,7 +79,7 @@ _Screen* GlutDisplay::DefaultScreen()
 ///////////////////////////////////////////////////////////////////////
 //
 
-
+bool GlutWindow::glutinitialized = false;
 
 ///////////////////////////////////////////////////////////////////////
 void  GlutWindow::XMapWindow()
@@ -163,6 +163,9 @@ int GlutWindow::_GlutWindow(Display* display, WindowId parent,
     GlutWindow* win= MasterObject::Instance()->FindWindow(parent);
     mapped = false;
 
+    int argc=0;
+    GlutWindow::init(&argc, NULL);
+
     if ( win == NULL ) {  // not a subwindow, creating a new top-level window
         int old_glut_window = glutGetWindow();
 
@@ -213,6 +216,21 @@ int GlutWindow::_GlutWindow(Display* display, WindowId parent,
 GlutWindow::~GlutWindow()
 {
 #warning "Todo : delete childs. close the window"
+}
+
+int GlutWindow::init(int* argc, char** argv)
+{
+  if(glutinitialized == false)
+    {
+        glutInit(argc, argv);
+        glutinitialized = true;
+    }
+
+}
+
+int GLUIInit(int* argc, char** argv)
+{
+   return GlutWindow::init(argc, argv);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

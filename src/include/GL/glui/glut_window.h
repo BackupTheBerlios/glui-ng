@@ -94,6 +94,7 @@ namespace GLUI
                     unsigned int border_width,
                     unsigned long border,
                     unsigned long background );
+            static int init(int* argc, char** argv); //optional
             virtual ~GlutWindow();
             virtual int AddEvent (::XEvent* event);
             WindowId GetWindowId();
@@ -145,6 +146,7 @@ namespace GLUI
             unsigned int KeyModifierState;
             long unsigned int GlutWindowId;
             bool mapped;
+            static bool glutinitialized;
         protected: //defines
             enum _KeyModifierShift { KeyModifierShift=8 }; //256 first chars are already used in keyboard functions of glut
     };

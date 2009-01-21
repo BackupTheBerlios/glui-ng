@@ -11,11 +11,12 @@ int main(int argc, char* argv[])
 #else
 int main(int argc, char** argv)
 {
+    //glutWindow->init(&argc, argv);  //optional
     Display*    glutDisplay = new Display("glut display");
     GLUIWindow* glutWindow = new GLUIWindow(glutDisplay,
                                             glutDisplay->DefaultScreen()->RootWindow(),
                                             0, 0,
-                                            100, 200,
+                                            200, 200,
                                             1,
                                             1,
                                             0);

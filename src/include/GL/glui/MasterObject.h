@@ -31,7 +31,6 @@ namespace GLUI
 
     inline MasterObject::MasterObject()
     {
-        throw("USE OF DEFAULT MasterObject Constructor");
     }
 
 }

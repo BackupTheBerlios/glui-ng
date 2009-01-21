@@ -123,6 +123,7 @@ namespace GLUI
 }
 
 
+int GLUIInit(int* argc, char** argv); //optional
 
 //now select automatically the window class according to the
 //window manager we use
