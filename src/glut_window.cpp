@@ -85,6 +85,7 @@ bool GlutWindow::glutinitialized = false;
 void  GlutWindow::XMapWindow()
 {
   glutSetWindow(GlutWindowId);
+  MasterObject::Instance()->pack(0, 0); //repack all master windows
   glutShowWindow();
 }
 
@@ -252,7 +253,7 @@ int GlutWindow::AddEvent(::XResizeRequestEvent *event)
     CurrentSize.size.w = theEvent->width;
     CurrentSize.size.h = theEvent->height;
 
-    this->pack(0, 0);
+    this->pack(x, y);
 
     if ( theEvent->width  != CurrentSize.size.w ||
             theEvent->height != CurrentSize.size.h ) {
@@ -295,8 +296,7 @@ int GlutWindow::AddEvent(::XExposeEvent *event)
 
     //update sizes and positions
     this->update_size();
-    this->pack(0, 0);
-
+    Container::AddEvent (event)
 
     // Check here if the window needs resizing
     win_w = glutGet( GLUT_WINDOW_WIDTH );
@@ -306,17 +306,9 @@ int GlutWindow::AddEvent(::XExposeEvent *event)
         return 0;
     }
 
-    //    Draw GLUI window
-    glClearColor( theme::Instance()->bkgd_color[0] / 255.0f,
-            theme::Instance()->bkgd_color[1] / 255.0f,
-            theme::Instance()->bkgd_color[2] / 255.0f,
-            1.0f );
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    draw();
 
-    this->SetOrthoProjection();
 
-    glMatrixMode( GL_MODELVIEW );
-    glLoadIdentity();
 
     // Recursively draw the main panel
     this->AddEvent(event);

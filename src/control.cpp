@@ -142,6 +142,8 @@ int Control::AddEvent(::XExposeEvent *event)
     //we have been exposed, redraw ourself
     glMatrixMode( GL_MODELVIEW );
     glPushMatrix();
+    glLoadIdentity();
+    glTranslatef(x, y, GLUI_BOTTOM_VIEWPORT + GLUI_CONTROL_MAX_THICKNESS * level());
     draw();
     glPopMatrix();
     debug::Instance()->FlushGL();
@@ -187,8 +189,6 @@ int Control::set_size( Size sz, Size min)
     Container* cont  = dynamic_cast<Container*>(GetRootNode());
     if ( cont != NULL)
     {
-        cont->update_size();
-        cont->pack (0, 0);
         drawinghelpers::PostRedisplay(this);
 
     }

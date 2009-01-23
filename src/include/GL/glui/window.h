@@ -52,6 +52,9 @@
 #undef DefaultVisual
 
 
+#define  GLUI_BOTTOM_VIEWPORT  -1000
+// allow a stack of 500 objects
+#define  GLUI_TOP_VIEWPORT     GLUI_BOTTOM_VIEWPORT + 500 * GLUI_CONTROL_MAX_THICKNESS
 
 /*** Flags for GLUI class constructor ***/
 #define  GLUI_SUBWINDOW          ((long)(1<<1))

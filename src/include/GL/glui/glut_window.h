@@ -158,7 +158,13 @@ namespace GLUI
 
     inline void GlutWindow::draw()
     {
-        //nothing to do, this is done by xexpose event;
+        //    Draw GLUI window
+        glLoadIdentity();
+        this->SetOrthoProjection();
+        glTranslatef(0, 0, GLUI_BOTTOM_VIEWPORT + 1);
+        drawinghelpers::draw_box( this->Width(),
+                this->Height(),
+                NULL);
     }
 
     inline WindowId GlutWindow::GetWindowId()

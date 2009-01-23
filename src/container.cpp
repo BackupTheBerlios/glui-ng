@@ -227,7 +227,7 @@ void Container::pack (int x, int y)
         child = dynamic_cast<Control*>(node);
         if ( NULL != child)
         {
-            child->pack(x_offset, y_offset);
+            child->pack(x + x_offset, y + y_offset);
             if (CurrOrientation == horizontal )
             {
                 x_offset += child->Width();
@@ -420,12 +420,8 @@ int Container::AddEvent (::XExposeEvent* event)
             "%s %s \n",__func__,
             dynamic_cast<Node*>(this)->whole_tree());
 
-    glMatrixMode( GL_MODELVIEW );
-    glPushMatrix();
-
     pack (x, y);
-    draw();  //we're allready positioned to (0,0,0) of current widget, so just draw
-
+    Control::AddEvent (event);
     if (CurrOrientation == horizontal )
     {
         node = dynamic_cast<Control*>(first_child());

@@ -70,5 +70,17 @@ int  MasterObject::add_control( Node *window )
 }
 
 
+void MasterObject::pack( int x, int y)
+{
+    GLUIWindow* win = dynamic_cast<GLUIWindow*>( this->first_child());
+
+    while( win ) {
+        win->pack(0, 0);
+        win = dynamic_cast<GLUIWindow*>(win->next());
+    }
+    return NULL;
+
+}
+
 
 

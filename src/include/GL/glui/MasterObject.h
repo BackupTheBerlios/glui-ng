@@ -24,6 +24,7 @@ namespace GLUI
             static MasterObject* Instance();
             GLUIWindow*      FindWindow( WindowId window_id );
             virtual int  add_control( Node *window );
+            virtual void pack( int x, int y)
 
         private:
             MasterObject();

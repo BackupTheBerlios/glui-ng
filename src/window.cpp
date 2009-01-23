@@ -65,7 +65,7 @@ void  _Window::SetOrthoProjection( void )
     glMatrixMode( GL_PROJECTION );
     glLoadIdentity();
     /*  gluOrtho2D( 0.0, (float) win_w, 0.0, (float) win_h );          */
-    glOrtho( 0.0, (float)this->Width(), 0.0, (float)this->Height(), -1000.0, 1000.0 );
+    glOrtho( 0.0, (float)this->Width(), 0.0, (float)this->Height(), GLUI_BOTTOM_VIEWPORT, GLUI_TOP_VIEWPORT );
     glMatrixMode( GL_MODELVIEW );
 
 

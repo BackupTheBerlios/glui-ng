@@ -29,6 +29,8 @@
 #include <GL/glui/event_handler.h>
 
 
+#define GLUI_CONTROL_MAX_THICKNESS 4
+
 namespace GLUI
 {
     class LiveVariables;
