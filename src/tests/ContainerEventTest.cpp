@@ -71,10 +71,10 @@ int main(int argc, char* argv[])
     branch2.add_control(&leef1b2);
     branch2.add_control(&leef2b2);
 
-    leefb1.set_size(Control::Size(10,20));  //position 0x 0y size 10x 20y
+    leefb1.set_size(Control::Size(10u,20u));  //position 0x 0y size 10x 20y
     leefb1.WaitedEvent = KeyPress;
-    leef1b2.set_size(Control::Size(10,30)); //position 0x 20y size 10 30
-    leef2b2.set_size(Control::Size(10,10)); //position 0x 50y size 10 10
+    leef1b2.set_size(Control::Size(10u,30u)); //position 0x 20y size 10 30
+    leef2b2.set_size(Control::Size(10u,10u)); //position 0x 50y size 10 10
     leef2b2.WaitedEvent = KeyPress;
 
     ::XKeyEvent keyevent;

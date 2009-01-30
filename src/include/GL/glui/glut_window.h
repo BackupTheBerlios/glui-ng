@@ -44,6 +44,7 @@
   of GLUI.
   */
 #include <GL/glui/window.h>
+#include <GL/glui/drawinghelpers.h>
 namespace GLUI
 {
     class GlutDisplay;
@@ -118,6 +119,8 @@ namespace GLUI
             int AddEvent(::XCrossingEvent* event);
             int AddEvent(::XMapEvent* event);
             int AddEvent(::XUnmapEvent* event);
+            virtual int         set_size( Size sz, Size min=Size(0u,0u) ); //replace with a XResizeRequestEvent
+
 
         protected: //methods
 

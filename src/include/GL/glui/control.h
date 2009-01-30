@@ -55,7 +55,7 @@ namespace GLUI
                     char w;
                     char h;
                 } percent;
-                Size(int w, int h)
+                Size(unsigned int w, unsigned int h)
                     {this->size.w=w; this->size.h=h;
                      percent.w = 0; percent.h = 0; }
                 Size(float percent_w, float percent_h)
@@ -123,7 +123,8 @@ namespace GLUI
             virtual int AddEvent (::XKeyEvent* event);
 
 
-            virtual int         set_size( Size sz, Size min=Size(0,0) );
+            virtual int         set_size( Size sz, Size min=Size(0u,0u) ); //replace with a XResizeRequestEvent
+
             void         set_alignment( Alignement align );
             void         set_resize_policy( SizePolicy policy) { resizeable = policy; }
             SizePolicy   get_resize_policy( void ) { return resizeable;}
@@ -132,7 +133,6 @@ namespace GLUI
 
             Control(const char* name);
             virtual ~Control();
-            virtual void GetAbsPosition(Control* CtrlToFind, int* x, int* y);
 
         protected: //methods
             Control();
@@ -184,20 +184,6 @@ namespace GLUI
 
     }
 
-
-    inline void Control::GetAbsPosition( Control* CtrlToFind, int* x, int* y)
-    {
-        if (CtrlToFind == this)
-        {
-            *x = 0;
-            *y = 0;
-        }
-        Control* parent=dynamic_cast<Control*>(this->parent_node);
-        if (parent != NULL)
-        {
-            parent->GetAbsPosition(this,x,y);
-        }
-    }
 
 
 }

@@ -33,6 +33,7 @@
 
 #include <GL/glui/node.h>
 #include <GL/glui/debug.h>
+#include <GL/glui/MasterObject.h>
 using namespace GLUI;
 /********************************************* Node::Node() *******/
 
@@ -102,7 +103,7 @@ Node    *Node::next( void )
 Node* Node::GetRootNode()
 {
     Node* current = this->parent_node;
-    if(current == NULL) return this;
+    if(current == NULL || current == MasterObject::Instance() ) return this;
     while (current != NULL && current->parent() != NULL)
     {
         current = current->parent();
@@ -262,7 +263,14 @@ const char* Node::whole_tree(int start)
         parent_node->whole_tree(0);
         tree += ".";
     }
-    tree += NodeName;
+    if (NodeName)
+    {
+        tree += NodeName;
+    }
+    else
+    {
+        tree += "some widget have no name!";
+    }
     if (start) {
         tree += "\"";
     }

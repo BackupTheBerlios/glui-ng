@@ -172,7 +172,7 @@ int Control::AddEvent (::XKeyEvent* event)
 /******* Control::set_w() **************/
 int Control::set_size( Size sz, Size min)
 {
-    Size dontchange(0, 0);
+    Size dontchange(0u, 0u);
     if (dontchange != min)
     {
         this->Min = min;
@@ -185,13 +185,14 @@ int Control::set_size( Size sz, Size min)
     {
         return EINVAL;
     }
-
-    Container* cont  = dynamic_cast<Container*>(GetRootNode());
+#warning "use a bottom to top approach : child shall ask parent to update size only if size did change"
+    Control* cont  = dynamic_cast<Control*>(GetRootNode());
     if ( cont != NULL)
     {
-        drawinghelpers::PostRedisplay(this);
-
+        cont->update_size();
+        cont->pack (0, 0);
     }
+    drawinghelpers::PostRedisplay(this);
 }
 
 
@@ -219,7 +220,7 @@ Control::Control(const char* name) : Node(name)
 
     active         = false;
     enabled        = true;
-    Min            = Size(0, 0);
+    Min            = Size(0u, 0u);
     CurrentSize    = Min;
     alignment      = LEFT;
     resizeable     = FixedSize;

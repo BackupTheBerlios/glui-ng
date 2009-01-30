@@ -250,14 +250,8 @@ void Container::pack (int x, int y)
 #warning "remove alignement code and create spacer control instead"
 void Container::align()
 {
-    int  orig_x_abs;
-    int  orig_y_abs;
     Container* par;
 
-    GetAbsPosition(this, &orig_x_abs, &orig_y_abs);
-
-    /* Fix alignment bug relating to columns              */
-    /*return;              */
 
     if ( NULL == parent() )
         return;  /* Clearly this shouldn't happen, though */
@@ -267,13 +261,13 @@ void Container::align()
         return;
 
     if ( alignment == Control::LEFT ) {
-        x = 0 ;
+        x = par->X() ;
     }
     else if ( alignment == Control::RIGHT ) {
-        x = par->Width() - this->CurrentSize.size.w;
+        x = par->X() + par->Width() - this->CurrentSize.size.w;
     }
     else if ( alignment == Control::CENTER ) {
-        x = (par->Width() - this->CurrentSize.size.w) / 2;
+        x = par->X() + (par->Width() - this->CurrentSize.size.w) / 2;
     }
 
     // now align childs
@@ -421,29 +415,19 @@ int Container::AddEvent (::XExposeEvent* event)
             dynamic_cast<Node*>(this)->whole_tree());
 
     pack (x, y);
+    // we don't need this since it's allready done into the Control::AddEvent(XEposeEvent)
+    // glMatrixMode   ( GL_MODELVIEW );  // Select The Model View Matrix
+    // glPushMatrix();
+    // glLoadIdentity ( );    // Reset The Model View Matrix
+
     Control::AddEvent (event);
-    if (CurrOrientation == horizontal )
+    node = dynamic_cast<Control*>(first_child());
+    while( node )
     {
-        node = dynamic_cast<Control*>(first_child());
-        while( node )
-        {
-            node->AddEvent(event);
-            glTranslatef( (float)node->Width(), 0.0, 0.0);
-            node = dynamic_cast<Control*>(node->next());
-        }
+        node->AddEvent(event);
+        node = dynamic_cast<Control*>(node->next());
     }
-    else
-    {
-        //we display childs in reverse order to have them stacked top to bottom
-        node = dynamic_cast<Control*>(last_child());
-        while( node )
-        {
-            node->AddEvent(event);
-            glTranslatef( 0.0, (float) node->Height(), 0.0);
-            node = dynamic_cast<Control*>(node->prev());
-        }
-    }
-    glPopMatrix();
+    // glPopMatrix();
     debug::Instance()->FlushGL();
 }
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -588,8 +572,6 @@ int Container::ForwardEvent(::XEvent* event, int* eventX, int* eventY, int Event
     Control* child = FindChildWidget(*eventX, *eventY);
     if (child != NULL)
     {
-        *eventX = *eventX - child->X();
-        *eventY = *eventY - child->Y();
         return child->AddEvent(event);
     }
     //the event is for this widget and not a child

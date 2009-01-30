@@ -93,7 +93,6 @@ namespace GLUI
             virtual int AddEvent (::XMappingEvent* event);
             virtual int AddEvent (::XErrorEvent* event);
 
-            virtual void GetAbsPosition(Control* CtrlToFind, int* x, int* y);
 
 
 
@@ -152,41 +151,6 @@ namespace GLUI
         return NULL;
     }
 
-
-    inline void Container::GetAbsPosition(Control* CtrlToFind, int* x, int* y)
-    {
-        if (CtrlToFind == this)
-        {
-            *x = 0;
-            *y = 0;
-            return Control::GetAbsPosition(CtrlToFind, x, y);
-        }
-        //get relative position among childs
-        Control* sibling = dynamic_cast<Control*>(first_child());
-        while (sibling != NULL && CtrlToFind != sibling)
-        {
-           if (CurrOrientation == horizontal )
-            {
-                *x += sibling->Width();
-            }
-            else
-            {
-               *y += sibling->Height();
-            }
-            sibling = dynamic_cast<Control*>(sibling->next());
-        }
-        if (CtrlToFind != sibling)
-        {
-            *x = 0;
-            *y = 0;
-            return;
-        }
-        Control* parent=dynamic_cast<Control*>(this->parent_node);
-        if (parent != NULL)
-        {
-            parent->GetAbsPosition(this,x,y);
-        }
-    }
 
 
 

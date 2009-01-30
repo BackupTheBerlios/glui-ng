@@ -87,6 +87,8 @@ void  GlutWindow::XMapWindow()
   glutSetWindow(GlutWindowId);
   MasterObject::Instance()->pack(0, 0); //repack all master windows
   glutShowWindow();
+  mapped = true;
+  drawinghelpers::PostRedisplay(this);
 }
 
 void GlutWindow::XMapRaised()
@@ -199,6 +201,7 @@ int GlutWindow::_GlutWindow(Display* display, WindowId parent,
     {
         throw rc;
     }
+    set_size(Size(width, height));
 
     //init glut callbacks
     glutDisplayFunc (display_func);
@@ -275,52 +278,52 @@ int GlutWindow::AddEvent(::XResizeRequestEvent *event)
 
 int GlutWindow::AddEvent(::XExposeEvent *event)
 {
-    debug::Instance()->print( __FILE__, __LINE__, _level,
-            "display\n");
-    int       win_w, win_h;
+    if (mapped)
+    {
+        debug::Instance()->print( __FILE__, __LINE__, _level,
+                "display\n");
+        int       win_w, win_h;
 
-    // SUBTLE: on freeGLUT, the correct window is always already set.
-    // But older versions of GLUT need this call, or else subwindows
-    // don't update properly when resizing or damage-painting.
-    glutSetWindow( this->GlutWindowId );
+        // SUBTLE: on freeGLUT, the correct window is always already set.
+        // But older versions of GLUT need this call, or else subwindows
+        // don't update properly when resizing or damage-painting.
+        glutSetWindow( this->GlutWindowId );
 
-    // Set up OpenGL state for widget drawing
-    glEnable( GL_DEPTH_TEST );
-    //glDisable( GL_DEPTH_TEST );
-    glCullFace( GL_BACK );
-    glDisable( GL_CULL_FACE );
-    //glEnable( GL_LIGHTING );
-    glDisable(GL_LIGHTING);
+        // Set up OpenGL state for widget drawing
+        glEnable( GL_DEPTH_TEST );
+        glCullFace( GL_BACK );
+        glDisable( GL_CULL_FACE );
+        glDisable( GL_LIGHTING );
+        glEnable ( GL_COLOR_MATERIAL );
 
-    this->SetCurrentDrawBuffer();
+        SetOrthoProjection();
 
-    //update sizes and positions
-    this->update_size();
-    Container::AddEvent (event)
 
-    // Check here if the window needs resizing
-    win_w = glutGet( GLUT_WINDOW_WIDTH );
-    win_h = glutGet( GLUT_WINDOW_HEIGHT );
-    if ( win_w != this->Width() || win_h != this->Height() ) {
-        glutReshapeWindow( this->Width(), this->Height() );
-        return 0;
+        this->SetCurrentDrawBuffer();
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear Screen And Depth Buffer
+
+        //update sizes and positions
+        this->update_size();
+
+        // Check here if the window needs resizing
+        win_w = glutGet( GLUT_WINDOW_WIDTH );
+        win_h = glutGet( GLUT_WINDOW_HEIGHT );
+        if ( win_w != this->Width() || win_h != this->Height() ) {
+            glutReshapeWindow( this->Width(), this->Height() );
+        }
+
+        Container::AddEvent (event);
+
+        switch (drawinghelpers::get_buffer_mode()) {
+            case drawinghelpers::buffer_front: // Make sure drawing gets to screen
+                glFlush();
+                break;
+            case drawinghelpers::buffer_back: // Bring back buffer to front
+                glutSwapBuffers();
+                break;
+        }
+        glutPostRedisplay();
     }
-
-    draw();
-
-
-
-    // Recursively draw the main panel
-    this->AddEvent(event);
-    switch (drawinghelpers::get_buffer_mode()) {
-        case drawinghelpers::buffer_front: // Make sure drawing gets to screen
-            glFlush();
-            break;
-        case drawinghelpers::buffer_back: // Bring back buffer to front
-            glutSwapBuffers();
-            break;
-    }
-    glutPostRedisplay();
     return 0;
 }
 
@@ -377,7 +380,11 @@ int GlutWindow::AddEvent(::XUnmapEvent* event)
     Container::AddEvent((::XEvent*) event);
 }
 
-
+int GlutWindow::set_size( Size sz, Size min) //replace with a XResizeRequestEvent
+{
+    Control::set_size(sz,min);
+    glutReshapeWindow( this->Width(), this->Height() );
+}
 
 
 

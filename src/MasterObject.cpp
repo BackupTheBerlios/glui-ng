@@ -42,9 +42,14 @@ using namespace GLUI;
 ///////////////////////////////////////////////////////////////////////////
 MasterObject* MasterObject::Instance()
 {
-    static MasterObject object;
+    static MasterObject object("MasterObject");
     return &object;
 }
+
+MasterObject::MasterObject(const char *name) : Node (name)
+{
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 GLUIWindow*      MasterObject::FindWindow( WindowId window_id )
@@ -78,7 +83,6 @@ void MasterObject::pack( int x, int y)
         win->pack(0, 0);
         win = dynamic_cast<GLUIWindow*>(win->next());
     }
-    return NULL;
 
 }
 

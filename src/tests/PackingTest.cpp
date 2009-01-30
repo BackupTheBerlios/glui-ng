@@ -66,24 +66,14 @@ int main(int argc, char* argv[])
     branch2.add_control(&leef1b2);
     branch2.add_control(&leef2b2);
 
-    leefb1.set_size(Control::Size(10,20));  //position 0x 0y size 10x 20y
-    leef1b2.set_size(Control::Size(10,30)); //position 0x 20y size 10 30
-    leef2b2.set_size(Control::Size(10,10)); //position 0x 50y size 10 10
+    leefb1.set_size(Control::Size(10u,20u));  //position 0x 0y size 10x 20y
+    leef1b2.set_size(Control::Size(10u,30u)); //position 0x 20y size 10 30
+    leef2b2.set_size(Control::Size(10u,10u)); //position 0x 50y size 10 10
 
-    assert( leefb1.X() == 0 && leefb1.Y() == 0 );
-    assert( leef1b2.X() == 0 && leef1b2.Y() == 0 );
-    assert( leef2b2.X() == 0 && leef2b2.Y() == leef1b2.Height() );
-
-    int x, y;
-    branch1.GetAbsPosition(&branch1, &x, &y);
-    assert( x==0 && y==0);
-    branch2.GetAbsPosition(&branch2, &x, &y);
-    assert( x==0 && y==branch1.Height());
-    leefb1.GetAbsPosition(&leefb1, &x, &y);
-    assert( x==0 && y==0);
-    leef1b2.GetAbsPosition(&leef1b2, &x, &y);
-    assert( x==0 && y==branch1.Height());
-    leef2b2.GetAbsPosition(&leef2b2, &x, &y);
-    assert( x==0 && y==branch1.Height() + leef1b2.Height());
+    assert( branch1.X() == 0 && branch1.Y() == 0);
+    assert( branch2.X() == 0 && branch2.Y() == branch1.Height());
+    assert( leefb1.X()  == 0 && leefb1.Y()  == 0);
+    assert( leef1b2.X() == 0 && leef1b2.Y() == branch1.Height());
+    assert( leef2b2.X() == 0 && leef2b2.Y() == branch1.Height() + leef1b2.Height());
 
 }

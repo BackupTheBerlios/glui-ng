@@ -68,17 +68,7 @@ void    StaticText::draw( )
 void    StaticText::set_text(const char *text )
 {
     *(dynamic_cast<std::string*>(this)) = text;
-
-    ::XEvent EventToForward;
-    //ask for redisplay of window
-    EventToForward.xexpose.type=Expose;
-    EventToForward.xexpose.send_event=true;
-    GetAbsPosition(this, &EventToForward.xexpose.x, &EventToForward.xexpose.y );
-    EventToForward.xexpose.width = this->Width();
-    EventToForward.xexpose.height = this->Height();
-
-
-    Control::AddEvent(&EventToForward);
+    drawinghelpers::PostRedisplay(this);
 }
 
 
