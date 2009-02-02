@@ -15,6 +15,7 @@ check ./PackingTest
 check ./SizeComputationTest
 check ./ContainerEventTest
 check ./GlutWindowTest
+check ./GlutKeyboardTest
 
 popd
 
