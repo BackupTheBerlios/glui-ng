@@ -143,7 +143,7 @@ int Control::AddEvent(::XExposeEvent *event)
     glMatrixMode( GL_MODELVIEW );
     glPushMatrix();
     glLoadIdentity();
-    glTranslatef(x, y, GLUI_BOTTOM_VIEWPORT + GLUI_CONTROL_MAX_THICKNESS * level());
+    glTranslatef(x, y, BOTTOM_VIEWPORT + GLUI_CONTROL_MAX_THICKNESS * level());
     draw();
     glPopMatrix();
     debug::Instance()->FlushGL();

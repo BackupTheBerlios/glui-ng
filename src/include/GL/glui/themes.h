@@ -28,22 +28,34 @@
   3. This notice may not be removed or altered from any source distribution. 
 
 */
+#include <GL/gl.h>
 namespace GLUI
 {
-	class theme
-	{
-		public : //methods
-			static theme* Instance();
-		public : //variables
-			unsigned char    bkgd_color[3];
-			float            bkgd_color_f[3];
-            //font             DefaultFont;
-		private : //methods
-			theme( void );
-	};
+    class theme
+    {
+        public : //methods
+            static theme* Instance();
+            void FillglColorPointer(GLint size,
+                    GLenum type,
+                    GLsizei stride,
+                    const GLvoid *pointer,
+                    uint32_t count );
+            uint8_t* Get_bkgd_color();
+        protected : //variables
+            uint8_t    bkgd_color[4];
+        private : //methods
+            theme( void );
+    };
+
+
+    inline uint8_t* theme::Get_bkgd_color()
+    {
+#warning "protect this with a const cast"
+        return bkgd_color;
+    };
+
 
 }
-
 
 //IDEA :
 //a theme shall be provided as a plugin, this plugin contain a C entry with the name

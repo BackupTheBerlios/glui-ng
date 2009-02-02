@@ -69,6 +69,12 @@ namespace GLUI
     class _Window;
 
     typedef long unsigned int WindowId;
+    enum ViewPort
+    {
+        BOTTOM_VIEWPORT=-1000,
+        TOP_VIEWPORT= BOTTOM_VIEWPORT + 500 * GLUI_CONTROL_MAX_THICKNESS,
+    };
+
 
     class _Screen
     {

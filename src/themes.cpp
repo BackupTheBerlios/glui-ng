@@ -24,18 +24,134 @@
 */
 
 #include <GL/glui/themes.h>
+#include <string.h>
 
 using namespace GLUI;
 
+
+void theme::FillglColorPointer(GLint size,
+        GLenum type,
+        GLsizei stride,
+        const GLvoid *pointer,
+        uint32_t count)
+{
+    if (size >= 3 && size <=4)
+    {
+        switch (type)
+        {
+            case GL_BYTE :
+                {
+                    int8_t colorelem[4] = { bkgd_color[0] - INT8_MAX,
+                        bkgd_color[1] - INT8_MAX,
+                        bkgd_color[2] - INT8_MAX,
+                        bkgd_color[3] - INT8_MAX };
+                    for (uint32_t i=0; i<count; i++)
+                    {
+                        memcpy((int8_t*)pointer + size * i ,colorelem, size * sizeof(int8_t));
+                    }
+                    return;
+                }
+            case GL_UNSIGNED_BYTE :
+                {
+                    uint8_t colorelem[4] = { bkgd_color[0],
+                        bkgd_color[1],
+                        bkgd_color[2],
+                        bkgd_color[3] };
+                    for (uint32_t i=0; i<count; i++)
+                    {
+                        memcpy((uint8_t*)pointer + size * i ,colorelem, size * sizeof(uint8_t));
+                    }
+                    return;
+                }
+            case GL_SHORT:
+                {
+                    int16_t colorelem[4] = { bkgd_color[0] * INT16_MAX / UINT8_MAX,
+                        bkgd_color[1] * INT16_MAX / UINT8_MAX,
+                        bkgd_color[2] * INT16_MAX / UINT8_MAX,
+                        bkgd_color[3] * INT16_MAX / UINT8_MAX };
+                    for (uint32_t i=0; i<count; i++)
+                    {
+                        memcpy((int16_t*)pointer + size * i ,colorelem, size * sizeof(int16_t));
+                    }
+                    return;
+                }
+            case GL_UNSIGNED_SHORT:
+                {
+                    uint16_t colorelem[4] = { bkgd_color[0] * UINT16_MAX / UINT8_MAX,
+                        bkgd_color[1] * UINT16_MAX / UINT8_MAX,
+                        bkgd_color[2] * UINT16_MAX / UINT8_MAX,
+                        bkgd_color[3] * UINT16_MAX / UINT8_MAX };
+                    for (uint32_t i=0; i<count; i++)
+                    {
+                        memcpy((uint16_t*)pointer + size * i ,colorelem, size * sizeof(uint16_t));
+                    }
+                    return;
+                }
+            case GL_INT:
+                {
+                    int32_t colorelem[4] = { bkgd_color[0] * INT32_MAX / UINT8_MAX,
+                        bkgd_color[1] * INT32_MAX / UINT8_MAX,
+                        bkgd_color[2] * INT32_MAX / UINT8_MAX,
+                        bkgd_color[3] * INT32_MAX / UINT8_MAX };
+                    for (uint32_t i=0; i<count; i++)
+                    {
+                        memcpy((int32_t*)pointer + size * i ,colorelem, size * sizeof(int32_t));
+                    }
+                    return;
+                }
+            case GL_UNSIGNED_INT:
+                {
+                    uint32_t colorelem[4] = { bkgd_color[0] * UINT32_MAX / UINT8_MAX,
+                        bkgd_color[1] * UINT32_MAX / UINT8_MAX,
+                        bkgd_color[2] * UINT32_MAX / UINT8_MAX,
+                        bkgd_color[3] * UINT32_MAX / UINT8_MAX };
+                    for (uint32_t i=0; i<count; i++)
+                    {
+                        memcpy((uint32_t*)pointer + size * i ,colorelem, size * sizeof(uint32_t));
+                    }
+                    return;
+                }
+            case GL_FLOAT:
+                {
+                    float colorelem[4] = { (float)bkgd_color[0] * 1.0f / UINT8_MAX,
+                        (float)bkgd_color[1] * 1.0f / UINT8_MAX,
+                        (float)bkgd_color[2] * 1.0f / UINT8_MAX,
+                        (float)bkgd_color[3] * 1.0f / UINT8_MAX };
+                    for (uint32_t i=0; i<count; i++)
+                    {
+                        memcpy((float*)pointer + size * i ,colorelem, size * sizeof(float));
+                    }
+                    return;
+                }
+            case GL_DOUBLE:
+                {
+                    double colorelem[4] = { (double)bkgd_color[0] * 1.0 / UINT8_MAX,
+                        (double)bkgd_color[1] * 1.0 / UINT8_MAX,
+                        (double)bkgd_color[2] * 1.0 / UINT8_MAX,
+                        (double)bkgd_color[3] * 1.0 / UINT8_MAX };
+                    for (uint32_t i=0; i<count; i++)
+                    {
+                        memcpy((double*)pointer + size * i ,colorelem, size * sizeof(double));
+                    }
+                    return;
+                }
+            default:
+                 throw(GL_INVALID_VALUE);
+        }
+    }
+    else
+    {
+        throw(GL_INVALID_VALUE);
+    }
+}
+
+
 theme::theme()
 {
-	int r=200, g=200, b=200;
-	bkgd_color[0] = r;
-	bkgd_color[1] = g;
-	bkgd_color[2] = b;
-	bkgd_color_f[0] = r / 255.0f;
-	bkgd_color_f[1] = g / 255.0f;
-	bkgd_color_f[2] = b / 255.0f;
+	bkgd_color[0] = 236; //red
+	bkgd_color[1] = 233; //green
+	bkgd_color[2] = 216; //blue
+    bkgd_color[3] = 0; //alpha
 }
 
 theme* theme::Instance()
