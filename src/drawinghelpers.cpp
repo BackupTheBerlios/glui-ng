@@ -23,15 +23,13 @@ void      drawinghelpers::draw_raised_box( int w, int h )
 						6, 2, 1, 5,		//bottom slope
 						5, 4, 0, 1};	//left slope
 
-	GLint Colors[] = {            0,            0,            0,
-						0,            0,            0,
-						0,            0,            0,
-						0,            0,            0,
-						theme::Instance()->bkgd_color[0],theme::Instance()->bkgd_color[1],theme::Instance()->bkgd_color[2],
-						theme::Instance()->bkgd_color[0],theme::Instance()->bkgd_color[1],theme::Instance()->bkgd_color[2],
-						theme::Instance()->bkgd_color[0],theme::Instance()->bkgd_color[1],theme::Instance()->bkgd_color[2],
-						theme::Instance()->bkgd_color[0],theme::Instance()->bkgd_color[1],theme::Instance()->bkgd_color[2]};
-
+	GLint Colors[8][3];
+    memset(Colors, 0, 8*3*sizeof(GLint));
+    theme::Instance()->FillglColorPointer(3,
+                    GL_INT,
+                    0,
+                    &Colors[4][0],
+                    4 );
 
 
 	glEnableClientState(GL_VERTEX_ARRAY);
@@ -66,15 +64,13 @@ void      drawinghelpers::draw_lowered_box( int w, int h )
 						6, 2, 1, 5,		//bottom slope
 						5, 4, 0, 1};	//left slope
 
-	GLint Colors[] = {            0,            0,            0,
-						0,            0,            0,
-						0,            0,            0,
-						0,            0,            0,
-						theme::Instance()->bkgd_color[0],theme::Instance()->bkgd_color[1],theme::Instance()->bkgd_color[2],
-						theme::Instance()->bkgd_color[0],theme::Instance()->bkgd_color[1],theme::Instance()->bkgd_color[2],
-						theme::Instance()->bkgd_color[0],theme::Instance()->bkgd_color[1],theme::Instance()->bkgd_color[2],
-						theme::Instance()->bkgd_color[0],theme::Instance()->bkgd_color[1],theme::Instance()->bkgd_color[2]};
-
+	GLint Colors[8][3];
+    memset(Colors, 0, 8*3*sizeof(GLint));
+    theme::Instance()->FillglColorPointer(3,
+                    GL_INT,
+                    0,
+                    &Colors[4][0],
+                    4 );
 
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_COLOR_ARRAY);
@@ -92,7 +88,7 @@ void      drawinghelpers::draw_lowered_box( int w, int h )
 
 void drawinghelpers::set_to_bkgd_color( void )
 {
-  glColor3ubv( theme::Instance()->bkgd_color );
+  glColor3ubv( theme::Instance()->Get_bkgd_color() );
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -133,13 +129,13 @@ void drawinghelpers::draw_box(int w, int h, GLint *color_array)
         {    w,   0.0, 0.0}}; //3
     GLubyte indices[] = { 0, 1, 2, 3};
 
-    GLint Colors[] = {
-        theme::Instance()->bkgd_color[0],theme::Instance()->bkgd_color[1],theme::Instance()->bkgd_color[2], //0
-        theme::Instance()->bkgd_color[0],theme::Instance()->bkgd_color[1],theme::Instance()->bkgd_color[2], //1
-        theme::Instance()->bkgd_color[0],theme::Instance()->bkgd_color[1],theme::Instance()->bkgd_color[2], //2
-        theme::Instance()->bkgd_color[0],theme::Instance()->bkgd_color[1],theme::Instance()->bkgd_color[2], //3
-    };
+    float Colors[4][3];
 
+    theme::Instance()->FillglColorPointer(3,
+                    GL_FLOAT,
+                    0,
+                    Colors,
+                    4 );
 
 
     glEnableClientState(GL_VERTEX_ARRAY);
@@ -151,7 +147,7 @@ void drawinghelpers::draw_box(int w, int h, GLint *color_array)
     }
     else
     {
-        glColorPointer(3, GL_INT, 0, Colors);
+        glColorPointer(3, GL_FLOAT, 0, Colors);
     }
     glVertexPointer(3, GL_FLOAT, 0, Vertices);
     //go through our index array and draw our vertex array

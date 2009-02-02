@@ -175,7 +175,7 @@ int GlutWindow::_GlutWindow(Display* display, WindowId parent,
         glutInitWindowSize( width, height);
         if ( x >= 0 || y >= 0 )
             glutInitWindowPosition( x, y );
-        glutInitDisplayMode( GLUT_RGB | GLUT_DOUBLE );
+        glutInitDisplayMode( GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
         this->GlutWindowId = glutCreateWindow(" ");
 
 
@@ -291,10 +291,13 @@ int GlutWindow::AddEvent(::XExposeEvent *event)
 
         // Set up OpenGL state for widget drawing
         glEnable( GL_DEPTH_TEST );
-        glCullFace( GL_BACK );
-        glDisable( GL_CULL_FACE );
+        glDepthFunc(GL_LEQUAL);
+        //glCullFace( GL_BACK );
+        //glDisable( GL_CULL_FACE );
         glDisable( GL_LIGHTING );
         glEnable ( GL_COLOR_MATERIAL );
+        glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+        glShadeModel(GL_SMOOTH);
 
         SetOrthoProjection();
 
