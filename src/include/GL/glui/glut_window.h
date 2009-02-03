@@ -110,15 +110,15 @@ namespace GLUI
 
 
         public: //event handlers
-            int AddEvent(::XResizeRequestEvent* event);
-            int AddEvent(::XExposeEvent* event);
-            int AddEvent(::XDestroyWindowEvent* event);
-            int AddEvent(::XKeyEvent* event);
-            int AddEvent(::XButtonEvent* event);
-            int AddEvent(::XMotionEvent* event);
-            int AddEvent(::XCrossingEvent* event);
-            int AddEvent(::XMapEvent* event);
-            int AddEvent(::XUnmapEvent* event);
+            virtual int AddEvent(::XResizeRequestEvent* event);
+            virtual int AddEvent(::XExposeEvent* event);
+            virtual int AddEvent(::XDestroyWindowEvent* event);
+            virtual int AddEvent(::XKeyEvent* event);
+            virtual int AddEvent(::XButtonEvent* event);
+            virtual int AddEvent(::XMotionEvent* event);
+            virtual int AddEvent(::XCrossingEvent* event);
+            virtual int AddEvent(::XMapEvent* event);
+            virtual int AddEvent(::XUnmapEvent* event);
             virtual int         set_size( Size sz, Size min=Size(0u,0u) ); //replace with a XResizeRequestEvent
 
 

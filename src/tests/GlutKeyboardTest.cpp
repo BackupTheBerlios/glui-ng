@@ -20,9 +20,52 @@ class myGluiWin : public GLUIWindow
                                             1,
                                             1,
                                             0)
-    {}
+            {
+                Angle = 0;
+            }
+        virtual int AddEvent(::XKeyEvent* event);
        virtual void draw(void);
+       void simulatekey();
+    public : //variables
+       float Angle;
 };
+
+int myGluiWin::AddEvent(::XKeyEvent* event)
+{
+    Angle += 5.0f;
+    Container::AddEvent((::XEvent*) event);
+    drawinghelpers::PostRedisplay(this);
+}
+
+#if defined(GLUI_FREEGLUT)
+
+// FreeGLUT does not yet work perfectly with GLUI
+//  - use at your own risk.
+
+
+#include <GL/freeglut.h>
+
+#elif defined(GLUI_OPENGLUT)
+
+// OpenGLUT does not yet work properly with GLUI
+//  - use at your own risk.
+
+#include <GL/openglut.h>
+
+#else
+
+#ifdef __APPLE__
+#include <GLUT/glut.h>
+#else
+#include <GL/glut.h>
+#endif
+#endif
+
+
+void myGluiWin::simulatekey(void)
+{
+    keyboard_func (GLUT_KEY_UP, 100, 100);
+}
 
 
 void myGluiWin::draw(void)
@@ -49,7 +92,8 @@ void myGluiWin::draw(void)
     glEnd();											// Done Drawing The Quad
     glFlush();
     glTranslatef(5.5f,3.0f,-6.0f);				// Move Right 1.5 Units And Into The Screen 6.0
-    glRotatef(45.0,1.0f,1.0f,0.0f);			// Rotate The Quad On The X axis
+
+    glRotatef(Angle,1.0f,1.0f,0.0f);			// Rotate The Quad On The X axis
     glColor3f(0.5f,0.5f,1.0f);							// Set The Color To Blue One Time Only
     glBegin(GL_QUADS);									// Draw A Quad
         glColor3f(0.0f,1.0f,0.0f);			// Set The Color To Blue
@@ -94,9 +138,13 @@ int main(int argc, char** argv)
 {
     //glutWindow->init(&argc, argv);  //optional
     Display*    glutDisplay = new Display("glut display");
-    GLUIWindow* glutWindow = new myGluiWin(glutDisplay);
+    myGluiWin* glutWindow = new myGluiWin(glutDisplay);
     glutWindow->XMapWindow();
-    sleep(5);
+    for (uint8_t i=0; i<255; i++)
+    {
+        glutWindow->simulatekey();
+        sleep(1);
+    }
     glutWindow->XUnmapWindow();
 
 }
