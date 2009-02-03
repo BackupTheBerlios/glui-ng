@@ -49,7 +49,7 @@ GLUI_LIB = ../GENERATED/lib/libglui.a
 
 #GLUI_TESTS = checkbox statictext button horizontallayout textbutton
 GLUI_TESTS = SizeComputationTest PackingTest ContainerEventTest
-GLUI_TESTS+= GlutWindowTest GlutKeyboardTest
+GLUI_TESTS+= GlutWindowTest GlutKeyboardTest GlutKeyboardUserTest
 
 .PHONY: all setup examples tools clean depend doc doc-pdf doc-dist dist
 

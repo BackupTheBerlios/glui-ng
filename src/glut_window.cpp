@@ -164,7 +164,11 @@ int GlutWindow::_GlutWindow(Display* display, WindowId parent,
         XSetWindowAttributes *attributes )
 {
     GlutWindow* win= MasterObject::Instance()->FindWindow(parent);
-    mapped = false;
+    mapped      = false;
+    y_off_top   = 0;
+    y_off_bot   = 0;
+    x_off_left  = 0;
+    x_off_right = 0;
 
     int argc=0;
     GlutWindow::init(&argc, NULL);
