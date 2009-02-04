@@ -205,7 +205,16 @@ int GlutWindow::_GlutWindow(Display* display, WindowId parent,
     {
         throw rc;
     }
-    set_size(Size(width, height));
+    if (width != 0  && height != 0)
+    {
+        set_resize_policy(FixedSize);
+        set_size(Size(width, height));
+    }
+    else
+    {
+        update_size();
+        pack(x,y);
+    }
 
     //init glut callbacks
     glutDisplayFunc (display_func);
