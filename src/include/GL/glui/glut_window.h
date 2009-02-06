@@ -164,7 +164,7 @@ namespace GLUI
         //    Draw GLUI window
         glLoadIdentity();
         this->SetOrthoProjection();
-        glTranslatef(0, 0, BOTTOM_VIEWPORT + 1);
+        glTranslatef(x, y, BOTTOM_VIEWPORT + 1);
         drawinghelpers::draw_box( this->Width(),
                 this->Height(),
                 NULL);

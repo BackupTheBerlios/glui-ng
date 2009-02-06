@@ -184,7 +184,7 @@ void drawinghelpers::draw_active_box( int active, int x_min, int x_max, int y_mi
 
 /////////////////////////////////////////////////////////////////////////////
 
-void   drawinghelpers::draw_emboss_box(int x_min,int x_max,int y_min,int y_max)
+void drawinghelpers::draw_emboss_box(int x_min,int x_max,int y_min,int y_max)
 {
   glLineWidth( 1.0 );
   glColor3f( 1.0, 1.0, 1.0 );
@@ -218,7 +218,7 @@ drawinghelpers::buffer_mode_t drawinghelpers::get_buffer_mode() {
 }
 
 /////////////////////////////////////////////////////////////////////////////
-void          drawinghelpers::PostRedisplay(Control* ctrl)
+void drawinghelpers::PostRedisplay(Control* ctrl)
 {
         ::XEvent EventToForward;
     //ask for redisplay of window
@@ -232,6 +232,196 @@ void          drawinghelpers::PostRedisplay(Control* ctrl)
     if ( cont != NULL)
     {
         cont->AddEvent(&EventToForward);
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////
+void drawinghelpers::ConvertglColorPointer(GLint size, //<  how many components 3 (RGB) or 4(RGBA)
+                    GLenum intype,  //< type of the input
+                    const GLvoid *inpointer, //< pointer of the datas
+                    GLenum outype,  //< type of the output
+                    const GLvoid *outpointer  //<pointer to the outputdata
+                    )
+{
+    if (!(
+                (size >= 3 || size <= 4) &&
+                (intype == GL_BYTE           ||
+                 intype == GL_UNSIGNED_BYTE  ||
+                 intype == GL_SHORT          ||
+                 intype == GL_UNSIGNED_SHORT ||
+                 intype == GL_INT            ||
+                 intype == GL_UNSIGNED_INT   ||
+                 intype == GL_FLOAT          ||
+                 intype == GL_DOUBLE)    &&
+                (outype == GL_BYTE           ||
+                 outype == GL_UNSIGNED_BYTE  ||
+                 outype == GL_SHORT          ||
+                 outype == GL_UNSIGNED_SHORT ||
+                 outype == GL_INT            ||
+                 outype == GL_UNSIGNED_INT   ||
+                 outype == GL_FLOAT          ||
+                 outype == GL_DOUBLE)    &&
+                ( inpointer != NULL )    &&
+                ( outpointer != NULL )
+         )
+         )
+         {
+        throw(GL_INVALID_VALUE);
+    }
+    double colorelem[4];
+    switch (intype)
+    {
+        case GL_BYTE :
+            {
+                int8_t *bkgd_color = (int8_t*) inpointer;
+                colorelem[0] = (double)bkgd_color[0] * 1.0 / INT8_MAX;
+                colorelem[1] = (double)bkgd_color[1] * 1.0 / INT8_MAX;
+                colorelem[2] = (double)bkgd_color[2] * 1.0 / INT8_MAX;
+                if (size==4) colorelem[3] = (double)bkgd_color[3] * 1.0 / INT8_MAX;
+            }
+            break;
+        case GL_UNSIGNED_BYTE :
+            {
+                uint8_t *bkgd_color = (uint8_t*) inpointer;
+                colorelem[0] = (double)bkgd_color[0] * 1.0 / UINT8_MAX;
+                colorelem[1] = (double)bkgd_color[1] * 1.0 / UINT8_MAX;
+                colorelem[2] = (double)bkgd_color[2] * 1.0 / UINT8_MAX;
+                if (size==4) colorelem[3] = (double)bkgd_color[3] * 1.0 / UINT8_MAX;
+            }
+            break;
+        case GL_SHORT:
+            {
+                int16_t *bkgd_color = (int16_t*) inpointer;
+                colorelem[0] = (double)bkgd_color[0] * 1.0 / INT16_MAX;
+                colorelem[1] = (double)bkgd_color[1] * 1.0 / INT16_MAX;
+                colorelem[2] = (double)bkgd_color[2] * 1.0 / INT16_MAX;
+                if (size==4) colorelem[3] = (double)bkgd_color[3] * 1.0 / INT16_MAX;
+            }
+            break;
+        case GL_UNSIGNED_SHORT:
+            {
+                uint16_t *bkgd_color = (uint16_t*) inpointer;
+                colorelem[0] = (double)bkgd_color[0] * 1.0 / UINT16_MAX;
+                colorelem[1] = (double)bkgd_color[1] * 1.0 / UINT16_MAX;
+                colorelem[2] = (double)bkgd_color[2] * 1.0 / UINT16_MAX;
+                if (size==4) colorelem[3] = (double)bkgd_color[3] * 1.0 / UINT16_MAX;
+            }
+            break;
+        case GL_INT:
+            {
+                int32_t *bkgd_color = (int32_t*) inpointer;
+                colorelem[0] = (double)bkgd_color[0] * 1.0 / INT32_MAX;
+                colorelem[1] = (double)bkgd_color[1] * 1.0 / INT32_MAX;
+                colorelem[2] = (double)bkgd_color[2] * 1.0 / INT32_MAX;
+                if (size==4) colorelem[3] = (double)bkgd_color[3] * 1.0 / INT32_MAX;
+            }
+            break;
+        case GL_UNSIGNED_INT:
+            {
+                uint32_t *bkgd_color = (uint32_t*) inpointer;
+                colorelem[0] = (double)bkgd_color[0] * 1.0 / UINT32_MAX;
+                colorelem[1] = (double)bkgd_color[1] * 1.0 / UINT32_MAX;
+                colorelem[2] = (double)bkgd_color[2] * 1.0 / UINT32_MAX;
+                if (size==4) colorelem[3] = (double)bkgd_color[3] * 1.0 / UINT32_MAX;
+            }
+            break;
+        case GL_FLOAT:
+            {
+                float *bkgd_color = (float*) inpointer;
+                colorelem[0] = (double)bkgd_color[0];
+                colorelem[1] = (double)bkgd_color[1];
+                colorelem[2] = (double)bkgd_color[2];
+                if (size==4) colorelem[3] = (double)bkgd_color[3];
+            }
+            break;
+        case GL_DOUBLE:
+            {
+                double *bkgd_color = (double*) inpointer;
+                colorelem[0] = (double)bkgd_color[0];
+                colorelem[1] = (double)bkgd_color[1];
+                colorelem[2] = (double)bkgd_color[2];
+                if (size==4) colorelem[3] = (double)bkgd_color[3];
+            }
+            break;
+        default:
+            throw(GL_INVALID_VALUE);
+    }
+    switch (outype)
+    {
+        case GL_BYTE :
+            {
+                int8_t *bkgd_color = (int8_t*) outpointer;
+                bkgd_color[0] = (int8_t)(colorelem[0] * INT8_MAX);
+                bkgd_color[1] = (int8_t)(colorelem[1] * INT8_MAX);
+                bkgd_color[2] = (int8_t)(colorelem[2] * INT8_MAX);
+                if (size==4) bkgd_color[3] = (int8_t)(colorelem[3] * INT8_MAX);
+            }
+            break;
+        case GL_UNSIGNED_BYTE :
+            {
+                uint8_t *bkgd_color = (uint8_t*) outpointer;
+                bkgd_color[0] = (uint8_t)(colorelem[0] * UINT8_MAX);
+                bkgd_color[1] = (uint8_t)(colorelem[1] * UINT8_MAX);
+                bkgd_color[2] = (uint8_t)(colorelem[2] * UINT8_MAX);
+                if (size==4) bkgd_color[3] = (uint8_t)(colorelem[3] * UINT8_MAX);
+            }
+            break;
+        case GL_SHORT:
+            {
+                int16_t *bkgd_color = (int16_t*) outpointer;
+                bkgd_color[0] = (int16_t)(colorelem[0] * INT16_MAX);
+                bkgd_color[1] = (int16_t)(colorelem[1] * INT16_MAX);
+                bkgd_color[2] = (int16_t)(colorelem[2] * INT16_MAX);
+                if (size==4) bkgd_color[3] = (int16_t)(colorelem[3] * INT16_MAX);
+            }
+            break;
+        case GL_UNSIGNED_SHORT:
+            {
+                uint16_t *bkgd_color = (uint16_t*) outpointer;
+                bkgd_color[0] = (uint16_t)(colorelem[0] * UINT16_MAX);
+                bkgd_color[1] = (uint16_t)(colorelem[1] * UINT16_MAX);
+                bkgd_color[2] = (uint16_t)(colorelem[2] * UINT16_MAX);
+                if (size==4) bkgd_color[3] = (uint16_t)(colorelem[3] * UINT16_MAX);
+            }
+            break;
+        case GL_INT:
+            {
+                int32_t *bkgd_color = (int32_t*) outpointer;
+                bkgd_color[0] = (int32_t)(colorelem[0] * INT32_MAX);
+                bkgd_color[1] = (int32_t)(colorelem[1] * INT32_MAX);
+                bkgd_color[2] = (int32_t)(colorelem[2] * INT32_MAX);
+                if (size==4) bkgd_color[3] = (int32_t)(colorelem[3] * INT32_MAX);
+            }
+            break;
+        case GL_UNSIGNED_INT:
+            {
+                uint32_t *bkgd_color = (uint32_t*) outpointer;
+                bkgd_color[0] = (uint32_t)(colorelem[0] * UINT32_MAX);
+                bkgd_color[1] = (uint32_t)(colorelem[1] * UINT32_MAX);
+                bkgd_color[2] = (uint32_t)(colorelem[2] * UINT32_MAX);
+                if (size==4) bkgd_color[3] = (uint32_t)(colorelem[3] * UINT32_MAX);
+            }
+            break;
+        case GL_FLOAT:
+            {
+                float *bkgd_color = (float*) outpointer;
+                bkgd_color[0] = (float)colorelem[0];
+                bkgd_color[1] = (float)colorelem[1];
+                bkgd_color[2] = (float)colorelem[2];
+                if (size==4) bkgd_color[3] = (float)colorelem[3];
+            }
+            break;
+        case GL_DOUBLE:
+            {
+                double *bkgd_color = (double*) outpointer;
+                bkgd_color[0] = (double)colorelem[0];
+                bkgd_color[1] = (double)colorelem[1];
+                bkgd_color[2] = (double)colorelem[2];
+                if (size==4) bkgd_color[3] = (double)colorelem[3];
+            }
+            break;
+        default:
+            throw(GL_INVALID_VALUE);
     }
 }
 
