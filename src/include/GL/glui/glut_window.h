@@ -100,6 +100,7 @@ namespace GLUI
             virtual int AddEvent (::XEvent* event);
             WindowId GetWindowId();
             virtual void draw();
+            virtual void idle(); //< shall not rely on that, it binds you to GLUT
 
         public: //XMethods
             virtual void XMapWindow();
@@ -144,6 +145,7 @@ namespace GLUI
             static void motion_func(int,int);
             static void display_func(void);
             static void entry_func(int);
+            static void idle_func();
 
         protected: //variables
             unsigned int KeyModifierState;

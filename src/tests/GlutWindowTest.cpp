@@ -1,6 +1,8 @@
 #include <GL/glui/window.h>
 #include <unistd.h>
 #include <assert.h>
+#include <time.h>
+#include <stdlib.h>
 using namespace GLUI;
 
 #if (__USE_XLIB == 1 || __USE_WIN32 == 1 )
@@ -10,12 +12,37 @@ int main(int argc, char* argv[])
 }
 #else
 
+#if defined(GLUI_FREEGLUT)
+
+// FreeGLUT does not yet work perfectly with GLUI
+//  - use at your own risk.
+
+
+#include <GL/freeglut.h>
+
+#elif defined(GLUI_OPENGLUT)
+
+// OpenGLUT does not yet work properly with GLUI
+//  - use at your own risk.
+
+#include <GL/openglut.h>
+
+#else
+
+#ifdef __APPLE__
+#include <GLUT/glut.h>
+#else
+#include <GL/glut.h>
+#endif
+#endif
+
+
 class myGluiWin : public GLUIWindow
 {
     public :
         myGluiWin(Display* glutDisplay) : GLUIWindow(glutDisplay,
                                             glutDisplay->DefaultScreen()->RootWindow(),
-                                            0, 0,
+                                            -1, -1,
                                             200, 200,
                                             1,
                                             1,
@@ -24,6 +51,7 @@ class myGluiWin : public GLUIWindow
         set_resize_policy(FixedSize);
     }
        virtual void draw(void);
+       virtual void idle(void);
 };
 
 
@@ -92,14 +120,33 @@ void myGluiWin::draw(void)
 
 }
 
+
+void myGluiWin::idle(void)
+{
+    struct timespec sleeptime = { 0, 100000000 };
+    static int count = 0;
+
+    if (count < 50)
+      {
+        count++;
+        nanosleep(&sleeptime, NULL);
+      }
+    else
+      {
+        XUnmapWindow();
+        delete(this); 
+        exit(0);
+      }
+
+}
+
 int main(int argc, char** argv)
 {
-    //glutWindow->init(&argc, argv);  //optional
+    GLUIWindow::init(&argc, argv);  //optional
     Display*    glutDisplay = new Display("glut display");
     GLUIWindow* glutWindow = new myGluiWin(glutDisplay);
     glutWindow->XMapWindow();
-    sleep(5);
-    glutWindow->XUnmapWindow();
+    glutMainLoop ();
 
 }
 #endif

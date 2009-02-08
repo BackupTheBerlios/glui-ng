@@ -52,7 +52,7 @@ namespace GLUI
     {
 #warning "protect this with a const cast"
         return bkgd_color;
-    };
+    }
 
 
 }

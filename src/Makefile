@@ -45,7 +45,7 @@ CPPFLAGS += -I/usr/X11R6/include
 GLUI_HEADERS = $(shell find include -type f)
 
 #######################################
-GLUI_SRC = $(shell find  -maxdepth 1 -regex '.*\.cpp\|.*\.c')
+GLUI_SRC = $(shell find  -maxdepth 1 -regex '.*\.cpp\|.*\.c' -printf '%f\n')
 GLUI_OBJS = $(addprefix GENERATED/,$(addsuffix .o,$(basename ${GLUI_SRC})))
 
 GLUI_LIB = GENERATED/lib/libglui.a
@@ -56,14 +56,15 @@ GLUI_TOOLS = GENERATED/bin/ppm2array
 
 all: $(GLUI_LIB) examples tools
 
-$(GLUI_LIB) : setup
+$(GLUI_LIB) : GENERATED
+
 testplan : tests
 	./tests/testplan.sh
 
 tests : $(GLUI_LIB)
 	make -C tests $@
 
-setup:
+GENERATED:
 	mkdir -p GENERATED
 	mkdir -p GENERATED/bin
 	mkdir -p GENERATED/lib
@@ -79,7 +80,7 @@ GENERATED/bin/ppm2array: tools/ppm2array.cpp tools/ppm.cpp
 GENERATED/bin/%: example/%.cpp $(GLUI_LIB)
 	$(CXX) $(CPPFLAGS) -o $@ $<  $(LIBGLUI) $(LIBGLUT) $(LIBGL) $(LIBS)
 
-$(GLUI_LIB): $(GLUI_OBJS)
+$(GLUI_LIB): GENERATED $(GLUI_OBJS)
 	ar -r $(GLUI_LIB) $(GLUI_OBJS)
 
 ${GLUI_OBJS}: ${GLUI_HEADERS}

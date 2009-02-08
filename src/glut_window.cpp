@@ -169,10 +169,11 @@ int GlutWindow::_GlutWindow(Display* display, WindowId parent,
     y_off_bot   = 0;
     x_off_left  = 0;
     x_off_right = 0;
-
-    int argc=0;
-    GlutWindow::init(&argc, NULL);
-
+      {
+        int argc=1;
+        char* argv[1] = { "glutnoname" };
+        GlutWindow::init(&argc, argv);
+      }
     if ( win == NULL ) {  // not a subwindow, creating a new top-level window
         int old_glut_window = glutGetWindow();
 
@@ -226,7 +227,7 @@ int GlutWindow::_GlutWindow(Display* display, WindowId parent,
     glutPassiveMotionFunc (passive_motion_func);
     glutEntryFunc (entry_func);
     glutVisibilityFunc (visibility_func);
-    glutIdleFunc (NULL);
+    glutIdleFunc (idle_func);
 
 }
 
@@ -265,21 +266,20 @@ int GlutWindow::AddEvent (::XEvent *event)
 
 int GlutWindow::AddEvent(::XResizeRequestEvent *event)
 {
-    ::XResizeRequestEvent *theEvent = (::XResizeRequestEvent*) &event;
-    CurrentSize.size.w = theEvent->width;
-    CurrentSize.size.h = theEvent->height;
 
     this->pack(x, y);
 
-    if ( theEvent->width  != CurrentSize.size.w ||
-            theEvent->height != CurrentSize.size.h ) {
+    if ( event->width  != this->CurrentSize.size.w ||
+            event->height != this->CurrentSize.size.h ) {
+        this->CurrentSize.size.w = event->width;
+        this->CurrentSize.size.h = event->height;
         glutSetWindow( this->GlutWindowId );
-        glutReshapeWindow( CurrentSize.size.w, CurrentSize.size.h );
+        glutReshapeWindow( this->CurrentSize.size.w, this->CurrentSize.size.h );
     }
     else {
     }
 
-    glViewport( 0, 0, CurrentSize.size.w, CurrentSize.size.h);
+    glViewport( 0, 0, this->CurrentSize.size.w, this->CurrentSize.size.h);
 
     debug::Instance()->print( __FILE__, __LINE__, _level,
             "%d: %d\n", glutGetWindow(), this->flags );
@@ -650,63 +650,25 @@ void GlutWindow::visibility_func (int state)
 
 /********************************************** glui_idle_func() ********/
 /* Send idle event to each glui, then to the main window            */
-/*
 #warning "reput y axis up on event"
+void GlutWindow::idle (void)
+{
+        struct timespec sleeptime = { 0, 100000000 };
+        nanosleep(&sleeptime, NULL);
+}
+
+
 void GlutWindow::idle_func (void)
 {
-#warning "don't know what to do with that"
-    GlutWindow* win = MasterObject::Instance()->FindWindow(glutGetWindow());
-    while (glui)
+    int current_window = glutGetWindow ();
+    GlutWindow *glut_window = MasterObject::Instance()->FindWindow(glutGetWindow());
+
+    if (glut_window)
     {
-        debug::Instance()->print( __FILE__, __LINE__, _level,
-                "IDLE \t" );
-
-        if ( active_control != NULL ) {
-            // First we check if the control actually needs the idle right now.
-            // Otherwise, let's avoid wasting cycles and OpenGL context switching
-
-            if ( active_control->needs_idle() ) {
-                // Set the current glut window to the glui window
-                // But don't change the window if we're already at that window
-
-                if ( GlutWindowId > 0 && glutGetWindow() != GlutWindowId ) {
-                    glutSetWindow( GlutWindowId );
-                }
-
-                active_control->idle();
-            }
-        }
-
-        finish_drawing ();
-
-        glui = (GLUI *) glui->next ();
+        glut_window->idle();
     }
 
-    if (MasterObject::Instance()->glut_idle_CB)
-    {
-        // We set the current glut window before calling the user's
-        //idle function, even though glut explicitly says the window id is
-        //undefined in an idle callback.
-
-        // Check what the current window is first
-
-        // Arbitrarily set the window id to the main gfx window of the
-        //first glui window
-        //   int current_window, new_window;
-        //   current_window = glutGetWindow();
-        //   if (MasterObject::Instance()->gluis.first_child() != NULL ) {
-        //      new_window = ((GLUI_Main*)MasterObject::Instance()->gluis.first_child())->
-        //   main_gfx_window_id;
-        //   if ( new_window > 0 && new_window != old_window ) {
-        //   --- Window is changed only if its not already the current window ---
-        //  glutSetWindow( new_window );
-        // }
-        //}
-
-        MasterObject::Instance()->glut_idle_CB ();
-    }
 }
-*/
-/****************************** GLUI_Main::idle() **************/
+
 
 

@@ -2,6 +2,8 @@
 #include <unistd.h>
 #include <assert.h>
 #include <time.h>
+#include <stdlib.h>
+
 using namespace GLUI;
 
 #if (__USE_XLIB == 1 || __USE_WIN32 == 1 )
@@ -27,6 +29,9 @@ class myGluiWin : public GLUIWindow
         virtual int AddEvent(::XKeyEvent* event);
        virtual void draw(void);
        void simulatekey();
+       virtual void idle(void);
+
+
     public : //variables
        float Angle;
 };
@@ -134,19 +139,35 @@ void myGluiWin::draw(void)
 
 }
 
+
+void myGluiWin::idle(void)
+{
+    struct timespec sleeptime = { 0, 100000000 };
+    static int count = 0;
+
+    if (count < 50)
+      {
+        struct timespec sleeptime = { 0, 100000000 };
+        this->simulatekey();
+        nanosleep(&sleeptime, NULL);
+        count++;
+      }
+    else
+      {
+        this->XUnmapWindow();
+        delete(this); 
+        exit(0);
+      }
+
+}
+
 int main(int argc, char** argv)
 {
     //glutWindow->init(&argc, argv);  //optional
     Display*    glutDisplay = new Display("glut display");
     myGluiWin* glutWindow = new myGluiWin(glutDisplay);
     glutWindow->XMapWindow();
-    for (uint8_t i=0; i<25; i++)
-    {
-        struct timespec sleeptime = { 0, 100000000 };
-        glutWindow->simulatekey();
-        nanosleep(&sleeptime, NULL);
-    }
-    glutWindow->XUnmapWindow();
+    glutMainLoop ();
 
 }
 #endif

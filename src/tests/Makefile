@@ -22,7 +22,7 @@ endif
 
 CPPFLAGS += -I../ -I../include $(OPTS)
 
-LIBGLUI = -L../lib -lglui
+LIBGLUI = -L../GENERATED/lib -lglui
 LIBGL   = -lGLU -lGL
 LIBS    = -lXext -lX11  -lm
 
@@ -55,7 +55,7 @@ GLUI_TESTS+= GlutWindowTest GlutKeyboardTest GlutKeyboardUserTest
 
 tests : all
 
-all: $(GLUI_LIB) ${GLUI_TESTS}
+all: $(GLUI_LIB) $(addprefix GENERATED/bin/,${GLUI_TESTS})
 
 
 examples: $(GLUI_EXAMPLES)
@@ -63,9 +63,15 @@ examples: $(GLUI_EXAMPLES)
 tools: $(GLUI_TOOLS)
 
 
-${GLUI_TESTS}: $(addsuffix .cpp,${GLUI_TESTS}) $(GLUI_LIB)
+$(addprefix GENERATED/bin/,${GLUI_TESTS}) : GENERATED $(addsuffix .cpp,${GLUI_TESTS})
+
+GENERATED :
+	mkdir -p GENERATED/bin
+
+GENERATED/bin/%: %.cpp $(GLUI_LIB)
 	echo "    [EXE] $(addsuffix .cpp,$@)"
-	$(CXX) $(CPPFLAGS) -o $@ $(addsuffix .cpp,$@)  $(GLUI_LIB) $(LIBGLUT) $(LIBGL) $(LIBS)
+	$(CXX) $(CPPFLAGS) -o $@ $<  $(LIBGLUI) $(LIBGLUT) $(LIBGL) $(LIBS)
+
 
 
 .cpp.o: ${GLUI_HEADERS}
@@ -78,7 +84,7 @@ ${GLUI_TESTS}: $(addsuffix .cpp,${GLUI_TESTS}) $(GLUI_LIB)
 
 
 clean:
-	rm -f *.o $(addsuffix ${EXE},$(GLUI_TESTS))
+	rm -rf GENERATED
 
 
 
