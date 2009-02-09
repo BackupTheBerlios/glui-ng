@@ -47,12 +47,12 @@ namespace GLUI
     class GLUIAPI Container : public Control
     {
         public : //enums
-            enum orientation{ horizontal, vertical, useparent};
+            enum orientation{ useparent, TopDown, BottomUp, LeftToRight, RightToLeft};
             enum alignement{ left, center, right };
 
         public : //methods
             Container(const char *name,
-                    orientation orient=vertical);
+                    orientation orient=TopDown);
             virtual ~Container();
 
             virtual void update_size( void ); //<recursively update all control sizes
@@ -97,9 +97,9 @@ namespace GLUI
 
 
             virtual int Activate(); //< activate the current control
+            orientation GetParentOrientation();
 
         protected : //internal API
-            void check_size_constency( void );
             Control* FindChildWidget(int x, int y);
             int BroadcastEvent(::XEvent* event, int EventType, long mask_check);
             int ForwardEvent(::XEvent* event, int* eventX, int* eventY, int EventType, long mask_check);

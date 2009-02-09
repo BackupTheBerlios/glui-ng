@@ -1,6 +1,9 @@
 #include <GL/glui/window.h>
 #include <unistd.h>
 #include <assert.h>
+#include <time.h>
+#include <stdlib.h>
+
 using namespace GLUI;
 
 #if (__USE_XLIB == 1 || __USE_WIN32 == 1 )
@@ -9,7 +12,53 @@ int main(int argc, char* argv[])
     return 0;
 }
 #else
+/////////////////////////////////////////////////////////////////////
+class myControl : public Control
+{
+    public :
+        myControl(const char* name);
+        virtual void draw();
+        virtual int AddEvent(::XKeyEvent* event);
+    private:
+        float fColors[3];
+};
 
+myControl::myControl(const char* name) :
+    Control(name)
+{
+    fColors[0] = 1.0;
+    fColors[2] = 0.0;
+    set_size(Size(200u,10u));
+    x_off_left = 0;
+    x_off_right = 0;
+    y_off_top  = 0;
+    y_off_bot = 0;
+}
+
+int myControl::AddEvent(::XKeyEvent* event)
+{
+    float previous_red = fColors[0];
+    fColors[0] = fColors[2];
+    fColors[2] = previous_red;
+    drawinghelpers::PostRedisplay(this);
+}
+
+void myControl::draw()
+{
+    GLint iColorArray[4][3];
+    float fColorArray[4][3] = { fColors[0], 0.0, fColors[2],
+        fColors[0], 0.0, fColors[2],
+        fColors[0], 0.0, fColors[2],
+        fColors[0], 0.0, fColors[2] };
+    for (uint8_t i=0; i<4; i++)
+    {
+        drawinghelpers::ConvertglColorPointer(3, GL_FLOAT, fColorArray[i], GL_INT, iColorArray[i]);
+    }
+    drawinghelpers::draw_box(CurrentSize.size.w, CurrentSize.size.h, &(iColorArray[0][0]));
+}
+
+
+////////////////////////////////////////////////////////////////////
 class myGluiWin : public GLUIWindow
 {
     public :
@@ -19,15 +68,21 @@ class myGluiWin : public GLUIWindow
                                             200, 200,
                                             1,
                                             1,
-                                            0)
+                0),
+            ctrl("top box")
             {
                 Angle = 0;
+        add_control(&ctrl);
             }
         virtual int AddEvent(::XKeyEvent* event);
        virtual void draw(void);
        void simulatekey();
+       virtual void idle(void);
+
+
     public : //variables
-       float Angle;
+        float Angle;
+        myControl ctrl;
 };
 
 int myGluiWin::AddEvent(::XKeyEvent* event)
@@ -133,15 +188,34 @@ void myGluiWin::draw(void)
 
 }
 
+void myGluiWin::idle(void)
+{
+    struct timespec sleeptime = { 0, 100000000 };
+    static int count = 0;
+
+    if (count < 500)
+      {
+        struct timespec sleeptime = { 0, 100000000 };
+        nanosleep(&sleeptime, NULL);
+        count++;
+      }
+    else
+      {
+        this->XUnmapWindow();
+        delete(this);
+        exit(0);
+      }
+
+}
+
+//////////////////////////////////////////////////////////////////////////////////////
 int main(int argc, char** argv)
 {
     //glutWindow->init(&argc, argv);  //optional
     Display*    glutDisplay = new Display("glut display");
     myGluiWin* glutWindow = new myGluiWin(glutDisplay);
     glutWindow->XMapWindow();
-      // Turn the flow of control over to GLUT
     glutMainLoop ();
-    glutWindow->XUnmapWindow();
 
 }
 #endif

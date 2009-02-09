@@ -58,7 +58,7 @@ Checkbox::Checkbox( Node *parent,
 
     parent->add_control( this );
     this->resizeable = AdaptThisToFitChilds;
-    this->CurrOrientation = Container::horizontal;
+    this->CurrOrientation = Container::LeftToRight;
 #warning "fix this : hardcoded value, replace this code with real opengl call"
 #warning "and create a toogle button class for checkbox"
     this->x_off_left = 15;

@@ -94,7 +94,7 @@ int main(int argc, char* argv[])
     assert(root.Height() == branch1.Height() + branch2.Height() + root.YOffTop() + root.YOffBot());
 
     //horizontal orientation
-    root.set_orientation(Container::horizontal);
+    root.set_orientation(Container::LeftToRight);
 
     assert(branch1.Width() == leefb1.Width() + branch1.XOffLeft() + branch1.XOffRight());
     assert(branch1.Height() == leefb1.Height() + branch1.YOffTop() + branch1.YOffBot());

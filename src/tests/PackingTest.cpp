@@ -62,18 +62,41 @@ int main(int argc, char* argv[])
     root.add_control(&branch2);
 
     branch1.add_control(&leefb1);
+    branch1.set_orientation(Container::useparent);
 
     branch2.add_control(&leef1b2);
     branch2.add_control(&leef2b2);
+    branch2.set_orientation(Container::useparent);
 
-    leefb1.set_size(Control::Size(10u,20u));  //position 0x 0y size 10x 20y
-    leef1b2.set_size(Control::Size(10u,30u)); //position 0x 20y size 10 30
-    leef2b2.set_size(Control::Size(10u,10u)); //position 0x 50y size 10 10
+    leefb1.set_size(Control::Size(10u,20u));
+    leef1b2.set_size(Control::Size(10u,30u));
+    leef2b2.set_size(Control::Size(10u,10u));
 
+    root.set_orientation(Container::TopDown);
+    assert( branch1.X() == root.XOffLeft() && branch1.Y() == (root.Height() - root.YOffTop() - branch1.Height()) );
+    assert( branch2.X() == root.XOffLeft() && branch2.Y() == root.YOffBot());
+    assert( leefb1.X()  == root.XOffLeft() && leefb1.Y()  == (root.Height() - root.YOffTop() - branch1.YOffTop() - leefb1.Height()));
+    assert( leef1b2.X() == root.XOffLeft() && leef1b2.Y() == leef1b2.Height() + root.YOffBot());
+    assert( leef2b2.X() == root.XOffLeft() && leef2b2.Y() == root.YOffBot());
+    root.set_orientation(Container::BottomUp);
     assert( branch1.X() == 0 && branch1.Y() == 0);
     assert( branch2.X() == 0 && branch2.Y() == branch1.Height());
     assert( leefb1.X()  == 0 && leefb1.Y()  == 0);
     assert( leef1b2.X() == 0 && leef1b2.Y() == branch1.Height());
     assert( leef2b2.X() == 0 && leef2b2.Y() == branch1.Height() + leef1b2.Height());
+    root.set_orientation(Container::LeftToRight);
+    assert( branch1.X() == 0 && branch1.Y() == 0);
+    assert( branch2.X() == 0 && branch2.Y() == branch1.Height());
+    assert( leefb1.X()  == 0 && leefb1.Y()  == 0);
+    assert( leef1b2.X() == 0 && leef1b2.Y() == branch1.Height());
+    assert( leef2b2.X() == 0 && leef2b2.Y() == branch1.Height() + leef1b2.Height());
+    root.set_orientation(Container::RightToLeft);
+    assert( branch1.X() == 0 && branch1.Y() == 0);
+    assert( branch2.X() == 0 && branch2.Y() == branch1.Height());
+    assert( leefb1.X()  == 0 && leefb1.Y()  == 0);
+    assert( leef1b2.X() == 0 && leef1b2.Y() == branch1.Height());
+    assert( leef2b2.X() == 0 && leef2b2.Y() == branch1.Height() + leef1b2.Height());
+
+
 
 }

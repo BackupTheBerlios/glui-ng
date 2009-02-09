@@ -97,7 +97,7 @@ namespace GLUI
     {
         public :
             _Window(const char *name,
-                    Container::orientation orient=Container::vertical);
+                    Container::orientation orient=Container::TopDown);
             virtual int AddEvent (::XEvent *event)=0;
         public :  //operators
             void  set_ortho_projection( void );

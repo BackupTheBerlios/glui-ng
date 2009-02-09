@@ -70,7 +70,7 @@ GENERATED :
 	mkdir -p GENERATED/bin
 
 GENERATED/bin/%: %.cpp $(GLUI_LIB)
-	echo "    [EXE] $(addsuffix .cpp,$@)"
+	echo "    [EXE] $@"
 	$(CXX) $(CPPFLAGS) -o $@ $<  $(LIBGLUI) $(LIBGLUT) $(LIBGL) $(LIBS)
 
 

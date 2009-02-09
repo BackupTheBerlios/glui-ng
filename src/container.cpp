@@ -64,39 +64,6 @@ Container::~Container()
 
 }
 
-///////////////////////////////////////////////////////////////////////////////////////
-inline void Container::check_size_constency( void )
-{
-    Node* node;
-    Control* child;
-    int width(0);
-    int height(0);
-
-    node = this->first_child();
-    while (NULL != node)
-    {
-        child = dynamic_cast<Control*>(node);
-        if (NULL != child)
-        {
-          if (CurrOrientation == horizontal )
-                {
-                    width += child->Width() ;
-                    height = max<int> (this->CurrentSize.size.h, child->Height());
-                }
-                else
-                {
-                    width = max<int> (this->CurrentSize.size.w, child->Width());
-                    height += child->Height();
-                }
-        }
-        node = node->next();
-    }
-    if (width > this->CurrentSize.size.w) this->CurrentSize.size.w = width;
-    if(height > this->CurrentSize.size.h) this->CurrentSize.size.h = height;
-
-
-
-}
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -105,6 +72,10 @@ void Container::update_size( void )
 {
     Node* node;
     Control* child;
+
+    orientation theOrient = CurrOrientation;
+    if( theOrient == useparent ) theOrient = GetParentOrientation();
+
     if ( this->resizeable == PercentOfParent || //fixed size computed from parent
          this->resizeable == FixedSize //we have a fixed size
        )
@@ -125,12 +96,12 @@ void Container::update_size( void )
             {
                 child->update_size();
 
-                if (CurrOrientation == horizontal )
+                if (theOrient == LeftToRight || theOrient == RightToLeft )
                 {
                     width += child->Width();
                     height = max<int> (height, child->Height());
                 }
-                else
+                else if (theOrient == TopDown || theOrient == BottomUp )
                 {
                     width = max<int> (width, child->Width());
                     height += child->Height();
@@ -146,12 +117,12 @@ void Container::update_size( void )
             node = this->first_child();
             Size newsize;
 
-            if (CurrOrientation == horizontal )
+            if (theOrient == LeftToRight || theOrient == RightToLeft)
             {
                 newsize.size.w = (this->CurrentSize.size.w - width) / FillSpaceCount;
                 newsize.size.h = this->CurrentSize.size.h;
             }
-            else
+            else if (theOrient == TopDown || theOrient == BottomUp )
             {
                 newsize.size.w = this->CurrentSize.size.w;
                 newsize.size.h = (this->CurrentSize.size.h - width) / FillSpaceCount;
@@ -190,12 +161,12 @@ void Container::update_size( void )
             {
                 child->update_size();
 
-                if (CurrOrientation == horizontal )
+                if (theOrient == LeftToRight || theOrient == RightToLeft)
                 {
                     width += child->Width();
                     height = max<int> (height, child->Height() );
                 }
-                else
+                else if (theOrient == TopDown || theOrient == BottomUp )
                 {
                     width = max<int> (width, child->Width());
                     height += child->Height() ;
@@ -206,7 +177,6 @@ void Container::update_size( void )
         this->CurrentSize.size.w = width;
         this->CurrentSize.size.h = height;
     }
-    check_size_constency();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -215,26 +185,45 @@ void Container::pack (int x, int y)
     Node* node;
     Control* child;
     node = this->first_child();
+    orientation theOrient = CurrOrientation;
+    if( theOrient == useparent ) theOrient = GetParentOrientation();
 
     this->x = x;
     this->y = y;
-
     int x_offset = 0;
     int y_offset = 0;
+
 
     while (NULL != node)
     {
         child = dynamic_cast<Control*>(node);
         if ( NULL != child)
         {
-            child->pack(x + x_offset, y + y_offset);
-            if (CurrOrientation == horizontal )
+            if (theOrient == TopDown || theOrient == BottomUp )
             {
-                x_offset += child->Width();
+                if (theOrient == TopDown)
+                {
+                    y_offset += child->Height();  //increment before setting
+                    child->pack(x, y + this->Height() - y_off_top - y_offset);
+                }
+                else
+                {
+                    child->pack(x, y + y_offset);
+                    y_offset += child->Height();
+                }
             }
-            else
+            else if (theOrient == LeftToRight || theOrient == RightToLeft)
             {
-               y_offset += child->Height();
+                if (theOrient == LeftToRight)
+                {
+                    child->pack(x + x_offset, y);
+                    x_offset += child->Width();
+                }
+                else
+                {
+                    x_offset += child->Width();  //increment before setting
+                    child->pack(x + this->Width() - x_off_right - x_offset, y);
+                }
             }
         }
         node = node->next();
@@ -243,8 +232,21 @@ void Container::pack (int x, int y)
 
 }
 
-
-
+///////////////////////////////////////////////////////////////////////////////////////
+Container::orientation Container::GetParentOrientation()
+{
+    Container* parent = dynamic_cast<Container*>(this->parent());
+    if (CurrOrientation == useparent && NULL != parent)
+    {
+        return parent->GetParentOrientation();
+    }
+    else if (NULL == parent)
+    {
+        // even the top most parent has useparent, so arbitraly choose TopDown
+        return TopDown;
+    }
+    return CurrOrientation;
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////
 #warning "remove alignement code and create spacer control instead"
@@ -557,7 +559,8 @@ int Container::BroadcastEvent(::XEvent* event, int type, long mask_check)
     while (child != NULL && rc == 0)
     {
         rc = child->AddEvent(event);
-        Control* child = dynamic_cast<Control*>(child->next());
+        Node* sibling = child->next();
+        Control* child = dynamic_cast<Control*>(sibling);
     }
     //the event is for this widget and not a child
     return rc;

@@ -42,7 +42,7 @@ class GLUIAPI Collapsible : public Container
 {
     public  :
         Collapsible(const char *name,
-                   orientation orient=Container::vertical);
+                   orientation orient=Container::TopDown);
         void  open               (  bool recurse=false );
         void  close              (  bool recurse=false );
 
