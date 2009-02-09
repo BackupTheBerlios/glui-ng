@@ -184,8 +184,6 @@ void myGluiWin::draw(void)
 
 }
 
-<<<<<<< HEAD:src/tests/GlutKeyboardTest.cpp
-
 void myGluiWin::idle(void)
 {
     struct timespec sleeptime = { 0, 100000000 };
@@ -207,9 +205,7 @@ void myGluiWin::idle(void)
 
 }
 
-=======
 //////////////////////////////////////////////////////////////////////////////////////
->>>>>>> FixPacking:src/tests/GlutKeyboardTest.cpp
 int main(int argc, char** argv)
 {
     //glutWindow->init(&argc, argv);  //optional

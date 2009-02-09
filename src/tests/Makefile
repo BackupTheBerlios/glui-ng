@@ -50,6 +50,7 @@ GLUI_LIB = ../GENERATED/lib/libglui.a
 #GLUI_TESTS = checkbox statictext button horizontallayout textbutton
 GLUI_TESTS = SizeComputationTest PackingTest ContainerEventTest
 GLUI_TESTS+= GlutWindowTest GlutKeyboardTest GlutKeyboardUserTest
+GLUI_TESTS+= DrawingHelpsTest
 
 .PHONY: all setup examples tools clean depend doc doc-pdf doc-dist dist
 
@@ -63,7 +64,7 @@ examples: $(GLUI_EXAMPLES)
 tools: $(GLUI_TOOLS)
 
 
-$(addprefix GENERATED/bin/,${GLUI_TESTS}) : GENERATED $(addsuffix .cpp,${GLUI_TESTS})
+$(addprefix GENERATED/bin/,${GLUI_TESTS}) : GENERATED
 
 GENERATED :
 	mkdir -p GENERATED/bin
