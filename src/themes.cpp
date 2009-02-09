@@ -24,6 +24,7 @@
 */
 #define __STDC_LIMIT_MACROS
 #include <GL/glui/themes.h>
+#include <GL/glui/drawinghelpers.h>
 #include <string.h>
 #include <stdint.h>
 
@@ -36,114 +37,57 @@ void theme::FillglColorPointer(GLint size,
         const GLvoid *pointer,
         uint32_t count)
 {
-    if (size >= 3 && size <=4)
-    {
-        switch (type)
-        {
-            case GL_BYTE :
-                {
-                    int8_t colorelem[4] = { bkgd_color[0] - INT8_MAX,
-                        bkgd_color[1] - INT8_MAX,
-                        bkgd_color[2] - INT8_MAX,
-                        bkgd_color[3] - INT8_MAX };
-                    for (uint32_t i=0; i<count; i++)
-                    {
-                        memcpy((int8_t*)pointer + size * i ,colorelem, size * sizeof(int8_t));
-                    }
-                    return;
-                }
-            case GL_UNSIGNED_BYTE :
-                {
-                    uint8_t colorelem[4] = { bkgd_color[0],
-                        bkgd_color[1],
-                        bkgd_color[2],
-                        bkgd_color[3] };
-                    for (uint32_t i=0; i<count; i++)
-                    {
-                        memcpy((uint8_t*)pointer + size * i ,colorelem, size * sizeof(uint8_t));
-                    }
-                    return;
-                }
-            case GL_SHORT:
-                {
-                    int16_t colorelem[4] = { bkgd_color[0] * INT16_MAX / UINT8_MAX,
-                        bkgd_color[1] * INT16_MAX / UINT8_MAX,
-                        bkgd_color[2] * INT16_MAX / UINT8_MAX,
-                        bkgd_color[3] * INT16_MAX / UINT8_MAX };
-                    for (uint32_t i=0; i<count; i++)
-                    {
-                        memcpy((int16_t*)pointer + size * i ,colorelem, size * sizeof(int16_t));
-                    }
-                    return;
-                }
-            case GL_UNSIGNED_SHORT:
-                {
-                    uint16_t colorelem[4] = { bkgd_color[0] * UINT16_MAX / UINT8_MAX,
-                        bkgd_color[1] * UINT16_MAX / UINT8_MAX,
-                        bkgd_color[2] * UINT16_MAX / UINT8_MAX,
-                        bkgd_color[3] * UINT16_MAX / UINT8_MAX };
-                    for (uint32_t i=0; i<count; i++)
-                    {
-                        memcpy((uint16_t*)pointer + size * i ,colorelem, size * sizeof(uint16_t));
-                    }
-                    return;
-                }
-            case GL_INT:
-                {
-                    int32_t colorelem[4] = { bkgd_color[0] * INT32_MAX / UINT8_MAX,
-                        bkgd_color[1] * INT32_MAX / UINT8_MAX,
-                        bkgd_color[2] * INT32_MAX / UINT8_MAX,
-                        bkgd_color[3] * INT32_MAX / UINT8_MAX };
-                    for (uint32_t i=0; i<count; i++)
-                    {
-                        memcpy((int32_t*)pointer + size * i ,colorelem, size * sizeof(int32_t));
-                    }
-                    return;
-                }
-            case GL_UNSIGNED_INT:
-                {
-                    uint32_t colorelem[4] = { bkgd_color[0] * UINT32_MAX / UINT8_MAX,
-                        bkgd_color[1] * UINT32_MAX / UINT8_MAX,
-                        bkgd_color[2] * UINT32_MAX / UINT8_MAX,
-                        bkgd_color[3] * UINT32_MAX / UINT8_MAX };
-                    for (uint32_t i=0; i<count; i++)
-                    {
-                        memcpy((uint32_t*)pointer + size * i ,colorelem, size * sizeof(uint32_t));
-                    }
-                    return;
-                }
-            case GL_FLOAT:
-                {
-                    float colorelem[4] = { (float)bkgd_color[0] * 1.0f / UINT8_MAX,
-                        (float)bkgd_color[1] * 1.0f / UINT8_MAX,
-                        (float)bkgd_color[2] * 1.0f / UINT8_MAX,
-                        (float)bkgd_color[3] * 1.0f / UINT8_MAX };
-                    for (uint32_t i=0; i<count; i++)
-                    {
-                        memcpy((float*)pointer + size * i ,colorelem, size * sizeof(float));
-                    }
-                    return;
-                }
-            case GL_DOUBLE:
-                {
-                    double colorelem[4] = { (double)bkgd_color[0] * 1.0 / UINT8_MAX,
-                        (double)bkgd_color[1] * 1.0 / UINT8_MAX,
-                        (double)bkgd_color[2] * 1.0 / UINT8_MAX,
-                        (double)bkgd_color[3] * 1.0 / UINT8_MAX };
-                    for (uint32_t i=0; i<count; i++)
-                    {
-                        memcpy((double*)pointer + size * i ,colorelem, size * sizeof(double));
-                    }
-                    return;
-                }
-            default:
-                 throw(GL_INVALID_VALUE);
-        }
-    }
-    else
+    if (!(
+                (size >= 3 || size <= 4) &&
+                (type == GL_BYTE           ||
+                 type == GL_UNSIGNED_BYTE  ||
+                 type == GL_SHORT          ||
+                 type == GL_UNSIGNED_SHORT ||
+                 type == GL_INT            ||
+                 type == GL_UNSIGNED_INT   ||
+                 type == GL_FLOAT          ||
+                 type == GL_DOUBLE)    &&
+                ( pointer != NULL )
+         )
+       )
     {
         throw(GL_INVALID_VALUE);
     }
+    void *CurrentPos;
+    for (uint32_t i=0; i<count; i++)
+    {
+        switch (type)
+        {
+            case GL_BYTE:
+                CurrentPos = (void*)(((int8_t *) pointer ) + i * size * (stride+1));
+                break;
+            case GL_SHORT:
+                CurrentPos = (void*)(((int16_t *) pointer ) + i * size * (stride+1));
+                break;
+            case GL_INT:
+                CurrentPos = (void*)(((int32_t *) pointer ) + i * size * (stride+1));
+                break;
+            case GL_UNSIGNED_BYTE:
+                CurrentPos = (void*)(((uint8_t *) pointer ) + i * size * (stride+1));
+                break;
+            case GL_UNSIGNED_SHORT:
+                CurrentPos = (void*)(((uint16_t *) pointer ) + i * size * (stride+1));
+                break;
+            case GL_UNSIGNED_INT:
+                CurrentPos = (void*)(((uint32_t *) pointer ) + i * size * (stride+1));
+                break;
+            case GL_FLOAT:
+                CurrentPos = (void*)(((float *) pointer ) + i * size * (stride+1));
+                break;
+            case GL_DOUBLE:
+                CurrentPos = (void*)(((double *) pointer ) + i * size * (stride+1));
+                break;
+        }
+
+
+        drawinghelpers::ConvertglColorPointer(size, GL_UNSIGNED_BYTE, bkgd_color, type, CurrentPos);
+    }
+    return;
 }
 
 

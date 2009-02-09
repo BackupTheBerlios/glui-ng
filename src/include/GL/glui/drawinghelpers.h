@@ -51,6 +51,12 @@ namespace GLUI
             static void         set_to_bkgd_color( void );
             static buffer_mode_t get_buffer_mode();
             static void         PostRedisplay(Control* ctrl);
+            static void         ConvertglColorPointer(GLint size, //<  how many components 3 (RGB) or 4(RGBA)
+                    GLenum intype,  //< type of the input
+                    const GLvoid *inpointer, //< pointer of the datas
+                    GLenum outype,  //< type of the output
+                    const GLvoid *outpointer  //<pointer to the outputdata
+                    );
     };
 
 }
