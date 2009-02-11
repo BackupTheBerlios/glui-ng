@@ -123,34 +123,89 @@ void drawinghelpers::draw_box_inwards_outline(int enabled, int x_min, int x_max,
 
 /////////////////////////////////////////////////////////////////////////////
 
-void drawinghelpers::draw_box(int w, int h, GLint *color_array)
+void drawinghelpers::draw_box(int w, int h, uint8_t size, GLenum intype, void *color_array)
 {
     GLfloat Vertices[4][3] = { {  0.0,   0.0, 0.0}, //0
         {  0.0,     h, 0.0}, //1
         {    w,     h, 0.0}, //2
         {    w,   0.0, 0.0}}; //3
     GLubyte indices[] = { 0, 1, 2, 3};
-
-    float Colors[4][3];
-
-    theme::Instance()->FillglColorPointer(3,
-                    GL_FLOAT,
-                    0,
-                    Colors,
-                    4 );
-
-
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_COLOR_ARRAY);
+    float Colors[] = {0.0, 0.0, 0.0, 0.0,
+                      0.0, 0.0, 0.0, 0.0,
+                      0.0, 0.0, 0.0, 0.0,
+                      0.0, 0.0, 0.0, 0.0}; //allow enough size for a RGBA, however by default 3 will be used
 
     if (color_array)
     {
-        glColorPointer(3, GL_INT, 0, color_array);
+      for (uint8_t i=0; i<4 ; i++)
+        {
+          switch(intype)
+            {
+              case GL_BYTE:
+                    {
+                      int8_t* Colorp = (int8_t*) color_array;
+                      drawinghelpers::ConvertglColorPointer(size, intype, Colorp + i * size , GL_FLOAT, Colors + i * size);
+                    }
+                  break;
+              case GL_UNSIGNED_BYTE:
+                    {
+                      uint8_t* Colorp = (uint8_t*) color_array;
+                      drawinghelpers::ConvertglColorPointer(size, intype, Colorp + i * size , GL_FLOAT, Colors + i * size);
+                    }
+                  break;
+              case GL_SHORT:
+                    {
+                      int16_t* Colorp = (int16_t*) color_array;
+                      drawinghelpers::ConvertglColorPointer(size, intype, Colorp + i * size , GL_FLOAT, Colors + i * size);
+                    }
+                  break;
+              case GL_UNSIGNED_SHORT:
+                    {
+                      uint16_t* Colorp = (uint16_t*) color_array;
+                      drawinghelpers::ConvertglColorPointer(size, intype, Colorp + i * size , GL_FLOAT, Colors + i * size);
+                    }
+                  break;
+              case GL_INT:
+                    {
+                      int32_t* Colorp = (int32_t*) color_array;
+                      drawinghelpers::ConvertglColorPointer(size, intype, Colorp + i * size , GL_FLOAT, Colors + i * size);
+                    }
+                  break;
+              case GL_UNSIGNED_INT:
+                    {
+                      uint32_t* Colorp = (uint32_t*) color_array;
+                      drawinghelpers::ConvertglColorPointer(size, intype, Colorp + i * size , GL_FLOAT, Colors + i * size);
+                    }
+                  break;
+              case GL_FLOAT:
+                    {
+                      float* Colorp = (float*) color_array;
+                      drawinghelpers::ConvertglColorPointer(size, intype, Colorp + i * size , GL_FLOAT, Colors + i * size);
+                    }
+                  break;
+              case GL_DOUBLE:
+                    {
+                      double* Colorp = (double*) color_array;
+                      drawinghelpers::ConvertglColorPointer(size, intype, Colorp + i * size , GL_FLOAT, Colors + i * size);
+                    }
+                  break;
+            }
+        }
     }
     else
     {
         glColorPointer(3, GL_FLOAT, 0, Colors);
+        theme::Instance()->FillglColorPointer(3,
+                    GL_FLOAT,
+                    0,
+                    Colors,
+                    4 );
     }
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_COLOR_ARRAY);
+
+    glColorPointer(size, GL_FLOAT, 0, Colors);
     glVertexPointer(3, GL_FLOAT, 0, Vertices);
     //go through our index array and draw our vertex array
     glDrawElements(GL_QUADS, 4, GL_UNSIGNED_BYTE, indices);
@@ -271,6 +326,7 @@ void drawinghelpers::ConvertglColorPointer(GLint size, //<  how many components 
         throw(GL_INVALID_VALUE);
     }
     double colorelem[4];
+    colorelem[3] = 0.0;
     switch (intype)
     {
         case GL_BYTE :

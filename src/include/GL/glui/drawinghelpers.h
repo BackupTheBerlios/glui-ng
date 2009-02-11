@@ -44,7 +44,7 @@ namespace GLUI
             static void draw_lowered_box( int w, int h );
             static void         draw_box_inwards_outline(int enabled, int x_min, int x_max,
                     int y_min, int y_max );
-            static void         draw_box(int w, int h, GLint *color_array);
+            static void         draw_box(int w, int h, uint8_t size = 3, GLenum intype = GL_BYTE, void *color_array = NULL);
             static void         draw_emboss_box( int x_min, int x_max,int y_min,int y_max);
 
             static void         draw_active_box(int active,  int x_min, int x_max, int y_min, int y_max );

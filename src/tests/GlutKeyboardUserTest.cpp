@@ -45,16 +45,11 @@ int myControl::AddEvent(::XKeyEvent* event)
 
 void myControl::draw()
 {
-    GLint iColorArray[4][3];
     float fColorArray[4][3] = { fColors[0], 0.0, fColors[2],
         fColors[0], 0.0, fColors[2],
         fColors[0], 0.0, fColors[2],
         fColors[0], 0.0, fColors[2] };
-    for (uint8_t i=0; i<4; i++)
-    {
-        drawinghelpers::ConvertglColorPointer(3, GL_FLOAT, fColorArray[i], GL_INT, iColorArray[i]);
-    }
-    drawinghelpers::draw_box(CurrentSize.size.w, CurrentSize.size.h, &(iColorArray[0][0]));
+    drawinghelpers::draw_box(CurrentSize.size.w, CurrentSize.size.h, 3, GL_FLOAT,  &(fColorArray[0][0]));
 }
 
 

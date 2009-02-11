@@ -61,14 +61,12 @@ void myGluiWin::draw(void)
                                   {000, 255, 000},
                                   {000, 000, 255},
                                   {128, 128, 128}};
-    int32_t color[4][3];
-    drawinghelpers::ConvertglColorPointer(3, GL_UNSIGNED_BYTE, color_array, GL_INT, color);
 
     glLoadIdentity();
     glTranslatef(10.0,10.0,-20.0);
     drawinghelpers::draw_box(180, 180, NULL);
     glTranslatef(0.0,0.0,1.0);
-    drawinghelpers::draw_box(170, 170, (GLint*)color);
+    drawinghelpers::draw_box(170, 170, 3, GL_UNSIGNED_BYTE, color_array);
     glutPostRedisplay();
 }
 

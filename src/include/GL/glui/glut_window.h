@@ -168,8 +168,7 @@ namespace GLUI
         this->SetOrthoProjection();
         glTranslatef(x, y, BOTTOM_VIEWPORT + 1);
         drawinghelpers::draw_box( this->Width(),
-                this->Height(),
-                NULL);
+                this->Height());
     }
 
     inline WindowId GlutWindow::GetWindowId()
