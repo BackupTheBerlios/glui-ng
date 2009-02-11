@@ -406,7 +406,6 @@ int GlutWindow::set_size( Size sz, Size min) //replace with a XResizeRequestEven
 
 
 /********************************************** glui_display_func() ********/
-#warning "reput y axis up on event"
 void GlutWindow::display_func (void)
 {
     ::XExposeEvent event;
@@ -424,7 +423,6 @@ void GlutWindow::display_func (void)
 
 
 /********************************************** glui_reshape_func() ********/
-#warning "reput y axis up on event"
 void GlutWindow::reshape_func (int w, int h)
 {
     ::XResizeRequestEvent event;
@@ -449,7 +447,7 @@ void GlutWindow::reshape_func (int w, int h)
 
 #warning "factorise
 /********************************************** glui_keyboard_func() ********/
-#warning "reput y axis up on event"
+//GLUI use Y axis up (0,0) is bottom left corner as in OpenGl
 void GlutWindow::keyboard_func (unsigned char key, int x, int y)
 {
 
@@ -476,7 +474,7 @@ void GlutWindow::keyboard_func (unsigned char key, int x, int y)
 
 
 /************************************************ glui_special_func() ********/
-#warning "reput y axis up on event"
+//GLUI use Y axis up (0,0) is bottom left corner as in OpenGl
 void GlutWindow::special_func (int key, int x, int y)
 {
 
@@ -509,7 +507,7 @@ void GlutWindow::special_func (int key, int x, int y)
 }
 
 /********************************************** glui_mouse_func() ********/
-#warning "reput y axis up on event"
+//GLUI use Y axis up (0,0) is bottom left corner as in OpenGl
 void GlutWindow::mouse_func (int button, int state, int x, int y)
 {
     int win_w = glutGet (GLUT_WINDOW_WIDTH);
@@ -551,7 +549,7 @@ void GlutWindow::mouse_func (int button, int state, int x, int y)
 
 
 /********************************************** glui_motion_func() ********/
-#warning "reput y axis up on event"
+//GLUI use Y axis up (0,0) is bottom left corner as in OpenGl
 void GlutWindow::motion_func (int x, int y)
 {
         int win_w = glutGet (GLUT_WINDOW_WIDTH);
@@ -577,7 +575,7 @@ void GlutWindow::motion_func (int x, int y)
 
 
 /**************************************** glui_passive_motion_func() ********/
-#warning "reput y axis up on event"
+//GLUI use Y axis up (0,0) is bottom left corner as in OpenGl
 void GlutWindow::passive_motion_func (int x, int y)
 {
     motion_func (x,y);
@@ -585,7 +583,6 @@ void GlutWindow::passive_motion_func (int x, int y)
 
 
 /********************************************** glui_entry_func() ********/
-#warning "reput y axis up on event"
 void GlutWindow::entry_func (int state)
 {
     ::XCrossingEvent event;
@@ -615,7 +612,6 @@ void GlutWindow::entry_func (int state)
 
 
 /******************************************** glui_visibility_func() ********/
-#warning "reput y axis up on event"
 void GlutWindow::visibility_func (int state)
 {
     ::XMapEvent mapevent;
@@ -650,7 +646,6 @@ void GlutWindow::visibility_func (int state)
 
 /********************************************** glui_idle_func() ********/
 /* Send idle event to each glui, then to the main window            */
-#warning "reput y axis up on event"
 void GlutWindow::idle (void)
 {
         struct timespec sleeptime = { 0, 100000000 };

@@ -115,7 +115,14 @@ int myGluiWin::AddEvent(::XKeyEvent* event)
 
 void myGluiWin::simulatekey(void)
 {
+    static int count = 0;
+
+    count ++;
     keyboard_func (GLUT_KEY_UP, 100, 100);
+    if (count % 10 == 0)
+      {
+        keyboard_func (GLUT_KEY_UP, ctrl.X() + ctrl.Width()/2, this->Height() -  ctrl.Y() - ctrl.Height()/2 );
+      }
 }
 
 

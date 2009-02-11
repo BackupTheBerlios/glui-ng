@@ -119,8 +119,36 @@ namespace GLUI
 
             //event interfaces
             virtual int AddEvent (::XEvent* event);
-            virtual int AddEvent (::XExposeEvent* event);
             virtual int AddEvent (::XKeyEvent* event);
+            virtual int AddEvent (::XButtonEvent* event) { return 0; };
+            virtual int AddEvent (::XMotionEvent* event) { return 0; };
+            virtual int AddEvent (::XCrossingEvent* event) { return 0; };
+            virtual int AddEvent (::XFocusChangeEvent* event) { return 0; };
+            virtual int AddEvent (::XKeymapEvent* event) { return 0; };
+            virtual int AddEvent (::XExposeEvent* event);
+            virtual int AddEvent (::XGraphicsExposeEvent* event) { return 0; };
+            virtual int AddEvent (::XNoExposeEvent* event) { return 0; };
+            virtual int AddEvent (::XVisibilityEvent* event) { return 0; };
+            virtual int AddEvent (::XCreateWindowEvent* event) { return 0; };
+            virtual int AddEvent (::XDestroyWindowEvent* event) { return 0; };
+            virtual int AddEvent (::XUnmapEvent* event) { return 0; };
+            virtual int AddEvent (::XMapEvent* event) { return 0; };
+            virtual int AddEvent (::XMapRequestEvent* event) { return 0; };
+            virtual int AddEvent (::XReparentEvent* event) { return 0; };
+            virtual int AddEvent (::XConfigureEvent* event) { return 0; };
+            virtual int AddEvent (::XGravityEvent* event) { return 0; };
+            virtual int AddEvent (::XResizeRequestEvent* event) { return 0; };
+            virtual int AddEvent (::XConfigureRequestEvent* event) { return 0; };
+            virtual int AddEvent (::XCirculateEvent* event) { return 0; };
+            virtual int AddEvent (::XCirculateRequestEvent* event) { return 0; };
+            virtual int AddEvent (::XPropertyEvent* event) { return 0; };
+            virtual int AddEvent (::XSelectionClearEvent* event) { return 0; };
+            virtual int AddEvent (::XSelectionRequestEvent* event) { return 0; };
+            virtual int AddEvent (::XSelectionEvent* event) { return 0; };
+            virtual int AddEvent (::XColormapEvent* event) { return 0; };
+            virtual int AddEvent (::XClientMessageEvent* event) { return 0; };
+            virtual int AddEvent (::XMappingEvent* event) { return 0; };
+            virtual int AddEvent (::XErrorEvent* event) { return 0; };
 
 
             virtual int         set_size( Size sz, Size min=Size(0u,0u) ); //replace with a XResizeRequestEvent

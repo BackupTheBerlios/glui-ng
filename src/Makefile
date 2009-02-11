@@ -2,6 +2,9 @@
 
 #comment this for verbose make
 MAKEFLAGS+= -s
+#uncomment this if you want to know about Compiler extension
+# CPPFLAGS += -pedantic
+
 
 #for sgi   -- comment out the lines below to use on HP
 #CC=CC -g0 -o32
@@ -17,7 +20,7 @@ UNAME = $(shell uname)
 
 ifeq ($(UNAME), Linux)
 CXX       = g++
-CPPFLAGS += $(OPTS) -Wall -pedantic
+CPPFLAGS += $(OPTS) -Wall
 endif
 
 #######################################

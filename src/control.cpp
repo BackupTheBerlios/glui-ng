@@ -143,7 +143,7 @@ int Control::AddEvent(::XExposeEvent *event)
     glMatrixMode( GL_MODELVIEW );
     glPushMatrix();
     glLoadIdentity();
-    glTranslatef(x, y, BOTTOM_VIEWPORT + GLUI_CONTROL_MAX_THICKNESS * level());
+    glTranslatef(x + x_off_left, y + y_off_bot, BOTTOM_VIEWPORT + GLUI_CONTROL_MAX_THICKNESS * level());
     draw();
     glPopMatrix();
     debug::Instance()->FlushGL();
@@ -152,9 +152,42 @@ int Control::AddEvent(::XExposeEvent *event)
 
 int Control::AddEvent(::XEvent *event)
 {
-    if (event->xany.type == Expose)
+    switch ( event->type )
     {
-        return AddEvent((::XExposeEvent*) event);
+        case KeyPress : return  AddEvent((::XKeyEvent*) event);
+        case KeyRelease: return  AddEvent((::XKeyEvent*) event);
+        case ButtonPress: return  AddEvent((::XButtonEvent*) event);
+        case ButtonRelease: return  AddEvent((::XButtonEvent*) event);
+        case MotionNotify: return  AddEvent((::XMotionEvent*) event);
+        case EnterNotify: return  AddEvent((::XCrossingEvent*) event);
+        case LeaveNotify: return  AddEvent((::XCrossingEvent*) event);
+        case FocusIn: return  AddEvent((::XFocusChangeEvent*) event);
+        case FocusOut: return  AddEvent((::XFocusChangeEvent*) event);
+        case KeymapNotify: return  AddEvent((::XKeymapEvent*) event);
+        case Expose: return  AddEvent((::XExposeEvent*) event);
+        case GraphicsExpose: return  AddEvent((::XGraphicsExposeEvent*) event);
+        case NoExpose: return  AddEvent((::XNoExposeEvent*) event);
+        case VisibilityNotify: return  AddEvent((::XVisibilityEvent*) event);
+        case CreateNotify: return  AddEvent((::XCreateWindowEvent*) event);
+        case DestroyNotify: return  AddEvent((::XDestroyWindowEvent*) event);
+        case UnmapNotify: return  AddEvent((::XUnmapEvent*) event);
+        case MapNotify: return  AddEvent((::XMapEvent*) event);
+        case MapRequest: return  AddEvent((::XMapRequestEvent*) event);
+        case ReparentNotify: return  AddEvent((::XReparentEvent*) event);
+        case ConfigureNotify: return  AddEvent((::XConfigureEvent*) event);
+        case ConfigureRequest: return  AddEvent((::XConfigureRequestEvent*) event);
+        case GravityNotify: return  AddEvent((::XGravityEvent*) event);
+        case ResizeRequest: return  AddEvent((::XResizeRequestEvent*) event);
+        case CirculateNotify: return  AddEvent((::XCirculateEvent*) event);
+        case CirculateRequest: return  AddEvent((::XCirculateRequestEvent*) event);
+        case PropertyNotify: return  AddEvent((::XPropertyEvent*) event);
+        case SelectionClear: return  AddEvent((::XSelectionClearEvent*) event);
+        case SelectionRequest: return  AddEvent((::XSelectionRequestEvent*) event);
+        case SelectionNotify: return  AddEvent((::XSelectionEvent*) event);
+        case ColormapNotify: return  AddEvent((::XColormapEvent*) event);
+        case ClientMessage: return  AddEvent((::XClientMessageEvent*) event);
+        case MappingNotify: return  AddEvent((::XMappingEvent*) event);
+
     }
 
 }

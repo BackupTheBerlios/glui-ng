@@ -304,7 +304,6 @@ int Container::add_control(Node *control )
 
 ////////////////////////////////////////////////////////////////////////////////////////
 #warning "TODO : implement the DoNotPropagateMask update mechanism?"
-#warning "TODO : move to control class"
 int Container::AddEvent (::XEvent* event)
 {
     #warning "update this using tree list creation"
@@ -560,7 +559,7 @@ int Container::BroadcastEvent(::XEvent* event, int type, long mask_check)
     {
         rc = child->AddEvent(event);
         Node* sibling = child->next();
-        Control* child = dynamic_cast<Control*>(sibling);
+        child = dynamic_cast<Control*>(sibling);
     }
     //the event is for this widget and not a child
     return rc;
