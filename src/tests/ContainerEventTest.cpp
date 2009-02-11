@@ -53,6 +53,12 @@ class DoForward : public Container
 };
 
 
+void fillEventStruct(Control* theCtrl, ::XKeyEvent* theEvent)
+{
+    theEvent->x = theCtrl->X() + theCtrl->Width() / 2;
+    theEvent->y = theCtrl->Y() + theCtrl->Height() / 2;
+}
+
 //////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
@@ -79,20 +85,17 @@ int main(int argc, char* argv[])
 
     ::XKeyEvent keyevent;
     keyevent.type= KeyPress;
-    keyevent.x = 5;
-    keyevent.y = 10;
-
-    int step = 1;
 
     // try to send a event to some widget that is masked if we get something then error
+    fillEventStruct(&leefb1, &keyevent);
     root.AddEvent((::XEvent*) & keyevent);
     assert( leefb1.count == 0 && leefb1.bad_count == 0 );
     // try to send an event to some widget that shall refuse all events
-    keyevent.y = branch1.Height() + leef1b2.Height()/2;
+    fillEventStruct(&leef1b2, &keyevent);
     root.AddEvent((::XEvent*) & keyevent);
     assert( leef1b2.count == 0 && leef1b2.bad_count == 1 );
     // try to send an event to some widget that shall accept it
-    keyevent.y = branch1.Height() + leef1b2.Height() + leef2b2.Height()/2;
+    fillEventStruct(&leef2b2, &keyevent);
     root.AddEvent((::XEvent*) & keyevent);
     assert( leef2b2.count == 1 && leef2b2.bad_count == 0 );
 }

@@ -73,29 +73,52 @@ int main(int argc, char* argv[])
     leef2b2.set_size(Control::Size(10u,10u));
 
     root.set_orientation(Container::TopDown);
-    assert( branch1.X() == root.XOffLeft() && branch1.Y() == (root.Height() - root.YOffTop() - branch1.Height()) );
-    assert( branch2.X() == root.XOffLeft() && branch2.Y() == root.YOffBot());
-    assert( leefb1.X()  == root.XOffLeft() && leefb1.Y()  == (root.Height() - root.YOffTop() - branch1.YOffTop() - leefb1.Height()));
-    assert( leef1b2.X() == root.XOffLeft() && leef1b2.Y() == leef1b2.Height() + root.YOffBot());
-    assert( leef2b2.X() == root.XOffLeft() && leef2b2.Y() == root.YOffBot());
+    assert( branch1.X() == (root.XOffLeft()) );
+    assert( branch1.Y() == (root.Height() - root.YOffTop() - branch1.Height()) );
+    assert( branch2.X() == (root.XOffLeft()) );
+    assert(  branch2.Y() == (root.YOffBot()) );
+    assert( leefb1.X()  == (branch1.X() + branch1.XOffLeft()) );
+    assert( leefb1.Y()  == (branch1.Y() + branch1.YOffBot()) );
+    assert( leef1b2.X() == (branch2.X() + branch2.XOffLeft()) );
+    assert( leef1b2.Y() == (leef2b2.Height() + branch2.Y() +  branch2.YOffBot()) );
+    assert( leef2b2.X() == (branch2.X() + branch2.XOffLeft()) );
+    assert( leef2b2.Y() == (branch2.Y() + branch2.YOffBot()) );
+
     root.set_orientation(Container::BottomUp);
-    assert( branch1.X() == 0 && branch1.Y() == 0);
-    assert( branch2.X() == 0 && branch2.Y() == branch1.Height());
-    assert( leefb1.X()  == 0 && leefb1.Y()  == 0);
-    assert( leef1b2.X() == 0 && leef1b2.Y() == branch1.Height());
-    assert( leef2b2.X() == 0 && leef2b2.Y() == branch1.Height() + leef1b2.Height());
+    assert( branch1.X() == (root.XOffLeft()) );
+    assert( branch1.Y() == (root.YOffBot()) );
+    assert( branch2.X() == (root.XOffLeft()) );
+    assert( branch2.Y() == (root.YOffBot() + branch1.Height()) );
+    assert( leefb1.X()  == (branch1.X() + branch1.XOffLeft()) );
+    assert( leefb1.Y()  == (branch1.Y() + branch1.YOffBot()) );
+    assert( leef1b2.X() == (branch2.X() + branch2.XOffLeft()) );
+    assert( leef1b2.Y() == (branch2.Y() + branch2.YOffBot()) );
+    assert( leef2b2.X() == (branch2.X() + branch2.XOffLeft()) );
+    assert( leef2b2.Y() == (leef1b2.Y() + leef1b2.Height()) );
+
     root.set_orientation(Container::LeftToRight);
-    assert( branch1.X() == 0 && branch1.Y() == 0);
-    assert( branch2.X() == 0 && branch2.Y() == branch1.Height());
-    assert( leefb1.X()  == 0 && leefb1.Y()  == 0);
-    assert( leef1b2.X() == 0 && leef1b2.Y() == branch1.Height());
-    assert( leef2b2.X() == 0 && leef2b2.Y() == branch1.Height() + leef1b2.Height());
+    assert( branch1.X() == (root.XOffLeft()) );
+    assert( branch1.Y() == root.YOffBot() );
+    assert( branch2.X() == (branch1.X() + branch1.Width()) );
+    assert( branch2.Y() == (root.YOffBot()) );
+    assert( leefb1.X()  == (branch1.X() + branch1.XOffLeft()) );
+    assert( leefb1.Y()  == (branch1.Y() + branch1.YOffBot()) );
+    assert( leef1b2.X() == (branch2.X() + branch2.XOffLeft()) );
+    assert( leef1b2.Y() == (branch2.Y() + branch2.YOffBot()) );
+    assert( leef2b2.X() == (leef1b2.X() + leef1b2.Width()) );
+    assert( leef2b2.Y() == (branch2.Y() + branch2.YOffBot()) );
+
     root.set_orientation(Container::RightToLeft);
-    assert( branch1.X() == 0 && branch1.Y() == 0);
-    assert( branch2.X() == 0 && branch2.Y() == branch1.Height());
-    assert( leefb1.X()  == 0 && leefb1.Y()  == 0);
-    assert( leef1b2.X() == 0 && leef1b2.Y() == branch1.Height());
-    assert( leef2b2.X() == 0 && leef2b2.Y() == branch1.Height() + leef1b2.Height());
+    assert( branch1.X() == (branch2.X() + branch2.Width()) );
+    assert(  branch1.Y() == (root.YOffBot()) );
+    assert( branch2.X() == (root.XOffLeft()) );
+    assert( branch2.Y() == (root.YOffBot()) );
+    assert( leefb1.X()  == (branch1.X() + branch1.XOffLeft()) );
+    assert( leefb1.Y()  == (branch1.Y() + branch1.YOffBot()) );
+    assert( leef1b2.X() == (leef2b2.X() + leef2b2.Width()) );
+    assert( leef1b2.Y() == (branch2.Y() + branch2.YOffBot()) );
+    assert( leef2b2.X() == (branch2.X() + branch2.XOffLeft()) );
+    assert( leef2b2.Y() == (branch2.Y() + branch2.YOffBot()) );
 
 
 

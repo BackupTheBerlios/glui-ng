@@ -190,8 +190,8 @@ void Container::pack (int x, int y)
 
     this->x = x;
     this->y = y;
-    int x_offset = 0;
-    int y_offset = 0;
+    int ChildTotalWidth = 0;
+    int ChildTotalHeight = 0;
 
 
     while (NULL != node)
@@ -203,26 +203,26 @@ void Container::pack (int x, int y)
             {
                 if (theOrient == TopDown)
                 {
-                    y_offset += child->Height();  //increment before setting
-                    child->pack(x, y + this->Height() - y_off_top - y_offset);
+                    ChildTotalHeight += child->Height();  //increment before setting
+                    child->pack(x + x_off_left , y + this->Height() - y_off_top - ChildTotalHeight);
                 }
                 else
                 {
-                    child->pack(x, y + y_offset);
-                    y_offset += child->Height();
+                    child->pack(x + x_off_left , y + y_off_bot + ChildTotalHeight);
+                    ChildTotalHeight += child->Height();
                 }
             }
             else if (theOrient == LeftToRight || theOrient == RightToLeft)
             {
                 if (theOrient == LeftToRight)
                 {
-                    child->pack(x + x_offset, y);
-                    x_offset += child->Width();
+                    child->pack(x + ChildTotalWidth + x_off_left, y + y_off_bot);
+                    ChildTotalWidth += child->Width();
                 }
                 else
                 {
-                    x_offset += child->Width();  //increment before setting
-                    child->pack(x + this->Width() - x_off_right - x_offset, y);
+                    ChildTotalWidth += child->Width();  //increment before setting
+                    child->pack(x + this->Width() - x_off_right - ChildTotalWidth, y + y_off_bot);
                 }
             }
         }
@@ -240,7 +240,7 @@ Container::orientation Container::GetParentOrientation()
     {
         return parent->GetParentOrientation();
     }
-    else if (NULL == parent)
+    else if (CurrOrientation == useparent && NULL == parent)
     {
         // even the top most parent has useparent, so arbitraly choose TopDown
         return TopDown;
