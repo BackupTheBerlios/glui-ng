@@ -31,6 +31,29 @@
 namespace GLUI
 {
     class Control;
+
+    class VertexObject
+      {
+        protected : //variables
+            uint8_t VerticesSize;          //< number of components per vertice
+            uint32_t VerticeCount;         //< number of vertices in the object
+            uint8_t ColorSize;             //< number of components per colors (3 = RGB, 4 = RGBA)
+            uint8_t VerticeByFacesCount;   //< number of vertices per face of the object
+
+            float *Vertices;               //< array containing the vertices size*VerticeCount wide, for glVertexPointer
+            uint32_t *indices;             //< array containing the indices of each faces, for glDrawElements
+            float *Colors;                 //< array containing the Colors of each Vertice, for glColorPointer
+            float *Normals;                //< array containing the computed normals of the vertice, for glNormalPointer
+            //float *Texture;                //< array containing the texture coordinates of the vertice, for glTexCoordPointer
+        protected : //methods
+            VertexObject();
+        public:
+            VertexObject(uint8_t verticessize, uint32_t verticecount, uint8_t colorsize, uint8_t verticebyfacescount);
+            draw();                        //< draw the object at current place current opengl state
+
+      };
+
+
     class drawinghelpers
     {
         public : //data types
