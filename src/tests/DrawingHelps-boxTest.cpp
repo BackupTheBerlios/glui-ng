@@ -57,16 +57,24 @@ class myGluiWin : public GLUIWindow
 
 void myGluiWin::draw(void)
 {
-    uint8_t color_array[4][3]= { {255, 000, 000},
-                                  {000, 255, 000},
-                                  {000, 000, 255},
-                                  {128, 128, 128}};
+    uint8_t color_array[8][3]= { {255, 000, 000},
+                                  {255, 000, 000},
+                                  {255, 000, 000},
+                                  {255, 000, 000},
+/*{255, 000, 000},
+{255, 000, 000},
+{255, 000, 000},
+{255, 000, 000}};*/
 
+                                  {000, 255, 000},
+                                  {000, 255, 000},
+                                  {000, 255, 000},
+                                  {000, 255, 000}};
     glLoadIdentity();
     glTranslatef(10.0,10.0,-20.0);
-    drawinghelpers::draw_box(180, 180);
-    glTranslatef(0.0,0.0,1.0);
-    drawinghelpers::draw_box(170, 170, 3, GL_UNSIGNED_BYTE, color_array);
+    drawinghelpers::draw_raised_box(180, 180);
+    glTranslatef(10.0,10.0,2.0);
+    drawinghelpers::draw_raised_box(160, 160, 8, 3, GL_UNSIGNED_BYTE, color_array);
     glutPostRedisplay();
 }
 

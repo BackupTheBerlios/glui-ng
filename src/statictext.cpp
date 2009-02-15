@@ -54,7 +54,7 @@ StaticText::StaticText( Node *parent, const char *name )
 void    StaticText::draw( )
 {
 
-    drawinghelpers::draw_box(Width(), Height(), NULL); //erase text
+    drawinghelpers::draw_box(Width(), Height()); //erase text
   glColor3ubv( Color );
   glRasterPos3f(0.0, 0.0, 0.1);
   //glRasterPos store the color and translate, since glut drawing routine use
