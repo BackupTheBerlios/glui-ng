@@ -8,22 +8,22 @@
 
 using namespace GLUI;
 /////////////////////////////////////////////////////////////////////////
-void      drawinghelpers::draw_raised_box( uint32_t w, uint32_t h, uint32_t thickness, uint8_t size, GLenum intype, void *color_array)
+VertexObject* drawinghelpers::raised_box( uint32_t w, uint32_t h, uint32_t thickness, uint8_t size, GLenum intype, void *color_array)
 {
-	GLfloat Vertices[8][3] = { {  0.0,   0.0, 0.0}, //0
-							   {  0.0,     h, 0.0}, //1
-							   {    w,     h, 0.0}, //2
-							   {    w,   0.0, 0.0}, //3
-							   {  (float) thickness,   (float) thickness, (float) thickness}, //4
-							   {  (float) thickness, h-(float) thickness, (float) thickness}, //5
-							   {w-(float) thickness, h-(float) thickness, (float) thickness}, //6
-							   {w-(float) thickness,   (float) thickness, (float) thickness}}; //7
-	GLubyte indices[] = {
-						4, 7, 6, 5,		//front
-						0, 4, 7, 3,		//top slope
-						7, 3, 2, 6,		//right slope
-						6, 2, 1, 5,		//bottom slope
-                        5, 4, 0, 1};	//left slope
+    GLfloat Vertices[8][3] = { {  0.0,   0.0, 0.0}, //0
+                                {  0.0,     h, 0.0}, //1
+                                {    w,     h, 0.0}, //2
+                                {    w,   0.0, 0.0}, //3
+                                {  (float) thickness,   (float) thickness, (float) thickness}, //4
+                                {  (float) thickness, h-(float) thickness, (float) thickness}, //5
+                                {w-(float) thickness, h-(float) thickness, (float) thickness}, //6
+                                {w-(float) thickness,   (float) thickness, (float) thickness}}; //7
+    GLubyte indices[] = {
+                            4, 7, 6, 5,		//front
+                            0, 4, 7, 3,		//top slope
+                            7, 3, 2, 6,		//right slope
+                            6, 2, 1, 5,		//bottom slope
+                            5, 4, 0, 1};	//left slope
 
     float Colors[8][3];
     memset(Colors, 0, 8*3*sizeof(float));
@@ -42,62 +42,69 @@ void      drawinghelpers::draw_raised_box( uint32_t w, uint32_t h, uint32_t thic
     else
       {
         theme::Instance()->FillglColorPointer(3,
-                GL_INT,
+                GL_FLOAT,
                 0,
                 Colors,
                 8 );
 
       }
-    glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_COLOR_ARRAY);
+    VertexObject* vo = new VertexObject(3, 3, 4);
+    vo->SetVerticesArray(VertexObject::FLOAT, Vertices, 8);
+    vo->SetFaceIndicesArray (VertexObject::UINT8_T, indices, 5);
+    vo->SetColorArray (VertexObject::FLOAT, Colors, 8);
+    return vo;
 
-	glColorPointer(3, GL_FLOAT, 0, Colors);
-	glVertexPointer(3, GL_FLOAT, 0, Vertices);
-	//go through our index array and draw our vertex array
-	glDrawElements(GL_QUADS, 20, GL_UNSIGNED_BYTE, indices);
-
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_COLOR_ARRAY);
-	debug::Instance()->FlushGL();
 }
 
 
 /////////////////////////////////////////////////////////////////////////////
-void      drawinghelpers::draw_lowered_box( uint32_t w, uint32_t h, uint32_t thickness, uint8_t size, GLenum intype, void *color_array)
+VertexObject* drawinghelpers::lowered_box( uint32_t w, uint32_t h, uint32_t thickness, uint8_t size, GLenum intype, void *color_array)
 {
-	float Vertices[8][3] = { {  0.0,   0.0,  0.0},
-		                     {  0.0,     h,  0.0},
-							 {    w,     h,  0.0},
-							 {    w,   0.0,  0.0},
-							 {  0.5,   0.5, -0.5},
-							 {  0.5, h-0.5, -0.5},
-							 {w-0.5, h-0.5, -0.5},
-							 {w-0.5,   0.5, -0.5}};
-		GLubyte indices[] = {
-						4, 7, 6, 5,		//front
-						0, 4, 7, 3,		//top slope
-						7, 3, 2, 6,		//right slope
-						6, 2, 1, 5,		//bottom slope
-						5, 4, 0, 1};	//left slope
+    float Vertices[8][3] = { {  0.0,   0.0,  0.0},
+                                {  0.0,     h,  0.0},
+                                {    w,     h,  0.0},
+                                {    w,   0.0,  0.0},
+                                {  0.5,   0.5, -0.5},
+                                {  0.5, h-0.5, -0.5},
+                                {w-0.5, h-0.5, -0.5},
+                                {w-0.5,   0.5, -0.5}};
+    GLubyte indices[] = {
+                            4, 7, 6, 5,		//front
+                            0, 4, 7, 3,		//top slope
+                            7, 3, 2, 6,		//right slope
+                            6, 2, 1, 5,		//bottom slope
+                            5, 4, 0, 1};	//left slope
 
-	GLint Colors[8][3];
-    memset(Colors, 0, 8*3*sizeof(GLint));
-    theme::Instance()->FillglColorPointer(3,
-                    GL_INT,
-                    0,
-                    &Colors[4][0],
-                    4 );
+    float Colors[8][3];
+    memset(Colors, 0, 8*3*sizeof(float));
+    if (color_array)
+      {
+        ConvertglColorArray(
+                size, //<  how many components 3 (RGB) or 4(RGBA)
+                intype,  //< type of the input
+                color_array, //< pointer of the datas
+                GL_FLOAT,  //< type of the output
+                Colors,  //<pointer to the outputdata
+                8 //< count of the numbers of elements in the array (an element in 3 or 4 components)
+                );
 
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_COLOR_ARRAY);
-	glColorPointer(3, GL_INT, 0, Colors);
-	glVertexPointer(3, GL_FLOAT, 0, Vertices);
-	//go through our index array and draw our vertex array
-	glDrawElements(GL_QUADS, 20, GL_UNSIGNED_BYTE, indices);
+      }
+    else
+      {
+        theme::Instance()->FillglColorPointer(3,
+                GL_FLOAT,
+                0,
+                Colors,
+                8 );
 
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_COLOR_ARRAY);
-	debug::Instance()->FlushGL();
+      }
+    VertexObject* vo = new VertexObject(3, 3, 4);
+    vo->SetVerticesArray(VertexObject::FLOAT, Vertices, 8);
+    vo->SetFaceIndicesArray (VertexObject::UINT8_T, indices, 5);
+    vo->SetColorArray (VertexObject::FLOAT, Colors, 8);
+    return vo;
+
+
 }
 
 /////////////////////////////////////////////////////////////////////////////

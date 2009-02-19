@@ -23,14 +23,23 @@
   3. This notice may not be removed or altered from any source distribution.
 
 */
-
+#include <stdint.h>
+#include <GL/gl.h>
 namespace GLUI
 {
 
     class VertexObject
       {
           public: //types
-              enum datatype { UNDEF, UINT8_T, INT8_T, UINT16_T, INT16_T, UINT32_T, INT32_T, FLOAT, DOUBLE};
+              enum datatype { UNDEF   = 0,
+                              UINT8_T = GL_UNSIGNED_BYTE,
+                              INT8_T  = GL_BYTE,
+                              UINT16_T= GL_UNSIGNED_SHORT,
+                              INT16_T = GL_SHORT,
+                              UINT32_T= GL_UNSIGNED_INT,
+                              INT32_T = GL_INT,
+                              FLOAT   = GL_FLOAT,
+                              DOUBLE  = GL_DOUBLE};
               union pointers {
                   void*    all;
                   uint8_t* puint8;
@@ -42,64 +51,61 @@ namespace GLUI
                   float* pfloat;
                   double* pdouble;
               };
+              enum bufferstate {allocated, free};
+              struct DataArray
+              {
+                  uint32_t count;
+                  datatype datatype_t;
+                  pointers array;
+                  bufferstate state;
+              };
         protected : //variables
             uint8_t VerticesSize;          //< number of components per vertice
-            uint32_t VerticeCount;         //< number of vertices in the object
             uint8_t ColorSize;             //< number of components per colors (3 = RGB, 4 = RGBA)
             uint8_t VerticeByFacesCount;   //< number of vertices per face of the object
 
-            datatype Vertices_t;           //< type of the vertice array
-            pointers Vertices;             //< array containing the vertices size*VerticeCount wide, for glVertexPointer
-
-            datatype indices_t;            //< type of the indices array (float and double not allowed)
-            pointers indices;              //< array containing the indices of each faces, for glDrawElements
-
-            datatype Colors_t;             //< type of the color array
-            pointers Colors;               //< array containing the Colors of each Vertice, for glColorPointer
-
-            datatype Normals_t;            //< type of the Normal array
-            pointers Normals;              //< array containing the computed normals of the vertice, for glNormalPointer
-
-            datatype Texture_t;            //< type of the Texture array
-            pointers Texture;              //< array containing the texture coordinates of the vertice, for glTexCoordPointer
+            DataArray Vertices;             //< array containing the vertices size*VerticeCount wide, for glVertexPointer
+            DataArray indices;              //< array containing the indices of each faces, for glDrawElements
+            DataArray Colors;               //< array containing the Colors of each Vertice, for glColorPointer
+            DataArray Normals;              //< array containing the computed normals of the vertice, for glNormalPointer
+            DataArray Texture;              //< array containing the texture coordinates of the vertice, for glTexCoordPointer
 
 
         protected : //methods
             VertexObject();
-            void FreeVertex();
-            void FreeIndices();
-            void FreeColors();
-            void FreeNormals();
-            void FreeTexture();
-
+            void FreeArray(DataArray* array);
+            int AllocateArray (DataArray* array);
+            int CpyArray(DataArray* array, pointers data);
+            int SetArray (DataArray* array, datatype data_t, pointers data, uint32_t count);
         public:
             ~VertexObject();
             VertexObject(
                     uint8_t verticessize,
-                    uint32_t verticecount,
                     uint8_t colorsize,
-                    uint8_t verticebyfacescount,
-                    datatype vertices_t = UNDEF,
-                    pointers vertices = NULL,
-                    datatype indices_t = UNDEF,
-                    pointers indices = NULL,
-                    datatype colors_t = UNDEF,
-                    pointers colors = NULL,
-                    datatype normals_t = UNDEF,
-                    pointers normals = NULL,
-                    datatype texture_t = UNDEF,
-                    pointers texture = NULL
+                    uint8_t verticebyfacescount
                     );
-            int Describe(
-                    uint8_t verticessize,
-                    uint32_t verticecount,
-                    uint8_t colorsize,
-                    uint8_t verticebyfacescount);
-            int SetVerticesArray (datatype vertices_t, pointers vertices);
-            int SetIndicesArray (datatype indices_t, pointers indices);
-            int SetColorArray (datatype colors_t, pointers colors);
-            int SetNormalArray (datatype normals_t, pointers normals);
-            int SetTextureArray (datatype texture_t, pointers texture);
+            int SetVerticesArray (
+                    datatype vertices_t, //< type of the data in the array
+                    void* vertices,      //< buffer to the array
+                    uint32_t count);     //< number of vertices (the array is count* VerticesSize wide)
+            int SetFaceIndicesArray (
+                    datatype indices_t,  //< type of the data in the array
+                    void* indices,       //< buffer to the array
+                    uint32_t count);     //< number of faces (the array is count* VerticeByFacesCount wide)
+            int SetColorArray (
+                    datatype colors_t,  //< type of the data in the array
+                    void* colors,       //< buffer to the array
+                    uint32_t count);    //< number of colors (the array is count* ColorSizet wide)
+            int SetNormalArray (
+                    datatype normals_t, //< type of the data in the array
+                    void* normals,      //< buffer to the array
+                    uint32_t count);    //< number of normals (the array is count*3 wide)
+            int SetTextureArray (
+                    datatype texture_t, //< type of the data in the array
+                    void* texture,      //< buffer to the array
+                    uint32_t count);    //< number of texture components (the array is count wide)
+
+            int ComputeNormals();
 
 
 

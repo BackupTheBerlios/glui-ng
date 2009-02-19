@@ -35,11 +35,11 @@ namespace GLUI
     {
         public : //methods
             static theme* Instance();
-            void FillglColorPointer(GLint size,
-                    GLenum type,
-                    GLsizei stride,
-                    const GLvoid *pointer,
-                    uint32_t count );
+            void FillglColorPointer(GLint size,       //< numbers of elements per colors (3=RGB 4=RGBA)
+                    GLenum type,                      //< type of the array to fill
+                    GLsizei stride,                   //< if the array is interlaved with vectors
+                    const GLvoid *pointer,            //< pointer to the array
+                    uint32_t count );                 //< numbers of colors entries
             uint8_t* Get_bkgd_color();
         protected : //variables
             uint8_t    bkgd_color[4];

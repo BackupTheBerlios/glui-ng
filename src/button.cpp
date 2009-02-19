@@ -65,6 +65,8 @@ int Button::AddEvent (::XEvent *event)
 
 void   Button::draw()
 {
+    /* TODO
+     * this shall use a VertexObject, that is updated (delete then create a new one) on size update
     if (GetStatus() & EventInterpreter::buttonpressed)
     {
         drawinghelpers::draw_lowered_box( CurrentSize.size.w, CurrentSize.size.h );
@@ -74,6 +76,7 @@ void   Button::draw()
         drawinghelpers::draw_raised_box( CurrentSize.size.w, CurrentSize.size.h );
     }
     glTranslatef( 0.0, 0.0, level());
+    */
 }
 
 

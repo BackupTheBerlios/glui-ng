@@ -40,41 +40,49 @@ int main(int argc, char* argv[])
 class myGluiWin : public GLUIWindow
 {
     public :
-        myGluiWin(Display* glutDisplay) : GLUIWindow(glutDisplay,
-                                            glutDisplay->DefaultScreen()->RootWindow(),
-                                            -1, -1,
-                                            200, 200,
-                                            1,
-                                            1,
-                                            0)
-    {
-        set_resize_policy(FixedSize);
-    }
-       virtual void draw(void);
-       virtual void idle(void);
+        myGluiWin(Display* glutDisplay);
+        virtual void draw(void);
+
+        virtual void idle(void);
+    private :
+        VertexObject* box1;
+        VertexObject* box2;
 };
 
-
-void myGluiWin::draw(void)
+myGluiWin::myGluiWin(Display* glutDisplay) : GLUIWindow(glutDisplay,
+        glutDisplay->DefaultScreen()->RootWindow(),
+        -1, -1,
+        200, 200,
+        1,
+        1,
+        0)
 {
-    uint8_t color_array[8][3]= { {255, 000, 000},
-                                  {255, 000, 000},
-                                  {255, 000, 000},
-                                  {255, 000, 000},
+    uint8_t color_array[8][3] = { {255, 000, 000},
+                   {255, 000, 000},
+                   {255, 000, 000},
+                   {255, 000, 000},
 /*{255, 000, 000},
 {255, 000, 000},
 {255, 000, 000},
 {255, 000, 000}};*/
 
-                                  {000, 255, 000},
-                                  {000, 255, 000},
-                                  {000, 255, 000},
-                                  {000, 255, 000}};
+                   {000, 255, 000},
+                   {000, 255, 000},
+                   {000, 255, 000},
+                   {000, 255, 000}};
+
+    box1 = drawinghelpers::raised_box(180, 180);
+    box2 = drawinghelpers::raised_box(160, 160, 8, 3, GL_UNSIGNED_BYTE, color_array);
+    set_resize_policy(FixedSize);
+}
+
+void myGluiWin::draw(void)
+{
     glLoadIdentity();
     glTranslatef(10.0,10.0,-20.0);
-    drawinghelpers::draw_raised_box(180, 180);
+    box1->draw();
     glTranslatef(10.0,10.0,2.0);
-    drawinghelpers::draw_raised_box(160, 160, 8, 3, GL_UNSIGNED_BYTE, color_array);
+    box2->draw();
     glutPostRedisplay();
 }
 
