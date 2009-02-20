@@ -24,6 +24,7 @@
 #include <GL/glui/VertexObject.h>
 #include <GL/glui/Exception.h>
 #include <GL/glui/debug.h>
+#include <GL/glui/algebra3.h>
 #include <string.h>
 #include <iostream>
 #include <fstream>
@@ -250,4 +251,63 @@ void VertexObject::draw()
         glDisableClientState(GL_COLOR_ARRAY);
     }
     debug::Instance()->FlushGL();
+}
+
+
+//////////////////////////////////////////////////////////////////
+int VertexObject::ComputeNormals()
+{
+    FreeArray(Normals);
+    Normals->count = Vertices.count;
+    Normals->datatype_t = FLOAT;
+    try
+    {
+        AllocateArray(array);
+    }
+    catch(std::bad_alloc err)
+    {
+        std::cerr << err.what();
+        throw;
+    }
+    catch(Exception* err)
+    {
+        std::cerr << err->what();
+        throw;
+    }
+
+
+    int nbOfFaces = this->Vertices.count / this->VerticeByFacesCount;
+    for (int face = 0; face < nbOfFaces; face++)
+    {
+        uint32_t index1;
+        uint32_t index2;
+        uint32_t index3;
+        switch ( indices.datatype_t)
+        {
+            case UINT8_T :
+                index1 = indices.array.puint8[i * VerticeByFacesCount];
+                index2 = indices.array.puint8[i * VerticeByFacesCount + 1 ];
+                index3 = indices.array.puint8[i * VerticeByFacesCount + 2 ];
+                break;
+            case INT8_T:
+            case UINT16_T:
+            case INT16_T:
+            case UINT32_T:
+            case INT32_T:
+        }
+        vec3 v0( &( Vertices.array.pfloat[index1] ));
+        vec3 v1( &( Vertices.array.pfloat[index2] ));
+        vec3 v2( &( Vertices.array.pfloat[index3] ));
+        vec3 vnormal = (v1 - v0) ^ (v2 - v0);
+        Normals.array.pfloat[
+            indices.array.puint8[i * VerticeByFacesCount]
+            ] = vnormal[0];
+        Normals.array.pfloat[
+            indices.array.puint8[i * VerticeByFacesCount]
+            ] = vnormal[1];
+        Normals.array.pfloat[
+            indices.array.puint8[i * VerticeByFacesCount]
+            ] = vnormal[2];
+
+    }
 }

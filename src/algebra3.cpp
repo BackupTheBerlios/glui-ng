@@ -362,6 +362,13 @@ vec3::vec3()
     n[VX] = n[VY] = n[VZ] = 0.0;
 }
 
+vec3::vec3(float array[3])
+{
+    n[VX] = array[0];
+    n[VY] = array[1];
+    n[VZ] = array[2];
+}
+
 vec3::vec3(float x, float y, float z)
 {
     n[VX] = x;

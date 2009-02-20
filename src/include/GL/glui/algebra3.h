@@ -190,6 +190,7 @@ namespace GLUI
         // Constructors
 
         vec3();
+        vec3(float array[3]);
         vec3(float x, float y, float z);
         vec3(const vec3 &v);               // copy constructor
         vec3(const vec2 &v);               // cast v2 to v3
