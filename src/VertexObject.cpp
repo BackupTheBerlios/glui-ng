@@ -282,12 +282,35 @@ int VertexObject::ComputeNormals()
         uint32_t index1;
         uint32_t index2;
         uint32_t index3;
+        float fVertice0[3];
+        float fVertice1[3];
+        float fVertice2[3];
+
         switch ( indices.datatype_t)
         {
             case UINT8_T :
                 index1 = indices.array.puint8[i * VerticeByFacesCount];
                 index2 = indices.array.puint8[i * VerticeByFacesCount + 1 ];
                 index3 = indices.array.puint8[i * VerticeByFacesCount + 2 ];
+                break;
+            case INT8_T:
+            case UINT16_T:
+            case INT16_T:
+            case UINT32_T:
+            case INT32_T:
+        }
+        switch ( Vertices.datatype_t)
+        {
+            case UINT8_T :
+                fVertice0[0] = Vertices.array.puint8[index1];
+                fVertice0[1] = Vertices.array.puint8[index1];
+                fVertice0[2] = Vertices.array.puint8[index1];
+                fVertice1[0] = Vertices.array.puint8[index2];
+                fVertice1[1] = Vertices.array.puint8[index2];
+                fVertice1[2] = Vertices.array.puint8[index2];
+                fVertice2[0] = Vertices.array.puint8[index3];
+                fVertice2[1] = Vertices.array.puint8[index3];
+                fVertice2[2] = Vertices.array.puint8[index3];
                 break;
             case INT8_T:
             case UINT16_T:
