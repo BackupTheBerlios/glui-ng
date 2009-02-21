@@ -86,6 +86,7 @@ void VertexObject::FreeArray(DataArray* array)
             case INT32_T: delete[] array->array.pint32; break;
             case FLOAT: delete[] array->array.pfloat; break;
             case DOUBLE: delete[] array->array.pdouble; break;
+            case UNDEF : break;
         }
     }
     array->array.all = NULL;
@@ -103,7 +104,7 @@ int VertexObject::AllocateArray (DataArray* array)
         case UINT8_T:
             array->array.puint8 = new uint8_t[array->count];
             break;
-        case INT8_T
+        case INT8_T:
             array->array.pint8 = new int8_t[array->count];
             break;
         case UINT16_T:
@@ -257,7 +258,7 @@ void VertexObject::draw()
 //////////////////////////////////////////////////////////////////
 int VertexObject::ComputeNormals()
 {
-    FreeArray(Normals);
+/*    FreeArray(Normals);
     Normals->count = Vertices.count;
     Normals->datatype_t = FLOAT;
     try
@@ -333,4 +334,5 @@ int VertexObject::ComputeNormals()
             ] = vnormal[2];
 
     }
+*/
 }

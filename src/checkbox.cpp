@@ -151,3 +151,9 @@ void   Checkbox::update_size( void )
     this->CurrentSize.size.h = max<int>(13, this->CurrentSize.size.h);
 }
 
+
+///////////////////////////////////////////////////////////////////////////
+void Checkbox::common_init(void) {
+    CurrentSize.size.w              = 100;
+    CurrentSize.size.h              = 13;
+}

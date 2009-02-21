@@ -47,22 +47,13 @@ namespace GLUI
 			int min_h();
 		protected:
 			Panel( const char *name ) : Container(name) {}
-			void common_init( void );
+			 void common_init( void );
 
         protected : //variables
             panelType val;
 
 	};
 
-
-    ////////////INLINE
-    inline void Panel::common_init( void )
-    {
-        CurrentSize.size.w            = 300;
-        CurrentSize.size.h            = GLUI_DEFAULT_CONTROL_HEIGHT + 7;
-        val                           = embossed;
-        alignment                     = Container::center;
-    }
 
 
 }

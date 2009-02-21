@@ -45,7 +45,7 @@ namespace GLUI
 		DrawingSentinal(Control *c_); ///< The constructor sets up the drawing system
 		~DrawingSentinal(); ///< The destructor cleans up drawing back how it was 
 
-		inline void avoid_warning(void) {} // Do-nothing routine to avoid compiler warning about unused variable
+		 void avoid_warning(void) {} // Do-nothing routine to avoid compiler warning about unused variable
 	};
 
 

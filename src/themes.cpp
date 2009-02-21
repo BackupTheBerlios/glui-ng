@@ -29,7 +29,7 @@
 
 using namespace GLUI;
 
-
+////////////////////////////////////////////////////////////
 void theme::FillglColorPointer(GLint size,
         GLenum type,
         GLsizei stride,
@@ -88,8 +88,7 @@ void theme::FillglColorPointer(GLint size,
     }
     return;
 }
-
-
+////////////////////////////////////////////////////////////
 theme::theme()
 {
 	bkgd_color[0] = 236; //red
@@ -97,9 +96,17 @@ theme::theme()
 	bkgd_color[2] = 216; //blue
     bkgd_color[3] = 0; //alpha
 }
-
+////////////////////////////////////////////////////////////
 theme* theme::Instance()
 {
 	static theme TheTheme;
 	return &TheTheme;
 }
+////////////////////////////////////////////////////////////
+uint8_t* theme::Get_bkgd_color()
+{
+#warning "protect this with a const cast"
+    return bkgd_color;
+}
+
+

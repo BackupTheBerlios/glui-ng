@@ -564,8 +564,8 @@ int Container::BroadcastEvent(::XEvent* event, int type, long mask_check)
     //the event is for this widget and not a child
     return rc;
 }
-////////////////////////////////////////////////////////////////////////////////////////////
 //
+////////////////////////////////////////////////////////////////////////////////////////////
 int Container::ForwardEvent(::XEvent* event, int* eventX, int* eventY, int EventType, long mask_check)
 {
     if (event->type != EventType) return EINVAL;
@@ -596,3 +596,39 @@ int Container::AddEvent (::XKeyEvent* event)
     //
 }
 */
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////
+void Container::set_orientation( orientation new_orientation)
+{
+    CurrOrientation = new_orientation;
+    Container* cont  = dynamic_cast<Container*>(GetRootNode());
+    if ( cont != NULL)
+      {
+        cont->update_size();
+        cont->pack (0, 0);
+      }
+
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////
+Control* Container::FindChildWidget(int x, int y)
+{
+    Node* current_node = first_child();
+    while (current_node)
+      {
+        Control* current_control = dynamic_cast<Control*>(current_node);
+        if (current_control)
+          {
+            if (x > current_control->X() &&
+                    x < (current_control->X() + current_control->Width()) &&
+                    y > current_control->Y() &&
+                    y < (current_control->Y() + current_control->Height())
+               )
+                return current_control;
+          }
+        current_node = current_node->next();
+      }
+    return NULL;
+}

@@ -56,6 +56,26 @@
 #include <GL/glui/drawinghelpers.h>
 using namespace GLUI;
 
+///////////////////////////////////////////////////////////////////////
+GlutDisplay::GlutDisplay(char* name)
+{
+}
+///////////////////////////////////////////////////////////////////////
+void GlutWindow::draw()
+{
+    //    Draw GLUI window
+    glLoadIdentity();
+    this->SetOrthoProjection();
+    glTranslatef(x, y, BOTTOM_VIEWPORT + 1);
+    drawinghelpers::draw_box( this->Width(),
+            this->Height());
+}
+///////////////////////////////////////////////////////////////////////
+WindowId GlutWindow::GetWindowId()
+{
+    return GlutWindowId;
+}
+
 
 ///////////////////////////////////////////////////////////////////////
 int GlutScreen::Depth()

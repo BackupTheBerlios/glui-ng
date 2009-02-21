@@ -12,8 +12,8 @@ MAKEFLAGS+= -s
 
 # Compiler options
 OPTS+=-g
-OPTS+=-O0
-#OPTS+=-O2
+#OPTS+=-O0
+OPTS+=-O2
 OPTS+=-DDEBUG=1
 
 UNAME = $(shell uname)

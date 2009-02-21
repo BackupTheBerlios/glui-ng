@@ -40,19 +40,12 @@ namespace GLUI
                     GLsizei stride,                   //< if the array is interlaved with vectors
                     const GLvoid *pointer,            //< pointer to the array
                     uint32_t count );                 //< numbers of colors entries
-            uint8_t* Get_bkgd_color();
+             uint8_t* Get_bkgd_color();
         protected : //variables
             uint8_t    bkgd_color[4];
         private : //methods
             theme( void );
     };
-
-
-    inline uint8_t* theme::Get_bkgd_color()
-    {
-#warning "protect this with a const cast"
-        return bkgd_color;
-    }
 
 
 }

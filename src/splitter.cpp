@@ -94,3 +94,14 @@ void  Splitter::draw (void)
   }
 }
 */
+
+///////////////////////////////////////////////////////////////////////
+void Splitter::common_init()
+{
+    set_orientation(LeftToRight);
+    CurrentSize.size.w     = 0;
+    CurrentSize.size.h     = 0;
+}
+
+
+

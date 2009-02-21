@@ -49,15 +49,12 @@ namespace GLUI
 			~Checkbox();
 
 		protected:
-			void common_init(void) ;
+			 void common_init(void) ;
 			StaticText* text;
 			//	Button button;
 	};
 
-	inline void Checkbox::common_init(void) {
-		CurrentSize.size.w              = 100;
-		CurrentSize.size.h              = 13;
-	}
+
 
 
 }

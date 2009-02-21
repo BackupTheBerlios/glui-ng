@@ -79,5 +79,23 @@ void   Button::draw()
     */
 }
 
+void Button::common_init(void) {
+    CurrentSize.size.h            = GLUI_BUTTON_SIZE;
+    CurrentSize.size.w            = 100;
+    alignment    = Control::CENTER;
+}
 
+
+TextButton::TextButton (Node *parent, const char *name,
+        int id, CB cb ) :
+    Button(parent, name, id, cb),
+    text(this, "text")
+{
+    this->resizeable == AdaptThisToFitChilds;
+}
+
+void TextButton::SetText(char* newtext)
+{
+    text.set_text(newtext);
+}
 

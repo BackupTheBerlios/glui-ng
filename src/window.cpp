@@ -42,6 +42,15 @@ _Window::_Window() :
 }
 
 
+void _Window::SetViewport()
+{
+    glViewport( 0, 0, this->Width(), this->Height() );
+}
+
+_Display::_Display()
+{
+}
+
 int _Window::SetCurrentDrawBuffer( void )
 {
     /* Save old buffer */

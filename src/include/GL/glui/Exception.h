@@ -37,31 +37,11 @@ namespace GLUI
             const std::string* str;
             int err;
         public:
-            Exception(int errnb, const std::string* str);
-            Exception(int errnb, const char* str);
-            virtual const char * 	what () const throw ();
+             Exception(int errnb, const std::string* str);
+             Exception(int errnb, const char* str);
+             virtual const char * 	what () const throw ();
     };
 
-    inline Exception::Exception(int errnb, const std::string* str)
-    {
-        this->err = errnb;
-        this->str   = str;
-        this->c_str = NULL;
-    }
-
-    inline Exception::Exception(int errnb, const char* str)
-    {
-        this->err = errnb;
-        this->str   = NULL;
-        this->c_str = str;
-    }
-
-
-    inline const char * Exception::what () const throw ()
-    {
-        if (this->str != NULL) return this->str->c_str();
-        else if (this->c_str != NULL) return this->c_str;
-    }
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
 #define GLUI_THROW(errnb, str) throw new Exception(errnb, __FILE__ ":" TOSTRING(__LINE__) str TOSTRING(errnb))

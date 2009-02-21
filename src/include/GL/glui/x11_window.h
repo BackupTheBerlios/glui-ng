@@ -55,7 +55,7 @@ namespace GLUI
 	class GLUIAPI X11Display : public _Display
 	{
 		public :
-			X11Display(char* name);
+			inline X11Display(char* name);
 		private:
 			X11Display();
 	}
@@ -87,10 +87,5 @@ namespace GLUI
 	};
 
 
-	inline X11Display::X11Display(char* name)
-	{
-		disp = XOpenDisplay(name);
-		if (! disp) throw exception(__func__,EINVAL);
-	}
 }
 #endif //__GLUI_GLUT_WINDOW_H

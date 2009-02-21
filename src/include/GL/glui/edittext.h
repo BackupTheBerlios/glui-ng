@@ -86,7 +86,7 @@ namespace GLUI
                     int id=-1, CB callback=CB() );
 
         protected:
-            void common_init( void );
+             void common_init( void );
             void common_construct( Node *parent, const char *name,
                     int data_type, int live_type, void *live_var,
                     int id, CB callback );
@@ -126,27 +126,7 @@ namespace GLUI
             int                 int_low, int_high;
     };
 
-    inline void EditText::common_init( void ) {
-        CurrentSize.size.h    = GLUI_EDITTEXT_HEIGHT;
-        CurrentSize.size.w    = GLUI_EDITTEXT_WIDTH;
-        title_x_offset        = 0;
-        text_x_offset         = 55;
-        insertion_pt          = -1;
-        last_insertion_pt     = -1;
-        substring_start       = 0;
-        data_type             = GLUI_EDITTEXT_TEXT;
-        substring_end         = 2;
-        num_periods           = 0;
-        has_limits            = GLUI_LIMIT_NONE;
-        sel_start             = 0;
-        sel_end               = 0;
-        active_type           = GLUI_CONTROL_ACTIVE_PERMANENT;
-        can_activate          = true;
-        spacebar_mouse_click  = false;
-        spinner               = NULL;
-        debug                 = false;
-        draw_text_only        = false;
-    }
+
 
 }
 

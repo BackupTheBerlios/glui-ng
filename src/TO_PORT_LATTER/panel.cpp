@@ -34,7 +34,16 @@
 
 #include "glui_internal_control.h"
 using namespace GLUI;
+///////////////////////////////////////////////////////////////////
+void Panel::common_init( void )
+{
+    CurrentSize.size.w            = 300;
+    CurrentSize.size.h            = GLUI_DEFAULT_CONTROL_HEIGHT + 7;
+    val                           = embossed;
+    alignment                     = Container::center;
+}
 
+///////////////////////////////////////////////////////////////////
 Panel::Panel(GLUI* theglui, Node *parent, const char *name,
                 int type):
     Container(name)

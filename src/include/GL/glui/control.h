@@ -84,16 +84,16 @@ namespace GLUI
 
 
         public:
-            virtual int    Width() const;
-            virtual int    Height() const;
-            int  YOffTop() const;
-            int  YOffBot() const;
-            int  XOffLeft() const;
-            int  XOffRight() const;
-            int  X() const;
-            int  Y() const;
+             virtual int    Width() const;
+             virtual int    Height() const;
+             int  YOffTop() const;
+             int  YOffBot() const;
+             int  XOffLeft() const;
+             int  XOffRight() const;
+             int  X() const;
+             int  Y() const;
 
-            int SetMargins(int top, int bottom, int left, int right);
+             int SetMargins(int top, int bottom, int left, int right);
 
 
             virtual int Activate(); //< activate the current control return 0 if activated, !=0 on error (can't activate)
@@ -178,39 +178,6 @@ namespace GLUI
     };
 
 
-    inline int Control::Width() const
-    {
-        return CurrentSize.size.w + x_off_left + x_off_right;
-    }
-    inline int Control::Height() const
-    {
-        return CurrentSize.size.h + y_off_top + y_off_bot;
-    }
-
-    inline int  Control::YOffTop() const {return y_off_top;}
-    inline int  Control::YOffBot() const {return y_off_bot;}
-    inline int  Control::XOffLeft() const {return x_off_left;}
-    inline int  Control::XOffRight() const {return x_off_right;}
-    inline int  Control::X() const {return x;}
-    inline int  Control::Y() const {return y;}
-
-
-
-    inline int Control::SetMargins(int top, int bottom, int left, int right)
-    {
-        y_off_top = top;
-        y_off_bot = bottom;
-        x_off_left = left;
-        x_off_right = right;
-        Control* cont  = dynamic_cast<Control*>(GetRootNode());
-        if ( cont != NULL)
-        {
-            cont->update_size();
-            cont->pack (0, 0);
-        }
-        return 0;
-
-    }
 
 
 

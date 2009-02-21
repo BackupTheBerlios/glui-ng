@@ -57,7 +57,7 @@ namespace GLUI
 
             virtual void update_size( void ); //<recursively update all control sizes
             virtual void pack ( int x, int y); //<recursively update positions
-            void set_orientation( orientation new_orientation);
+             void set_orientation( orientation new_orientation);
             virtual void align( void );
             virtual int  add_control( Node *control );
 
@@ -100,7 +100,7 @@ namespace GLUI
             orientation GetParentOrientation();
 
         protected : //internal API
-            Control* FindChildWidget(int x, int y);
+             Control* FindChildWidget(int x, int y);
             int BroadcastEvent(::XEvent* event, int EventType, long mask_check);
             int ForwardEvent(::XEvent* event, int* eventX, int* eventY, int EventType, long mask_check);
 
@@ -119,37 +119,6 @@ namespace GLUI
     };
 
 
-    inline void Container::set_orientation( orientation new_orientation)
-    {
-        CurrOrientation = new_orientation;
-        Container* cont  = dynamic_cast<Container*>(GetRootNode());
-        if ( cont != NULL)
-        {
-            cont->update_size();
-            cont->pack (0, 0);
-        }
-
-    }
-
-    inline Control* Container::FindChildWidget(int x, int y)
-    {
-        Node* current_node = first_child();
-        while (current_node)
-        {
-            Control* current_control = dynamic_cast<Control*>(current_node);
-            if (current_control)
-            {
-                if (x > current_control->X() &&
-                        x < (current_control->X() + current_control->Width()) &&
-                        y > current_control->Y() &&
-                        y < (current_control->Y() + current_control->Height())
-                   )
-                    return current_control;
-            }
-            current_node = current_node->next();
-        }
-        return NULL;
-    }
 
 
 

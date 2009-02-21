@@ -35,7 +35,14 @@
 #include <GL/glui/debug.h>
 
 using namespace GLUI;
-
+/////////////////////////////////////////////////////////////////////
+void CommandLine::common_init() {
+    hist_list.resize(HIST_SIZE);
+    curr_hist = 0;
+    oldest_hist = 0;
+    newest_hist = 0;
+    commit_flag = false;
+}
 /****************************** CommandLine::CommandLine() **********/
 CommandLine::CommandLine( Node *parent, const char *name, 
                                     std::string *data, int id, CB cb )

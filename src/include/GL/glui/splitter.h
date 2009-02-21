@@ -65,16 +65,7 @@ namespace GLUI
             bool draw_separator;
 
         protected: //methods
-            void common_init();
+             void common_init();
     };
-
-    //////////inlines
-    void Splitter::common_init()
-    {
-        set_orientation(LeftToRight);
-        CurrentSize.size.w     = 0;
-        CurrentSize.size.h     = 0;
-    }
-
 }
 #endif //__SPLITTER_H

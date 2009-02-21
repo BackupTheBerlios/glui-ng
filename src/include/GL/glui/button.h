@@ -38,7 +38,7 @@ namespace GLUI
 
 		protected:
 			void draw_pressed( void );
-			void common_init(void) ;
+			 void common_init(void) ;
 	};
 
 
@@ -52,8 +52,8 @@ namespace GLUI
 	class GLUIAPI TextButton : public Button
 	{
 		public :
-			void SetText(char* newtext);
-			TextButton (Node *parent, const char *name,
+			 void SetText(char* newtext);
+			 TextButton (Node *parent, const char *name,
 					int id=-1, CB cb=CB() ) ;
 
 		private:
@@ -64,24 +64,6 @@ namespace GLUI
 	};
 
 
-	inline void Button::common_init(void) {
-		CurrentSize.size.h            = GLUI_BUTTON_SIZE;
-		CurrentSize.size.w            = 100;
-		alignment    = Control::CENTER;
-	}
 
-
-	inline TextButton::TextButton (Node *parent, const char *name,
-			int id, CB cb ) :
-		Button(parent, name, id, cb),
-		text(this, "text")
-	{
-		this->resizeable == AdaptThisToFitChilds;
-	}
-
-	inline void TextButton::SetText(char* newtext)
-	{
-		text.set_text(newtext);
-	}
 }
 #endif

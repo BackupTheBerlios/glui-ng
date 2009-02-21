@@ -96,7 +96,7 @@ namespace GLUI
     class _Window : public Container
     {
         public :
-            _Window(const char *name,
+             _Window(const char *name,
                     Container::orientation orient=Container::TopDown);
             virtual int AddEvent (::XEvent *event)=0;
         public :  //operators
@@ -109,7 +109,7 @@ namespace GLUI
             virtual void XUnmapSubwindows()=0;
 
 
-            void SetViewport(void);
+             void SetViewport(void);
 
         protected :
             _Window();
@@ -120,14 +120,7 @@ namespace GLUI
 
     };
 
-    inline void _Window::SetViewport()
-    {
-        glViewport( 0, 0, this->Width(), this->Height() );
-    }
 
-    inline _Display::_Display()
-    {
-    }
 
 }
 

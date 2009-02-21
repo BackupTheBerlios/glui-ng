@@ -23,7 +23,7 @@ namespace GLUI
 	};
 
     ///////////////////INLINES///////
-    inline void Separator::common_init()
+     void Separator::common_init()
     {
         CurrentSize.size.w            = 100;
         CurrentSize.size.h            = default_height;

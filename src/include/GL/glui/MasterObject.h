@@ -28,12 +28,8 @@ namespace GLUI
 
         private:
             MasterObject(const char *name);
-            MasterObject();
+             MasterObject();
     };
-
-    inline MasterObject::MasterObject()
-    {
-    }
 
 }
 

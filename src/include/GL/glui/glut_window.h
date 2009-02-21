@@ -64,7 +64,7 @@ namespace GLUI
     class GlutDisplay: public _Display
     {
         public :
-            GlutDisplay(char* name);
+             GlutDisplay(char* name);
             virtual _Screen* DefaultScreen();
         private:
             GlutDisplay();
@@ -98,8 +98,8 @@ namespace GLUI
             static int init(int* argc, char** argv); //optional
             virtual ~GlutWindow();
             virtual int AddEvent (::XEvent* event);
-            WindowId GetWindowId();
-            virtual void draw();
+             WindowId GetWindowId();
+             virtual void draw();
             virtual void idle(); //< shall not rely on that, it binds you to GLUT
 
         public: //XMethods
@@ -155,26 +155,6 @@ namespace GLUI
         protected: //defines
             enum _KeyModifierShift { KeyModifierShift=8 }; //256 first chars are already used in keyboard functions of glut
     };
-
-
-    inline GlutDisplay::GlutDisplay(char* name)
-    {
-    }
-
-    inline void GlutWindow::draw()
-    {
-        //    Draw GLUI window
-        glLoadIdentity();
-        this->SetOrthoProjection();
-        glTranslatef(x, y, BOTTOM_VIEWPORT + 1);
-        drawinghelpers::draw_box( this->Width(),
-                this->Height());
-    }
-
-    inline WindowId GlutWindow::GetWindowId()
-    {
-        return GlutWindowId;
-    }
 
 }
 #endif //__GLUI_GLUT_WINDOW_H
