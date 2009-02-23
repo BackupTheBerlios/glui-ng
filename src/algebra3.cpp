@@ -613,7 +613,7 @@ istream& operator >> (istream& s, vec3& v) {
 }
 */
 
-void swap(vec3 &a, vec3 &b)
+void GLUI::swap(vec3 &a, vec3 &b)
 {
     vec3 tmp(a);
     a = b;
@@ -916,7 +916,7 @@ istream& GLUI::operator >> (istream& s, vec4& v) {
 }
 */
 
-void swap(vec4 &a, vec4 &b)
+void GLUI::swap(vec4 &a, vec4 &b)
 {
     vec4 tmp(a);
     a = b;
@@ -1169,7 +1169,7 @@ istream& GLUI::operator >> (istream& s, mat3& m) {
 }
 */
 
-void swap(mat3 &a, mat3 &b)
+void GLUI::swap(mat3 &a, mat3 &b)
 {
     mat3 tmp(a);
     a = b;
@@ -1482,7 +1482,7 @@ istream& GLUI::operator >> (istream& s, mat4& m)
 }
 */
 
-void swap(mat4 &a, mat4 &b)
+void GLUI::swap(mat4 &a, mat4 &b)
 {
     mat4 tmp(a);
     a = b;
@@ -1495,7 +1495,7 @@ void swap(mat4 &a, mat4 &b)
  *                                                              *
  ****************************************************************/
 
-mat3 identity2D()
+mat3 GLUI::identity2D()
 {
     return mat3(
         vec3(1.0, 0.0, 0.0),
@@ -1503,7 +1503,7 @@ mat3 identity2D()
         vec3(0.0, 0.0, 1.0));
 }
 
-mat3 translation2D(const vec2 &v)
+mat3 GLUI::translation2D(const vec2 &v)
 {
     return mat3(
         vec3(1.0, 0.0, v[VX]),
@@ -1511,7 +1511,7 @@ mat3 translation2D(const vec2 &v)
         vec3(0.0, 0.0, 1.0));
 }
 
-mat3 rotation2D(const vec2 &Center, double angleDeg)
+mat3 GLUI::rotation2D(const vec2 &Center, double angleDeg)
 {
     double angleRad = (double) (angleDeg * M_PI / 180.0);
     double c = (double) cos(angleRad);
@@ -1523,7 +1523,7 @@ mat3 rotation2D(const vec2 &Center, double angleDeg)
         vec3(0.0, 0.0, 1.0));
 }
 
-mat3 scaling2D(const vec2 &scaleVector)
+mat3 GLUI::scaling2D(const vec2 &scaleVector)
 {
     return mat3(
         vec3(scaleVector[VX], 0.0, 0.0),
@@ -1531,7 +1531,7 @@ mat3 scaling2D(const vec2 &scaleVector)
         vec3(0.0, 0.0, 1.0));
 }
 
-mat4 identity3D()
+mat4 GLUI::identity3D()
 {
     return mat4(
         vec4(1.0, 0.0, 0.0, 0.0),
@@ -1540,7 +1540,7 @@ mat4 identity3D()
         vec4(0.0, 0.0, 0.0, 1.0));
 }
 
-mat4 translation3D(const vec3 &v)
+mat4 GLUI::translation3D(const vec3 &v)
 {
     return mat4(
         vec4(1.0, 0.0, 0.0, v[VX]),
@@ -1549,7 +1549,7 @@ mat4 translation3D(const vec3 &v)
         vec4(0.0, 0.0, 0.0, 1.0));
 }
 
-mat4 rotation3D(const vec3 &Axis, double angleDeg)
+mat4 GLUI::rotation3D(const vec3 &Axis, double angleDeg)
 {
     double angleRad = (double) (angleDeg * M_PI / 180.0);
     double c = (double) cos(angleRad);
@@ -1575,7 +1575,7 @@ mat4 rotation3D(const vec3 &Axis, double angleDeg)
         vec4(0.0, 0.0, 0.0, 1.0));
 }
 
-mat4 rotation3Drad(const vec3 &Axis, double angleRad)
+mat4 GLUI::rotation3Drad(const vec3 &Axis, double angleRad)
 {
     double c = (double) cos(angleRad);
     double s = (double) sin(angleRad);
@@ -1600,7 +1600,7 @@ mat4 rotation3Drad(const vec3 &Axis, double angleRad)
         vec4(0.0, 0.0, 0.0, 1.0));
 }
 
-mat4 scaling3D(const vec3 &scaleVector)
+mat4 GLUI::scaling3D(const vec3 &scaleVector)
 {
     return mat4(
         vec4(scaleVector[VX], 0.0, 0.0, 0.0),
@@ -1609,7 +1609,7 @@ mat4 scaling3D(const vec3 &scaleVector)
         vec4(0.0, 0.0, 0.0, 1.0));
 }
 
-mat4 perspective3D(double d)
+mat4 GLUI::perspective3D(double d)
 {
     return mat4(
         vec4(1.0f, 0.0f, 0.0f,   0.0f),

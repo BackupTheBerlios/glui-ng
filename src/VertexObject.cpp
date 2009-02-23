@@ -258,7 +258,12 @@ VertexObject::V3List::V3List()
 {
     next = NULL;
 }
-
+//////////////////////////////////////////////////////////////////
+VertexObject::V3List::V3List(vec3 vert)
+{
+    next = NULL;
+    vertex = vert;
+}
 //////////////////////////////////////////////////////////////////
 void VertexObject::V3List::clean()
 {
