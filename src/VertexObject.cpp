@@ -253,17 +253,50 @@ void VertexObject::draw()
     }
     debug::Instance()->FlushGL();
 }
+//////////////////////////////////////////////////////////////////
+VertexObject::V3List::V3List()
+{
+    next = NULL;
+}
 
-
+//////////////////////////////////////////////////////////////////
+void VertexObject::V3List::clean()
+{
+    if (next != NULL)
+      {
+        next->clean();
+      }
+    if (next == NULL)
+      {
+        return;
+      }
+    //next is not null and shall have cleaned itself
+    delete next;
+    next = NULL;
+    return;
+}
+//////////////////////////////////////////////////////////////////
+void VertexObject::V3List::add(V3List* newv3)
+{
+    if (newv3 != NULL)
+      {
+        V3List* last = this;
+        while (last->next != NULL)
+          {
+            last = last->next;
+          }
+        last->next = newv3;
+      }
+}
 //////////////////////////////////////////////////////////////////
 int VertexObject::ComputeNormals()
 {
-/*    FreeArray(Normals);
-    Normals->count = Vertices.count;
-    Normals->datatype_t = FLOAT;
+    FreeArray(&Normals);
+    Normals.count = Vertices.count;
+    Normals.datatype_t = FLOAT;
     try
     {
-        AllocateArray(array);
+        AllocateArray(&Normals);
     }
     catch(std::bad_alloc err)
     {
@@ -275,7 +308,16 @@ int VertexObject::ComputeNormals()
         std::cerr << err->what();
         throw;
     }
-
+    V3List* VerticeAndNormalsArray;
+    try
+      {
+        VerticeAndNormalsArray = new V3List[Vertices.count];
+      }
+    catch(std::bad_alloc err)
+    {
+        std::cerr << err.what();
+        throw;
+    }
 
     int nbOfFaces = this->Vertices.count / this->VerticeByFacesCount;
     for (int face = 0; face < nbOfFaces; face++)
@@ -283,56 +325,170 @@ int VertexObject::ComputeNormals()
         uint32_t index1;
         uint32_t index2;
         uint32_t index3;
-        float fVertice0[3];
-        float fVertice1[3];
-        float fVertice2[3];
+        uint32_t index4; //optional index if QUAD is used
+        double fVertice0[3];
+        double fVertice1[3];
+        double fVertice2[3];
 
         switch ( indices.datatype_t)
         {
             case UINT8_T :
-                index1 = indices.array.puint8[i * VerticeByFacesCount];
-                index2 = indices.array.puint8[i * VerticeByFacesCount + 1 ];
-                index3 = indices.array.puint8[i * VerticeByFacesCount + 2 ];
+                index1 = indices.array.puint8[face * VerticeByFacesCount];
+                index2 = indices.array.puint8[face * VerticeByFacesCount + 1 ];
+                index3 = indices.array.puint8[face * VerticeByFacesCount + 2 ];
+                if (VerticeByFacesCount == 4) index4 = indices.array.puint8[face * VerticeByFacesCount + 3 ];
                 break;
             case INT8_T:
+                index1 = indices.array.pint8[face * VerticeByFacesCount];
+                index2 = indices.array.pint8[face * VerticeByFacesCount + 1 ];
+                index3 = indices.array.pint8[face * VerticeByFacesCount + 2 ];
+                if (VerticeByFacesCount == 4) index4 = indices.array.pint8[face * VerticeByFacesCount + 3 ];
+                break;
             case UINT16_T:
+                index1 = indices.array.puint16[face * VerticeByFacesCount];
+                index2 = indices.array.puint16[face * VerticeByFacesCount + 1 ];
+                index3 = indices.array.puint16[face * VerticeByFacesCount + 2 ];
+                if (VerticeByFacesCount == 4) index4 = indices.array.puint16[face * VerticeByFacesCount + 3 ];
+                break;
             case INT16_T:
+                index1 = indices.array.pint16[face * VerticeByFacesCount];
+                index2 = indices.array.pint16[face * VerticeByFacesCount + 1 ];
+                index3 = indices.array.pint16[face * VerticeByFacesCount + 2 ];
+                if (VerticeByFacesCount == 4) index4 = indices.array.pint16[face * VerticeByFacesCount + 3 ];
+                break;
             case UINT32_T:
+                index1 = indices.array.puint32[face * VerticeByFacesCount];
+                index2 = indices.array.puint32[face * VerticeByFacesCount + 1 ];
+                index3 = indices.array.puint32[face * VerticeByFacesCount + 2 ];
+                if (VerticeByFacesCount == 4) index4 = indices.array.puint32[face * VerticeByFacesCount + 3 ];
+                break;
             case INT32_T:
+                index1 = indices.array.pint32[face * VerticeByFacesCount];
+                index2 = indices.array.pint32[face * VerticeByFacesCount + 1 ];
+                index3 = indices.array.pint32[face * VerticeByFacesCount + 2 ];
+                if (VerticeByFacesCount == 4) index4 = indices.array.pint32[face * VerticeByFacesCount + 3 ];
+                break;
+            default:
+                throw new Exception(EINVAL, "indices has not an int type");
+
         }
         switch ( Vertices.datatype_t)
         {
             case UINT8_T :
-                fVertice0[0] = Vertices.array.puint8[index1];
-                fVertice0[1] = Vertices.array.puint8[index1];
-                fVertice0[2] = Vertices.array.puint8[index1];
-                fVertice1[0] = Vertices.array.puint8[index2];
-                fVertice1[1] = Vertices.array.puint8[index2];
-                fVertice1[2] = Vertices.array.puint8[index2];
-                fVertice2[0] = Vertices.array.puint8[index3];
-                fVertice2[1] = Vertices.array.puint8[index3];
-                fVertice2[2] = Vertices.array.puint8[index3];
+                fVertice0[0] = Vertices.array.puint8[index1*VerticesSize +0];
+                fVertice0[1] = Vertices.array.puint8[index1*VerticesSize +1];
+                fVertice0[2] = Vertices.array.puint8[index1*VerticesSize +2];
+                fVertice1[0] = Vertices.array.puint8[index2*VerticesSize +0];
+                fVertice1[1] = Vertices.array.puint8[index2*VerticesSize +1];
+                fVertice1[2] = Vertices.array.puint8[index2*VerticesSize +2];
+                fVertice2[0] = Vertices.array.puint8[index3*VerticesSize +0];
+                fVertice2[1] = Vertices.array.puint8[index3*VerticesSize +1];
+                fVertice2[2] = Vertices.array.puint8[index3*VerticesSize +2];
                 break;
             case INT8_T:
+                fVertice0[0] = Vertices.array.pint8[index1*VerticesSize +0];
+                fVertice0[1] = Vertices.array.pint8[index1*VerticesSize +1];
+                fVertice0[2] = Vertices.array.pint8[index1*VerticesSize +2];
+                fVertice1[0] = Vertices.array.pint8[index2*VerticesSize +0];
+                fVertice1[1] = Vertices.array.pint8[index2*VerticesSize +1];
+                fVertice1[2] = Vertices.array.pint8[index2*VerticesSize +2];
+                fVertice2[0] = Vertices.array.pint8[index3*VerticesSize +0];
+                fVertice2[1] = Vertices.array.pint8[index3*VerticesSize +1];
+                fVertice2[2] = Vertices.array.pint8[index3*VerticesSize +2];
+                break;
             case UINT16_T:
+                fVertice0[0] = Vertices.array.puint16[index1*VerticesSize +0];
+                fVertice0[1] = Vertices.array.puint16[index1*VerticesSize +1];
+                fVertice0[2] = Vertices.array.puint16[index1*VerticesSize +2];
+                fVertice1[0] = Vertices.array.puint16[index2*VerticesSize +0];
+                fVertice1[1] = Vertices.array.puint16[index2*VerticesSize +1];
+                fVertice1[2] = Vertices.array.puint16[index2*VerticesSize +2];
+                fVertice2[0] = Vertices.array.puint16[index3*VerticesSize +0];
+                fVertice2[1] = Vertices.array.puint16[index3*VerticesSize +1];
+                fVertice2[2] = Vertices.array.puint16[index3*VerticesSize +2];
+                break;
             case INT16_T:
+                fVertice0[0] = Vertices.array.pint16[index1*VerticesSize +0];
+                fVertice0[1] = Vertices.array.pint16[index1*VerticesSize +1];
+                fVertice0[2] = Vertices.array.pint16[index1*VerticesSize +2];
+                fVertice1[0] = Vertices.array.pint16[index2*VerticesSize +0];
+                fVertice1[1] = Vertices.array.pint16[index2*VerticesSize +1];
+                fVertice1[2] = Vertices.array.pint16[index2*VerticesSize +2];
+                fVertice2[0] = Vertices.array.pint16[index3*VerticesSize +0];
+                fVertice2[1] = Vertices.array.pint16[index3*VerticesSize +1];
+                fVertice2[2] = Vertices.array.pint16[index3*VerticesSize +2];
+                break;
             case UINT32_T:
+                fVertice0[0] = Vertices.array.puint32[index1*VerticesSize +0];
+                fVertice0[1] = Vertices.array.puint32[index1*VerticesSize +1];
+                fVertice0[2] = Vertices.array.puint32[index1*VerticesSize +2];
+                fVertice1[0] = Vertices.array.puint32[index2*VerticesSize +0];
+                fVertice1[1] = Vertices.array.puint32[index2*VerticesSize +1];
+                fVertice1[2] = Vertices.array.puint32[index2*VerticesSize +2];
+                fVertice2[0] = Vertices.array.puint32[index3*VerticesSize +0];
+                fVertice2[1] = Vertices.array.puint32[index3*VerticesSize +1];
+                fVertice2[2] = Vertices.array.puint32[index3*VerticesSize +2];
+                break;
             case INT32_T:
-        }
-        vec3 v0( &( Vertices.array.pfloat[index1] ));
-        vec3 v1( &( Vertices.array.pfloat[index2] ));
-        vec3 v2( &( Vertices.array.pfloat[index3] ));
-        vec3 vnormal = (v1 - v0) ^ (v2 - v0);
-        Normals.array.pfloat[
-            indices.array.puint8[i * VerticeByFacesCount]
-            ] = vnormal[0];
-        Normals.array.pfloat[
-            indices.array.puint8[i * VerticeByFacesCount]
-            ] = vnormal[1];
-        Normals.array.pfloat[
-            indices.array.puint8[i * VerticeByFacesCount]
-            ] = vnormal[2];
+                fVertice0[0] = Vertices.array.pint32[index1*VerticesSize +0];
+                fVertice0[1] = Vertices.array.pint32[index1*VerticesSize +1];
+                fVertice0[2] = Vertices.array.pint32[index1*VerticesSize +2];
+                fVertice1[0] = Vertices.array.pint32[index2*VerticesSize +0];
+                fVertice1[1] = Vertices.array.pint32[index2*VerticesSize +1];
+                fVertice1[2] = Vertices.array.pint32[index2*VerticesSize +2];
+                fVertice2[0] = Vertices.array.pint32[index3*VerticesSize +0];
+                fVertice2[1] = Vertices.array.pint32[index3*VerticesSize +1];
+                fVertice2[2] = Vertices.array.pint32[index3*VerticesSize +2];
+                break;
+            case FLOAT:
+                fVertice0[0] = Vertices.array.pfloat[index1*VerticesSize +0];
+                fVertice0[1] = Vertices.array.pfloat[index1*VerticesSize +1];
+                fVertice0[2] = Vertices.array.pfloat[index1*VerticesSize +2];
+                fVertice1[0] = Vertices.array.pfloat[index2*VerticesSize +0];
+                fVertice1[1] = Vertices.array.pfloat[index2*VerticesSize +1];
+                fVertice1[2] = Vertices.array.pfloat[index2*VerticesSize +2];
+                fVertice2[0] = Vertices.array.pfloat[index3*VerticesSize +0];
+                fVertice2[1] = Vertices.array.pfloat[index3*VerticesSize +1];
+                fVertice2[2] = Vertices.array.pfloat[index3*VerticesSize +2];
+                break;
+            case DOUBLE:
+                fVertice0[0] = Vertices.array.pdouble[index1*VerticesSize +0];
+                fVertice0[1] = Vertices.array.pdouble[index1*VerticesSize +1];
+                fVertice0[2] = Vertices.array.pdouble[index1*VerticesSize +2];
+                fVertice1[0] = Vertices.array.pdouble[index2*VerticesSize +0];
+                fVertice1[1] = Vertices.array.pdouble[index2*VerticesSize +1];
+                fVertice1[2] = Vertices.array.pdouble[index2*VerticesSize +2];
+                fVertice2[0] = Vertices.array.pdouble[index3*VerticesSize +0];
+                fVertice2[1] = Vertices.array.pdouble[index3*VerticesSize +1];
+                fVertice2[2] = Vertices.array.pdouble[index3*VerticesSize +2];
+                break;
+            default :
+                throw new Exception(EINVAL, "Vertices has an undefined type");
 
+        }
+        vec3 v0( fVertice0 );
+        vec3 v1( fVertice1 );
+        vec3 v2( fVertice2 );
+        vec3 vnormal = (v1 - v0) ^ (v2 - v0);
+        VerticeAndNormalsArray[index1].add(new V3List(vnormal));
+        VerticeAndNormalsArray[index2].add(new V3List(vnormal));
+        VerticeAndNormalsArray[index3].add(new V3List(vnormal));
+        if (VerticeByFacesCount == 4)  VerticeAndNormalsArray[index4].add(new V3List(vnormal));
     }
-*/
+    //we have processed all the faces and created the normals associated, now compute the average and fill the array
+    for (uint32_t i=0; i < Vertices.count; i++)
+      {
+        V3List* normals = &VerticeAndNormalsArray[i];
+        vec3 normal = normals->vertex;
+        while (normals->next != NULL)
+          {
+            normals= normals->next;
+            normal = normal + normals->vertex;
+          }
+        normal.normalize();
+        Normals.array.pfloat[i*3 + 0] = normal[VX];
+        Normals.array.pfloat[i*3 + 1] = normal[VY];
+        Normals.array.pfloat[i*3 + 2] = normal[VZ];
+      }
+
 }

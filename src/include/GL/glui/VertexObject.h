@@ -25,6 +25,7 @@
 */
 #include <stdint.h>
 #include <GL/gl.h>
+#include <GL/glui/algebra3.h>
 namespace GLUI
 {
 
@@ -59,6 +60,15 @@ namespace GLUI
                   pointers array;
                   bufferstate state;
               };
+              struct V3List
+                {
+                  vec3 vertex;
+                  V3List* next;
+                  V3List();                //< constructor
+                  V3List(vec3 vert);       //< constructor
+                  void clean();            //< recursively delete the list
+                  void add(V3List* newv3); //< add a V3List at the end of the list
+                };
         protected : //variables
             uint8_t VerticesSize;          //< number of components per vertice
             uint8_t ColorSize;             //< number of components per colors (3 = RGB, 4 = RGBA)
