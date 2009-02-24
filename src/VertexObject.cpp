@@ -474,7 +474,12 @@ int VertexObject::ComputeNormals()
         vec3 v0( fVertice0 );
         vec3 v1( fVertice1 );
         vec3 v2( fVertice2 );
-        vec3 vnormal = (v1 - v0) ^ (v2 - v0);
+
+        vec3 vp1 = v1 - v0;
+        vec3 vp2 = v2 - v0;
+
+        vec3 vnormal = vp1 ^ vp2;
+        vnormal.normalize();
         VerticeAndNormalsArray[index1].add(new V3List(vnormal));
         VerticeAndNormalsArray[index2].add(new V3List(vnormal));
         VerticeAndNormalsArray[index3].add(new V3List(vnormal));

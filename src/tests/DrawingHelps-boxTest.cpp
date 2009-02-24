@@ -71,7 +71,7 @@ myGluiWin::myGluiWin(Display* glutDisplay) : GLUIWindow(glutDisplay,
                    {000, 255, 000},
                    {000, 255, 000}};
 
-    box1 = drawinghelpers::raised_box(180, 180);
+    box1 = drawinghelpers::raised_box(180, 180, 9);
     box2 = drawinghelpers::raised_box(160, 160, 8, 3, GL_UNSIGNED_BYTE, color_array);
     set_resize_policy(FixedSize);
 }
