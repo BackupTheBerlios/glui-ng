@@ -4,3 +4,6 @@ ifeq (${OS},Cygwin)
    EXE:=.exe
 endif
 
+.SECONDARY:
+
+

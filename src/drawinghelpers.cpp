@@ -18,6 +18,15 @@ VertexObject* drawinghelpers::raised_box( uint32_t w, uint32_t h, uint32_t thick
                                 {w-(float) thickness,   (float) thickness, (float) thickness}, //5
                                 {w-(float) thickness, h-(float) thickness, (float) thickness}, //6
                                 {  (float) thickness, h-(float) thickness, (float) thickness}}; //7
+    GLfloat Normals[8][3]   = { {  0.0,   0.0, 0.0}, //0
+                                {  0.0,   0.0, 0.0}, //1
+                                {  0.0,   0.0, 0.0}, //2
+                                {  0.0,   0.0, 0.0}, //3
+                                {  0.0,   0.0, 0.0}, //4
+                                {  0.0,   0.0, 0.0}, //5
+                                {  0.0,   0.0, 0.0}, //6
+                                {  0.0,   0.0, 0.0}}; //7
+
     GLubyte indices[] = {
                             4, 5, 6, 7,		//front
                             7, 6, 2, 1,		//top slope
@@ -53,6 +62,7 @@ VertexObject* drawinghelpers::raised_box( uint32_t w, uint32_t h, uint32_t thick
     vo->SetFaceIndicesArray (VertexObject::UINT8_T, indices, 5);
     vo->SetColorArray (VertexObject::FLOAT, Colors, 8);
     vo->ComputeNormals();
+    //vo->SetNormalArray (VertexObject::FLOAT, Normals, 8);
     return vo;
 
 }
@@ -246,7 +256,7 @@ void drawinghelpers::draw_emboss_box(int x_min,int x_max,int y_min,int y_max)
 /////////////////////////////////////////////////////////////////////////////
 #warning "move get_buffer_mode to window class since it belongs more there"
 drawinghelpers::buffer_mode_t drawinghelpers::get_buffer_mode() {
-    char* bufferModeEnv = getenv("BUFFER_MODE");
+    char* bufferModeEnv = getenv("GLUI_BUFFER_MODE");
     if ( bufferModeEnv != NULL &&
             0 ==  strcmp(bufferModeEnv, "buffer_front") ) return buffer_front;
     else return buffer_back;

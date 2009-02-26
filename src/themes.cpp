@@ -108,5 +108,27 @@ uint8_t* theme::Get_bkgd_color()
 #warning "protect this with a const cast"
     return bkgd_color;
 }
-
+////////////////////////////////////////////////////////////
+void theme::GetVersion(uint32_t* Major, uint32_t* Minor, uint32_t* revision)
+{
+    *Major = 0;
+    *Minor = 0;
+    *revision = 0;
+}
+////////////////////////////////////////////////////////////
+void theme::DoLightning()
+{
+    glDisable ( GL_LIGHTING );
+/*
+    //< http://jerome.jouvie.free.fr/OpenGl/Tutorials/Tutorial13.php
+    glEnable ( GL_LIGHTING );
+    GLfloat LightAmbient[]= { 0.5f, 0.5f, 0.5f, 1.0f };
+    GLfloat LightDiffuse[]= { 1.0f, 1.0f, 1.0f, 1.0f };
+    GLfloat LightPosition[]= { 1.0f, 1.0f, 1.0f, 0.0f };
+    glLightfv(GL_LIGHT1, GL_AMBIENT, LightAmbient);
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, LightDiffuse);
+    glLightfv(GL_LIGHT1, GL_POSITION,LightPosition);
+    glEnable(GL_LIGHT1);
+    */
+}
 

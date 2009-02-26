@@ -115,7 +115,11 @@ namespace GLUI
                     void* texture,      //< buffer to the array
                     uint32_t count);    //< number of texture components (the array is count wide)
 
-            int ComputeNormals();
+            int ComputeNormals();       //< this function computes normals according to faces
+                                        //< and face indices, this is a rather expensive function so it
+                                        //< shall not be used on object with static geometry
+                                        //< (normals can be computed once for all
+                                        //<  with this function and then stored into an array and SetNormalArray)
 
 
 

@@ -327,12 +327,12 @@ int GlutWindow::AddEvent(::XExposeEvent *event)
         glDepthFunc(GL_LEQUAL);
         //glCullFace( GL_BACK );
         //glDisable( GL_CULL_FACE );
-        glDisable( GL_LIGHTING );
         glEnable ( GL_COLOR_MATERIAL );
         glEnable ( GL_NORMALIZE );
         glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
         glShadeModel(GL_SMOOTH);
 
+        theme::Instance()->DoLightning();
         SetOrthoProjection();
 
 

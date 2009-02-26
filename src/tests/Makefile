@@ -50,13 +50,13 @@ GLUI_LIB = ../GENERATED/lib/libglui.a
 #GLUI_TESTS = checkbox statictext button horizontallayout textbutton
 GLUI_TESTS = SizeComputationTest PackingTest ContainerEventTest
 GLUI_TESTS+= GlutWindowTest GlutKeyboardTest GlutKeyboardUserTest
-GLUI_TESTS+= DrawingHelpsTest DrawingHelps-boxTest
+GLUI_TESTS+= DrawingHelpsTest DrawingHelps-boxTest Lightning_test
 
 .PHONY: all setup examples tools clean depend doc doc-pdf doc-dist dist
 
 tests : all
 
-all: $(GLUI_LIB) $(addprefix GENERATED/bin/,${GLUI_TESTS})
+all: $(GLUI_LIB) $(addsuffix ${EXE},$(addprefix GENERATED/bin/,${GLUI_TESTS}))
 
 
 examples: $(GLUI_EXAMPLES)
@@ -64,24 +64,24 @@ examples: $(GLUI_EXAMPLES)
 tools: $(GLUI_TOOLS)
 
 
-$(addprefix GENERATED/bin/,${GLUI_TESTS}) : GENERATED
+$(addsuffix ${EXE},$(addprefix GENERATED/bin/,${GLUI_TESTS})) : GENERATED
 
 GENERATED :
 	mkdir -p GENERATED/bin
 
-GENERATED/bin/%: %.cpp $(GLUI_LIB)
+GENERATED/bin/%${EXE}: GENERATED/%.o $(GLUI_LIB)
 	echo "    [EXE] $@"
 	$(CXX) $(CPPFLAGS) -o $@ $<  $(LIBGLUI) $(LIBGLUT) $(LIBGL) $(LIBS)
 
 
 
-.cpp.o: ${GLUI_HEADERS}
+GENERATED/%.o: %.cpp ${GLUI_HEADERS}
 	echo "    [CXX] $<"
-	$(CXX) $(CPPFLAGS) -c $<
+	$(CXX) $(CPPFLAGS) -c $< -o $@
 
-.c.o: ${GLUI_HEADERS}
+GENERATED/%.o: %.c ${GLUI_HEADERS}
 	echo "    [CC ] $<"
-	$(CXX) $(CPPFLAGS) -c $<
+	$(CXX) $(CPPFLAGS) -c $< -o $@
 
 
 clean:
