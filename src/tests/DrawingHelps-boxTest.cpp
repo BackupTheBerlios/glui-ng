@@ -81,7 +81,7 @@ void myGluiWin::draw(void)
     glLoadIdentity();
     glTranslatef(10.0,10.0,-20.0);
     box1->draw();
-    glTranslatef(10.0,10.0,2.0);
+    glTranslatef(10.0,10.0,10.0);
     box2->draw();
     glutPostRedisplay();
 }

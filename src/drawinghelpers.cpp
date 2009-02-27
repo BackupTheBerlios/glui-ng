@@ -20,10 +20,10 @@ VertexObject* drawinghelpers::raised_box( uint32_t w, uint32_t h, uint32_t thick
                                 {  (float) thickness, h-(float) thickness, (float) thickness}}; //7
     GLubyte indices[] = {
                             4, 5, 6, 7,		//front
-                            7, 6, 2, 1,		//top slope
+                            7, 6, 2, 3,		//top slope
                             5, 1, 2, 6,		//right slope
                             0, 1, 5, 4,		//bottom slope
-                            0, 4, 7, 1};	//left slope
+                            0, 4, 7, 3};	//left slope
 
     float Colors[8][3];
     memset(Colors, 0, 8*3*sizeof(float));
