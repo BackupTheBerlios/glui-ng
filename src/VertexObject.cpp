@@ -60,6 +60,27 @@ VertexObject::VertexObject (
     Texture.array.all = NULL;
     Texture.datatype_t = UNDEF;
     Texture.count = 0;
+
+    float no_mat[] = {0.0f, 0.0f, 0.0f, 1.0f};
+    float mat_ambient[] = {0.7f, 0.7f, 0.7f, 1.0f};
+    float mat_ambient_color[] = {0.8f, 0.8f, 0.2f, 1.0f};
+    float mat_diffuse[] = {0.1f, 0.5f, 0.8f, 1.0f};
+    float mat_specular[] = {1.0f, 1.0f, 1.0f, 1.0f};
+    float mat_emission[] = {0.3f, 0.2f, 0.2f, 0.0f};
+
+    memcpy(this->no_mat, no_mat, sizeof(no_mat)/sizeof(no_mat[0]));
+    memcpy(this->mat_ambient, mat_ambient, sizeof(mat_ambient)/sizeof(mat_ambient[0]));
+    memcpy(this->mat_ambient_color, mat_ambient_color, sizeof(mat_ambient_color)/sizeof(mat_ambient_color[0]));
+    memcpy(this->mat_diffuse, mat_diffuse, sizeof(mat_diffuse)/sizeof(mat_diffuse[0]));
+    memcpy(this->mat_specular, mat_specular, sizeof(mat_specular)/sizeof(mat_specular[0]));
+    memcpy(this->mat_emission, mat_emission, sizeof(mat_emission)/sizeof(mat_emission[0]));
+
+
+    this->no_shininess = 0.0f;
+    this->low_shininess = 5.0f;
+    this->high_shininess = 00.0f;
+
+
 };
 
 /////////////////////////////////////////////////////////////////
@@ -229,7 +250,7 @@ int VertexObject::CpyArray(DataArray* array, pointers data)
 /////////////////////////////////////////////////////////////////
 void VertexObject::draw()
 {
-#warning "TODO: save and restore client state"
+    glPushClientAttrib(0);
     glEnableClientState(GL_VERTEX_ARRAY);
 
     if (Colors.datatype_t != UNDEF  && Colors.state == allocated)
@@ -237,20 +258,29 @@ void VertexObject::draw()
         glEnableClientState(GL_COLOR_ARRAY);
         glColorPointer(ColorSize, Colors.datatype_t, 0, Colors.array.all);
     }
+    if (Normals.datatype_t != UNDEF  && Normals.state == allocated)
+    {
+        glEnableClientState(GL_NORMAL_ARRAY);
+        glNormalPointer(Normals.datatype_t, 0, Normals.array.all);
+    }
     glVertexPointer(VerticesSize, Vertices.datatype_t, 0, Vertices.array.all);
     //go through our index array and draw our vertex array
     GLenum mode;
     if ( VerticeByFacesCount == 3 ) mode = GL_TRIANGLES;
     else mode = GL_QUADS;
 
+    glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient_color);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+    glMaterialf(GL_FRONT, GL_SHININESS, high_shininess);
+    glMaterialfv(GL_FRONT, GL_EMISSION, no_mat);
+
+
     //indices.count has allready the right count of indices (VerticeByFacesCount*nbfaces)
     glDrawElements(mode, indices.count, indices.datatype_t, indices.array.all);
 
-    glDisableClientState(GL_VERTEX_ARRAY);
-    if (Colors.datatype_t != UNDEF  && Colors.state == allocated)
-    {
-        glDisableClientState(GL_COLOR_ARRAY);
-    }
+    glPopClientAttrib();
+
     debug::Instance()->FlushGL();
 }
 //////////////////////////////////////////////////////////////////

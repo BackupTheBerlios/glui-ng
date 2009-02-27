@@ -81,6 +81,18 @@ namespace GLUI
             DataArray Texture;              //< array containing the texture coordinates of the vertice, for glTexCoordPointer
 
 
+            float no_mat[4];
+            float mat_ambient[4];
+            float mat_ambient_color[4];
+            float mat_diffuse[4];
+            float mat_specular[4];
+            float no_shininess;
+            float low_shininess;
+            float high_shininess;
+            float mat_emission[4];
+
+
+
         protected : //methods
             VertexObject();
             void FreeArray(DataArray* array);
