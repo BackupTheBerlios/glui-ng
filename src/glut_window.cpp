@@ -56,6 +56,8 @@
 #include <GL/glui/drawinghelpers.h>
 using namespace GLUI;
 
+#define MODULE_KEY  "GLUI_DEBUG_GLUTWINDOW"
+
 ///////////////////////////////////////////////////////////////////////
 GlutDisplay::GlutDisplay(char* name)
 {
@@ -286,7 +288,7 @@ int GlutWindow::AddEvent (::XEvent *event)
 
 int GlutWindow::AddEvent(::XResizeRequestEvent *event)
 {
-
+    IN("");
     this->pack(x, y);
 
     if ( event->width  != this->CurrentSize.size.w ||
@@ -301,20 +303,19 @@ int GlutWindow::AddEvent(::XResizeRequestEvent *event)
 
     glViewport( 0, 0, this->CurrentSize.size.w, this->CurrentSize.size.h);
 
-    debug::Instance()->print( __FILE__, __LINE__, _level,
-            "%d: %d\n", glutGetWindow(), this->flags );
+    MSG("%d: %d\n", glutGetWindow(), this->flags );
 
     glutPostRedisplay();
+    OUT("");
     return 0;
 }
 
 
 int GlutWindow::AddEvent(::XExposeEvent *event)
 {
+    IN("");
     if (mapped)
     {
-        debug::Instance()->print( __FILE__, __LINE__, _level,
-                "display\n");
         int       win_w, win_h;
 
         // SUBTLE: on freeGLUT, the correct window is always already set.
@@ -361,6 +362,7 @@ int GlutWindow::AddEvent(::XExposeEvent *event)
         }
         glutPostRedisplay();
     }
+    OUT("");
     return 0;
 }
 
@@ -431,14 +433,14 @@ void GlutWindow::display_func (void)
 {
     ::XExposeEvent event;
         event.type   = Expose;
-
-    debug::Instance()->print (__FILE__, __LINE__, 0 , "display func\n");
+    IN("");
     GlutWindow* win= MasterObject::Instance()->FindWindow(glutGetWindow ());
 
     if (win)
     {
         win->AddEvent(&event);
     }
+    OUT("");
 }
 
 
@@ -451,8 +453,7 @@ void GlutWindow::reshape_func (int w, int h)
         event.width  = w;
         event.height = h;
 
-
-    debug::Instance()->print (__FILE__, __LINE__, 0, "glui_reshape_func(): %d  w/h: %d/%d\n", glutGetWindow (), w, h);
+    IN("");
 
     /***  First check if this is main glut window ***/
     GlutWindow* glut_window = MasterObject::Instance()->FindWindow(glutGetWindow ());
@@ -460,6 +461,7 @@ void GlutWindow::reshape_func (int w, int h)
     {
         glut_window->AddEvent(&event);
     }
+    OUT("");
 }
 
 
@@ -472,6 +474,7 @@ void GlutWindow::reshape_func (int w, int h)
 void GlutWindow::keyboard_func (unsigned char key, int x, int y)
 {
 
+    IN("");
     int win_w = glutGet (GLUT_WINDOW_WIDTH);
     int win_h = glutGet (GLUT_WINDOW_HEIGHT);
     y = win_h - y;
@@ -484,13 +487,14 @@ void GlutWindow::keyboard_func (unsigned char key, int x, int y)
     int current_window = glutGetWindow ();
     GlutWindow* glut_window = MasterObject::Instance()->FindWindow(glutGetWindow());
 
-    debug::Instance ()->print (__FILE__, __LINE__, 0, "key: %d\n", current_window);
+    MSG("key: %d\n", current_window);
 
     if (glut_window)
     {
         event.state=glut_window->KeyModifierState;
         glut_window->AddEvent(&event);
     }
+    OUT("");
 }
 
 
@@ -643,7 +647,7 @@ void GlutWindow::visibility_func (int state)
     #warning "complete the structure with other information"
 
 
-    debug::Instance ()->print (__FILE__, __LINE__, 0, "IN GLUI VISIBILITY()\n");
+    IN("");
     /*  fflush( stdout );          */
 
     int current_window = glutGetWindow ();
@@ -660,6 +664,7 @@ void GlutWindow::visibility_func (int state)
             glut_window->AddEvent(&unmapevent);
         }
     }
+    OUT("");
 
 
 }

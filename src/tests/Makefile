@@ -56,7 +56,7 @@ GLUI_TESTS+= DrawingHelpsTest DrawingHelps-boxTest Lightning_test
 
 tests : all
 
-all: $(GLUI_LIB) $(addsuffix ${EXE},$(addprefix GENERATED/bin/,${GLUI_TESTS}))
+all:  GENERATED $(GLUI_LIB) $(addsuffix ${EXE},$(addprefix GENERATED/bin/,${GLUI_TESTS}))
 
 
 examples: $(GLUI_EXAMPLES)
@@ -70,17 +70,17 @@ GENERATED :
 	mkdir -p GENERATED/bin
 
 GENERATED/bin/%${EXE}: GENERATED/%.o $(GLUI_LIB)
-	echo "    [EXE] $@"
+	echo "    [EXE] ${DIRPREFIX}$@"
 	$(CXX) $(CPPFLAGS) -o $@ $<  $(LIBGLUI) $(LIBGLUT) $(LIBGL) $(LIBS)
 
 
 
 GENERATED/%.o: %.cpp ${GLUI_HEADERS}
-	echo "    [CXX] $<"
+	echo "    [CXX] ${DIRPREFIX}$<"
 	$(CXX) $(CPPFLAGS) -c $< -o $@
 
 GENERATED/%.o: %.c ${GLUI_HEADERS}
-	echo "    [CC ] $<"
+	echo "    [CC ] ${DIRPREFIX}$<"
 	$(CXX) $(CPPFLAGS) -c $< -o $@
 
 

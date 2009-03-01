@@ -57,7 +57,7 @@ GLUI_TOOLS = GENERATED/bin/ppm2array
 
 .PHONY: all setup examples tools clean depend doc doc-pdf doc-dist dist tests
 
-all: $(GLUI_LIB) examples tools
+all: GENERATED $(GLUI_LIB) examples tools
 
 $(GLUI_LIB) : GENERATED
 
@@ -65,7 +65,7 @@ testplan : tests
 	./tests/testplan.sh
 
 tests : $(GLUI_LIB)
-	make -C tests $@
+	make -C tests $@ DIRPREFIX=./tests/
 
 GENERATED:
 	mkdir -p GENERATED
@@ -83,7 +83,7 @@ GENERATED/bin/ppm2array: tools/ppm2array.cpp tools/ppm.cpp
 GENERATED/bin/%: example/%.cpp $(GLUI_LIB)
 	$(CXX) $(CPPFLAGS) -o $@ $<  $(LIBGLUI) $(LIBGLUT) $(LIBGL) $(LIBS)
 
-$(GLUI_LIB): GENERATED $(GLUI_OBJS)
+$(GLUI_LIB): $(GLUI_OBJS)
 	ar -r $(GLUI_LIB) $(GLUI_OBJS)
 
 ${GLUI_OBJS}: ${GLUI_HEADERS}

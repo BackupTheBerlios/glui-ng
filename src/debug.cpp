@@ -44,6 +44,9 @@ using namespace GLUI;
 debug::debug()
 {
     use_debug = getenv("GLUI_ENABLE_DEBUG");
+    glui_enable_fileandline = getenv("GLUI_ENABLE_FILEANDLINE");
+    glui_enable_indent_traces = getenv("GLUI_ENABLE_INDENT_TRACES");
+    shift = 0;
     if (use_debug != NULL)
     {
         buf = new char[ISIZE];
@@ -55,20 +58,39 @@ debug::~debug()
     if ( use_debug != NULL ) delete buf;
 }
 
-int debug::print(const char* file, int line, int level, const char* format,...)
+int debug::print(const char* key,
+        const char* file,
+        int line,
+        const char* func,
+        int level,
+        const char* format,...)
 {
 
-    if (use_debug != NULL )
+    if (use_debug != NULL && NULL != getenv(key))
     {
+        if ( level == -1) shift--;
         va_list arg;
         va_start(arg, format);
         int ret = vsnprintf(buf, ISIZE-1, format, arg);
         va_end(arg);
-        if (ret<=0) {
+        if (ret < 0) {
             cerr << "debug string too long, error :" << ret << '\n';
             return -1;
         }
-        cerr << buf;
+        if ( glui_enable_indent_traces != NULL )
+          {
+            for (uint32_t i=0; i<shift; i++)
+              {
+                cerr << "    ";
+              }
+          }
+        if ( NULL != glui_enable_fileandline )
+          {
+            cerr << file << ":" << line << "  ";
+          }
+
+        cerr << func << ":" << buf << endl;
+        if (level == 1) shift++;
         return 0;
     }
 }

@@ -1,7 +1,25 @@
 setting the following environment variables will help debugging
 
+---------- OPENGL DISPLAYS ------
 GLUI_BUFFER_MODE=buffer_front : use simple buffering algorithm
                (ie write to front buffer instead of back buffer +switch)
 GLUI_SYNC=true : activate flush,
                require buffer_front to be set in GLUI_BUFFER_MODE
+
+
+---------- TRACES -------------
+GENERAL TRACES require GLUI_ENABLE_DEBUG to be set
+you can print additional file and line strings by setting GLUI_ENABLE_FILEANDLINE
+you can activate indentation of traces GLUI_ENABLE_INDENT_TRACES
+
+
+you can activate per object debug if the sources has been instrumented for
+by exporting variables in the environment, let say you want to debug objet xyz
+then export GLUI_DEBUG_XYZ=yes
+
+for example : VertexObject
+export GLUI_ENABLE_DEBUG=yes
+export GLUI_DEBUG_VERTEXOBJECT=yes
+will enable VertexObject builtin traces
+
 

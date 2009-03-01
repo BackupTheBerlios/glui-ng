@@ -30,6 +30,8 @@
 #include <fstream>
 #include <new>
 
+#define MODULE_KEY "GLUI_DEBUG_VERTEXOBJECT"
+
 using namespace GLUI;
 /////////////////////////////////////////////////////////////////
 VertexObject::VertexObject (
@@ -38,6 +40,7 @@ VertexObject::VertexObject (
         uint8_t verticebyfacescount
         )
 {
+    IN("");
     this->VerticesSize = verticessize;
     this->ColorSize = colorsize;
     this->VerticeByFacesCount = verticebyfacescount;
@@ -79,22 +82,26 @@ VertexObject::VertexObject (
     this->no_shininess = 0.0f;
     this->low_shininess = 5.0f;
     this->high_shininess = 00.0f;
-
+    OUT("");
 
 };
 
 /////////////////////////////////////////////////////////////////
 VertexObject::~VertexObject()
 {
+    IN("");
     FreeArray(&Vertices);
     FreeArray(&indices);
     FreeArray(&Colors);
     FreeArray(&Normals);
     FreeArray(&Texture);
+    OUT("");
+
 };
 /////////////////////////////////////////////////////////////////
 void VertexObject::FreeArray(DataArray* array)
 {
+    IN("");
     if (array->state != free)
     {
         switch (array->datatype_t)
@@ -112,12 +119,14 @@ void VertexObject::FreeArray(DataArray* array)
     }
     array->array.all = NULL;
     array->state = free;
+    OUT("");
 };
 
 
 //////////////////////////////////////////////////////////////////
 int VertexObject::AllocateArray (DataArray* array)
 {
+    IN("");
     FreeArray(array);
     if (array->count == 0) GLUI_THROW(EINVAL, "count is zero, cowardly refuse to allocate empty array");
     switch (array->datatype_t)
@@ -150,12 +159,14 @@ int VertexObject::AllocateArray (DataArray* array)
             GLUI_THROW(EINVAL, "unkown datatype");
     }
     array->state = allocated;
+    OUT("");
     return 0;
 }
 
 /////////////////////////////////////////////////////////////////
 int VertexObject::SetArray (DataArray* array, datatype data_t, pointers data, uint32_t count)
 {
+    IN("");
     FreeArray(array);
     array->count = count;
     array->datatype_t = data_t;
@@ -174,47 +185,59 @@ int VertexObject::SetArray (DataArray* array, datatype data_t, pointers data, ui
         std::cerr << err->what();
         throw;
     }
+    OUT("");
 
 }
 
 /////////////////////////////////////////////////////////////////
 int VertexObject::SetVerticesArray (datatype vertices_t, void* vertices, uint32_t count)
 {
+    IN("");
     pointers data;
     data.all = vertices;
     SetArray(&this->Vertices, vertices_t, data, count*VerticesSize);
+    OUT("");
 }
 /////////////////////////////////////////////////////////////////
 int VertexObject::SetFaceIndicesArray (datatype indices_t, void* indices, uint32_t count)
 {
+    IN("");
     pointers data;
     data.all = indices;
     SetArray(&this->indices, indices_t, data, count*VerticeByFacesCount);
+    OUT("");
 }
 /////////////////////////////////////////////////////////////////
 int VertexObject::SetColorArray (datatype colors_t, void* colors, uint32_t count)
 {
+    IN("");
     pointers data;
     data.all = colors;
     SetArray(&this->Colors, colors_t, data, count*ColorSize);
+    OUT("");
 }
 /////////////////////////////////////////////////////////////////
 int VertexObject::SetNormalArray (datatype normals_t, void* normals, uint32_t count)
 {
+    IN("");
     pointers data;
     data.all = normals;
     SetArray(&this->Normals, normals_t, data, count * 3);
+    OUT("");
 }
 /////////////////////////////////////////////////////////////////
 int VertexObject::SetTextureArray (datatype texture_t, void* texture, uint32_t count)
 {
+    IN("");
     pointers data;
     data.all = texture;
     SetArray(&this->Texture, texture_t, data, count);
+    OUT("");
 }
 /////////////////////////////////////////////////////////////////
 int VertexObject::CpyArray(DataArray* array, pointers data)
 {
+    IN("");
     if (array->count == 0) GLUI_THROW(EINVAL, "count is zero, cowardly refuse to copy empty array");
     switch (array->datatype_t)
     {
@@ -245,11 +268,13 @@ int VertexObject::CpyArray(DataArray* array, pointers data)
         default:
             GLUI_THROW(EINVAL, "unkown datatype");
     }
+    OUT("");
     return 0;
 }
 /////////////////////////////////////////////////////////////////
 void VertexObject::draw()
 {
+    IN("");
     glPushClientAttrib(0);
     glEnableClientState(GL_VERTEX_ARRAY);
 
@@ -282,37 +307,46 @@ void VertexObject::draw()
     glPopClientAttrib();
 
     debug::Instance()->FlushGL();
+    OUT("");
 }
 //////////////////////////////////////////////////////////////////
 VertexObject::V3List::V3List()
 {
+    IN("");
     next = NULL;
+    OUT("");
 }
 //////////////////////////////////////////////////////////////////
 VertexObject::V3List::V3List(vec3 vert)
 {
+    IN("");
     next = NULL;
     vertex = vert;
+    OUT("");
 }
 //////////////////////////////////////////////////////////////////
 void VertexObject::V3List::clean()
 {
+    IN("");
     if (next != NULL)
       {
         next->clean();
       }
     if (next == NULL)
       {
+        OUT("");
         return;
       }
     //next is not null and shall have cleaned itself
     delete next;
     next = NULL;
+    OUT("");
     return;
 }
 //////////////////////////////////////////////////////////////////
 void VertexObject::V3List::add(V3List* newv3)
 {
+    IN("");
     if (newv3 != NULL)
       {
         V3List* last = this;
@@ -322,10 +356,12 @@ void VertexObject::V3List::add(V3List* newv3)
           }
         last->next = newv3;
       }
+    OUT("");
 }
 //////////////////////////////////////////////////////////////////
 int VertexObject::ComputeNormals()
 {
+    IN("");
     FreeArray(&Normals);
     Normals.count = Vertices.count;
     Normals.datatype_t = FLOAT;
@@ -530,5 +566,6 @@ int VertexObject::ComputeNormals()
         Normals.array.pfloat[i*3 + 1] = normal[VY];
         Normals.array.pfloat[i*3 + 2] = normal[VZ];
       }
+    OUT("");
 
 }

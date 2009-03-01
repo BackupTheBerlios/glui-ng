@@ -37,6 +37,8 @@ using namespace std;
 #include <algorithm>
 using namespace GLUI;
 
+#define MODULE_KEY  "GLUI_DEBUG_CONTAINER"
+
 ///////////////////////////////////////////////////////////////////////////////////////
 Container::Container(const char *name ,
                    orientation orient):
@@ -411,9 +413,7 @@ int Container::AddEvent (::XKeymapEvent* event)
 int Container::AddEvent (::XExposeEvent* event)
 {
     Control *node;
-    debug::Instance()->print( __FILE__, __LINE__, _level,
-            "%s %s \n",__func__,
-            dynamic_cast<Node*>(this)->whole_tree());
+    IN("");
 
     pack (x, y);
     // we don't need this since it's allready done into the Control::AddEvent(XEposeEvent)
@@ -430,6 +430,7 @@ int Container::AddEvent (::XExposeEvent* event)
     }
     // glPopMatrix();
     debug::Instance()->FlushGL();
+    OUT("");
 }
 ///////////////////////////////////////////////////////////////////////////////////////////
 int Container::AddEvent (::XGraphicsExposeEvent* event)

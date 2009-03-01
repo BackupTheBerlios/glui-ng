@@ -35,6 +35,8 @@
 #include <GL/glui/debug.h>
 #include <GL/glui/MasterObject.h>
 using namespace GLUI;
+
+#define MODULE_KEY  "GLUI_DEBUG_NODE"
 /********************************************* Node::Node() *******/
 
 Node::Node()
@@ -239,15 +241,12 @@ void   Node::unlink( void )
 
 void Node::dump( FILE *out, const char *name )
 {
-	debug::Instance()->print( __FILE__, __LINE__, _level,
-			"node: %s\n", name );
-	debug::Instance()->print( __FILE__, __LINE__, _level,
-			"   parent: %p     child_head: %p    child_tail: %p\n",
+	MSG( "node: %s\n", name );
+	MSG("   parent: %p     child_head: %p    child_tail: %p\n",
 			(void *) parent_node,
 			(void *) child_head,
 			(void *) child_tail );
-	debug::Instance()->print( __FILE__, __LINE__, _level,
-			"   next: %p       prev: %p\n",
+	MSG("   next: %p       prev: %p\n",
 			(void *) next_sibling,
 			(void *) prev_sibling );
 }

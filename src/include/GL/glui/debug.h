@@ -1,3 +1,5 @@
+#ifndef __GLUI_DEBUG_H
+#define __GLUI_DEBUG_H
 /****************************************************************************
 
   GLUI User Interface Toolkit
@@ -46,12 +48,28 @@ namespace GLUI
 			static debug* Instance();
 
 			~debug();
-			int print(const char* file, int line, int level, const char* format,...);
+			int print(
+                    const char* key,    //< the key in the env to enable this trace
+                    const char* file,   //< the file where the trace is located
+                    int line,           //< the line of the debug string
+                    const char* func,   //< the function that call debug::print
+                    int levelshift,     //< relative indent (-1 unindent, 1 indent, 0 keep same indent)
+                    const char* format, //< printf like format
+                    ...);               //< additional args
 			void FlushGL(void);
 
 		private:
 			debug();
 			char* use_debug;
+            char* glui_enable_fileandline;
+            char* glui_enable_indent_traces;
 			char* buf;
+            int shift;
 	};
+#define IN(format, ...) debug::Instance()->print(MODULE_KEY, __FILE__, __LINE__, __func__,  1, format, ## __VA_ARGS__)
+#define OUT(format, ...) debug::Instance()->print(MODULE_KEY, __FILE__, __LINE__, __func__,  -1, format, ## __VA_ARGS__)
+#define MSG(format, ...) debug::Instance()->print(MODULE_KEY, __FILE__, __LINE__, __func__,  0, format, ## __VA_ARGS__)
+
 }
+
+#endif //__GLUI_DEBUG_H
