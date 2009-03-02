@@ -75,8 +75,7 @@ namespace GLUI
                   V3List* next;
                   V3List();                //< constructor
                   V3List(vec3 vert);       //< constructor
-                  void clean();            //< recursively delete the list
-                  void add(V3List* newv3); //< add a V3List at the end of the list
+                  void print();            //< print the list
                 };
 
         protected : //variables

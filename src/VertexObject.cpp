@@ -281,7 +281,6 @@ void VertexObject::draw()
 {
     IN("");
     glPushClientAttrib(0);
-    glEnableClientState(GL_VERTEX_ARRAY);
 
     if (this->Colors != NULL)
     {
@@ -295,6 +294,7 @@ void VertexObject::draw()
     }
     if (this->Vertices != NULL)
     {
+        glEnableClientState(GL_VERTEX_ARRAY);
         glVertexPointer(VerticesSize, Vertices->datatype_t, 0, Vertices->array.all);
         //go through our index array and draw our vertex array
         GLenum mode;
@@ -333,38 +333,16 @@ VertexObject::V3List::V3List(vec3 vert)
     OUT("");
 }
 //////////////////////////////////////////////////////////////////
-void VertexObject::V3List::clean()
+void VertexObject::V3List::print()
 {
-    IN("");
-    if (next != NULL)
+    V3List* last = this;
+    do
       {
-        next->clean();
+        cerr << last->vertex[VX]<< ","<< last->vertex[VY]<<","<< last->vertex[VZ]<<" ";
+        last = last->next;
       }
-    if (next == NULL)
-      {
-        OUT("");
-        return;
-      }
-    //next is not null and shall have cleaned itself
-    delete next;
-    next = NULL;
-    OUT("");
-    return;
-}
-//////////////////////////////////////////////////////////////////
-void VertexObject::V3List::add(V3List* newv3)
-{
-    IN("");
-    if (newv3 != NULL)
-      {
-        V3List* last = this;
-        while (last->next != NULL)
-          {
-            last = last->next;
-          }
-        last->next = newv3;
-      }
-    OUT("");
+    while (last != NULL);
+    cerr << endl;
 }
 //////////////////////////////////////////////////////////////////
 int VertexObject::ComputeNormals()
@@ -386,10 +364,11 @@ int VertexObject::ComputeNormals()
         std::cerr << err->what();
         throw;
     }
-    V3List* VerticeAndNormalsArray;
+    V3List** VerticeAndNormalsArray;
     try
       {
-        VerticeAndNormalsArray = new V3List[Vertices->count];
+        VerticeAndNormalsArray = new V3List*[Vertices->count];
+        memset(VerticeAndNormalsArray, 0, Vertices->count * sizeof(V3List*));
       }
     catch(std::bad_alloc err)
     {
@@ -397,7 +376,7 @@ int VertexObject::ComputeNormals()
         throw;
     }
 
-    int nbOfFaces = this->Vertices->count / this->VerticeByFacesCount;
+    int nbOfFaces = this->indices->count / this->VerticeByFacesCount;
     for (int face = 0; face < nbOfFaces; face++)
     {
         uint32_t index1;
@@ -553,16 +532,43 @@ int VertexObject::ComputeNormals()
 
         vec3 vnormal = vp1 ^ vp2;
         vnormal.normalize();
-        VerticeAndNormalsArray[index1].add(new V3List(vnormal));
-        VerticeAndNormalsArray[index2].add(new V3List(vnormal));
-        VerticeAndNormalsArray[index3].add(new V3List(vnormal));
-        if (VerticeByFacesCount == 4)  VerticeAndNormalsArray[index4].add(new V3List(vnormal));
+        MSG("index : %d\n", index1);
+          {
+            V3List* backup = VerticeAndNormalsArray[index1];
+            VerticeAndNormalsArray[index1] = new V3List(vnormal);
+            VerticeAndNormalsArray[index1]->next = backup;
+            VerticeAndNormalsArray[index1]->print();
+          }
+        MSG("index : %d\n", index2);
+          {
+            V3List* backup = VerticeAndNormalsArray[index2];
+            VerticeAndNormalsArray[index2] = new V3List(vnormal);
+            VerticeAndNormalsArray[index2]->next = backup;
+            VerticeAndNormalsArray[index2]->print();
+          }
+        MSG("index : %d\n", index3);
+          {
+            V3List* backup = VerticeAndNormalsArray[index3];
+            VerticeAndNormalsArray[index3] = new V3List(vnormal);
+            VerticeAndNormalsArray[index3]->next = backup;
+            VerticeAndNormalsArray[index3]->print();
+          }
+        if (VerticeByFacesCount == 4) 
+          {
+            MSG("index : %d\n", index4);
+              {
+                V3List* backup = VerticeAndNormalsArray[index4];
+                VerticeAndNormalsArray[index4] = new V3List(vnormal);
+                VerticeAndNormalsArray[index4]->next = backup;
+                VerticeAndNormalsArray[index4]->print();
+              }
+          }
     }
     //we have processed all the faces and created the normals associated, now compute the average and fill the array
-    for (uint32_t i=0; i < Vertices->count; i++)
+    for (uint32_t i=0; i < Vertices->count/VerticesSize; i++)
       {
         cerr << "vertice" << i << ":";
-        V3List* normals = &VerticeAndNormalsArray[i];
+        V3List* normals = VerticeAndNormalsArray[i];
         vec3 normal = normals->vertex;
         cerr << normal[VX]<< ","<< normal[VY]<<","<<normal[VZ]<< " ";
         while (normals->next != NULL)
@@ -571,7 +577,15 @@ int VertexObject::ComputeNormals()
              cerr << normals->vertex[VX]<< ","<< normals->vertex[VY]<<","<<normals->vertex[VZ]<<" ";
             normal = normal + normals->vertex;
           }
+        normals = VerticeAndNormalsArray[i];
+        while (normals)
+          {
+            V3List* next = normals->next;
+            delete normals;
+            normals = next;
+          }
         cerr << endl;
+        cerr << normal[VX]<< ","<< normal[VY]<<","<<normal[VZ]<<endl;
         normal.normalize();
         Normals->array.pfloat[i*3 + 0] = normal[VX];
         Normals->array.pfloat[i*3 + 1] = normal[VY];
@@ -581,7 +595,7 @@ int VertexObject::ComputeNormals()
     {
         for (uint32_t i=0; i< Normals->count/3; i++)
         {
-            MSG("%f %f %d\n", Normals->array.pfloat[i*3 + 0],  Normals->array.pfloat[i*3 + 1], Normals->array.pfloat[i*3 + 2]);
+            MSG("%f %f %f\n", Normals->array.pfloat[i*3 + 0],  Normals->array.pfloat[i*3 + 1], Normals->array.pfloat[i*3 + 2]);
         }
     }
     else
