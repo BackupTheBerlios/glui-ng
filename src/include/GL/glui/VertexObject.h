@@ -52,14 +52,23 @@ namespace GLUI
                   float* pfloat;
                   double* pdouble;
               };
-              enum bufferstate {allocated, free};
+
               struct DataArray
               {
-                  uint32_t count;
-                  datatype datatype_t;
-                  pointers array;
-                  bufferstate state;
+                  public :
+                      uint32_t count;
+                      datatype datatype_t;
+                      pointers array;
+                      /// methods
+                      DataArray(uint32_t count, datatype datatype_t);
+                      DataArray(uint32_t count, datatype datatype_t,pointers data);
+                      ~DataArray();
+                  private:
+                      void _DataArray(uint32_t count, datatype datatype_t,pointers data);
+                      DataArray();
+                      int CpyArray(pointers data);
               };
+
               struct V3List
                 {
                   vec3 vertex;
@@ -69,16 +78,17 @@ namespace GLUI
                   void clean();            //< recursively delete the list
                   void add(V3List* newv3); //< add a V3List at the end of the list
                 };
+
         protected : //variables
             uint8_t VerticesSize;          //< number of components per vertice
             uint8_t ColorSize;             //< number of components per colors (3 = RGB, 4 = RGBA)
             uint8_t VerticeByFacesCount;   //< number of vertices per face of the object
 
-            DataArray Vertices;             //< array containing the vertices size*VerticeCount wide, for glVertexPointer
-            DataArray indices;              //< array containing the indices of each faces, for glDrawElements
-            DataArray Colors;               //< array containing the Colors of each Vertice, for glColorPointer
-            DataArray Normals;              //< array containing the computed normals of the vertice, for glNormalPointer
-            DataArray Texture;              //< array containing the texture coordinates of the vertice, for glTexCoordPointer
+            DataArray* Vertices;             //< array containing the vertices size*VerticeCount wide, for glVertexPointer
+            DataArray* indices;              //< array containing the indices of each faces, for glDrawElements
+            DataArray* Colors;               //< array containing the Colors of each Vertice, for glColorPointer
+            DataArray* Normals;              //< array containing the computed normals of the vertice, for glNormalPointer
+            DataArray* Texture;              //< array containing the texture coordinates of the vertice, for glTexCoordPointer
 
 
             float no_mat[4];
@@ -95,10 +105,7 @@ namespace GLUI
 
         protected : //methods
             VertexObject();
-            void FreeArray(DataArray* array);
-            int AllocateArray (DataArray* array);
-            int CpyArray(DataArray* array, pointers data);
-            int SetArray (DataArray* array, datatype data_t, pointers data, uint32_t count);
+
         public:
             ~VertexObject();
             VertexObject(

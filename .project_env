@@ -34,3 +34,13 @@ function restoresession() {
 }
 
 pushd src
+
+
+# for debug
+export GLUI_ENABLE_DEBUG=yes
+export GLUI_ENABLE_INDENT_TRACES=yes
+export GLUI_ENABLE_FILEANDLINE=yes
+
+#debug vertexobject class
+export GLUI_DEBUG_VERTEXOBJECT=yes
+

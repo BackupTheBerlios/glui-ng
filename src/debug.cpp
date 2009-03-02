@@ -89,7 +89,8 @@ int debug::print(const char* key,
             cerr << file << ":" << line << "  ";
           }
 
-        cerr << func << ":" << buf << endl;
+        cerr << func << ":" << buf;
+        if (ret == 0) cerr << endl;
         if (level == 1) shift++;
         return 0;
     }
