@@ -108,6 +108,7 @@ namespace GLUI
             virtual void XMapSubwindows();
             virtual void XUnmapWindow();
             virtual void XUnmapSubwindows();
+            virtual KeySym XLookupKeysym(::XKeyEvent *key_event, int index);
 
 
         public: //event handlers

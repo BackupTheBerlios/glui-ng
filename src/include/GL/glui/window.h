@@ -102,12 +102,14 @@ namespace GLUI
         public :  //operators
             void  set_ortho_projection( void );
             void  set_viewport( void );
+        public : //XMethods
             virtual void XMapWindow()=0;
             virtual void XMapRaised()=0;
             virtual void XMapSubwindows()=0;
             virtual void XUnmapWindow()=0;
             virtual void XUnmapSubwindows()=0;
-
+            virtual KeySym XLookupKeysym(::XKeyEvent *key_event, int index)=0; //a KeySym is a 32bit not unicode char
+            static  uint32_t KeySymToUcs4(KeySym keysym);
 
              void SetViewport(void);
 

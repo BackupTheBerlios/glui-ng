@@ -691,5 +691,12 @@ void GlutWindow::idle_func (void)
 
 }
 
-
+////////////////////////////////////////////////////////////////////
+KeySym GlutWindow::XLookupKeysym(::XKeyEvent *key_event, int index)
+{
+    switch (key_event->keycode)
+    {
+        default: return 0;
+    }
+}
 
