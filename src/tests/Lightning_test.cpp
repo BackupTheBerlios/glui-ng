@@ -1,4 +1,5 @@
 #include <GL/glui/window.h>
+#include <GL/glui/debug.h>
 #include <unistd.h>
 #include <assert.h>
 #include <time.h>
@@ -43,8 +44,8 @@ class myGluiWin : public GLUIWindow
         myGluiWin(Display* glutDisplay);
         virtual ~myGluiWin();
         virtual void draw(void);
-
         virtual void idle(void);
+        virtual int AddEvent(::XKeyEvent* event);
     private :
         VertexObject* box1;
         GLUquadricObj *quadric;
@@ -69,6 +70,40 @@ myGluiWin::~myGluiWin()
     delete box1;
     gluDeleteQuadric(quadric);
 }
+
+int myGluiWin::AddEvent(::XKeyEvent* event)
+{
+    static float x=0;
+    static float y=0;
+    switch(event->keycode)
+    {
+        case 97: //left
+            x--;
+            break;
+        case 119: //up
+            y++;
+            break;
+        case 100: //right
+            x++;
+            break;
+        case 115: //down
+            y--;
+            break;
+    }
+    glEnable ( GL_LIGHTING );
+    cerr << event->keycode << "=>" << x << "," << y << endl;
+    GLfloat LightAmbient[]= { 0.5f, 0.5f, 0.5f, 1.0f };
+    GLfloat LightDiffuse[]= { 1.0f, 1.0f, 1.0f, 1.0f };
+    GLfloat LightSpecular[]= { 1.0f, 1.0f, 1.0f, 1.0f };
+    GLfloat LightPosition[]= { x, y, 10.0f, 0.0f };
+    glLightfv(GL_LIGHT1, GL_AMBIENT, LightAmbient);
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, LightDiffuse);
+    glLightfv(GL_LIGHT1, GL_SPECULAR, LightSpecular);
+    glLightfv(GL_LIGHT1, GL_POSITION,LightPosition);
+    glEnable(GL_LIGHT1);
+
+}
+
 
 void myGluiWin::draw(void)
 {
@@ -108,7 +143,7 @@ void myGluiWin::idle(void)
     struct timespec sleeptime = { 0, 100000000 };
     static int count = 0;
 
-    if (count < 50)
+    if (count < 50000)
       {
         count++;
         nanosleep(&sleeptime, NULL);

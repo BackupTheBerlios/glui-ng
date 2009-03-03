@@ -67,7 +67,7 @@ VertexObject::VertexObject (
 
     this->no_shininess = 0.0f;
     this->low_shininess = 5.0f;
-    this->high_shininess = 00.0f;
+    this->high_shininess = 100.0f;
     OUT("");
 
 };

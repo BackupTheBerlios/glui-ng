@@ -487,7 +487,7 @@ void GlutWindow::keyboard_func (unsigned char key, int x, int y)
     int current_window = glutGetWindow ();
     GlutWindow* glut_window = MasterObject::Instance()->FindWindow(glutGetWindow());
 
-    MSG("key: %d\n", current_window);
+    MSG("key: %d(%d,%d)\n", key, x, y);
 
     if (glut_window)
     {
@@ -512,7 +512,7 @@ void GlutWindow::special_func (int key, int x, int y)
     event.x = x;
     event.y = y;
 
-
+    MSG("key: %d(%d,%d)\n", key, x, y);
 
     int current_window = glutGetWindow ();
     GlutWindow* glut_window = MasterObject::Instance()->FindWindow(glutGetWindow());
