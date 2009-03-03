@@ -487,10 +487,10 @@ void GlutWindow::keyboard_func (unsigned char key, int x, int y)
     int current_window = glutGetWindow ();
     GlutWindow* glut_window = MasterObject::Instance()->FindWindow(glutGetWindow());
 
-    MSG("key: %d(%d,%d)\n", key, x, y);
 
     if (glut_window)
     {
+        MSG("key: %d(%d,%d) modifier %d\n", key, x, y, glutGetModifiers());
         event.state=glut_window->KeyModifierState;
         glut_window->AddEvent(&event);
     }
@@ -512,7 +512,6 @@ void GlutWindow::special_func (int key, int x, int y)
     event.x = x;
     event.y = y;
 
-    MSG("key: %d(%d,%d)\n", key, x, y);
 
     int current_window = glutGetWindow ();
     GlutWindow* glut_window = MasterObject::Instance()->FindWindow(glutGetWindow());
@@ -525,6 +524,7 @@ void GlutWindow::special_func (int key, int x, int y)
             if ( glutModifiers | GLUT_ACTIVE_CTRL  ) glut_window->KeyModifierState | ControlMask;
             if ( glutModifiers | GLUT_ACTIVE_ALT   ) glut_window->KeyModifierState | Mod1Mask;
 
+            MSG("key: %d(%d,%d) modifier %d\n", key, x, y, glutModifiers/*glut_window->KeyModifierState*/);
             event.state=glut_window->KeyModifierState;
             glut_window->AddEvent(&event);
 
