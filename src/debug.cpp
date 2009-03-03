@@ -58,7 +58,25 @@ debug::~debug()
     if ( use_debug != NULL ) delete buf;
 }
 
-int debug::print(const char* key,
+void debug::rawprint(const char* key, const char* format,...)
+{
+
+    if (use_debug != NULL && NULL != getenv(key))
+    {
+        va_list arg;
+        va_start(arg, format);
+        int ret = vsnprintf(buf, ISIZE-1, format, arg);
+        va_end(arg);
+        if (ret < 0) {
+            cerr << "debug string too long, error :" << ret << '\n';
+            return ;
+        }
+        cerr << buf;
+    }
+}
+
+
+void debug::print(const char* key,
         const char* file,
         int line,
         const char* func,
@@ -75,7 +93,7 @@ int debug::print(const char* key,
         va_end(arg);
         if (ret < 0) {
             cerr << "debug string too long, error :" << ret << '\n';
-            return -1;
+            return ;
         }
         if ( glui_enable_indent_traces != NULL )
           {
@@ -92,7 +110,6 @@ int debug::print(const char* key,
         cerr << func << ":" << buf;
         if (ret == 0) cerr << endl;
         if (level == 1) shift++;
-        return 0;
     }
 }
 

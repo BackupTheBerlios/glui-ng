@@ -37,6 +37,7 @@
 #include <stdarg.h>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 using namespace std;
 
 const size_t ISIZE = 500;
@@ -48,7 +49,8 @@ namespace GLUI
 			static debug* Instance();
 
 			~debug();
-			int print(
+            void rawprint(const char* key, const char* format,...); //< raw print debug message
+			void print(
                     const char* key,    //< the key in the env to enable this trace
                     const char* file,   //< the file where the trace is located
                     int line,           //< the line of the debug string
@@ -69,6 +71,7 @@ namespace GLUI
 #define IN(format, ...) debug::Instance()->print(MODULE_KEY, __FILE__, __LINE__, __func__,  1, format, ## __VA_ARGS__)
 #define OUT(format, ...) debug::Instance()->print(MODULE_KEY, __FILE__, __LINE__, __func__,  -1, format, ## __VA_ARGS__)
 #define MSG(format, ...) debug::Instance()->print(MODULE_KEY, __FILE__, __LINE__, __func__,  0, format, ## __VA_ARGS__)
+#define RAWMSG(format, ...) debug::Instance()->rawprint(MODULE_KEY, format, ## __VA_ARGS__)
 
 }
 

@@ -338,11 +338,11 @@ void VertexObject::V3List::print()
     V3List* last = this;
     do
       {
-        cerr << last->vertex[VX]<< ","<< last->vertex[VY]<<","<< last->vertex[VZ]<<" ";
+        RAWMSG("%f,%f,%f ",last->vertex[VX],last->vertex[VY],last->vertex[VZ]);
         last = last->next;
       }
     while (last != NULL);
-    cerr << endl;
+    RAWMSG("\n");
 }
 //////////////////////////////////////////////////////////////////
 int VertexObject::ComputeNormals()
@@ -567,14 +567,14 @@ int VertexObject::ComputeNormals()
     //we have processed all the faces and created the normals associated, now compute the average and fill the array
     for (uint32_t i=0; i < Vertices->count/VerticesSize; i++)
       {
-        cerr << "vertice" << i << ":";
+        RAWMSG("vertice %d :",i);
         V3List* normals = VerticeAndNormalsArray[i];
         vec3 normal = normals->vertex;
-        cerr << normal[VX]<< ","<< normal[VY]<<","<<normal[VZ]<< " ";
+        RAWMSG("%f,%f,%f ", normal[VX], normal[VY],normal[VZ]);
         while (normals->next != NULL)
           {
             normals= normals->next;
-             cerr << normals->vertex[VX]<< ","<< normals->vertex[VY]<<","<<normals->vertex[VZ]<<" ";
+            RAWMSG("%f,%f,%f ", normals->vertex[VX], normals->vertex[VY],normals->vertex[VZ]);
             normal = normal + normals->vertex;
           }
         normals = VerticeAndNormalsArray[i];
@@ -584,8 +584,8 @@ int VertexObject::ComputeNormals()
             delete normals;
             normals = next;
           }
-        cerr << endl;
-        cerr << normal[VX]<< ","<< normal[VY]<<","<<normal[VZ]<<endl;
+        RAWMSG("\n");
+        RAWMSG("%f,%f,%f\n", normal[VX], normal[VY],normal[VZ]);
         normal.normalize();
         Normals->array.pfloat[i*3 + 0] = normal[VX];
         Normals->array.pfloat[i*3 + 1] = normal[VY];
