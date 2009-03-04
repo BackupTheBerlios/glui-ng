@@ -18,14 +18,15 @@ VertexObject* drawinghelpers::raised_box( uint32_t w, uint32_t h, uint32_t thick
                                 {w-(float) thickness,   (float) thickness, (float) thickness}, //5
                                 {w-(float) thickness, h-(float) thickness, (float) thickness}, //6
                                 {  (float) thickness, h-(float) thickness, (float) thickness}}; //7
-    GLfloat Normals[8][3]   = { {  0.0,   0.0, 0.0}, //0
-                                {  0.0,   0.0, 0.0}, //1
-                                {  0.0,   0.0, 0.0}, //2
-                                {  0.0,   0.0, 0.0}, //3
-                                {  0.0,   0.0, 0.0}, //4
-                                {  0.0,   0.0, 0.0}, //5
-                                {  0.0,   0.0, 0.0}, //6
-                                {  0.0,   0.0, 0.0}}; //7
+    GLfloat Normals[8][3]   = { {  -0.408248, -0.408248, 0.816497}, //0
+                                {  0.408248, -0.408248, 0.816497}, //1
+                                {  0.408248, 0.408248, 0.816497}, //2
+                                {  -0.408248, 0.408248, 0.816497}, //3
+                                {  0.0, 0.0, 1.0}, //4
+                                {  0.0, 0.0, 1.0}, //5
+                                {  0.0, 0.0, 1.0}, //6
+                                {  0.0, 0.0, 1.0}}; //7
+
 
     GLubyte indices[] = {
                             4, 5, 6, 7,		//front
@@ -61,8 +62,8 @@ VertexObject* drawinghelpers::raised_box( uint32_t w, uint32_t h, uint32_t thick
     vo->SetVerticesArray(VertexObject::FLOAT, Vertices, 8);
     vo->SetFaceIndicesArray (VertexObject::UINT8_T, indices, 5);
     vo->SetColorArray (VertexObject::FLOAT, Colors, 8);
-    vo->ComputeNormals();
-    //vo->SetNormalArray (VertexObject::FLOAT, Normals, 8);
+    //vo->ComputeNormals();
+    vo->SetNormalArray (VertexObject::FLOAT, Normals, 8);
     return vo;
 
 }

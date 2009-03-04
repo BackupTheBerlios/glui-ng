@@ -124,7 +124,7 @@ void theme::DoLightning()
     //< http://jerome.jouvie.free.fr/OpenGl/Tutorials/Tutorial13.php
     glEnable ( GL_LIGHTING );
     GLfloat LightAmbient[]= { 0.5f, 0.5f, 0.5f, 1.0f };
-    GLfloat LightDiffuse[]= { 1.0f, 1.0f, 1.0f, 1.0f };
+    GLfloat LightDiffuse[]= { 0.2f, 0.5f, 0.5f, 1.0f };
     GLfloat LightPosition[]= { 1.0f, 1.0f, 1.0f, 0.0f };
     glLightfv(GL_LIGHT1, GL_AMBIENT, LightAmbient);
     glLightfv(GL_LIGHT1, GL_DIFFUSE, LightDiffuse);

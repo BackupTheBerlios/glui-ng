@@ -51,8 +51,8 @@ VertexObject::VertexObject (
     Texture  = NULL;
 
     float no_mat[] = {0.0f, 0.0f, 0.0f, 1.0f};
-    float mat_ambient[] = {0.7f, 0.7f, 0.7f, 1.0f};
-    float mat_ambient_color[] = {0.8f, 0.8f, 0.2f, 1.0f};
+    float mat_ambient[] = {0.2f, 0.2f, 0.2f, 1.0f};
+    float mat_ambient_color[] = {0.1f, 0.8f, 0.2f, 1.0f};
     float mat_diffuse[] = {0.1f, 0.5f, 0.8f, 1.0f};
     float mat_specular[] = {1.0f, 1.0f, 1.0f, 1.0f};
     float mat_emission[] = {0.3f, 0.2f, 0.2f, 0.0f};
@@ -67,7 +67,7 @@ VertexObject::VertexObject (
 
     this->no_shininess = 0.0f;
     this->low_shininess = 5.0f;
-    this->high_shininess = 00.0f;
+    this->high_shininess = 100.0f;
     OUT("");
 
 };
@@ -595,7 +595,7 @@ int VertexObject::ComputeNormals()
     {
         for (uint32_t i=0; i< Normals->count/3; i++)
         {
-            MSG("%f %f %f\n", Normals->array.pfloat[i*3 + 0],  Normals->array.pfloat[i*3 + 1], Normals->array.pfloat[i*3 + 2]);
+            MSG("%f, %f, %f\n", Normals->array.pfloat[i*3 + 0],  Normals->array.pfloat[i*3 + 1], Normals->array.pfloat[i*3 + 2]);
         }
     }
     else
