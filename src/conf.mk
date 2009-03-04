@@ -4,6 +4,8 @@ ifeq (${OS},Cygwin)
    EXE:=.exe
 endif
 
+BackEnd = GLUT
+
 .SECONDARY:
 
 

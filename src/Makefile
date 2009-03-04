@@ -1,4 +1,5 @@
 .SUFFIXES: .cpp
+include ./conf.mk
 
 #comment this for verbose make
 MAKEFLAGS+= -s
@@ -49,6 +50,17 @@ GLUI_HEADERS = $(shell find include -type f)
 
 #######################################
 GLUI_SRC = $(shell find  -maxdepth 1 -regex '.*\.cpp\|.*\.c' -printf '%f\n')
+
+ifeq (${BackEnd},XGL)
+GLUI_SRC+= $(shell find XGL -maxdepth 1 -regex '.*\.cpp\|.*\.c' )
+endif
+ifeq (${BackEnd},GLUT)
+GLUI_SRC+= $(shell find GLUT -maxdepth 1 -regex '.*\.cpp\|.*\.c' )
+endif
+ifeq (${BackEnd},WGL)
+GLUI_SRC+= $(shell find WGL -maxdepth 1 -regex '.*\.cpp\|.*\.c' )
+endif
+
 GLUI_OBJS = $(addprefix GENERATED/,$(addsuffix .o,$(basename ${GLUI_SRC})))
 
 GLUI_LIB = GENERATED/lib/libglui.a
@@ -57,9 +69,7 @@ GLUI_TOOLS = GENERATED/bin/ppm2array
 
 .PHONY: all setup examples tools clean depend doc doc-pdf doc-dist dist tests
 
-all: GENERATED $(GLUI_LIB) examples tools
-
-$(GLUI_LIB) : GENERATED
+all: $(GLUI_LIB) examples tools
 
 testplan : tests
 	./tests/testplan.sh
@@ -67,33 +77,36 @@ testplan : tests
 tests : $(GLUI_LIB)
 	make -C tests $@ DIRPREFIX=./tests/
 
-GENERATED:
-	mkdir -p GENERATED
-	mkdir -p GENERATED/bin
-	mkdir -p GENERATED/lib
-
 examples: $(GLUI_LIB)
 	make -C example $@
 
 tools: $(GLUI_TOOLS) $(GLUI_LIB)
 
 GENERATED/bin/ppm2array: tools/ppm2array.cpp tools/ppm.cpp
+	mkdir -p $(dir $@)
 	$(CXX) $(CPPFLAGS) -o $@ $^
 
 GENERATED/bin/%: example/%.cpp $(GLUI_LIB)
+	mkdir -p $(dir $@)
 	$(CXX) $(CPPFLAGS) -o $@ $<  $(LIBGLUI) $(LIBGLUT) $(LIBGL) $(LIBS)
 
 $(GLUI_LIB): $(GLUI_OBJS)
+	mkdir -p $(dir $@)
 	ar -r $(GLUI_LIB) $(GLUI_OBJS)
 
 ${GLUI_OBJS}: ${GLUI_HEADERS}
 
+
+
+
 GENERATED/%.o: %.cpp ${GLUI_HEADERS}
 	echo "    [CXX] $<"
+	mkdir -p $(dir $@)
 	$(CXX) $(CPPFLAGS) -c $< -o $@
 
 GENERATED/%.o: %.c ${GLUI_HEADERS}
 	echo "    [CC ] $<"
+	mkdir -p $(dir $@)
 	$(CXX) $(CPPFLAGS) -c $< -o $@
 
 
