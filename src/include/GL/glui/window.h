@@ -98,7 +98,6 @@ namespace GLUI
         public :
              _Window(const char *name,
                     Container::orientation orient=Container::TopDown);
-            virtual int AddEvent (::XEvent *event)=0;
         public :  //operators
             void  set_ortho_projection( void );
             void  set_viewport( void );
@@ -111,9 +110,24 @@ namespace GLUI
 
              void SetViewport(void);
 
+        public: //event handlers
+             virtual int AddEvent (::XEvent *event);
+             virtual int AddEvent(::XResizeRequestEvent* event);
+             virtual int AddEvent(::XExposeEvent* event);
+             virtual int AddEvent(::XDestroyWindowEvent* event);
+             virtual int AddEvent(::XKeyEvent* event);
+             virtual int AddEvent(::XButtonEvent* event);
+             virtual int AddEvent(::XMotionEvent* event);
+             virtual int AddEvent(::XCrossingEvent* event);
+             virtual int AddEvent(::XMapEvent* event);
+             virtual int AddEvent(::XUnmapEvent* event);
+             //virtual int         set_size( Size sz, Size min=Size(0u,0u) ); //replace with a XResizeRequestEvent
+
+
         protected :
             _Window();
 
+            bool mapped;
             long flags;
             int  SetCurrentDrawBuffer( void );
             void  SetOrthoProjection( void );

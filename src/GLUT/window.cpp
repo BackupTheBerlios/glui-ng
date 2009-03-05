@@ -175,7 +175,7 @@ GlutWindow::GlutWindow(Display *display, WindowId parent,
 
 #warning "TODO: copy constructor using WindowId, throw EINVAL if already registered"
 
-int GlutWindow::_GlutWindow(Display* display, WindowId parent,
+void GlutWindow::_GlutWindow(Display* display, WindowId parent,
         int x, int y,
         unsigned int width, unsigned int height,
         unsigned int border_width,
@@ -273,159 +273,6 @@ int GLUIInit(int* argc, char** argv)
    return GlutWindow::init(argc, argv);
 }
 
-///////////////////////////////////////////////////////////////////////////////
-int GlutWindow::AddEvent (::XEvent *event)
-{
-    switch (event->type)
-    {
-        case Expose : return AddEvent((::XExposeEvent*) event);
-        case DestroyNotify :  return AddEvent((::XDestroyWindowEvent*) event);
-        case ResizeRequest: return AddEvent((::XResizeRequestEvent*) event);
-    }
-
-    return EINVAL;
-}
-
-int GlutWindow::AddEvent(::XResizeRequestEvent *event)
-{
-    IN("");
-    this->pack(x, y);
-
-    if ( event->width  != this->CurrentSize.size.w ||
-            event->height != this->CurrentSize.size.h ) {
-        this->CurrentSize.size.w = event->width;
-        this->CurrentSize.size.h = event->height;
-        glutSetWindow( this->GlutWindowId );
-        glutReshapeWindow( this->CurrentSize.size.w, this->CurrentSize.size.h );
-    }
-    else {
-    }
-
-    glViewport( 0, 0, this->CurrentSize.size.w, this->CurrentSize.size.h);
-
-    MSG("%d: %d\n", glutGetWindow(), this->flags );
-
-    glutPostRedisplay();
-    OUT("");
-    return 0;
-}
-
-
-int GlutWindow::AddEvent(::XExposeEvent *event)
-{
-    IN("");
-    if (mapped)
-    {
-        int       win_w, win_h;
-
-        // SUBTLE: on freeGLUT, the correct window is always already set.
-        // But older versions of GLUT need this call, or else subwindows
-        // don't update properly when resizing or damage-painting.
-        glutSetWindow( this->GlutWindowId );
-
-        // Set up OpenGL state for widget drawing
-        glEnable( GL_DEPTH_TEST );
-        glDepthFunc(GL_LEQUAL);
-        //glCullFace( GL_BACK );
-        //glDisable( GL_CULL_FACE );
-        glEnable ( GL_COLOR_MATERIAL );
-        glEnable ( GL_NORMALIZE );
-        glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-        glShadeModel(GL_SMOOTH);
-
-        theme::Instance()->DoLightning();
-        SetOrthoProjection();
-
-
-        this->SetCurrentDrawBuffer();
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear Screen And Depth Buffer
-
-        //update sizes and positions
-        this->update_size();
-
-        // Check here if the window needs resizing
-        win_w = glutGet( GLUT_WINDOW_WIDTH );
-        win_h = glutGet( GLUT_WINDOW_HEIGHT );
-        if ( win_w != this->Width() || win_h != this->Height() ) {
-            glutReshapeWindow( this->Width(), this->Height() );
-        }
-
-        Container::AddEvent (event);
-
-        switch (drawinghelpers::get_buffer_mode()) {
-            case drawinghelpers::buffer_front: // Make sure drawing gets to screen
-                glFlush();
-                break;
-            case drawinghelpers::buffer_back: // Bring back buffer to front
-                glutSwapBuffers();
-                break;
-        }
-        glutPostRedisplay();
-    }
-    OUT("");
-    return 0;
-}
-
-int GlutWindow::AddEvent(::XDestroyWindowEvent *event)
-{
-#warning "USE container destructor"
-    Node* child = first_child();
-    while (child)
-    {
-        Node* next = child->next();
-        delete child;
-        child = next;
-    }
-    delete this;
-    return 0;
-}
-
-
-int GlutWindow::AddEvent(::XKeyEvent* event)
-{
-    Container::AddEvent((::XEvent*) event);
-}
-
-
-int GlutWindow::AddEvent(::XButtonEvent* event)
-{
-    Container::AddEvent((::XEvent*) event);
-}
-
-
-int GlutWindow::AddEvent(::XMotionEvent* event)
-{
-    Container::AddEvent((::XEvent*) event);
-}
-
-
-int GlutWindow::AddEvent(::XCrossingEvent* event)
-{
-    Container::AddEvent((::XEvent*) event);
-}
-
-
-int GlutWindow::AddEvent(::XMapEvent* event)
-{
-    ::XExposeEvent expose;
-    expose.type = Expose;
-    Container::AddEvent((::XEvent*) event);
-    this->AddEvent(&expose);
-}
-
-
-int GlutWindow::AddEvent(::XUnmapEvent* event)
-{
-    Container::AddEvent((::XEvent*) event);
-}
-
-int GlutWindow::set_size( Size sz, Size min) //replace with a XResizeRequestEvent
-{
-    Control::set_size(sz,min);
-    glutReshapeWindow( this->Width(), this->Height() );
-}
-
-
 
 
 /********************************************** glui_display_func() ********/
@@ -465,6 +312,65 @@ void GlutWindow::reshape_func (int w, int h)
 }
 
 
+int GlutWindow::AddEvent(::XResizeRequestEvent *event)
+{
+    IN("");
+    this->pack(x, y);
+
+    if ( event->width  != this->CurrentSize.size.w ||
+            event->height != this->CurrentSize.size.h ) {
+        glutSetWindow( this->GlutWindowId );
+        glutReshapeWindow( event->width, event->height );
+        MSG("%d: %d\n", glutGetWindow(), this->flags );
+        _Window::AddEvent(event);
+        glutPostRedisplay();
+    }
+    OUT("");
+    return 0;
+}
+
+int GlutWindow::AddEvent(::XExposeEvent *event)
+{
+    IN("");
+    if (mapped)
+    {
+        int       win_w, win_h;
+
+        // SUBTLE: on freeGLUT, the correct window is always already set.
+        // But older versions of GLUT need this call, or else subwindows
+        // don't update properly when resizing or damage-painting.
+        glutSetWindow( this->GlutWindowId );
+
+        // Check here if the window needs resizing
+        win_w = glutGet( GLUT_WINDOW_WIDTH );
+        win_h = glutGet( GLUT_WINDOW_HEIGHT );
+        if ( win_w != this->Width() || win_h != this->Height() ) {
+            glutReshapeWindow( this->Width(), this->Height() );
+        }
+
+        _Window::AddEvent (event);
+        switch (drawinghelpers::get_buffer_mode()) {
+            case drawinghelpers::buffer_front: // Make sure drawing gets to screen
+                glFlush();
+                break;
+            case drawinghelpers::buffer_back: // Bring back buffer to front
+                glutSwapBuffers();
+                break;
+        }
+
+
+        glutPostRedisplay();
+    }
+    OUT("");
+    return 0;
+}
+
+int GlutWindow::set_size( Size sz, Size min) //replace with a XResizeRequestEvent
+{
+    Control::set_size(sz,min);
+    glutReshapeWindow( this->Width(), this->Height() );
+    return 0;
+}
 
 
 
@@ -475,7 +381,6 @@ void GlutWindow::keyboard_func (unsigned char key, int x, int y)
 {
 
     IN("");
-    int win_w = glutGet (GLUT_WINDOW_WIDTH);
     int win_h = glutGet (GLUT_WINDOW_HEIGHT);
     y = win_h - y;
     ::XKeyEvent event;
@@ -492,7 +397,7 @@ void GlutWindow::keyboard_func (unsigned char key, int x, int y)
     if (glut_window)
     {
         event.state=glut_window->KeyModifierState;
-        glut_window->AddEvent(&event);
+        dynamic_cast<_Window*>(glut_window)->AddEvent(&event);
     }
     OUT("");
 }
@@ -503,7 +408,6 @@ void GlutWindow::keyboard_func (unsigned char key, int x, int y)
 void GlutWindow::special_func (int key, int x, int y)
 {
 
-    int win_w = glutGet (GLUT_WINDOW_WIDTH);
     int win_h = glutGet (GLUT_WINDOW_HEIGHT);
     y = win_h - y;
     ::XKeyEvent event;
@@ -514,19 +418,18 @@ void GlutWindow::special_func (int key, int x, int y)
 
 
 
-    int current_window = glutGetWindow ();
     GlutWindow* glut_window = MasterObject::Instance()->FindWindow(glutGetWindow());
 
     if (glut_window)
     {
             int glutModifiers = glutGetModifiers();
             glut_window->KeyModifierState &= ! ( ControlMask | ShiftMask | Mod1Mask );
-            if ( glutModifiers | GLUT_ACTIVE_SHIFT ) glut_window->KeyModifierState | ShiftMask;
-            if ( glutModifiers | GLUT_ACTIVE_CTRL  ) glut_window->KeyModifierState | ControlMask;
-            if ( glutModifiers | GLUT_ACTIVE_ALT   ) glut_window->KeyModifierState | Mod1Mask;
+            if ( glutModifiers | GLUT_ACTIVE_SHIFT ) glut_window->KeyModifierState |= ShiftMask;
+            if ( glutModifiers | GLUT_ACTIVE_CTRL  ) glut_window->KeyModifierState |= ControlMask;
+            if ( glutModifiers | GLUT_ACTIVE_ALT   ) glut_window->KeyModifierState |= Mod1Mask;
 
             event.state=glut_window->KeyModifierState;
-            glut_window->AddEvent(&event);
+            dynamic_cast<_Window*>(glut_window)->AddEvent(&event);
 
     }
 }
@@ -535,7 +438,6 @@ void GlutWindow::special_func (int key, int x, int y)
 //GLUI use Y axis up (0,0) is bottom left corner as in OpenGl
 void GlutWindow::mouse_func (int button, int state, int x, int y)
 {
-    int win_w = glutGet (GLUT_WINDOW_WIDTH);
     int win_h = glutGet (GLUT_WINDOW_HEIGHT);
 
     y = win_h - y;
@@ -546,7 +448,6 @@ void GlutWindow::mouse_func (int button, int state, int x, int y)
     event.y=y;
 
 
-    int current_window = glutGetWindow ();
     GlutWindow *glut_window = MasterObject::Instance()->FindWindow(glutGetWindow());
 
     if (glut_window)
@@ -563,12 +464,12 @@ void GlutWindow::mouse_func (int button, int state, int x, int y)
         }
         int glutModifiers = glutGetModifiers();
         glut_window->KeyModifierState &= ! ( ControlMask | ShiftMask | Mod1Mask );
-        if ( glutModifiers | GLUT_ACTIVE_SHIFT ) glut_window->KeyModifierState | ShiftMask;
-        if ( glutModifiers | GLUT_ACTIVE_CTRL  ) glut_window->KeyModifierState | ControlMask;
-        if ( glutModifiers | GLUT_ACTIVE_ALT   ) glut_window->KeyModifierState | Mod1Mask;
+        if ( glutModifiers | GLUT_ACTIVE_SHIFT ) glut_window->KeyModifierState |= ShiftMask;
+        if ( glutModifiers | GLUT_ACTIVE_CTRL  ) glut_window->KeyModifierState |= ControlMask;
+        if ( glutModifiers | GLUT_ACTIVE_ALT   ) glut_window->KeyModifierState |= Mod1Mask;
 
         event.state=glut_window->KeyModifierState;
-        glut_window->AddEvent(&event);
+        dynamic_cast<_Window*>(glut_window)->AddEvent(&event);
     }
 }
 
@@ -577,7 +478,6 @@ void GlutWindow::mouse_func (int button, int state, int x, int y)
 //GLUI use Y axis up (0,0) is bottom left corner as in OpenGl
 void GlutWindow::motion_func (int x, int y)
 {
-        int win_w = glutGet (GLUT_WINDOW_WIDTH);
     int win_h = glutGet (GLUT_WINDOW_HEIGHT);
 
     y = win_h - y;
@@ -588,13 +488,12 @@ void GlutWindow::motion_func (int x, int y)
     event.y=y;
 
 
-    int current_window = glutGetWindow ();
     GlutWindow *glut_window = MasterObject::Instance()->FindWindow(glutGetWindow());
 
     if (glut_window)
     {
         event.state=glut_window->KeyModifierState;
-        glut_window->AddEvent(&event);
+        dynamic_cast<_Window*>(glut_window)->AddEvent(&event);
     }
 }
 
@@ -622,13 +521,12 @@ void GlutWindow::entry_func (int state)
 #warning "complete the structure with other information"
 
 
-    int current_window = glutGetWindow ();
     GlutWindow *glut_window = MasterObject::Instance()->FindWindow(glutGetWindow());
 
     if (glut_window)
     {
         event.state=glut_window->KeyModifierState;
-        glut_window->AddEvent(&event);
+        dynamic_cast<_Window*>(glut_window)->AddEvent(&event);
     }
 
 }
@@ -650,18 +548,17 @@ void GlutWindow::visibility_func (int state)
     IN("");
     /*  fflush( stdout );          */
 
-    int current_window = glutGetWindow ();
     GlutWindow *glut_window = MasterObject::Instance()->FindWindow(glutGetWindow());
 
     if (glut_window)
     {
         if ( state == GLUT_VISIBLE )
         {
-            glut_window->AddEvent(&mapevent);
+            dynamic_cast<_Window*>(glut_window)->AddEvent(&mapevent);
         }
         else
         {
-            glut_window->AddEvent(&unmapevent);
+            dynamic_cast<_Window*>(glut_window)->AddEvent(&unmapevent);
         }
     }
     OUT("");
@@ -681,7 +578,6 @@ void GlutWindow::idle (void)
 
 void GlutWindow::idle_func (void)
 {
-    int current_window = glutGetWindow ();
     GlutWindow *glut_window = MasterObject::Instance()->FindWindow(glutGetWindow());
 
     if (glut_window)
