@@ -1,1 +1,16 @@
+#general packages dependencies
+glibmm 2.0 is required (unicode string support)
+   (this package seems only to depend on glib and libsigc++)
+
+- glut/openglut/freeglut is required if you want to build the glut backend
+- X11 is required if you want to build the x11 backend
+- windows(R) is required if you want to build the windows backend
+  (not supported yet)
+- Macos(R) is required if you want to build the macos backend
+   => OpenGl libs are mandatory
+
+
+# posix dependency
 nanosleep is required if glut package is used
+
+

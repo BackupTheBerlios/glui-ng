@@ -487,10 +487,10 @@ void GlutWindow::keyboard_func (unsigned char key, int x, int y)
     int current_window = glutGetWindow ();
     GlutWindow* glut_window = MasterObject::Instance()->FindWindow(glutGetWindow());
 
-    MSG("key: %d\n", current_window);
 
     if (glut_window)
     {
+        MSG("key: %d(%d,%d) modifier %d\n", key, x, y, glutGetModifiers());
         event.state=glut_window->KeyModifierState;
         glut_window->AddEvent(&event);
     }
@@ -513,7 +513,6 @@ void GlutWindow::special_func (int key, int x, int y)
     event.y = y;
 
 
-
     int current_window = glutGetWindow ();
     GlutWindow* glut_window = MasterObject::Instance()->FindWindow(glutGetWindow());
 
@@ -525,6 +524,7 @@ void GlutWindow::special_func (int key, int x, int y)
             if ( glutModifiers | GLUT_ACTIVE_CTRL  ) glut_window->KeyModifierState | ControlMask;
             if ( glutModifiers | GLUT_ACTIVE_ALT   ) glut_window->KeyModifierState | Mod1Mask;
 
+            MSG("key: %d(%d,%d) modifier %d\n", key, x, y, glutModifiers/*glut_window->KeyModifierState*/);
             event.state=glut_window->KeyModifierState;
             glut_window->AddEvent(&event);
 
@@ -691,5 +691,128 @@ void GlutWindow::idle_func (void)
 
 }
 
+////////////////////////////////////////////////////////////////////
+KeySym GlutWindow::XLookupKeysym(::XKeyEvent *key_event, int index)
+{
+    switch (key_event->keycode)
+    {
 
+        GLUT_KEY_F1 << KeyModifierShift : return XK_F1;
+        GLUT_KEY_F2 << KeyModifierShift : return XK_F2;
+        GLUT_KEY_F3 << KeyModifierShift : return XK_F3;
+        GLUT_KEY_F4 << KeyModifierShift : return XK_F4;
+        GLUT_KEY_F5 << KeyModifierShift : return XK_F5;
+        GLUT_KEY_F6 << KeyModifierShift : return XK_F6;
+        GLUT_KEY_F7 << KeyModifierShift : return XK_F7;
+        GLUT_KEY_F8 << KeyModifierShift : return XK_F8;
+        GLUT_KEY_F9 << KeyModifierShift : return XK_F9;
+        GLUT_KEY_F10 << KeyModifierShift : return XK_F10;
+        GLUT_KEY_F11 << KeyModifierShift : return XK_F11;
+        GLUT_KEY_F12 << KeyModifierShift : return XK_F12;
+        GLUT_KEY_UP << KeyModifierShift : return XK_Up;
+        GLUT_KEY_RIGHT << KeyModifierShift : return XK_Right;
+        GLUT_KEY_DOWN << KeyModifierShift : return XK_Down;
+        GLUT_KEY_PAGE_UP << KeyModifierShift : return XK_Page_Up;
+        GLUT_KEY_PAGE_DOWN << KeyModifierShift : return XK_Page_Down;
+        GLUT_KEY_HOME << KeyModifierShift : return XK_Home;
+        GLUT_KEY_END << KeyModifierShift : return XK_End;
+        GLUT_KEY_INSERT << KeyModifierShift : return XK_Insert;
+        ' ' : return XK_space;
+        '!' : return XK_exclam;
+        '"' : return XK_quotedbl;
+        '#' : return XK_numbersign;
+        '$' : return XK_dollar;
+        '%' : return XK_percent;
+        '&' : return XK_ampersand;
+        '\'': return XK_apostrophe;
+        '(' : return XK_parenleft;
+        ')' : return XK_parenright;
+        '*' : return XK_asterisk;
+        '+' : return XK_plus;
+        ',' : return XK_comma;
+        '-' : return XK_minus;
+        '.' : return XK_period;
+        '/' : return XK_slash;
+        '0' : return XK_0;
+        '1' : return XK_1;
+        '2' : return XK_2;
+        '3' : return XK_3;
+        '4' : return XK_4;
+        '5' : return XK_5;
+        '6' : return XK_6;
+        '7' : return XK_7;
+        '8' : return XK_8;
+        '9' : return XK_9;
+        ':' : return XK_colon;
+        ';' : return XK_semicolon;
+        '<' : return XK_less;
+        '=' : return XK_equal;
+        '>' : return XK_greater;
+        '?' : return XK_question;
+        '@' : return XK_at;
+        'A' : return XK_A;
+        'B' : return XK_B;
+        'C' : return XK_C;
+        'D' : return XK_D;
+        'E' : return XK_E;
+        'F' : return XK_F;
+        'G' : return XK_G;
+        'H' : return XK_H;
+        'I' : return XK_I;
+        'J' : return XK_J;
+        'K' : return XK_K;
+        'L' : return XK_L;
+        'M' : return XK_M;
+        'N' : return XK_N;
+        'O' : return XK_O;
+        'P' : return XK_P;
+        'Q' : return XK_Q;
+        'R' : return XK_R;
+        'S' : return XK_S;
+        'T' : return XK_T;
+        'U' : return XK_U;
+        'V' : return XK_V;
+        'W' : return XK_W;
+        'X' : return XK_X;
+        'Y' : return XK_Y;
+        'Z' : return XK_Z;
+        '[' : return XK_bracketleft;
+        '\\': return XK_backslash;
+        ']' : return XK_bracketright;
+        '^' : return XK_asciicircum;
+        '_' : return XK_underscore;
+        '`' : return XK_grave;
+        'a' : return XK_a;
+        'b' : return XK_b;
+        'c' : return XK_c;
+        'd' : return XK_d;
+        'e' : return XK_e;
+        'f' : return XK_f;
+        'g' : return XK_g;
+        'h' : return XK_h;
+        'i' : return XK_i;
+        'j' : return XK_j;
+        'k' : return XK_k;
+        'l' : return XK_l;
+        'm' : return XK_m;
+        'n' : return XK_n;
+        'o' : return XK_o;
+        'p' : return XK_p;
+        'q' : return XK_q;
+        'r' : return XK_r;
+        's' : return XK_s;
+        't' : return XK_t;
+        'u' : return XK_u;
+        'v' : return XK_v;
+        'w' : return XK_w;
+        'x' : return XK_x;
+        'y' : return XK_y;
+        'z' : return XK_z;
+        '{' : return XK_braceleft;
+        '|' : return XK_bar;
+        '}' : return XK_braceright;
+        '~' : return XK_asciitilde;
+        default: return XK_VoidSymbol;
+    }
+}
 

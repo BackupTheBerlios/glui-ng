@@ -119,7 +119,7 @@ void theme::GetVersion(uint32_t* Major, uint32_t* Minor, uint32_t* revision)
 void theme::DoLightning()
 {
 #warning "glPushAttrib"
-    glDisable ( GL_LIGHTING );
+/*    glDisable ( GL_LIGHTING );
 
     //< http://jerome.jouvie.free.fr/OpenGl/Tutorials/Tutorial13.php
     glEnable ( GL_LIGHTING );
@@ -130,6 +130,6 @@ void theme::DoLightning()
     glLightfv(GL_LIGHT1, GL_DIFFUSE, LightDiffuse);
     glLightfv(GL_LIGHT1, GL_POSITION,LightPosition);
     glEnable(GL_LIGHT1);
-
+*/
 }
 
