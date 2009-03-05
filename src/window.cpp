@@ -28,8 +28,10 @@
 
 #include <GL/glui/window.h>
 #include <GL/glui/drawinghelpers.h>
+#include <GL/glui/debug.h>
 #include <GL/gl.h>
 using namespace GLUI;
+#define MODULE_KEY  "GLUI_DEBUG_WINDOW"
 
 /*_Display::operator ::Display*()
 {
@@ -79,6 +81,134 @@ void  _Window::SetOrthoProjection( void )
 
 
 }
+
+///////////////////////////////////////////////////////////////////////////////
+int _Window::AddEvent (::XEvent *event)
+{
+    switch (event->type)
+    {
+        case Expose : return AddEvent((::XExposeEvent*) event);
+        case DestroyNotify :  return AddEvent((::XDestroyWindowEvent*) event);
+        case ResizeRequest: return AddEvent((::XResizeRequestEvent*) event);
+    }
+
+    return EINVAL;
+}
+
+int _Window::AddEvent(::XResizeRequestEvent *event)
+{
+    IN("");
+
+    if ( event->width  != this->CurrentSize.size.w ||
+            event->height != this->CurrentSize.size.h ) {
+        this->CurrentSize.size.h = event->height;
+        this->CurrentSize.size.w = event->width;
+        this->pack(x, y);
+        glViewport( 0, 0, this->CurrentSize.size.w, this->CurrentSize.size.h);
+    }
+    OUT("");
+    return 0;
+}
+
+
+
+int _Window::AddEvent(::XExposeEvent *event)
+{
+    IN("");
+    if (mapped)
+    {
+        // Set up OpenGL state for widget drawing
+        glEnable( GL_DEPTH_TEST );
+        glDepthFunc(GL_LEQUAL);
+        //glCullFace( GL_BACK );
+        //glDisable( GL_CULL_FACE );
+        glEnable ( GL_COLOR_MATERIAL );
+        glEnable ( GL_NORMALIZE );
+        glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+        glShadeModel(GL_SMOOTH);
+
+        theme::Instance()->DoLightning();
+        SetOrthoProjection();
+
+
+        this->SetCurrentDrawBuffer();
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear Screen And Depth Buffer
+
+        //update sizes and positions
+        this->update_size();
+
+        Container::AddEvent (event);
+
+        switch (drawinghelpers::get_buffer_mode()) {
+            case drawinghelpers::buffer_front: // Make sure drawing gets to screen
+                glFlush();
+                break;
+            case drawinghelpers::buffer_back: // Bring back buffer to front
+#warning "check how other *GL are doing swapbuffer"
+                //glutSwapBuffers();
+                break;
+        }
+    }
+    OUT("");
+    return 0;
+}
+
+
+
+int _Window::AddEvent(::XDestroyWindowEvent *event)
+{
+#warning "USE container destructor"
+    Node* child = first_child();
+    while (child)
+    {
+        Node* next = child->next();
+        delete child;
+        child = next;
+    }
+    delete this;
+    return 0;
+}
+
+
+int _Window::AddEvent(::XKeyEvent* event)
+{
+    Container::AddEvent((::XEvent*) event);
+}
+
+
+int _Window::AddEvent(::XButtonEvent* event)
+{
+    Container::AddEvent((::XEvent*) event);
+}
+
+
+int _Window::AddEvent(::XMotionEvent* event)
+{
+    Container::AddEvent((::XEvent*) event);
+}
+
+
+int _Window::AddEvent(::XCrossingEvent* event)
+{
+    Container::AddEvent((::XEvent*) event);
+}
+
+
+int _Window::AddEvent(::XMapEvent* event)
+{
+    ::XExposeEvent expose;
+    expose.type = Expose;
+    Container::AddEvent((::XEvent*) event);
+    this->AddEvent(&expose);
+}
+
+
+int _Window::AddEvent(::XUnmapEvent* event)
+{
+    Container::AddEvent((::XEvent*) event);
+}
+
+
 
 
 
