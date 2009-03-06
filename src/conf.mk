@@ -8,4 +8,4 @@ BackEnd = GLUT
 
 .SECONDARY:
 
-
+CPPFLAGS += -D __USE_XLIB
