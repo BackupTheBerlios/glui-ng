@@ -101,12 +101,19 @@ namespace GLUI
         public :  //operators
             void  set_ortho_projection( void );
             void  set_viewport( void );
+        public : //XMethods
+            virtual void XNextEvent()=0;  //< main loop, will block until an event
+                                          //< is available, process the event if
+                                          //< required and return for allowing
+                                          //< other windows to process their
+                                          //< events.
             virtual void XMapWindow()=0;
             virtual void XMapRaised()=0;
             virtual void XMapSubwindows()=0;
             virtual void XUnmapWindow()=0;
             virtual void XUnmapSubwindows()=0;
-
+            virtual KeySym XLookupKeysym(::XKeyEvent *key_event, int index)=0; //a KeySym is a 32bit not unicode char
+            static  uint32_t KeySymToUcs4(KeySym keysym);
 
              void SetViewport(void);
 
@@ -144,14 +151,13 @@ int GLUIInit(int* argc, char** argv); //optional
 //now select automatically the window class according to the
 //window manager we use
 #ifdef __USE_XLIB
-#warning "using Xlib"
 #include <GL/glui/x11_window.h>
 #elif  __USE_WIN32
-#warning "using win32"
 #include <GL/glui/win32_window.h>
-#else
-#warning "using glut"
+#elif  __USE_GLUT
 #include <GL/glui/glut_window.h>
+#else
+#error "you must have configured at least one backend"
 #endif
 
 

@@ -43,48 +43,46 @@
  This entire approach seems to be superceded by the "subwindow" flavor
  of GLUI.
 */
-#include <GL/glui/glui_exceptions.h>
+#include <GL/glui/Exception.h>
 #include <errno.h>
 namespace GLUI
 {
+#define GLUIWindow X11Window
+#define Display X11Display
 
-	typedef X11Window GLUIWindow;
-	typedef X11Display Display;
-	typedef
-
-	class GLUIAPI X11Display : public _Display
-	{
-		public :
-			inline X11Display(char* name);
-		private:
-			X11Display();
-	}
+    class GLUIAPI X11Display : public _Display
+    {
+        public :
+            inline X11Display(char* name);
+        private:
+            X11Display();
+    };
 
 
-	class GLUIAPI X11Window : public _Window
-	{
-		public:
-			X11Window(Display* display, int parent_window,
-					int x, int y,
-					unsigned int width, unsigned int height,
-					unsigned int border_width,
-					int depth
-					unsigned int _class,
-					Visual *visual,
-					unsigned long valuemask,
-					XSetWindowAttributes *attributes );
-			X11Window(Display *display, Window parent,
-					int x, int y,
-					unsigned int width, unsigned int height,
-					unsigned int border_width,
-					unsigned long border,
-					unsigned long background );
-		public : //operators
-			bool operator== (::Window target);
-		protected:
-			::Window* window;
-			X11Window();
-	};
+    class GLUIAPI X11Window : public _Window
+    {
+        public:
+            X11Window(Display* display, int parent_window,
+                    int x, int y,
+                    unsigned int width, unsigned int height,
+                    unsigned int border_width,
+                    int depth,
+                    unsigned int _class,
+                    Visual *visual,
+                    unsigned long valuemask,
+                    XSetWindowAttributes *attributes );
+            X11Window(Display *display, Window parent,
+                    int x, int y,
+                    unsigned int width, unsigned int height,
+                    unsigned int border_width,
+                    unsigned long border,
+                    unsigned long background );
+        public : //operators
+            bool operator== (::Window target);
+        protected:
+            ::Window* window;
+            X11Window();
+    };
 
 
 }
