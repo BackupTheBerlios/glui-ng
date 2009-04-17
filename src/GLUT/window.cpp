@@ -694,7 +694,7 @@ void GlutWindow::idle_func (void)
 ////////////////////////////////////////////////////////////////////
 KeySym GlutWindow::XLookupKeysym(::XKeyEvent *key_event, int index)
 {
-    switch (key_event->keycode)
+/*    switch (key_event->keycode)
     {
 
         GLUT_KEY_F1 << KeyModifierShift : return XK_F1;
@@ -813,6 +813,8 @@ KeySym GlutWindow::XLookupKeysym(::XKeyEvent *key_event, int index)
         '}' : return XK_braceright;
         '~' : return XK_asciitilde;
         default: return XK_VoidSymbol;
+
     }
+*/
 }
 

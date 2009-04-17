@@ -38,6 +38,8 @@ namespace GLUI
 
     class GLUIAPI Control : public Node, public EventHandler
     {
+        friend class theme; //< theme is the only class allowed to instantiate GLUI widgets
+
         public : //types
             enum SizePolicy {
                 FixedSize,
@@ -159,10 +161,10 @@ namespace GLUI
 
             int  add_control( Node *control ); //<prevent adding subsequent controls
 
-            Control(const char* name);
             virtual ~Control();
 
         protected: //methods
+            Control(const char* name);
             Control();
         protected: //variables
             static Control* focussed;
