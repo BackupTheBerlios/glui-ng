@@ -1,6 +1,7 @@
 #general packages dependencies
-glibmm 2.0 is required (unicode string support)
-   (this package seems only to depend on glib and libsigc++)
+libiconv : Unicode support
+xercesc : xml support
+libpthread : mutex/semaphores/RWllocks....
 
 - glut/openglut/freeglut is required if you want to build the glut backend
 - X11 is required if you want to build the x11 backend
