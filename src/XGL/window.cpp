@@ -36,6 +36,25 @@ X11Display::X11Display(char* name)
 	}
 /////////////////////////////////////////////////////////////////////
 //from glutMainLoopEvent
+#if TARGET_HOST_POSIX_X11
+/*
+ * Returns GLUT modifier mask for the state field of an X11 event.
+ */
+static int fghGetXModifiers( int state )
+{
+    int ret = 0;
+
+    if( state & ( ShiftMask | LockMask ) )
+        ret |= GLUT_ACTIVE_SHIFT;
+    if( state & ControlMask )
+        ret |= GLUT_ACTIVE_CTRL;
+    if( state & Mod1Mask )
+        ret |= GLUT_ACTIVE_ALT;
+
+    return ret;
+}
+#endif
+
 void X11Window::XNextEvent()
 {
     SFG_Window* window;
