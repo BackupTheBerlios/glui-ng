@@ -31,6 +31,11 @@
 #include <GL/gl.h>
 namespace GLUI
 {
+ class Arcball;
+ class Button;
+ class ToggleButton;
+ class TextButton;
+
     class theme
     {
         public : //methods
@@ -43,6 +48,11 @@ namespace GLUI
                     uint32_t count );                 //< numbers of colors entries
             void DoLightning();
              uint8_t* Get_bkgd_color();
+             void draw(Arcball* arcball);
+             void draw(Button* button);
+             void draw(ToggleButton* button);
+             void draw(TextButton* button);
+             
         protected : //variables
             uint8_t    bkgd_color[4];
         private : //methods

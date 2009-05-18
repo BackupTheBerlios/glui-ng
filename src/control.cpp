@@ -264,6 +264,10 @@ Control::Control(const char* name) : Node(name)
     x_off_right    = GLUI_XOFF;
     x              = 0;
     y              = 0;
+    APIMajor       = 0;
+    APIMinor       = 0;
+    APIRevision    = 0;
+
 }
 
 

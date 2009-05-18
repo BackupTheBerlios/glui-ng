@@ -35,10 +35,14 @@ namespace GLUI
 {
     class LiveVariables;
     class Container;
+    class theme;
 
     class GLUIAPI Control : public Node, public EventHandler
     {
-        friend class theme; //< theme is the only class allowed to instantiate GLUI widgets
+        friend class theme; //< theme class will contain the drawing functions
+                            //< widget still have to implement a default drawing function
+                            //< it's up to the widget object to draw the theme::Instance()->draw(this)
+                            //< and draw it default as a fallback
 
         public : //types
             enum SizePolicy {
@@ -166,6 +170,8 @@ namespace GLUI
         protected: //methods
             Control(const char* name);
             Control();
+
+            bool CheckWidgetApiRevision(int Major, int Minor, int Revision);
         protected: //variables
             static Control* focussed;
             SizePolicy resizeable;
@@ -177,6 +183,9 @@ namespace GLUI
             int             x, y;         //relative position from parent
             int  y_off_top, y_off_bot;    // top and bottom margin inside the control
             int  x_off_left, x_off_right; // right and left inner margin
+            int APIMajor, APIMinor, APIRevision; //< API of this component, check is performed
+                                                 //< by theme class to know if it can render the
+                                                 //< object
     };
 
 

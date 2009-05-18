@@ -14,6 +14,7 @@
 #include <GL/glui/statictext.h>
 #include <GL/glui/callback.h>
 #include <GL/glui/live.h>
+#include <GL/glui/theme.h>
 namespace GLUI
 {
 	class Node;
@@ -38,7 +39,8 @@ namespace GLUI
 
 		protected:
 			void draw_pressed( void );
-			 void common_init(void) ;
+			void common_init(void) ;
+                protected: //variable
 	};
 
 

@@ -47,6 +47,8 @@ class myGluiWin : public GLUIWindow
     private :
         VertexObject* box1;
         VertexObject* box2;
+        VertexObject* box3;
+        VertexObject* box4;
 };
 
 myGluiWin::myGluiWin(Display* glutDisplay) : GLUIWindow(glutDisplay,
@@ -73,6 +75,8 @@ myGluiWin::myGluiWin(Display* glutDisplay) : GLUIWindow(glutDisplay,
 
     box1 = drawinghelpers::raised_box(180, 180, 9);
     box2 = drawinghelpers::raised_box(160, 160, 8, 3, GL_UNSIGNED_BYTE, color_array);
+    box3 = drawinghelpers::raised_box(80, 80, 0, 3, );
+    box4 = drawinghelpers::raised_box(81, 81, 0);
     set_resize_policy(FixedSize);
 }
 

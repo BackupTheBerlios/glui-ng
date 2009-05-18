@@ -43,8 +43,8 @@ namespace GLUI
                 buffer_back=2   ///< Double buffering: postpone updates until next redraw.
             };
         public :
-            static VertexObject* raised_box( uint32_t w, uint32_t h, uint32_t thickness = 1, uint8_t size = 3, GLenum intype = GL_BYTE, void *color_array = NULL );
-            static VertexObject* lowered_box( uint32_t w, uint32_t h, uint32_t thickness = 1, uint8_t size = 3, GLenum intype = GL_BYTE, void *color_array = NULL );
+            static VertexObject* raised_box( uint32_t w, uint32_t h, uint32_t thickness = 0, uint8_t size = 3, GLenum intype = GL_BYTE, void *color_array = NULL );
+            static VertexObject* lowered_box( uint32_t w, uint32_t h, uint32_t thickness = 0, uint8_t size = 3, GLenum intype = GL_BYTE, void *color_array = NULL );
             static void draw_box_inwards_outline(int enabled, int x_min, int x_max,
                                                  int y_min, int y_max );
             static void draw_box(uint32_t w, uint32_t h, uint8_t size = 3, GLenum intype = GL_BYTE, void *color_array = NULL);
