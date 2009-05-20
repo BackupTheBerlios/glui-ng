@@ -38,8 +38,8 @@ using namespace GLUI;
 /****************************** Button::Button() **********/
 Button::Button( Node *parent, const char *name,
         int id, CB cb ):
-    Container(name),
-    value(NULL, id, cb)
+    Container(name)
+    //,value(NULL, id, cb)
 
 {
     common_init();
@@ -54,7 +54,8 @@ int Button::AddEvent (::XEvent *event)
 
     if (GetStatus() & EventInterpreter::click )
     {
-        value.SetVal(true);
+        //value.SetVal(true);
+        value = true;
         drawinghelpers::PostRedisplay(this);
     }
 

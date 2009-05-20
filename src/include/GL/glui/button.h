@@ -21,7 +21,7 @@ namespace GLUI
 	class GLUIAPI Button : public Container, public EventInterpreter
 	{
 		public:
-			LiveInt value;
+			//LiveInt value;
 		public:
 			void draw( void );
 			/**
@@ -37,8 +37,9 @@ namespace GLUI
 			virtual int AddEvent(::XEvent *event);
 
 		protected:
+                        bool value;
 			void draw_pressed( void );
-			 void common_init(void) ;
+			void common_init(void) ;
 	};
 
 
