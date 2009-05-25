@@ -23,6 +23,7 @@ source ${confiserie}/init.sh "$@" &&
     #helper makefiles that we use
     include ${confiserie}/Makefiles/Makefile.tags    &&
     include ${confiserie}/CXX/Makefile.beautifull_rules  &&
+    include ${confiserie}/Makefiles/Makefile.autolib     &&
     include ${confiserie}/CXX/Makefile.autoapp           &&
     #include ${confiserie}/C/autopcflags                &&
     include ${confiserie}/CXX/Makefile.auto_headers_deps
@@ -31,12 +32,13 @@ source ${confiserie}/init.sh "$@" &&
 #the tests itself
 {
     runtest ${confiserie}/CXX/test_cxx.sh                &&
+    runtest ${confiserie}/C/test_shared_static.sh        &&
     runtest ${confiserie}/pkg-config/test_pkg-config.sh
 
 } ||clean_on_sig 
 
+export CC=${CXX}
 
-
-create_makefile Makefile.confiserie TOPSRC_DIR OBJDIR confiserie INSTALL_PREFIX BIN_DIR SBIN_DIR LIB_DIR LIBEXEC_DIR SYS_CONF SHARED_DATA_DIR INCLUDE_DIR WHICH CXX CXXFLAGS CPPFLAGS CXX_LDFLAGS PKG_CONFIG_INSTALL_DIR
+create_makefile Makefile.confiserie TOPSRC_DIR OBJDIR confiserie INSTALL_PREFIX BIN_DIR SBIN_DIR LIB_DIR LIBEXEC_DIR SYS_CONF SHARED_DATA_DIR INCLUDE_DIR WHICH CXX CXXFLAGS CPPFLAGS CXX_LDFLAGS PKG_CONFIG_INSTALL_DIR  SHAREDLIBEXT STATICLIBEXT CC RANLIB ARFLAGS AR
 
 finish_confiserie

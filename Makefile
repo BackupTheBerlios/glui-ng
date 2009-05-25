@@ -25,9 +25,10 @@ export MAKEFLAGS+=s
 endif
 
 #your subdirs
-subdirs = lib drivers tests applications
+subdirs = src tests
+#subdirs += example tools
 
-all :  ${subdirs} runtest
+all :  ${subdirs}
 all clean debug install : ${subdirs}
 install debug : all
 	
@@ -53,9 +54,9 @@ ${subdirs} ::
 	$(MAKE) $(MAKECMDGOALS) -C $@ MSGSUBDIR=${MSGSUBDIR}/$@/ VPATH=${TOPSRC_DIR}/${MSGSUBDIR}/$@
 	echo ${PWD}
 
+testplan : tests
+	./tests/testplan.sh
 
-runtest :
-	./test.sh 2>/dev/null
 
 #includes
 export TOPSRC_DIR?=${PWD}

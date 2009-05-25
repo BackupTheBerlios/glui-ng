@@ -1,0 +1,71 @@
+p.code {
+	border-style: dotted;
+	border-width: thin;
+	background-color:#ffffcc;
+	margin-left: 2cm;
+	margin-right: 2cm
+}
+
+pre.code {
+	border-style: dotted;
+	border-width: thin;
+	background-color:#ffffcc;
+	margin-left: 2cm;
+	margin-right: 2cm
+}
+	
+
+span.code {
+	border-style: dotted;
+	border-width: thin;
+	background-color:#ffffcc;
+}
+
+div.note {
+	border-style : solid;
+	border-color : red;
+	border-width : thin;
+	margin-left: 2cm;
+	margin-right: 2cm
+}
+div.note:first-child {
+	color : red
+}
+
+ul.none {
+	list-style-type: none;
+	text-align : justify;
+	padding-bottom: 0.2cm;
+	position:relative;
+	left:-20px
+}
+
+ul.note {
+	border-style : solid;
+	border-color : red;
+	border-width : thin;
+	margin-left: 2cm;
+	margin-right: 2cm;
+	left:-20px
+}
+ul.note:first-line {
+	color : red;
+	text-decoration : underline
+}
+
+
+li {
+	padding-top: 0.2cm
+}
+
+
+div.note {
+	color : red;
+	inline
+}
+h1 {
+	text-align : center;
+}
+p {
+	text-align : justify
+}

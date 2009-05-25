@@ -1,0 +1,164 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+	<head>
+		<meta http-equiv="content-type"
+		content="text/html; charset=ISO-8859-1">
+		<link rel="stylesheet" type="text/css" href="mystyle.css">
+		<title>confiserie</title>
+	</head>
+	<body>
+		<table style="text-align: left; width: 100%; height: 56px;" border="0"
+			cellpadding="2" cellspacing="2">
+			<tbody>
+				<tr>
+					<td style="vertical-align: top;"><a
+							href="http://developer.berlios.de/projects/confiserie/"
+							title="BerliOS Developer"> <img
+							src="http://developer.berlios.de/bslogo.php?group_id=1859"
+							alt="BerliOS Developer Logo" border="0" height="32" width="124"></a></td>
+					<td style="vertical-align: top; text-align: center;"><big><big><big><span
+										style="font-weight: bold;">UNCHAIN <br>
+										THE POWER OF <br>
+										GNU MAKE</span></big></big></big><br>
+					</td>
+					<td style="vertical-align: top; text-align: right;"><a
+							href="http://www.opensource.org/docs/definition.php"> <img
+							src="http://www.opensource.org/trademarks/opensource/web/opensource-110x95.png"
+							border="0" height="95" width="110"></a></td>
+				</tr>
+			</tbody>
+		</table>
+		<br>
+		<div style="text-align: center;">
+			The simplicity of automake?&nbsp; the power of make? easy to read
+			configure? ease of debugging and extend tests?<br>
+			ALL OF THIS IN ONE IS POSSIBLE!<br>
+		</div>
+		<h1>what is confiserie ? </h1>
+		<p>it's a replacement for GNU(Posix?) systems of the well known gnu
+		autoconf it's also the french term for "sweet". it's like them : a
+		small goodlooking tastefull thing that make developers happy ^_^</p>
+		<p>	it's a set of scripts to run to check particular requirements of a
+		package, a script to help user maintaining the pakage's scripts, a set
+		of Makefiles templates </p>
+		<p>	the main goal is to teach user good behaviour when creating a
+		software and not only depend on autotools whithout understanding a
+		single step of what they do</p>
+		</p>
+		<h1> why such a Project?<br>
+		</h1>
+		<ul>
+			<li> because autoconf rely on
+			the knowledge of 2 languages to be used
+			and extented : </li>
+		</ul>
+		<ul>
+			<ul>
+				<li> (ba)sh <br>
+				</li>
+				<ul>
+					<li>for checking the return
+					values in case of use, behave
+					correctly<br>
+					</li>
+					<li>in case of extention of
+					autoconf you need to know sh to
+					create the test</li>
+				</ul>
+			</ul>
+			<ul>
+				<li> m4 <br>
+				</li>
+				<ul>
+					<li>to include it inside
+					your sh test for use <br>
+					</li>
+					<li>m4 to include it into
+					autoconf for extension</li>
+				</ul>
+			</ul>
+		</ul>
+		<ul>
+			<li>because autoconf need the
+			creation (and create) lot of "unused
+			files" (files produced to produce another files using autotools, where
+			only one file is required)<br>
+			</li>
+			<li>because the same can be
+			achieved more easely with well designed
+			sh scripts </li>
+			<li>because programmer often
+			learn sh to make simple SA tasks and
+			find autoconf script unreadable</li>
+			<li>because the output of an
+			autoconf/automake is often unreadable
+			and don't take advantages of modern make&nbsp;</li>
+			<li>the main goal is to teach
+			user good behaviour when creating a
+			software and not only depend on autotools whithout understanding a
+			single step of what they do : it's a kind of "educationware"</li>
+		</ul>
+		<h1>USAGE <br>
+		</h1>
+		<a href="confiserie_usage.html">the configure script</a><br>
+		<a href="Makefiles%20templates.html">the Makefiles</a><br>
+		<a href="confiserie_extension.html">HAVE YOUR LIB/TOOL
+			SUPPORTED (ie extend it)</a><br>
+		<a href="misc_questions.html">MISC QUESTIONS i asked myself (not a faq
+			then ^_^, but if you have question it will be included here)</a><br>
+		<h1>REQUIREMENTS</h1>
+		a working POSIX/X-Open shell. (like bash)<br>
+		a working awk (like gnu awk) (because OBJDIR won't be supported
+		else......)<br>
+		a set of working binutils (ln, echo....)<br>
+		a sane developement environment<br>
+		for advanced features (makefiles templates and related tests) you will
+		need <span style="color: rgb(255, 0, 0);">GNU
+			MAKE<br>
+			<br>
+			<span style="color: rgb(0, 0, 0);">someone
+				once told me : "don't bother
+				to make portable makefiles, use a portable make", the real fact is that
+				gnu make offers facilities that make Makefiles writing so easy that an
+				Automake like configuration file can be done as a Makefile<br>
+				<p class="note"> Look at provided </br>
+						<a href="Makefiles%20templates.html">Makefile
+							templates</a> : you'll see that creating makefiles is really easy if
+						you
+						have the right included rules!<br>
+						it's so easy that I wouldn't pass myself anymore of gnu make O_O</p>
+		<h1> special thanks :<br>
+		</h1>
+		to the autotools maintainers that helped to develop opensources<br>
+		to the autoconfs because some of the scripts provided are port of
+		their work<br>
+		to the GNU Make maintainers for creating and maintaining GNU make<br>
+		<h1>DON'T HESITATE :</h1>
+		<ul>
+			<li>to request support <br>
+			</li>
+			<li>to report bugs</li>
+			<li>to ask help for adding
+			tests....</li>
+		</ul>
+		I wrote this package for my own usage, so I created the tests I
+		needed.... <br>
+		I'll be happy to see that it's usefull to other people ^_^<br>
+		<br>
+		<h1><a href="http://developer.berlios.de/projects/confiserie/"
+				title="BerliOS Developer"> downloads/cvs.... on<img
+				src="http://developer.berlios.de/bslogo.php?group_id=1859"
+				alt="BerliOS Developer Logo" border="0" height="32" width="124"></a></h1>
+		<h1> LINKS</h1>
+		
+		<p class="note">PLEASE
+								SEND ME YOUR
+								PROJECT URL TO HELP ME PROMOTE CONFISERIE<br>
+								your URL will be included here ^_^</p>
+		<br><a href="http://freeopenml.berlios.de/">freeOpenML</a><br>
+		<div style="text-align: center;"><a
+				href="http://cityhunter.is-a-geek.org/">my personal home runned
+				webserver ^_^</a><br>
+		</div>
+	</body>
+</html>

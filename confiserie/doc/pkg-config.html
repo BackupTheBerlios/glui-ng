@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<link rel="stylesheet" type="text/css" href="mystyle.css">
+		<title>pkg-config</title>
+	</head>
+	<body>
+		<h1>Integration with pkg-config</h1>
+		it's now possible to use and create pkg-config file transparently in
+		confiserie.....<br>
+		<h2>Creation of pkg-config files</h2>
+		a Makefile has to be included to take advantage of the feature<br>
+		<br>
+		<p class="code">include ${confiserie}/pkg-config/Makefile.pc</p>
+		<p> this Makefile will look for PKG_CONFIG variable and for each
+		"packages" listed into this variable will look for corresponding </p>
+		<ul>
+			<li>*_VERSION [mandatory] : version of the package in the format X.Y.Z</li>
+			<li>*_DESC [mandatory] : a one line description</li>
+			<li>*_HEADERS_DIR : where inside ${INCLUDE_DIR} the headers are stored</li>
+			<li>*_REQUIRES : a list of requirement as described into man
+			pkg-config</li>
+			<li>*_LIBS : libs flags (not for compilation but for pkg-config file)</li>
+		</ul>
+		<p> * is the package name (such as gtk+-2.0) canonicalized (ie '+'
+		stripped, '-' and '.' replaced by '_' : gtk_2_0) </p>
+		<p> example : </p>
+		<p class="code"> PKG_CONFIG = foo+-2.0<br>
+		export foo_2_0_VERSION=1.2.3<br>
+		export foo_2_0_DESC=test for pc creation<br>
+		export foo_2_0_HEADERS_DIR=foo<br>
+		export foo_2_0_REQUIRES=gtk+-2.0<br>
+		export foo_2_0_LIBS= -lfoo-1<br>
+		</p>
+		<p> the generated pc is located into .GEN directory and an install rule
+		is provided&lt; </p>
+		<h2>Automatic use of pkg-config file</h2>
+		<br>
+		<p>this is done via the use of *_REQUIRES variable and the </p>
+		<p class="code">include ${confiserie}/#/Makefile.pc</p>
+		<p>where # is the language used (C, CXX, java....)</p>
+		<p> it will create makefiles and include them <br>
+		this Makefile (stored in .DEP directory) modify CFLAGS, LDFLAGS....
+		according to result provided by pkg-config<br>
+		</p>
+		<br>
+		<br>
+	</body>
+</html>

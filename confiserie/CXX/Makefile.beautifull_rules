@@ -1,0 +1,61 @@
+#/***********************************************************************
+#* copyright (c) 2004-2006 MALET Jean-luc aka cityhunter
+#* This library is free software; you can redistribute it and/or modify
+#* it under the terms of the LGPL v2.1 or latter at your option
+#* http://www.gnu.org/copyleft/lesser.html
+#************************************************************************/
+
+
+ifndef COLOR
+	export CXXMESG?=echo -e [ CXX  ]\\t
+	export LDMESG?=echo -e [ LD  ]\\t
+	export SUCCESSMSG?=echo -e  [ BUILD SUCCESS ]\\t
+	export CLEANINGMSG?=echo -e [ cleaning ]\\t
+	export GENMSG?=echo -e [ GEN ]\\t
+	export INSTALLMSG?=echo -e [ installing ]\\t
+else
+	export CXXMESG?=echo -e [\\e[33m CXX \\e[0m ]\\t
+	export LDMESG?=echo -e [ \\e[33m LD \\e[0m ]\\t
+	export SUCCESSMSG?=echo -e [ \\e[32m BUILD SUCCESS\\e[0m ]\\t
+	export CLEANINGMSG?=echo -e [ \\e[32mcleaning \\e[0m ]\\t
+	export GENMSG?=echo -e [ \\e[33m GEN\\e[0m ]\\t
+	export INSTALLMSG?=echo -e [ \\e[32minstalling\\e[0m ]\\t
+endif
+
+clean : clean_cxx_rule
+clean_cxx_rule:
+	rm -rf GERNERATED
+	rm -f *.o
+
+distclean : clean 
+
+dep :: ${subdirs}
+
+	
+
+define cxx_o_macro
+	${CXXMESG} ${MSGSUBDIR}$<
+	-rm -rf $@
+	mkdir -p $(dir $@)
+	${CXX} -c ${CXXFLAGS} ${CPPFLAGS} -o $@ $<
+endef
+#automatic compilation : .cc into .o
+%.o: %.cc
+	$(call cxx_o_macro)
+%.o: %.cpp
+	$(call cxx_o_macro)
+%.o: %.C
+	$(call cxx_o_macro)
+%.o:	%.cxx
+	$(call cxx_o_macro)
+
+GENERATED/%.o: %.cc
+	$(call cxx_o_macro)
+GENERATED/%.o: %.cpp
+	$(call cxx_o_macro)
+GENERATED/%.o: %.C
+	$(call cxx_o_macro)
+GENERATED/%.o:	%.cxx
+	$(call cxx_o_macro)
+
+
