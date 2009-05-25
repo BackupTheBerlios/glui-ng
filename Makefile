@@ -61,5 +61,5 @@ testplan : tests
 #includes
 export TOPSRC_DIR?=${PWD}
 include ${TOPSRC_DIR}/Makefile.confiserie
-
+include ${confiserie}/CXX/Makefile.tags
 
