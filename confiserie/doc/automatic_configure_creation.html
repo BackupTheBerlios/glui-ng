@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>automatic configure creation</title>
+</head>
+<body>
+<h1><span style="color: rgb(255, 0, 0);">PLANED</span><br>
+</h1>
+<br>
+napper has a special mode switch&nbsp; : --create-configure
+&lt;filename&gt;<br>
+if this switch is specified, napper will try to find optional headers
+requirements, headers requirements, tools requirements and produce a
+configure<br>
+<br>
+how is it performed :<br>
+the tool assume the following rules :<br>
+<ul>
+  <li>headers provided by the package use the form #include "myheader.h"</li>
+  <li>headers provided by third parties use the form #include
+&lt;standard_header.h&gt;</li>
+  <li>optional headers have the HAVE_*_H counterpart ie GL/GLu.h
+appears in source included into #ifdef HAVE_GL_GLU_H .... #endif</li>
+  <li>Makefile commands (the part preceded by a tabulation) are parsed
+too<br>
+  </li>
+  <ul>
+    <li>only lines that begins with a tab are checked</li>
+    <li>the computer on which the parsing is done must have the
+executables installed</li>
+    <li>the script will convert $(UPPERCASE) to lowercase counterpart
+ie $(AWK) will become awk</li>
+  </ul>
+</ul>
+<br>
+the result of the parsing will be stored in <br>
+configure.template<br>
+confiserie/configure.*.sh.template parts<br>
+see <a href="configure%20exemples.html">configure exemples :
+fractioned templates</a><br>
+<br>
+<span style="font-weight: bold;"><span style="color: rgb(255, 0, 0);">note
+: </span></span><span style="color: rgb(255, 0, 0);"><span
+ style="color: rgb(0, 0, 0);">this is only a way to begin using
+confiserie, since there is no way to find optional runtime utils,&nbsp;
+or runtime required utils</span></span>
+</body>
+</html>

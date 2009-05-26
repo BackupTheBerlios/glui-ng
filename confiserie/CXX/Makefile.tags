@@ -1,0 +1,39 @@
+#/***********************************************************************
+#* copyright (c) 2004-2006 MALET Jean-luc aka cityhunter
+#* This library is free software; you can redistribute it and/or modify
+#* it under the terms of the LGPL v2.1 or latter at your option
+#* http://www.gnu.org/copyleft/lesser.html
+#************************************************************************/
+
+
+# this target will parse TAGS environment variable, which is a list of tagfile
+# separated by ',' for each file in the environment each '_' will be replaced 
+# by a '/' the last part will be then removed to get a path which will be used
+# to produce the tag
+# if tagfile doesn't contain a path, then it will be outputed into ${TOPSRC_DIR}
+# else it will be outputed according the whole path
+# for example :
+# TAGS=/path/to/the/topsrcdir/tags,/path/to/the/topsrcdir/_usr_include_GL_tags,_usr_include_X11_tags
+# will produce :
+# /path/to/the/topsrcdir/tags : contain the tag of the package
+# /path/to/the/topsrcdir/_usr_include_GL_tags : contain the tags of /usr/include/GL/ (last part is 
+# stripped)
+# ${TOPSRC_DIR}/_usr_include_X11_tags : contain tags of /usr/include/X11
+
+tags :: clean_tags
+	cd ${TOPSRC_DIR}
+	IFS=','; for tags in $${TAGS}; do \
+	    echo "tags : $${tags}";\
+	    tagname=$$(basename $${tags});\
+	    dirname=$${tagname//_/\/};\
+	    dirname=$$(dirname $${dirname});\
+	    ctags -R --c++-kinds=+p --fields=+iaS --extra=+q -f $${tags}\
+	                                                        $${dirname};\
+	done
+
+clean : clean_tags
+
+clean_tags :
+	cd ${TOPSRC_DIR}
+	IFS=','; for tags in $${TAGS}; do rm -f $${tags}; done
+

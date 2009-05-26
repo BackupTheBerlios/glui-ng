@@ -1,0 +1,227 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="content-type"
+ content="text/html; charset=ISO-8859-1">
+  <title>misc questions</title>
+</head>
+<body>
+<h1> so why using it instead of writing our own script? </h1>
+<ul>
+  <li> because the scripts are already done.... why redoing the same
+thing ?</li>
+  <li> because your ./configure script will be smaller then easier to
+check</li>
+</ul>
+<h1>What are the limitations ?<br>
+</h1>
+I don't bother supporting old non-POSIX OS, the reason is simple :<br>
+"what is the purpose of creating an out of speed package if this is
+to make it run on a slowass/outdated system?"<br>
+my goal is to provide portability as long as portability don't means
+"create features that will make it slower or harder to maintain". <br>
+this
+is a "go higher, even higher" rule<br>
+<br>
+doing so, the script will fail if a tool don't support POSIX/X-Open
+conformance. This is a way to test your conformance too. This is the
+case of echo...<br>
+if you want your out-of speed package to run on outdated OS, choose
+autoconf!<br>
+<br>
+I know this is a little selfish but in a world where <big
+ style="font-weight: bold; font-style: italic; text-decoration: underline;">free</big>
+OS exists
+there are no reason to stuck with trash (note that what I call trash
+is outdated packages, an atari st with linux isn't a trash ^_^)<br>
+if you're not happy with this, write to your OS provider to complain ^_^<br>
+<br>
+the Makefile templates included are GNU make compatible. I think the
+lisibility of include functionnality (the fact we can include a
+makefile
+like a #include in C) prevails over portability (anyway GMake is
+portable so portability is acheived...). This help create small
+makefiles (about 10 lines) increasing then ease of maintaining, ease of
+extention..... One of the main goal is to provide a K.I.S.S compatible
+framework (Keep It Simple Stupid : don't try to over add
+functionnalities, split it ! make a programm that do a precise task not
+everything, perfect exemples are cp, mv, ln, awk tools, a perfect
+counter exemple is perl that try to do everything at the price of high
+complexibility) nothing prevent you from not using included
+templates.....<br>
+I'm sorry to say that POSIX didn't made a choice concerning include
+functionality..........<br>
+<br>
+<br>
+<h1>What are the alternatives?</h1>
+<ul>
+  <li><a href="http://www.scons.org/">scons</a> is one</li>
+  <li>automake, autoconf, libtool, pkgconfig </li>
+</ul>
+<h2>Scons related thougth</h2>
+yesterday I was talking with a fan of scons... of course the discussion
+was animated ^_^ (will vim or emacs be the best editor?... O_o oups....
+not the right logfile ^_^)<br>
+<ul>
+  <li>one thing he told me is that "make was used to perform tasks that
+he is not designed to" : I didn't noticed this first but it comes back
+to my memory now... In fact make is exactly used to perform task that
+he was designed for : track dependencies....</li>
+  <li>the debugability issue was then aborded : of course make is an
+hard to debug tool because he can execute things in perfect outoforder
+fashion... this give him the abilitiy to run several jobs in parallel,
+to make distributed compile and so fancy things.... but there are ways
+to debug it :</li>
+  <ul>
+    <li>-d for debug mode<br>
+    </li>
+    <li>-p&nbsp;&nbsp; Print&nbsp; the&nbsp; data&nbsp; base&nbsp;
+(rules&nbsp; and variable values) that results from reading the
+makefiles</li>
+    <li>-r&nbsp;&nbsp; Eliminate use of the built-in implicit rules</li>
+    <li>-n&nbsp;&nbsp; Print the commands that would be executed, but
+do not execute them.</li>
+  </ul>
+  <li>then the QT moc compiler stuff was aborded.... this wasn't an
+issue... in fact I think that QT made a big mistake with their cpp
+files, because they had to be processed by moc compiler first they
+aren't cpp file anymore... maybe a good extension should have been .cqt
+. Anyway, there is plenty of ways to create the right rules on way is
+to use partial file (my knowledge lack in moc related stuff, but if i'm
+correct the moc compiler extract informations of cpp file and output
+them in a file) so make %.o depends on %.moc and add a rule to create
+the moc file is one way.....</li>
+  <li>he told me about regular expression in make, for me %.o : %.c is
+perfectly readable... I know about the partern... anyone that used
+posix regular expression will not have anytrouble with this...</li>
+  <li>he told me about the variables..... do you find $(myvar)
+unreadble? in fact anyone that is used to sh scripting wont... I think
+that make is even more readable than sh because it has only two way of
+referencing the content of a variable : $(myvar) or ${myvar} (note that
+the second is usable in sh too ^_^</li>
+  <li>he told me about cached compile (he wanted to have several
+configuration builds directories), scons do it, as it is possible with
+make... the
+vpath method is one, the links farms are anothers.... I prefer not to
+rely on a cached mecanism since it can become buggy and will force you
+to recompile everything by default like too much people do.... I prefer
+to have separate build directories
+that will remain consistent, this is much more clean and error
+proof.... again this is mor KISS compatible to my point of view....</li>
+  <li>then he talked about ease of automatic parsing by tools....
+experience showed me that this is easier to write your makefiles than
+to fight against a tool that don't do your fancy compiling
+behaviour.... then the perfect counter exemple is the&nbsp; simplicity
+achieved into the<a href="Makefiles%20templates.html"> templates</a> <br>
+  </li>
+  <li>then it require python... that is not widely installed and
+"waste" lot of space on disc if you only require it to compile<br>
+  </li>
+  <li>of course it's more portable.... but as I said portability is to
+my point of view only POSIX... standards are made for this....</li>
+</ul>
+<h1> why is it better than autoconf?<br>
+</h1>
+<ul>
+  <li><a href="http://freeopenml.berlios.de/againstautotools.html">because</a><br>
+  </li>
+  <li> because you have the entire control of HOW the config.h is build
+    <a
+ href="http://svn.berlios.de/viewcvs/confiserie/trunk/confiserie/configure_templates/configure.template">see
+this for an exemple of complex output policy</a><br>
+  </li>
+  <li> because it's easier to read</li>
+  <li> because you can easely figure what script failed and fix it if
+needed you don't have to look into logs and process a 100000000+
+lines script&nbsp; just add a "set -x" at begin of the incrimined
+script and a "set +x" at end re-run the tests..... and see what you
+need</li>
+  <li>because scripts will output errors of LD, CC... directly letting
+know when something is really wrong without reading a file.....</li>
+  <li>because you easely add behaviour modification like --enable-xx or
+--disable-yyy&nbsp;&nbsp; (confiserie init.sh only provide some all
+package wide enable/disable like --prefix=)</li>
+  <li>because it's more historical unix behaviour compliant (which is
+more simplier&nbsp; and used widely like CFLAGS env, CXXFLAGS,
+LD_FLAGS...) : set up your building environnement : you're the master
+of "how,when,where,why,who,what"</li>
+  <li>because it'll produce more LinuxFS/historical unix tree compliant
+installed tree : autoconf allow you to set some install directories
+that can produce&nbsp; an unorganized FS yes this is a lack of
+flexibility but experience tend to show that even distro builders
+like Mandrake (fixed now but they have done it in past) don't bother
+setting correct --prefix resulting having
+most package installed into /usr/local..... which is a reserved
+directory for SA testing..... I assume here that an average SA know
+what he's doing and if really testing a package will set the correct
+--prefix..... other SA that don't know are newbies and then will have
+the correct behaviour : --prefix=/usr</li>
+  <li>because it assume that you know how to compile a thing, because
+it'll learn users how to use an UNIX compiler environnement, my
+experience shows that when I teach other about CFLAGS and other
+environnement variables they are astonished and wonder why such thing
+isn't known.... look : what is better to have a set of package built
+the same way? issue a ./configure&nbsp; at each build with the rights
+options or set once for all the CFLAGS&nbsp; LDFLAGS.... (which can
+be automated in a bashrc....)<br>
+  </li>
+</ul>
+<div style="margin-left: 40px;"><span style="font-weight: bold;"><span
+ style="color: rgb(255, 0, 0);">
+<br>
+</span></span></div>
+<h1>What is a link farm?</h1>
+this paragraph is related to building into another directory ie not
+poluting the sources.<br>
+there is 3 historical behaviours<br>
+&nbsp;&nbsp;&nbsp; -copy the sources <br>
+&nbsp;&nbsp;&nbsp; -make link farms<br>
+&nbsp;&nbsp;&nbsp; -VPATH (OBJDIR....)<br>
+<br>
+copy of the sources is the obvious solution but has a lot of drawbacks
+like the impossibility to modify the sources into current directory
+which make it unpracticable and this is space consuming<br>
+<br>
+link farms is a derivative of the copy method, that consist of creating
+a shadow copy of the sources into another directory by creating a set
+of
+links from the shadow to the sources files. The drawbacks are the
+creation time of the shadow copy (tests tends to prove that this time
+is
+negligeable t least under linux), and the fact that we work on the link
+(ie getting the
+real modification times&nbsp; require a ls -L), the obvious benefit is
+that we can directly work on the&nbsp; shadow copy making the creation
+step more easy.<br>
+<br>
+last is to use VPATH feature of gnu make. no drawbacks unless the fact
+we have 2 really distinctive tree (one is the sources, the other is the
+objects)&nbsp; making the work of a developper more hard (unless
+everything goes right, case that happens on production only ) and that
+the package must have been designed to handle this special case.<br>
+<br>
+confiserie will handle both case : link farms and VPATH, because link
+farms is dangerous when working in same directory as sources (and that
+the detection mechanism don't work well... it will be made an option of
+confiserie)<br>
+I choosed link farms because the overhead of creating the links was
+really small, because it allow to work in the builddir transparently
+and
+because it simplify the makefile creation overhead.<br>
+<br>
+the problem when creating a link farm (this issue is still true with
+VPATH) is that we run the configure step under another tree, this means
+that ./confiserie/* aren't accessible easely.... so we need to figure
+were we are... (where the source is located). If Unix designer weren't
+gods this will be impossible task : we always know where we are runned
+but not where we are located...... BUT ^_^ unix designer created the $0
+argument : the complete string from which we are invoqued..... <br>
+example : <br>
+/test/toto/tata/configure --prefix=/usr will have a $0 of
+/test/toto/tata/configure.....&nbsp; a small awk magical line and
+miracle we can create a $confiserie variable ^_^<br>
+this makes a dependency upon awk that is already a requirement......<br>
+&nbsp;&nbsp;&nbsp; <br>
+<br>
+</body>
+</html>

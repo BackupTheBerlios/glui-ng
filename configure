@@ -1,0 +1,45 @@
+#!/bin/sh
+# (C) 2005-2005 MALET Jean-Luc aka cityhunter
+#this file is provided under the thermes of the BSD licence, you can use it, modify it
+#include it into your commercial software as you want
+
+#those lines can't be provided as separate scripts, and are required to make link farms
+#confiserie will works only if this script is called configure
+
+
+progname=${0/*\//}
+confiserie=${0/\/$progname/}/confiserie
+
+#this funtion should clean the file you create with this script
+#it will be automatically done by init.sh
+custom_clean_on_sig() {
+    rm -f Makefile.confiserie
+}
+
+source ${confiserie}/init.sh "$@" &&
+
+#the additional included Makefiles
+{
+    #helper makefiles that we use
+    include ${confiserie}/CXX/Makefile.tags    &&
+    include ${confiserie}/CXX/Makefile.beautifull_rules  &&
+    include ${confiserie}/Makefiles/Makefile.autolib     &&
+    include ${confiserie}/CXX/Makefile.autoapp           &&
+    #include ${confiserie}/C/autopcflags                &&
+    include ${confiserie}/CXX/Makefile.auto_headers_deps
+} ||clean_on_sig
+
+#the tests itself
+{
+    runtest ${confiserie}/CXX/test_cxx.sh                &&
+    runtest ${confiserie}/C/test_shared_static.sh        &&
+    runtest ${confiserie}/pkg-config/test_pkg-config.sh
+
+} ||clean_on_sig 
+
+export CC=${CXX}
+export libglui_VERSION=0.0.1
+
+create_makefile Makefile.confiserie TOPSRC_DIR OBJDIR confiserie INSTALL_PREFIX BIN_DIR SBIN_DIR LIB_DIR LIBEXEC_DIR SYS_CONF SHARED_DATA_DIR INCLUDE_DIR WHICH CXX CXXFLAGS CPPFLAGS CXX_LDFLAGS PKG_CONFIG_INSTALL_DIR  SHAREDLIBEXT STATICLIBEXT CC RANLIB ARFLAGS AR libglui_VERSION
+
+finish_confiserie

@@ -1,5 +1,5 @@
 .SUFFIXES: .cpp
-include ../conf.mk
+include ../Makefile.confiserie
 
 #for sgi   -- comment out the lines below to use on HP
 #CC=CC -g0 -o32
@@ -22,7 +22,6 @@ endif
 
 CPPFLAGS += -I../ -I../include $(OPTS)
 
-LIBGLUI = -L../GENERATED/lib -lglui
 LIBGL   = -lGLU -lGL
 LIBS    = -lXext -lX11  -lm
 
@@ -44,8 +43,11 @@ GLUI_HEADERS = $(shell find ../include -type f)
 
 #######################################
 
-
-GLUI_LIB = ../GENERATED/lib/libglui.a
+ifneq (${SHAREDLIBEXT},)
+LIBGLUI = -L../src/GENERATED/ -lglui-${libglui_VERSION}
+else
+LIBGLUI = ../src/GENERATED/libglui-*.a
+endif
 
 #GLUI_TESTS = checkbox statictext button horizontallayout textbutton
 GLUI_TESTS = SizeComputationTest PackingTest ContainerEventTest
@@ -56,7 +58,7 @@ GLUI_TESTS+= DrawingHelpsTest DrawingHelps-boxTest Lightning_test
 
 tests : all
 
-all:  GENERATED $(GLUI_LIB) $(addsuffix ${EXE},$(addprefix GENERATED/bin/,${GLUI_TESTS}))
+all:  GENERATED $(addsuffix ${EXE},$(addprefix GENERATED/bin/,${GLUI_TESTS}))
 
 
 examples: $(GLUI_EXAMPLES)
@@ -69,7 +71,7 @@ $(addsuffix ${EXE},$(addprefix GENERATED/bin/,${GLUI_TESTS})) : GENERATED
 GENERATED :
 	mkdir -p GENERATED/bin
 
-GENERATED/bin/%${EXE}: GENERATED/%.o $(GLUI_LIB)
+GENERATED/bin/%${EXE}: GENERATED/%.o 
 	echo "    [EXE] ${DIRPREFIX}$@"
 	$(CXX) $(CPPFLAGS) -o $@ $<  $(LIBGLUI) $(LIBGLUT) $(LIBGL) $(LIBS)
 

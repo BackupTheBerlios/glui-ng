@@ -1,0 +1,248 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+	<head>
+		<meta content="text/html; charset=ISO-8859-1"
+		http-equiv="content-type">
+		<link rel="stylesheet" type="text/css" href="mystyle.css">
+		<title>Makefiles templates</title>
+	</head>
+	<body>
+		<div style="text-align: center;">
+			<h1>Makefiles</h1>
+			<div style="text-align: justify;">confiserie was at first a
+				remplacement for configure.... <br>
+				but it's hard to have a functional remplacement without taking care of
+				the underlying build mechanism....<br>
+				Make is the historical tool used to build software. it's a really
+				powerfull tool but difficult to use....<br>
+				<br>
+				every computer science student had used it and had trouble with it,
+				because of the needed precision to write Makefiles.....<br>
+				<br>
+				but Makefile aren't so hard....<br>
+				<br>
+				if we take advange of some usefull functionalities of gnu Make we can
+				even achieve creating makefiles without writing a single line in a
+				Makefile....<br>
+				<br>
+				here are some good exemple of what simplicity confiserie Makefile can
+				acheive :<br>
+				<a
+					href="http://svn.berlios.de/viewcvs/confiserie/trunk/confiserie/make_templates/Makefile.app_auto?view=markup">automatic
+					C applications creation</a><br>
+				<a
+					href="http://svn.berlios.de/viewcvs/confiserie/trunk/confiserie/make_templates/Makefile.lib_auto?view=markup">automatic
+					librairies creation</a><br>
+				<br>
+				and remember that those are Makefiles : you have access to the whole
+				power of make within it, you can then do as you whish, create custom
+				rules.... it's up to you<br>
+				<br>
+				you can find more templates <a
+					href="http://svn.berlios.de/viewcvs/confiserie/trunk/confiserie/make_templates/">here</a><br>
+				<br>
+				<h2> how can I tell napper to add a confiserie's Makefile helper in confiserie's DIR?</h2>
+				add a line include <ul class="code"> ${confiserie}/helper_makefile</ul>
+				include is a function defined in init.sh that do nothing.... the only
+				use of this function is to add a line containing the filename of the
+				helper makefile<br>
+				<br>
+				<h2> What
+					variables are available to control creation/installation with automatic
+					application/library creation?<br>
+				</h2>
+				<ul class="none">
+					<li>*_SCRIPTS : Scripts, nothing is performed appart install</li>
+					<li>*_PROGRAMS : C programs</li>
+					<ul>
+						<li>bin_PROGRAMS : programs installed into ${PREFIX}/bin</li>
+						<li>sbin_PROGRAMS: installed into ${PREFIX}/sbin</li>
+						<li>noinst_PROGRAMS : programs not installed, created for building
+						for exemple</li>
+						<li>custom_PROGRAMS : custom programs installed somewhere user must
+						define ${CUSTOM_BIN_DIR} env variable, should be used for specific
+						application</li>
+					</ul>
+					<li>	*_XXXPROGRAMS : where XXX is the name of the language to compile with
+					(CXX,java....) has the same meaning of above but with special handling of the
+					language used</li>
+					<li>*_LIBRARIES : libraries</li>
+					<ul>
+						<li>noinst_LIBRARIES : archive libraries compiled for this
+						application and not installed then statically linked</li>
+						<li>libexec_LIBRARIES : libraries installed in ${PREFIX}/libexec</li>
+						<li>lib_LIBRARIES : shared or archive libraries (depends of extension
+						of the library name) installed in ${PREFIX}/lib</li>
+						<li>a_LIBRARIES : archive libraries installed in ${PREFIX}/lib</li>
+						<li>custom_LIBRARIES : custom libraries installed somewhere, user
+						must define ${CUSTOM_LIB_DIR} env variable, should be used for specific
+						application</li>
+						<li>custom_a_LIBRARIES : custom libraries installed somewhere, user
+						must define ${CUSTOM_LIB_DIR} env variable, should be used for specific
+						application, this target force use of archives libraries</li>
+					</ul>
+					<li>	file_CONFIG : configuration file (usualy stored in /etc)</li>
+					<li>	file_DATA : various data (usualy stored in /usr/share)</li>
+				</ul>
+				<ul class="note"> note:<br>
+					installation require include of Makefile.install helper makefile for file_*
+					targets, autolib and autoapp provide installation rules for the
+					targets
+				</ul>
+				<ul class="note"> note:<br> on library version,
+					historicaly GNU tools (don't know if this is a common unix behaviour)
+					add the version at end of the library name (like libfoo.so.2.4.0) I've
+					asked me for long how to specify the version of a library when linking?
+					because linking with the previous example is done with -lfoo (the linker
+					then add lib and .so to have libfoo.so and look for such file [usually a
+					link] then look into this elf for soname properties and link) the
+					problem is that if you want to force a library version (for example
+					gtk-1) you can't tell the linker about the version with such scheme
+					(libgtk.so.1.2.0) BUT if you use the naming scheme libfoo-2.4.0.so
+					linking with foo-2.4.0 will have the correct behaviour.... <br>
+					usually you only link to a major version (maybe with a revision) and
+					then want to link to -l foo-2 rather than foo-2.4 or foo-2.4.0.... the
+					trick to achieve this is the same as with the other scheme : make
+					simlinks : libfoo.so -&gt; libfoo-2.so -&gt; libfoo-2.4.so -&gt;
+					libfoo-2.4.0.so<br>
+					confiserie is designed to use this scheme and when using autoinstall
+					feature will look for *_VERSION variable where * is one of the library 
+					name listed in *_LIBRARIES, it will then make the links<br>
+					so to provide library version information : <br>
+					lib_LIBRARIES=toto foo	<br>
+					toto_VERSION=2.4.8 <br>
+					foo_VERSION=1.5.3 <br>
+					this will create libtoto-2.4.8.(so/a) libfoo-1.5.3.(so/a) and symlinks<br>
+				</ul>
+				for each program/library listed in *_PROGRAMS/*_LIBRARIES variable you
+				can define the following variable (let's assume your lib/program is
+				called toto)<br>
+				<ul>
+					<li>toto_SOURCES : list toto bin/lib sources, if no sources is
+					provided the Makefile assume the program/lib already exist (for exemple
+					a shell sript....)</li>
+					<li>toto_LDADD : additional libraries to link with, per lib/bin</li>
+					<li>toto_ARADD : additional statical archive to add to object list,
+					this is for exemple used if you want to specify the path of the archive,
+					archives listed here are added to prerequisite list</li>
+					<li>toto_MODE : mode for this target only, mode like 644 or a=rx,u+w
+					are valid, see man chmod</li>
+					<li>toto_OWNER : owner/group for this target only... owners like
+					toto:users is valid, see man chown</li>
+					<li>toto_VERSION : this is only for libraries, this is used to create the
+					name of the library and symlink, and others things (pkg-config....) </li>
+				</ul>
+				<ul class="note">
+					note : <br> the name into *_LIBRARIES
+					and *_*PROGRAMS will be modified as follow : <br>
+					<ul>
+						<li>'-' is replaced by '_'</li>
+						<li>'.' is replaced by '_'<br>
+						</li>
+						<li>'+' is stripped</li>
+						<li>ex gtk+-test.truc will have gtk_test_truc_SOURCES<br>
+						</li>
+					</ul>
+				</ul>
+				general variables :<br>
+				<ul>
+					<li>CFLAGS : C flags shared among all project</li>
+					<li>LDFLAGS : idem for linker</li>
+					<li>CPPFLAGS: idem for C preprocessor</li>
+					<li>CXXFLAGS : idem for C++</li>
+					<li>LIB_INSTALL_MODE : octal/chmod flags for libraries</li>
+					<li>BIN_INSTALL_MODE : idem for binaries</li>
+					<li>SBIN_INSTALL_MODE : idem for sbinaries</li>
+					<li>CUSTOM_BIN_INSTALL_MODE : idem for cutom binaries</li>
+					<li>LIBEXEC_INSTALL_MODE : idem for libexec libraries</li>
+					<li>CUSTOM_LIB_INSTALL_MODE : idem for custom libraries</li>
+					<li>same can be done for owner/group by replacing _MODE by owner in
+					the previous points _OWNER (ex: LIB_INSTALL_OWNER)<br>
+					</li>
+				</ul>
+				<ul class="note"> notes about autolib use<br>
+					creation of libraries should not depends on the language used to create
+					the objects files, but on the type of objects (ELF....) so linking
+					objects into a library only rely on LD....<br>
+					that's why to use this functionality you have to include
+					${confiserie}/Makefiles/Makefile.autolib<br>
+					note that the helper Makefile is located into Makefiles subdir, which
+					is dedicated to generic Makefiles...<br>
+					<br>
+					autolib handle automatically filename extension (ie add automatically
+					.a or .so to the created library)<br>
+					autolib also handle automatically version if the corresponding
+					_VERSION is provided
+				</ul>
+				<ul class="note">notes about autoapp use<br>
+					unlike
+					libraries binaries are more troublemakers.... because you need to know
+					every libraries required and link with them.... the problem is that some
+					libraries are compiler dependant (libgcc_s... ).... this means that you need at option :<br>
+					<ul>
+						<li>know every univers's compilers and version, and substitute to them</li>
+						<li>use the compiler to link</li>
+					</ul>
+					this means that creating a program will rely on a compiler.... a little
+					bit troublemaker.....<br>
+					I solved this issue by creating subdirectorie per languages (ie
+					${confiserie}/C/ and ${confiserie}/CXX for example) containing each a
+					Makefile.autoapp<br>
+					a C++ program will likely have in his Makefile a "include
+					${confiserie}/CXX/Makefile.autoapp" <br>
+					but what if you want in the same Makefile to create both C and C++
+					programs? listing them into _PROGRAMS will make hard to determine which
+					program is in what language....<br>
+					a better solution is to have separate variables : _PROGRAMS are for C
+					linkage step, and _CXXPROGRAMS for C++ linkage...<br>
+					note that _PROGRAMS can handle fine scripts<br>
+				</ul>
+				<h2> I don't want to bother with file listing, I want every .c to be listed 
+					as source	file of toto?</h2>
+				for people that want to make a once for all Makefile (ie never have to
+				update the makefile on source addition) they should consider using
+				<span class="code">$(shell ls *.c) </span> to create the file list....<br>
+				for exemple : 
+				<p class="code"> toto_SOURCES=$(shell ls *.c)</p>
+				or <p class="code">toto_SOURCES=$(shell find -name *.c)</p>
+				<h2> how can I include Makefile.confiserie in my makefile?</h2>
+				add a line <br>
+				<p class="code">
+				include $(TOPSRC_DIR)/Makefile.confiserie
+				</p>
+				at <span style="color: rgb(255, 0, 0);">bottom</span> of your Makefile
+				(as a general rule it's safer to include makefiles at end, and as an
+				obligatory rule after the variables, I recommand the order
+				variables-rules-includes)<br>
+				<span class="code">$(TOPSRC_DIR)</span> 
+				is a variable you'll set for exemple in you topsource makefile 
+				<span class="code"> export TOPSRC_DIR=$(PWD) </span>
+			 	that YOU have control on<br>
+				<br>
+				<br>
+				<h2>planned but removed:</h2>
+				it's planned to have configure script provide librairies
+				variables, this means that you won't need to specify -lfoo on
+				application/library ldflags but rather use $(LIBFOO)<br>
+				this will help provide support for static and dynamic libraries, the
+				script will take care to set LIBFOO variable to the correct value (ie
+				/usr/lib/libfoo.a or -lfoo according to the build type)<br>
+				why did I removed such feature? simply because it isn't needed.... if
+				you read some books on gcc/ld you'll find that doing a -ltoto will try
+				to find libtoto.so or libtoto.a and to link with... in fact the only way
+				to "force" use of a static library is<br>
+				<ol>
+					<li>to provide full path : solution removed because too complex and I
+					prefer to rely on the tool, you may use _ARADD....<br>
+					</li>
+					<li>add -static (or equivalent option) into LDFLAGS : solution that I
+					choosed =&gt;creation of a test to find which flag suit</li>
+				</ol>
+				<ul class="note"> note <br>
+					use instead pkg-config
+				</ul>
+			</div>
+			<br>
+		</div>
+	</body>
+</html>

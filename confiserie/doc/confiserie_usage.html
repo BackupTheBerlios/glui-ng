@@ -1,0 +1,297 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="content-type"
+ content="text/html; charset=ISO-8859-1">
+ <title>confiserie usage</title>
+ <link rel="stylesheet" type="text/css" href="mystyle.css">
+</head>
+<body>
+	<h1>What will it produce?</h1>
+	NOTHING<br>
+	O_o o_O! <br>
+	what the purpose of nothing? I leave this to you : do what you want<br>
+	just look at the <a href="confiserie_extension.html#output">wanted
+		behaviour</a> of test scripts<br>
+	and on the <a href="configure%20exemples.html">exemples</a><br>
+	<br>
+	well to tell the truth.... it will create a .config.cache file... that can
+	be converted to a header with the 
+	<p class="code">${confiserie}/C/convert_cache_to_header.sh
+	path/to/some/cachefile</p>
+	or into a makefile with the
+	<p	class="code">${confiserie}/Makefiles/convert_cache_to_makefile.sh
+	path/to/some/cachefile</p>
+	
+	<br>
+	<h1>OK then HOW will it work? How can I use it?</h1>
+	<ul class="none">
+		<li>you might want to see the 
+		<a href="configure%20exemples.html">exemples</a>
+		</li>
+		<li>you create an sh script like every sh script (read the bash guide on
+		tldp.org) this script will call tests that are located into confiserie
+		subdir of your topsource directory.	</li>
+		
+		<li>in this script you call test scripts that can easely be recognised
+		because each call to a test script MUST begin with the prefix 
+		<span class="code"> ${confiserie}/ </span></li>
+		<li>each test script return 0 on success and an error (!=0) on failure
+		(UNIX common behaviour)&nbsp; and output result on stdout, you can then
+		redirect results into the wanted file....</li>
+		<li>
+		each script ought to cache result into .configure.cache.new to faster tests
+		</li>
+		<li>
+		stderr is always used in thoses scripts to provide user feedback
+		(output messages on console)
+		</li>
+		<li>
+		first thing to do is to create a 
+		<a href="configure%20exemples.html#real_exemple">testscript</a> 
+		or use a
+		<a href="configure%20exemples.html#templates"> template</a>:
+		<ul class="none">
+			<li>include in your script every tests you want </li>
+			<li>there is typically 2 types of tests : <a
+				href="confiserie_extension.html#tests">utilities tests and compilation
+				tests.</a>
+			</li>
+		</ul>
+		</li>
+		<li>
+		once the ./configure test is writen you need to "napper" the package ie add 
+		the required scripts : 
+		</li>
+		<p class="code"> $ napper path/to/the/package	</p>
+		<li>
+		it'll :
+		<ul>
+			<li>parse the configure for ${confiserie}/* strings</li>
+			<li>copy the tests and the requirements to confiserie directory</li>
+		</ul>
+		</li>
+		<ul class="note">note <br>
+			that the confiserie directory is dedicated to tests, you can use
+			it to store your own tests (thanks to napper intelligence)
+		</ul>
+		<li>
+		that's all
+		</li>
+		<li>
+		you should be aware of <a
+			href="http://confiserie.berlios.de/confiserie_extension.html#output">output
+			policy of confiserie</a>
+		</li>
+	</ul>
+	
+	<h2> how can I find which scripts are available?</h2>
+	you should look into /usr/share/confiserie/ dir (default install dir) <br>
+	or
+	<p class="code"> $ find / -type d -name confiserie </p>
+	or<br>
+	<p class="code"> $ cat /etc/confiser.conf	</p>
+	or<br>
+	<p class="code"> $ napper --copy-all /path/to/sources</p>
+	<br>
+	
+	<h2>how can I include automatically the scripts needed to my
+		sources?</h2>
+	<p class="code">$ napper /path/to/sources</p>
+	
+	<h2>I saw that there are makefiles in you tests?</h2>
+	this is normal, confiserie allow any kind of files....<br>
+	those makefiles are provided to give user already written rules, so
+	they don't have to re-create them....<br>
+	there is several way to use them<br>
+	<ul>
+		<li>in configure script notice that you're using some helper Makefile
+		by adding
+		<p class="code">include  ${confiserie}/some_helper_makefile </p>
+		then include the Makefile into the Makefiles that require them
+		like in <a
+			href="http://svn.berlios.de/viewcvs/confiserie/trunk/confiserie/make_templates/Makefile.app_auto?view=markup">Makefile.app_auto
+			template</a> (at bottom)<br>
+		</li>
+		<ul>
+		<li>simply cat them to your 'result' makefile : add in your
+		testscript the line 
+		<p class="code">cat ${confiserie}/Makefile.beautifull_rules	&gt;&gt; mymakefile </p>
+		</li>
+		<li>use make include feature : add in your testscript the line 
+		<p class="code">include ${confiserie}/C/Makefile.beautifull_rules</p>
+		</li>
+		</ul>
+	</ul>
+	if you don't want to be bound to make include feature... you can but
+	this is not recommanded because you can't use autodep features, you
+	can't use auto creation of library and applications with a list of
+	sources.....<br>
+	remember gnu make is portable, free of charge.... <span
+		style="text-decoration: underline; font-weight: bold;">why</span> not
+	use it?<br>
+	<h2>how can I use config.h?</h2>
+	do a <span class="code"> #include "config.h" </span> in your sources (or whatever you have created
+	: config.h is only a common name)<br>
+	<ul class="note">
+		DON'T USE CLASSICAL AUTOCONF	BEHAVIOUR FOR config.h : <br> 
+		#ifdef&nbsp; HAVE_CONFIG_H<br>
+		#inlcude "config.h"<br>
+		#endif<br>
+		because this is absurd : you have a configure script that perform some
+		test and enable/disable features, there is no "logical" aim to compile
+		with and without the config file....<br>
+	</ul>
+	<h1>how can I add optional features in my configure</h1>
+	there is a special variable called CONFIGURE_OPTS which is an erray
+	containing strings...
+	<p class="code">
+	CONFIGURE_OPTS[index]="option,variable_to_set,description,defaultvalue"
+	</p>
+	<ul>
+		<li>index is an integer beginning at 1</li>
+		<li>option is string identifier like <span class="code">--prefix=</span>
+		it has been chosen to follow autoconf behaviour and then to not use
+		<span class="code">option &lt;space&gt; value</span> but 
+		<span class="code">option=value</span>
+		</li>
+		<li>variable to set is the name of the variable to modify for example PREFIX</li>
+		<li>description is the description of the option, it's an arbritary string
+		displayed into help<br> 
+		for example : configure package to be located in prefix [path]<br>
+		it's advised to give a hint of the possible values inside [] (like
+		[path], [YES|NO]....)<br>
+		</li>
+		<li>
+		the last option is the default value to use, if this string is empty no
+		value is stored
+		</li>
+	</ul>
+	init.sh provide 3 additional options : --prefix=, -h, -V, which are the
+	configuration prefix, display help and exit, version and exit<br>
+	display help will create the help according to the values in
+	CONFIGURE_OPTS<br>
+	<br>
+	<h1>how to automaticly clean on error?</h1>
+	provide a <span class="code">custom_clean_on_sig</span> bash function <br>
+	this function will be registered by init.sh as an interrupt/signal
+	handler for Ctrl+C like signals<br>
+	<br>
+	then write the configure script the following way :
+	<pre class="code">
+	#!/bin/sh
+	. $confiserie/init.sh "$@" &&
+	(
+	...... &&
+	...... &&
+	)||clean_on_sig
+	</pre>
+	<ul class="note"> IMPORTANT <br>
+	init.sh provide a function clean_on_sig which is the function used to 
+	clean, this function will call custom_clean_on_sig if it is declared
+	don't redefine this function unless you know what you're doing...
+	</ul>
+	<ul class="note">note the following points:
+		<ul>
+			<li>the tests are run in a sub shell ie	inside a '(' ')' pair</li>
+			<li>we didn't bothered making if else	constructs : &amp;&amp; will
+		 	execute the next test only if the previous was successfull</li>
+			<li> we use || to perform a default action if	the test were not 
+			successfull : || execute the next function only if the previous 
+			wasn't successfull, since the previous is the subshell that	will
+		 	fail on requirement missing</li>
+			<li>we use clean_on_sig function that is defined by user, this
+			function is normally used to clean everything on signal reception....
+			but nothing prevent using it for cleaning	pupose ^_^</li>
+			<li>if you want to have variables exported then use functions instead
+			of subshell or group of instructions ( replace '(' by '{' and ')' by '}')
+			</li>
+		</ul>
+	</ul>
+	<h1><a name="outofspeed"></a>How can make it run outofspeed/extend it
+		intelligently?</h1>
+	napper is a intelligent tool : it only update the scripts that he
+	installed leaving the other script/file in confiserie directory<br>
+	this means that you can safely use this directory to store your own
+	test/configuration files ^_^<br>
+	particulary one big advantage over autoconf is that you can use SOURCE
+	files : by source I mean : Makefile, C/C++ source or headers, anything
+	compilable with a compiler, scripts..... shortly : everything ^_^<br>
+	why such feature? simply because rather than creating the source at run
+	time (autoconf behaviour) we prefer to use already present files<br>
+	this has several advantages :<br>
+	<ul>
+		<li>a ./configure script isn't simply a script but a complet test
+		suite : it's easely extented and other compilers can easely be added</li>
+		<li>you can group your tests : when your application <span
+			style="text-decoration: underline;">require</span> a set of headers/
+		headers functionnality group them into a source file (note the concept
+		:
+		you write your application in a certain language, you then know well
+		this language, it's then simplier to write a source file and test
+		it....) this will save lot of compilation time</li>
+		<li>you can test if some functions are supported directly<br>
+		</li>
+	</ul>
+	exemple :<br>
+	imagine you need several headers : unistd.h OpenML/OpenML.h string.h<br>
+	imagine you need POSIX compliance : _POSIX_JOB_CONTROL _POSIX_SAVED_IDS<br>
+	imagine you need C99 compliance<br>
+	<pre class="code">
+	#define _ISOC99_SOURCE
+	#define _POSIX_C_SOURCE 199309L
+	#include &lt;unistd.h&gt;
+	#include &lt;OpenML/OpenML.h&gt;
+	#include &lt;string.h&gt;
+	#include &lt;stdint.h&gt;
+
+	#ifndef _POSIX_JOB_CONTROL
+	#error Job control is not supported
+	#endif
+	#ifndef _POSIX_SAVED_IDS 
+	#error posix saved ids not supported 
+	#endif
+
+	int main (int argc, char** argv) 
+	{
+		uint16_t type1; //C99type
+		type1=1;
+		printf("type1 : %d",type1);
+	}
+	</pre>
+	and a script like this :
+	<p class="code">
+	export LDFLAGS="$LDFLAGS -l totest1 -l totest2"<br>
+	$confiserie/test_compile_c.sh $confiserie/mytest.c<br>
+	</p>
+	<ul>
+		will do in a single shot the following tests :
+		<ul>
+			<li>test 3 headers presence and usability</li>
+			<li>test fonctionnality of building environnement</li>
+			<li>test a function presence and usablity (printf)</li>
+			<li>try to link with library libtotest1 and libtotest2</li>
+		</ul>
+	</ul>
+	this is the recommanded way to perform required tests, or to extend for
+	a particular functionality (imagine you provide a library, giving a
+	source and a script can easely extend the condiserie package)<br>
+	<br>
+	<ul class="note">NOTE <br>
+	don't try to run the compiled	source
+	after : this is uneeded and may cause false behaviour in case of
+	crosscompiling, compiling and linking are sufficient to test the
+	requirement. This has a side effect : you don't need to bother making a
+	working programm but only a compilable one ^_^
+	</ul>
+	<ul class="note">NOTE2<br>
+	when modifying the CFLAGS/LDFLAGS
+	and other environnement variable dont forget to include a
+	$THEVARIABLEYOURMODIFYING like in the exemple&nbsp; and if you're not
+	doing this in a test script don't forget to revert the variable back
+	after the test. in a test script there is no problems since an exprted
+	variable is exported only to the child process
+	</ul>
+
+</body>
+</html>
