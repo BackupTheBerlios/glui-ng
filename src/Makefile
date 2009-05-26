@@ -61,7 +61,6 @@ libglui_SOURCES+= $(shell find WGL -maxdepth 1 -regex '.*\.cpp\|.*\.c' )
 endif
 
 libglui_LDADD   =  -lGLU -lGL ${LIBGLUT}
-libglui_VERSION = 0.0.1
 #########################################################################################
 
 

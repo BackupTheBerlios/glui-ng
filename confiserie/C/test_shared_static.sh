@@ -81,6 +81,8 @@ mytest() {
         conf_cache RANLIB
         conf_cache ARFLAGS
 
+
+
         if [ -z "$STATICLIBEXT" ] && [ -z "$SHAREDLIBEXT" ]; then
                 echo "can't determine extension.... " >&2
                 return 1

@@ -43,8 +43,8 @@ GLUI_HEADERS = $(shell find ../include -type f)
 
 #######################################
 
-ifdef ${SHAREDLIBEXT}
-LIBGLUI = -L../src/GENERATED/ -lglui
+ifneq (${SHAREDLIBEXT},)
+LIBGLUI = -L../src/GENERATED/ -lglui-${libglui_VERSION}
 else
 LIBGLUI = ../src/GENERATED/libglui-*.a
 endif

@@ -6,27 +6,34 @@
 #************************************************************************/
 
 
+ifdef CONFISERIE_DEBUG
+$(warning SHAREDLIBEXT : ${SHAREDLIBEXT})
+$(warning STATICLIBEXT : ${STATICLIBEXT})
+$(warning noinst_LIBRARIES : ${noinst_LIBRARIES})
+$(warning noinst_so_LIBRARIES : ${noinst_so_LIBRARIES})
+$(warning libexec_LIBRARIES : ${libexec_LIBRARIES})
+$(warning lib_LIBRARIES : ${lib_LIBRARIES})
+$(warning a_LIBRARIES : ${a_LIBRARIES})
+$(warning custom_LIBRARIES : ${custom_LIBRARIES})
+$(warning custom_a_LIBRARIES : ${custom_a_LIBRARIES})
+endif
+
+###################################################################################
 #noinst libraries are ar libraries that are used a compile time and not installed
 ifdef noinst_LIBRARIES
 autolibapp=yes
 include $(foreach lib,${noinst_LIBRARIES},$(shell confiserie=${confiserie}  ${confiserie}/Makefiles/make_lib_mk.sh NOINST_DIR ${lib} .a) )
-else
-ifdef CONFISERIE_DEBUG
-$(warning noinst_LIBRARIES not defined, disabling)
-endif
 endif
 
+###################################################################################
 #noinstso libraries are ar libraries that are used a compile time and not installed
 #shared lib is forced
 ifdef noinst_so_LIBRARIES
 autolibapp=yes
 include $(foreach lib,${noinst_so_LIBRARIES},$(shell confiserie=${confiserie}  ${confiserie}/Makefiles/make_lib_mk.sh NOINST_DIR ${lib} .so) )
-else
-ifdef CONFISERIE_DEBUG
-$(warning noinst_so_LIBRARIES not defined, disabling)
-endif
 endif
 
+#######################################################################################
 #libexec libraries are .so libs (if system allows them) that are installed in LIBEXEC dir
 ifdef libexec_LIBRARIES
 autolibapp=yes
@@ -36,39 +43,31 @@ endif
 ifdef STATICLIBEXT
 include $(foreach lib,${libexec_LIBRARIES},$(shell confiserie=${confiserie} ${confiserie}/Makefiles/make_lib_mk.sh LIBEXEC_DIR ${lib} ${STATICLIBEXT}) )
 endif
-else
-ifdef CONFISERIE_DEBUG
-$(warning libexec_LIBRARIES not defined, disabling)
-endif
 endif
 
-
+#######################################################################################
 #lib libraries are .so libs if OS support them
 ifdef lib_LIBRARIES
 autolibapp=yes
 ifdef SHAREDLIBEXT
+$(foreach lib,${noinst_LIBRARIES}, $(warning noinst_LIBRARIES ${lib}))
 include $(foreach lib,${lib_LIBRARIES},$(shell confiserie=${confiserie} ${confiserie}/Makefiles/make_lib_mk.sh LIB_DIR ${lib} ${SHAREDLIBEXT}) )
 endif
 ifdef STATICLIBEXT
+$(foreach lib,${noinst_LIBRARIES}, $(warning noinst_LIBRARIES ${lib}))
 include $(foreach lib,${lib_LIBRARIES},$(shell confiserie=${confiserie} ${confiserie}/Makefiles/make_lib_mk.sh LIB_DIR ${lib} ${STATICLIBEXT}) )
 endif
-
-else
-ifdef CONFISERIE_DEBUG
-$(warning lib_LIBRARIES not defined, disabling)
-endif
 endif
 
+######################################################################################
 #a libraries are forced .a libs
 ifdef a_LIBRARIES
 autolibapp=yes
 include $(foreach lib,${a_LIBRARIES},$(shell confiserie=${confiserie} ${confiserie}/Makefiles/make_lib_mk.sh LIB_DIR ${lib} .a) )
-else
-ifdef CONFISERIE_DEBUG
-$(warning a_LIBRARIES not defined, disabling)
-endif
 endif
 
+
+#######################################################################################
 #custom libraries are .so (if os support them) libs installed into custom directory
 ifdef custom_LIBRARIES
 autolibapp=yes
@@ -78,25 +77,19 @@ endif
 ifdef STATICLIBEXT
 include $(foreach lib,${custom_LIBRARIES},$(shell confiserie=${confiserie} ${confiserie}/Makefiles/make_lib_mk.sh CUSTOM_LIB_DIR ${lib} ${STATICLIBEXT}) )
 endif
-
-else
-ifdef CONFISERIE_DEBUG
-$(warning custom_LIBRARIES not defined, disabling)
-endif
 endif
 
+#######################################################################################
 #custom a libraries are ar libs installed into custom directory
 ifdef custom_a_LIBRARIES
 autolibapp=yes
 include $(foreach lib,${custom_LIBRARIES},$(shell confiserie=${confiserie} ${confiserie}/Makefiles/make_lib_mk.sh CUSTOM_LIB_DIR ${lib} .a) )
-else
-ifdef CONFISERIE_DEBUG
-$(warning custom_a_LIBRARIES not defined, disabling)
-endif
 endif
 
+
+
+#######################################################################################
 ifdef autolibapp
-
 GENMSG ?= echo "[ GEN ]"
 LDMESG ?= echo "[ LNK ]"
 ARMSG ?= echo "[ AR ]"

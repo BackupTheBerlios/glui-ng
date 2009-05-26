@@ -1,0 +1,16 @@
+cygwin has a some issue with dll names installed
+
+usually on unix env there are the set of symlinks like
+libGL.so -> libGL-1.so -> libGL-1.4.so -> libGL-1.4.0.so
+
+cygwin don't provide this and only provide
+/bin/cygGL-1.dll
+
+however there is no way (appart brute force) to detect that (maybe in next confiserie)
+and the best way is to create the symlinks by hand :
+
+cd /bin
+ln -s cygGL-1.dll cygGL.dll
+ln -s cygglut-3.dll cygglut.dll
+
+
