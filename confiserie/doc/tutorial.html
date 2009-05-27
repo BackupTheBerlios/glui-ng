@@ -1,0 +1,127 @@
+<html>
+    <body>
+        <h1> tutorial for using confiserie in a project</h1>
+        this tutorial is taken from my own experience when I tried to 
+        use confiserie in my own projects.</br>
+        this isn't intended to show all the cases but rather to give a method 
+        on how to do it</br>
+        <h2> hypotesis </h2>
+        <ul>
+            <li>the project is in c++</li>
+            <li>we are using a third party library that use pkgconfig</li>
+            <li>we are using auto app feature of confiserie</li>
+        </ul>
+        <h2>writing the configure</h2>
+        <ul>
+            <li>I copied the configure located into example directory</li>
+            <li>modify the custom_clean_on_sig function so that it will remove
+                all the created files</li>
+            <li>now customise the includes</li>
+            <ul>
+                <li> we are creating a C++ auto app : include ${confiserie}/CXX/Makefile.autoapp</li>
+                <li> auto app just provide a way to convert some makefiles
+                variables into real compile makefile, it don't provide the
+                rules used for compilation itself, so we need some rule
+                provider, confiserie provide one : ${confiserie}/CXX/Makefile.beautifull_rules</li>
+                <li> since I use vim as a text editor, I want to have some tags 
+                for fast browsing : ${confiserie}/Makefiles/Makefile.tags</li>
+                <li> during development step it is usefull to track header
+                dependencies (this is less usefull during deployment but don't
+                take too much compile time so it's a good idea to keep this
+                feature activated) : include ${confiserie}/CXX/Makefile.auto_headers_deps </li>
+            </ul>
+            <li> ok I think I have all the makefiles helpers I need for my
+            dev, time to move to the real requirements checks</li>
+            <ul>
+                <li> it's a c++ application, so we need to check if
+                there is a c++ compiler at least, since it's a test
+                it have to be run at configure time, so prefix it with
+                runtest directive : runtest ${confiserie}/CXX/test_cxx.sh</li>
+                <li>the c++ program rely on a third party library that
+                use pkgconfig : runtest ${confiserie}/pkg-config/test_pkg-config.sh</li>
+            </ul>
+            <li>now that we have included all the dependecies (not tested at
+            confugure time but used to have the confiserie tree well filed), 
+            and that we have setup all the test, we have to run it once, for this
+            we need to end the test with finish_confiserie</li>
+        </ul>
+        now run it and check the log displayed</br>
+        at end of the log a summary of modified/set environment variable is 
+        displayed</br>
+        confiserie script do use environment variable to communicate, nothing is
+        produced by confiserie tests, only the environement of the configure
+        itself is modified, at the end configure script will only show you
+        what worth to be used in your headers or makefiles has been set
+        or has been modified.</br>
+        last step is to save the state, it's again you that choose what has to be
+        saved, you do it using 2 functions : create_makefile and create_include.<br>
+        both take at first argument a filename, and a list of environment
+        variable to save, you only choose the ones that are relevant for your
+        use..<br>
+        example : create_makefile Makefile.confiserie TOPSRC_DIR OBJDIR confiserie INSTALL_PREFIX BIN_DIR SBIN_DIR LIB_DIR LIBEXEC_DIR SYS_CONF SHARED_DATA_DIR INCLUDE_DIR WHICH CXX CXXFLAGS CPPFLAGS CXX_LDFLAGS PKG_CONFIG_INSTALL_DIR
+        <h2>writing the makefiles</h2>
+        ok we done the configure, saved the result into a Makefile.confiserie
+        and now?<br>
+        we have to create the Makefiles!<br>
+        <ul>
+            <li>top source dir</li>
+            <ul>
+                <li> this is the simpliest : in make_templates of 
+                confiserie you will find several prewritten makefiles, and in
+                particular Makefile.topsource_dir,</li>
+                <li> just copy it to your top
+                source dir, rename it into Makefile for convinience</li>
+                <li> edit it, seek for subdirs variable, add the dirs where
+                make shall perform some task</li>
+                <li> at the end add your Makefiles's includes : 
+                include ${TOPSRC_DIR}/Makefile.confiserie</li>
+            </ul>
+            <li> program directory</li>
+            <ul>
+                <li> here are our program sources, where the real work is done we
+                wanted to not bother and use an automatic target creation makefile
+                that looks like an automake configure file</li>
+                <li> copy Makefile.app_auto from make_templates dir and rename
+                it into Makefile</li>
+                <li> it's a c++ program that shall be installed into 
+                ${prefix}/bin. We have to define bin_CXXPROGRAMS variable with
+                our program list (here only one : gpx_geotag)<li>
+                <li> we have to say what are the sources (not headers) of
+                gpx_geotag : gpx_geotag_SOURCES =  gpx_geotag.cpp</li>
+                <li> last we have to make "make" aware of the confiserie helpers</li>
+                <ul>
+                    <li>include ${confiserie}/CXX/Makefile.autoapp</li>
+                    <li>include ${confiserie}/CXX/Makefile.beautifull_rules (
+                    remember : autoapp don't provide the build rule for allowing
+                    user to define it's own)</li>
+                </ul>
+            </ul>
+            <li> run ./configure and make</li>
+        </ul>
+        that's all, now we want to add another feature : dependency traking
+        <ul>
+            <li>looking into Makefile.auto_headers_deps we see in the comment
+            that for using it we need </li>
+            <ul>
+                <li>add the line "-include ${gpx_geotag_SOURCES:%.cpp=GENERATED/%.d}"
+                into our makefile</li>
+                <li> add include ${confiserie}/CXX/Makefile.auto_headers_deps</li>
+            </ul>
+        </ul>
+    </ul>
+    that's all, we have writen a top source makefile that will lauch make into
+    the sources subdirs, added a makefile into the souces subdirs that contain a
+    way to create makefiles to build/install the program, contain a way to 
+    compile our sources, contain a way to track dependencies so that if a header
+    is modified, only relevant sources are rebuild (note that this step is only
+    usefull when writing the software, since for integrator/end builder it has
+    no use (they won't likely modify headers and then do a build/modify/build 
+    cycle) [TODO: add into the tutorial the way to use it as an option into 
+    configure
+    </body>
+</html>
+
+
+
+
+

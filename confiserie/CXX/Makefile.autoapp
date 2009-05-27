@@ -1,0 +1,76 @@
+#/***********************************************************************
+#* copyright (c) 2004-2006 MALET Jean-luc aka cityhunter
+#* This library is free software; you can redistribute it and/or modify
+#* it under the terms of the LGPL v2.1 or latter at your option
+#* http://www.gnu.org/copyleft/lesser.html
+#************************************************************************/
+
+ifdef CONFISERIE_DEBUG
+$(warning "available targets : noinst_CXXPROGRAMS bin_CXXPROGRAMS sbin_CXXPROGRAMS custom_CXXPROGRAMS")
+endif
+
+#programms created for compilation purpose but not installed
+ifdef noinst_CXXPROGRAMS
+autolibapp=yes
+include $(foreach app,${noinst_CXXPROGRAMS},$(shell confiserie=${confiserie} ${confiserie}/Makefiles/make_app_mk.sh NOINST_DIR ${app} CXX) )
+else
+ifdef CONFISERIE_DEBUG
+$(warning noinst_CXXPROGRAMS not defined, disabling)
+endif
+endif
+
+#programms installed into bin dir
+ifdef bin_CXXPROGRAMS
+autolibapp=yes
+include $(foreach app,${bin_CXXPROGRAMS},$(shell confiserie=${confiserie} ${confiserie}/Makefiles/make_app_mk.sh BIN_DIR ${app} CXX) )
+else
+ifdef CONFISERIE_DEBUG
+$(warning bin_CXXPROGRAMS not defined, disabling)
+endif
+endif
+
+#programms installed into sbin dir
+ifdef sbin_CXXPROGRAMS
+autolibapp=yes
+include $(foreach app,${sbin_CXXPROGRAMS},$(shell confiserie=${confiserie} ${confiserie}/Makefiles/make_app_mk.sh SBIN_DIR ${app} CXX) )
+else
+ifdef CONFISERIE_DEBUG
+$(warning sbin_CXXPROGRAMS not defined, disabling)
+endif
+endif
+
+#programms installed into bin dir
+ifdef custom_CXXPROGRAMS
+autolibapp=yes
+include $(foreach app,${custom_CXXPROGRAMS},$(shell confiserie=${confiserie} ${confiserie}/Makefiles/make_app_mk.sh CUSTOM_BIN_DIR ${app} CXX) )
+else
+ifdef CONFISERIE_DEBUG
+$(warning custom_CXXPROGRAMS not defined, disabling)
+endif
+endif
+
+
+
+
+ifdef autolibapp
+
+DEPMSG ?= echo "[ GEN ]"
+LDMESG ?= echo "[ LNK ]"
+ARMSG ?= echo "[ AR ]"
+INSTALLMSG ?= echo "[ INSTALL ]"
+SUCCESSMSG ?= echo "[ SUCCESS ]"
+CLEANINGMSG ?= echo "[CLEANING]"
+#don't forget to include the generated makefiles
+
+GENERATED :
+	mkdir -p GENERATED
+
+
+
+clean : autoappCXX_dep_clean
+
+autoappCXX_dep_clean : 
+	rm -rf GENERATED
+
+#endif autolibapp
+endif 
