@@ -73,21 +73,29 @@ myGluiWin::myGluiWin(Display* glutDisplay) : GLUIWindow(glutDisplay,
                    {000, 255, 000},
                    {000, 255, 000}};
 
+    uint8_t blackbox[8][3] = { {0, 0, 0},{0, 0, 0},{0, 0, 0},{0, 0, 0},{0, 0, 0},{0, 0, 0},{0, 0, 0},{0, 0, 0}};
+
     box1 = drawinghelpers::raised_box(180, 180, 9);
     box2 = drawinghelpers::raised_box(160, 160, 8, 3, GL_UNSIGNED_BYTE, color_array);
-    box3 = drawinghelpers::raised_box(80, 80, 0, 3, );
-    box4 = drawinghelpers::raised_box(81, 81, 0);
+    box3 = drawinghelpers::raised_box(82, 82, 0, 3, GL_UNSIGNED_BYTE, blackbox);
+    box4 = drawinghelpers::raised_box(80, 80, 0);
     set_resize_policy(FixedSize);
 }
 
 void myGluiWin::draw(void)
 {
     glLoadIdentity();
-    glTranslatef(10.0,10.0,-20.0);
+    glTranslatef(10.0,10.0,-30.0);
     box1->draw();
     glTranslatef(10.0,10.0,10.0);
     box2->draw();
+    glTranslatef(5.0,5.0,10.0);
+    box3->draw();
+    glTranslatef(1.0,1.0,0.1);
+    box4->draw();
+
     glutPostRedisplay();
+
 }
 
 

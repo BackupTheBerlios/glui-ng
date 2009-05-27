@@ -14,7 +14,7 @@
 #include <GL/glui/statictext.h>
 #include <GL/glui/callback.h>
 #include <GL/glui/live.h>
-#include <GL/glui/theme.h>
+#include <GL/glui/themes.h>
 namespace GLUI
 {
 	class Node;
