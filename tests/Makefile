@@ -1,93 +1,104 @@
-.SUFFIXES: .cpp
-include ../Makefile.confiserie
+# (C) 2005-2005 MALET Jean-Luc aka cityhunter
+#this file is provided under the thermes of the BSD licence, you can use it, modify it
+#include it into your commercial software as you want
 
-#for sgi   -- comment out the lines below to use on HP
-#CC=CC -g0 -o32
-#CC=gcc
+# as a general rule to avoid issues
+#    make variables first
+#    make rules following (first appearing rule is the default when issuing 'make')
+#    includes last
 
-# Compiler options
-OPTS+=-g
-OPTS+=-O0
-#OPTS+=-O2
-OPTS+=-DDEBUG=1
 
-UNAME = $(shell uname)
+#general variables
+.PHONY : all lib clean debug tests
 
-ifeq ($(UNAME), Linux)
-CXX       = g++
-CPPFLAGS += $(OPTS) -Wall -pedantic
-endif
+export TOPSRC_DIR?=..
 
-#######################################
+# load configuration (variables with gnu make Makefile are modified chronologicaly
+# ie when they appears in a Makefile)
+include ${TOPSRC_DIR}/Makefile.confiserie
 
-CPPFLAGS += -I../ -I../include $(OPTS)
+#if you want to setup a VPATH
+export VPATH=${TOPSRC_DIR}/${MSGSUBDIR}
 
-LIBGL   = -lGLU -lGL
-LIBS    = -lXext -lX11  -lm
+#default target (make execute by defaut the first target he find):
+all :
 
-# One of the following options only...
-
-# (1) OpenGLUT
-# LIBGLUT   = -L/usr/X11R6/lib -lopenglut
-# CPPFLAGS += -I/usr/X11R6/include -DGLUI_OPENGLUT
-
-# (2) FreeGLUT
-# LIBGLUT   = -L/usr/X11R6/lib -lfreeglut
-# CPPFLAGS += -I/usr/X11R6/include -DGLUI_FREEGLUT
-
-# (3) GLUT
-LIBGLUT   = -L/usr/X11R6/lib -lglut
-CPPFLAGS += -I/usr/X11R6/include
-
-GLUI_HEADERS = $(shell find ../include -type f)
-
-#######################################
 
 ifneq (${SHAREDLIBEXT},)
-LIBGLUI = -L../src/GENERATED/ -lglui-${libglui_VERSION}
+LIBGLUIDLL = -L../src/GENERATED/ -lglui-${libglui_VERSION}
 else
-LIBGLUI = ../src/GENERATED/libglui-*.a
+LIBGLUIA = ../src/GENERATED/libglui-*.a
 endif
 
-#GLUI_TESTS = checkbox statictext button horizontallayout textbutton
-GLUI_TESTS = SizeComputationTest PackingTest ContainerEventTest
-GLUI_TESTS+= GlutWindowTest GlutKeyboardTest GlutKeyboardUserTest
-GLUI_TESTS+= DrawingHelpsTest DrawingHelps-boxTest Lightning_test
+#addition to environnement variable, be carefull when nesting subdirs in this makefile
+LDFLAGS  += -lpthread -lGLU -lGL
+CFLAGS   += -Wall -fPIC -Werror-implicit-function-declaration
+CPPFLAGS += -I../include
 
-.PHONY: all setup examples tools clean depend doc doc-pdf doc-dist dist
+# programs to install in ${prefix}/bin directory
+# this variable is used in Makefile.autoapp to create the required Makefiles
+# it then has to be set before including of Makefiles.autoapp
+noinst_CXXPROGRAMS = SizeComputationTest PackingTest ContainerEventTest
+noinst_CXXPROGRAMS+= GlutWindowTest GlutKeyboardTest GlutKeyboardUserTest
+noinst_CXXPROGRAMS+= DrawingHelpsTest DrawingHelps-boxTest Lightning_test
 
-tests : all
+#sources and additional variables for myapp1
+SizeComputationTest_SOURCES = SizeComputationTest.cpp
+SizeComputationTest_LDADD   = ${LIBGLUIDLL}
+SizeComputationTest_ARADD   = ${LIBGLUIA}
 
-all:  GENERATED $(addsuffix ${EXE},$(addprefix GENERATED/bin/,${GLUI_TESTS}))
-
-
-examples: $(GLUI_EXAMPLES)
-
-tools: $(GLUI_TOOLS)
-
-
-$(addsuffix ${EXE},$(addprefix GENERATED/bin/,${GLUI_TESTS})) : GENERATED
-
-GENERATED :
-	mkdir -p GENERATED/bin
-
-GENERATED/bin/%${EXE}: GENERATED/%.o 
-	echo "    [EXE] ${DIRPREFIX}$@"
-	$(CXX) $(CPPFLAGS) -o $@ $<  $(LIBGLUI) $(LIBGLUT) $(LIBGL) $(LIBS)
+PackingTest_SOURCES = PackingTest.cpp
+PackingTest_LDADD   = ${LIBGLUIDLL}
+PackingTest_ARADD   = ${LIBGLUIA}
 
 
-
-GENERATED/%.o: %.cpp ${GLUI_HEADERS}
-	echo "    [CXX] ${DIRPREFIX}$<"
-	$(CXX) $(CPPFLAGS) -c $< -o $@
-
-GENERATED/%.o: %.c ${GLUI_HEADERS}
-	echo "    [CC ] ${DIRPREFIX}$<"
-	$(CXX) $(CPPFLAGS) -c $< -o $@
+ContainerEventTest_SOURCES = ContainerEventTest.cpp
+ContainerEventTest_LDADD   = ${LIBGLUIDLL}
+ContainerEventTest_ARADD   = ${LIBGLUIA}
 
 
-clean:
-	rm -rf GENERATED
+GlutWindowTest_SOURCES = GlutWindowTest.cpp
+GlutWindowTest_LDADD   = ${LIBGLUIDLL}
+GlutWindowTest_ARADD   = ${LIBGLUIA}
 
+
+GlutKeyboardTest_SOURCES = GlutKeyboardTest.cpp
+GlutKeyboardTest_LDADD   = ${LIBGLUIDLL}
+GlutKeyboardTest_ARADD   = ${LIBGLUIA}
+
+
+GlutKeyboardUserTest_SOURCES = GlutKeyboardUserTest.cpp
+GlutKeyboardUserTest_LDADD   = ${LIBGLUIDLL}
+GlutKeyboardUserTest_ARADD   = ${LIBGLUIA}
+
+
+DrawingHelpsTest_SOURCES = DrawingHelpsTest.cpp
+DrawingHelpsTest_LDADD   = ${LIBGLUIDLL}
+DrawingHelpsTest_ARADD   = ${LIBGLUIA}
+
+
+DrawingHelps_boxTest_SOURCES = DrawingHelps-boxTest.cpp
+DrawingHelps_boxTest_LDADD   = ${LIBGLUIDLL}
+DrawingHelps_boxTest_ARADD   = ${LIBGLUIA}
+
+
+Lightning_test_SOURCES = Lightning_test.cpp
+Lightning_test_LDADD   = ${LIBGLUIDLL}
+Lightning_test_ARADD   = ${LIBGLUIA}
+
+
+
+#a special target : it only modify CFLAGS variables before making it the standard way
+debug : CFLAGS+= -g3 -gdwarf-2 -O0
+debug : all
+	
+clean : 
+	${CLEANINGMSG} ${MSGSUBDIR}
+
+
+#includes
+include ${confiserie}/CXX/Makefile.autoapp
+include ${confiserie}/CXX/Makefile.beautifull_rules
+include ${confiserie}/CXX/Makefile.auto_headers_deps
 
 
