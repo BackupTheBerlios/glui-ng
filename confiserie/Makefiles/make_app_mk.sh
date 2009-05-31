@@ -22,7 +22,7 @@ if test -n "${CONFISERIE_DEBUG}"; then
         echo \${3} : ${3} >&2
 fi
 
-cmd="\${${3}}  -o \$@ \$^ \${${3}_LDFLAGS} \${${name}_LDADD} "
+cmd="\${${3}} \${${3}FLAGS} \${CPPFLAGS} -o \$@ \$^ \${${3}_LDFLAGS} \${${name}_LDADD} "
 
 case $1 in
 	BIN_DIR)
@@ -43,6 +43,17 @@ esac
 mkdir -p GENERATED
 cat > GENERATED/${name}.${3}.d <<EOF
 ifdef ${3}
+
+ifdef CONFISERIE_DEBUG
+\$(warning ${3}FLAGS : \${${3}FLAGS})
+\$(warning CPPFLAGS : \${CPPFLAGS})
+\$(warning ${3}_LDFLAGS : \${${3}_LDFLAGS})
+\$(warning ${name}_SOURCES : \${${name}_SOURCES})
+\$(warning ${name}_ARADD : \${${name}_ARADD})
+\$(warning ${name}_LDADD : \${${name}_LDADD})
+\$(warning ${name}_MODE : \${${name}_MODE})
+\$(warning ${name}_OWNER :\${${name}_OWNER})
+endif
 
 ifdef ${name}_SOURCES
 

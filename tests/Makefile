@@ -31,8 +31,8 @@ LIBGLUIA = ../src/GENERATED/libglui-*.a
 endif
 
 #addition to environnement variable, be carefull when nesting subdirs in this makefile
-LDFLAGS  += -lpthread -lGLU -lGL
-CFLAGS   += -Wall -fPIC -Werror-implicit-function-declaration
+CXX_LDFLAGS  += -lpthread -lGLU -lGL
+CXXFLAGS   += -Wall -fPIC -Werror-implicit-function-declaration
 CPPFLAGS += -I../include
 
 # programs to install in ${prefix}/bin directory
@@ -44,46 +44,46 @@ noinst_CXXPROGRAMS+= DrawingHelpsTest DrawingHelps-boxTest Lightning_test
 
 #sources and additional variables for myapp1
 SizeComputationTest_SOURCES = SizeComputationTest.cpp
-SizeComputationTest_LDADD   = ${LIBGLUIDLL}
+SizeComputationTest_LDADD   = ${LIBGLUIDLL}  -lglut
 SizeComputationTest_ARADD   = ${LIBGLUIA}
 
 PackingTest_SOURCES = PackingTest.cpp
-PackingTest_LDADD   = ${LIBGLUIDLL}
+PackingTest_LDADD   = ${LIBGLUIDLL}  -lglut
 PackingTest_ARADD   = ${LIBGLUIA}
 
 
 ContainerEventTest_SOURCES = ContainerEventTest.cpp
-ContainerEventTest_LDADD   = ${LIBGLUIDLL}
+ContainerEventTest_LDADD   = ${LIBGLUIDLL}  -lglut
 ContainerEventTest_ARADD   = ${LIBGLUIA}
 
 
 GlutWindowTest_SOURCES = GlutWindowTest.cpp
-GlutWindowTest_LDADD   = ${LIBGLUIDLL}
+GlutWindowTest_LDADD   = ${LIBGLUIDLL} -lglut
 GlutWindowTest_ARADD   = ${LIBGLUIA}
 
 
 GlutKeyboardTest_SOURCES = GlutKeyboardTest.cpp
-GlutKeyboardTest_LDADD   = ${LIBGLUIDLL}
+GlutKeyboardTest_LDADD   = ${LIBGLUIDLL}  -lglut
 GlutKeyboardTest_ARADD   = ${LIBGLUIA}
 
 
 GlutKeyboardUserTest_SOURCES = GlutKeyboardUserTest.cpp
-GlutKeyboardUserTest_LDADD   = ${LIBGLUIDLL}
+GlutKeyboardUserTest_LDADD   = ${LIBGLUIDLL}  -lglut
 GlutKeyboardUserTest_ARADD   = ${LIBGLUIA}
 
 
 DrawingHelpsTest_SOURCES = DrawingHelpsTest.cpp
-DrawingHelpsTest_LDADD   = ${LIBGLUIDLL}
+DrawingHelpsTest_LDADD   = ${LIBGLUIDLL}  -lglut
 DrawingHelpsTest_ARADD   = ${LIBGLUIA}
 
 
 DrawingHelps_boxTest_SOURCES = DrawingHelps-boxTest.cpp
-DrawingHelps_boxTest_LDADD   = ${LIBGLUIDLL}
+DrawingHelps_boxTest_LDADD   = ${LIBGLUIDLL}  -lglut
 DrawingHelps_boxTest_ARADD   = ${LIBGLUIA}
 
 
 Lightning_test_SOURCES = Lightning_test.cpp
-Lightning_test_LDADD   = ${LIBGLUIDLL}
+Lightning_test_LDADD   = ${LIBGLUIDLL}  -lglut
 Lightning_test_ARADD   = ${LIBGLUIA}
 
 
