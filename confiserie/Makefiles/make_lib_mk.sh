@@ -14,6 +14,14 @@
 . ${confiserie}/format_name.sh
 name=$( format_name "$2")
 
+if test -n "${CONFISERIE_DEBUG}"; then
+        echo generating GENERATED/${without_version_name}.d >&2
+        echo \${1} : ${1} >&2
+        echo \${2} : ${2} >&2
+        echo \${3} : ${3} >&2
+fi
+
+
 
 LIB_INSTALL_MESSAGE_LD="don't forget to run ldconfig or to update LD_LIBRARY_PATH env variable"
 
@@ -39,19 +47,36 @@ complete_name="${2}-\${${version}}${3}"
 without_version_name="${2}${3}"
 
 if [ "${3}" == ".so" ]; then
-	cmd="\${LD} \${LDFLAGS} \${${name}_LDADD} -shared -Bdynamic -soname \$@ -o \$@ \$^ "
+	cmd="\${LD} \${LDFLAGS} \${${name}_LDADD} -shared -Bdynamic -soname \$@ -o \$@ \$^ \${${name}_ARADD} "
 elif [ "${3}" == ".dll" ]; then
-        cmd="${CC} ${CC_LDFLAGS} -shared \
+        cmd="\${CC} \${CC_LDFLAGS} -shared \
                 -o \$@ -Wl,--out-implib=\$@.a\
                 -Wl,--export-all-symbols -Wl,--enable-auto-import \
-                -Wl,--no-whole-archive  \${${name}_LDADD} \$^"
+                -Wl,--no-whole-archive  \${${name}_LDADD} \$^ \${${name}_ARADD}"
 elif [ "${3}" == ".a" ]; then
-	cmd="\${AR} r \${ARFLAGS} \$@ \$^ && \${RANLIB} \$@"
+	cmd="\${AR} r \${ARFLAGS} \$@ \$^ \${${name}_ARADD} && \${RANLIB} \$@"
 fi
 
 mkdir -p GENERATED
 cat > GENERATED/${without_version_name}.d <<EOF
+ifndef LD
+\$(error LD is undefined)
+endif
+
 ifdef LD
+
+ifdef CONFISERIE_DEBUG
+\$(warning LD : \${LD})
+\$(warning AR : \${AR})
+\$(warning LDFLAGS : \${LDFLAGS})
+\$(warning ARFLAGS : \${ARFLAGS})
+\$(warning ${name}_LDADD : \${${name}_LDADD})
+\$(warning ${name}_ARADD : \${${name}_ARADD})
+\$(warning ${name}_MODE : \${${name}_MODE})
+\$(warning ${name}_OWNER :\${${name}_OWNER})
+endif
+
+
 all : GENERATED/${complete_name}
 clean : clean_${complete_name}
 install : all install_${complete_name}

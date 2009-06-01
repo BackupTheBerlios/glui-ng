@@ -10,11 +10,19 @@
 #* http://www.gnu.org/copyleft/lesser.html
 #************************************************************************/
 
+
 . ${confiserie}/format_name.sh
 name=$( format_name "$2")
 name="${name}${EXE}"
 
-cmd="\${${3}} \${${3}_LDFLAGS} \${${name}_LDADD} -o \$@ \$^ "
+if test -n "${CONFISERIE_DEBUG}"; then
+        echo generating GENERATED/${name}.${3}.d >&2
+        echo \${1} : ${1} >&2
+        echo \${2} : ${2} >&2
+        echo \${3} : ${3} >&2
+fi
+
+cmd="\${${3}} \${${3}FLAGS} \${CPPFLAGS} -o \$@ \$^ \${${3}_LDFLAGS} \${${name}_LDADD} "
 
 case $1 in
 	BIN_DIR)
@@ -35,6 +43,17 @@ esac
 mkdir -p GENERATED
 cat > GENERATED/${name}.${3}.d <<EOF
 ifdef ${3}
+
+ifdef CONFISERIE_DEBUG
+\$(warning ${3}FLAGS : \${${3}FLAGS})
+\$(warning CPPFLAGS : \${CPPFLAGS})
+\$(warning ${3}_LDFLAGS : \${${3}_LDFLAGS})
+\$(warning ${name}_SOURCES : \${${name}_SOURCES})
+\$(warning ${name}_ARADD : \${${name}_ARADD})
+\$(warning ${name}_LDADD : \${${name}_LDADD})
+\$(warning ${name}_MODE : \${${name}_MODE})
+\$(warning ${name}_OWNER :\${${name}_OWNER})
+endif
 
 ifdef ${name}_SOURCES
 
