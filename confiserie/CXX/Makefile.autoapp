@@ -41,13 +41,3 @@ endif
 
 
 
-ifdef autolibapp
-
-
-clean : clean_autoapp_dep
-
-clean_autoapp_dep : 
-	rm -rf GENERATED
-
-#endif autolibapp
-endif 

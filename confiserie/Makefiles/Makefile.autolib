@@ -4,13 +4,12 @@
 #* it under the terms of the LGPL v2.1 or latter at your option
 #* http://www.gnu.org/copyleft/lesser.html
 #************************************************************************/
-
+all:
 
 ifdef CONFISERIE_DEBUG
 $(warning SHAREDLIBEXT : ${SHAREDLIBEXT})
 $(warning STATICLIBEXT : ${STATICLIBEXT})
 $(warning noinst_LIBRARIES : ${noinst_LIBRARIES})
-$(warning noinst_so_LIBRARIES : ${noinst_so_LIBRARIES})
 $(warning libexec_LIBRARIES : ${libexec_LIBRARIES})
 $(warning lib_LIBRARIES : ${lib_LIBRARIES})
 $(warning a_LIBRARIES : ${a_LIBRARIES})
@@ -22,16 +21,14 @@ endif
 #noinst libraries are ar libraries that are used a compile time and not installed
 ifdef noinst_LIBRARIES
 autolibapp=yes
-include $(foreach lib,${noinst_LIBRARIES},$(shell confiserie=${confiserie}  ${confiserie}/Makefiles/make_lib_mk.sh NOINST_DIR ${lib} .a) )
+ifdef SHAREDLIBEXT
+include $(foreach lib,${noinst_LIBRARIES},$(shell confiserie=${confiserie}  ${confiserie}/Makefiles/make_lib_mk.sh NOINST_DIR ${lib} ${SHAREDLIBEXT}) )
+endif
+ifdef STATICLIBEXT
+include $(foreach lib,${noinst_LIBRARIES},$(shell confiserie=${confiserie}  ${confiserie}/Makefiles/make_lib_mk.sh NOINST_DIR ${lib} ${STATICLIBEXT}) )
+endif
 endif
 
-###################################################################################
-#noinstso libraries are ar libraries that are used a compile time and not installed
-#shared lib is forced
-ifdef noinst_so_LIBRARIES
-autolibapp=yes
-include $(foreach lib,${noinst_so_LIBRARIES},$(shell confiserie=${confiserie}  ${confiserie}/Makefiles/make_lib_mk.sh NOINST_DIR ${lib} .so) )
-endif
 
 #######################################################################################
 #libexec libraries are .so libs (if system allows them) that are installed in LIBEXEC dir
@@ -63,7 +60,7 @@ endif
 #a libraries are forced .a libs
 ifdef a_LIBRARIES
 autolibapp=yes
-include $(foreach lib,${a_LIBRARIES},$(shell confiserie=${confiserie} ${confiserie}/Makefiles/make_lib_mk.sh LIB_DIR ${lib} .a) )
+include $(foreach lib,${a_LIBRARIES},$(shell confiserie=${confiserie} ${confiserie}/Makefiles/make_lib_mk.sh LIB_DIR ${lib} ${STATICLIBEXT}) )
 endif
 
 
@@ -83,7 +80,7 @@ endif
 #custom a libraries are ar libs installed into custom directory
 ifdef custom_a_LIBRARIES
 autolibapp=yes
-include $(foreach lib,${custom_LIBRARIES},$(shell confiserie=${confiserie} ${confiserie}/Makefiles/make_lib_mk.sh CUSTOM_LIB_DIR ${lib} .a) )
+include $(foreach lib,${custom_LIBRARIES},$(shell confiserie=${confiserie} ${confiserie}/Makefiles/make_lib_mk.sh CUSTOM_LIB_DIR ${lib} ${STATICLIBEXT}) )
 endif
 
 
@@ -98,11 +95,6 @@ SUCCESSMSG ?= echo "[ SUCCESS ]"
 CLEANINGMSG ?= echo "[CLEANING]"
 #don't forget to include the generated makefiles
 
-
-clean : autolib_dep_clean
-
-autolib_dep_clean : 
-	rm -rf GENERATED
 
 #endif autolibapp
 endif 

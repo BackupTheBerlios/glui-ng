@@ -246,9 +246,7 @@ trap clean_on_sig 2 15                   &&
 unalias -a                               &&
 custom_clean_on_sig
 
-export TEST_SEPARATOR="_______________________________________________________________________________"
-alias runtest=source
-
+. ${confiserie}/common_test_definition.sh
 . ${confiserie}/clear_nls.sh || exit 1
 
 if which_result=$(${confiserie}/which.sh which); then

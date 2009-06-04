@@ -5,11 +5,19 @@
 #* http://www.gnu.org/copyleft/lesser.html
 #************************************************************************/
 
-#require awk and sed tests
-ifdef AWK
+
+ifdef CONFISERIE_DEBUG
+$(warning CONFISERIE_DEBUG : ${CONFISERIE_DEBUG})
+$(warning AWK : ${AWK})
+endif #CONFISERIE_DEBUG
+
 
 #this test only run if the variable ENABLE_AUTODEPS is set to yes
 ifeq (${ENABLE_AUTODEPS}, yes)
+
+#require awk and sed tests
+ifdef AWK
+
 
 ifndef COLOR
 	export GENMSG?=echo -e [ GEN ]\\t
@@ -47,5 +55,8 @@ GENERATED/%.C.d: %.C
 GENERATED/%.cxx.d: %.cxx
 	$(call cc_dep_macro)
 
-endif #ENABLE_AUTODEPS
+else
+$(error AWK must be set if ENABLE_AUTODEPS is set)
 endif #AWK
+
+endif #ENABLE_AUTODEPS
