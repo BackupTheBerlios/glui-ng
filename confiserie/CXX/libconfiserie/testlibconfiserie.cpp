@@ -4,15 +4,15 @@
 #* it under the terms of the LGPL v2.1 or latter at your option
 #* http://www.gnu.org/copyleft/lesser.html
 #************************************************************************/
+#include "libconfiserie.h"
 
 
-int do_nothing(void);
-int do_nothing2(void);
 
 int main(int argc, char** argv)
 {
+        confiserie sweet;
+        sweet.tata();
         int err;
         err = do_nothing2();
         if (err) return err;
-        return do_nothing();
 }

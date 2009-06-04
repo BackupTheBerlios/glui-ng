@@ -32,7 +32,7 @@ source ${confiserie}/init.sh "$@" &&
 #the tests itself
 {
     runtest ${confiserie}/CXX/test_cxx.sh                &&
-    runtest ${confiserie}/C/test_shared_static.sh        &&
+    runtest ${confiserie}/CXX/test_shared_static.sh        &&
     runtest ${confiserie}/pkg-config/test_pkg-config.sh
 
 } ||clean_on_sig 

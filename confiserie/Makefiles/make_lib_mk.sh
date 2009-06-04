@@ -47,14 +47,14 @@ complete_name="${2}-\${${version}}${3}"
 without_version_name="${2}${3}"
 
 if [ "${3}" == ".so" ]; then
-	cmd="\${LD} \${LDFLAGS} \${${name}_LDADD} -shared -Bdynamic -soname \$@ -o \$@ \$^ \${${name}_ARADD} "
+	cmd="\${LD} \${LDFLAGS} \${${name}_LDADD} -shared -Bdynamic -soname \$@ -o \$@ \${${name}_OBJ} \${${name}_ARADD} "
 elif [ "${3}" == ".dll" ]; then
         cmd="\${CC} \${CC_LDFLAGS} -shared \
                 -o \$@ -Wl,--out-implib=\$@.a\
                 -Wl,--export-all-symbols -Wl,--enable-auto-import \
-                -Wl,--no-whole-archive  \${${name}_LDADD} \$^ \${${name}_ARADD}"
+                -Wl,--no-whole-archive  \${${name}_LDADD} \${${name}_OBJ} \${${name}_ARADD}"
 elif [ "${3}" == ".a" ]; then
-	cmd="\${AR} r \${ARFLAGS} \$@ \$^ \${${name}_ARADD} && \${RANLIB} \$@"
+	cmd="\${AR} r \${ARFLAGS} \$@ \${${name}_OBJ} \${${name}_ARADD} && \${RANLIB} \$@"
 fi
 
 mkdir -p GENERATED
@@ -74,18 +74,26 @@ ifdef CONFISERIE_DEBUG
 \$(warning ${name}_ARADD : \${${name}_ARADD})
 \$(warning ${name}_MODE : \${${name}_MODE})
 \$(warning ${name}_OWNER :\${${name}_OWNER})
+\$(warning ${name}_DEPEND :\${${name}_DEPEND})
 endif
 
+MAKEFLAGS += Rr
 
 all : GENERATED/${complete_name}
 clean : clean_${complete_name}
 install : all install_${complete_name}
 
-GENERATED/${complete_name} : \$(addprefix GENERATED/, \$(addsuffix .o, \$(basename \${${name}_SOURCES}))) \${${name}_ARADD}
+.PHONY: ${name}
+
+${name} : GENERATED/${complete_name} 
+
+${name}_OBJ = \$(addprefix GENERATED/, \$(addsuffix .o, \$(basename \${${name}_SOURCES})))
+
+GENERATED/${complete_name} : \${${name}_OBJ} \${${name}_ARADD} \${${name}_DEPEND}
 	\${LDMESG} \$@
 	rm -f \$@
 	${cmd}
-	\${confiserie}/Makefiles/make_lib_links.sh \${$1}/${complete_name}
+	\${confiserie}/Makefiles/make_lib_links.sh GENERATED/${complete_name}
 	\${SUCCESSMSG} \$@
 
 
