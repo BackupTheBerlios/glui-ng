@@ -22,7 +22,7 @@ if test -n "${CONFISERIE_DEBUG}"; then
         echo \${3} : ${3} >&2
 fi
 
-cmd="\${${3}} \${${3}FLAGS} \${CPPFLAGS} -o \$@ \$^ \${${3}_LDFLAGS} \${${name}_LDADD} "
+cmd="\${${3}} \${${3}FLAGS} \${CPPFLAGS} -o \$@ \${${name}_OBJ} \${${name}_ARADD} \${${3}_LDFLAGS} \${${name}_LDADD} "
 
 case $1 in
 	BIN_DIR)
@@ -53,15 +53,24 @@ ifdef CONFISERIE_DEBUG
 \$(warning ${name}_LDADD : \${${name}_LDADD})
 \$(warning ${name}_MODE : \${${name}_MODE})
 \$(warning ${name}_OWNER :\${${name}_OWNER})
+\$(warning ${name}_DEPEND :\${${name}_DEPEND})
+\$(warning SUCCESSMSG :\${SUCCESSMSG})
 endif
 
 ifdef ${name}_SOURCES
+
+MAKEFLAGS += Rr
 
 all : GENERATED/${name}
 clean : clean_${name}
 install : all install_${name}
 
-GENERATED/${name} : \$(addsuffix .o, \$(addprefix GENERATED/, \$(basename \${${name}_SOURCES}))) \${${name}_ARADD}
+.PHONY : \${${name}_DEPEND}
+GENERATED/${name} : \${${name}_DEPEND}
+
+${name}_OBJ=\$(addsuffix .o, \$(addprefix GENERATED/, \$(basename \${${name}_SOURCES})))
+
+GENERATED/${name} : \${${name}_OBJ} \${${name}_ARADD}
 	\${LDMESG} \$@
 	rm -f \$@
 	${cmd}	

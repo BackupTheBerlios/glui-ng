@@ -4,14 +4,17 @@
 * it under the terms of the LGPL v2.1 or latter at your option
 * http://www.gnu.org/copyleft/lesser.html
 ************************************************************************/
+#include "libconfiserie.h"
 
-
-int do_nothing(void)
+void confiserie::tata(void)
 {
-  int i;
-  int ff=0xFFFF;
-  for (i=0; i<100; i++)
-    {
-      ff^=i;
-    }
+        for(int i=0; i<1000; i++)
+        {
+                this->toto(i);
+        }
+}
+
+void confiserie::toto(int i)
+{
+        j=j^i;
 }
