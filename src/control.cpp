@@ -84,6 +84,33 @@ void Control::update_size( void )
         return; //nothing to do since we already have a fixed size
     }
 }
+/******* Control::set_w() **************/
+int Control::set_size( Size sz, Size min)
+{
+    Size dontchange(0u, 0u);
+    if (dontchange != min)
+    {
+        this->Min = min;
+    }
+    if (sz > this->Min)
+    {
+        this->CurrentSize = sz;
+    }
+    else
+    {
+        return EINVAL;
+    }
+#warning "use a bottom to top approach : child shall ask parent to update size only if size did change"
+    Control* cont  = dynamic_cast<Control*>(GetRootNode());
+    if ( cont != NULL)
+    {
+        cont->update_size();
+        cont->pack (0, 0);
+    }
+    drawinghelpers::PostRedisplay(this);
+}
+
+
 /*************************** Drawing Utility routines *********************/
 
 
@@ -137,6 +164,7 @@ void Control::disable()
     }
 }
 
+////////////////////////////////////////////////////////////////////////////
 int Control::AddEvent(::XExposeEvent *event)
 {
     //we have been exposed, redraw ourself
@@ -144,12 +172,12 @@ int Control::AddEvent(::XExposeEvent *event)
     glPushMatrix();
     glLoadIdentity();
     glTranslatef(x + x_off_left, y + y_off_bot, BOTTOM_VIEWPORT + GLUI_CONTROL_MAX_THICKNESS * level());
-    draw();
+    theme::Instance()->draw(&this);
     glPopMatrix();
     debug::Instance()->FlushGL();
 }
 
-
+///////////////////////////////////////////////////////////////////////////
 int Control::AddEvent(::XEvent *event)
 {
     switch ( event->type )
@@ -192,7 +220,7 @@ int Control::AddEvent(::XEvent *event)
 
 }
 
-
+///////////////////////////////////////////////////////////////////////////
 int Control::AddEvent (::XKeyEvent* event)
 {
 #warning "TODO : if key is tab or backtab or this control don't support..."
@@ -201,32 +229,7 @@ int Control::AddEvent (::XKeyEvent* event)
     //    do the same
 }
 
-
-/******* Control::set_w() **************/
-int Control::set_size( Size sz, Size min)
-{
-    Size dontchange(0u, 0u);
-    if (dontchange != min)
-    {
-        this->Min = min;
-    }
-    if (sz > this->Min)
-    {
-        this->CurrentSize = sz;
-    }
-    else
-    {
-        return EINVAL;
-    }
-#warning "use a bottom to top approach : child shall ask parent to update size only if size did change"
-    Control* cont  = dynamic_cast<Control*>(GetRootNode());
-    if ( cont != NULL)
-    {
-        cont->update_size();
-        cont->pack (0, 0);
-    }
-    drawinghelpers::PostRedisplay(this);
-}
+///////////////////////////////////////////////////////////////////////////
 
 
 
@@ -311,3 +314,10 @@ int Control::SetMargins(int top, int bottom, int left, int right)
     return 0;
 
 }
+////////////////////////////////////////////////////////////////////////
+bool CheckWidgetApiRevision(int Major, int Minor, int Revision)
+{
+        if (Major != this->APIMajor) return false;
+        if (Minor <  this->APIMinor) return false;
+}
+

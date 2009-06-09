@@ -40,7 +40,6 @@ namespace GLUI
     {
         public : //methods
             static theme* Instance();
-            void GetVersion(uint32_t* Major, uint32_t* Minor, uint32_t* revision);
             void FillglColorPointer(GLint size,       //< numbers of elements per colors (3=RGB 4=RGBA)
                     GLenum type,                      //< type of the array to fill
                     GLsizei stride,                   //< if the array is interlaved with vectors
@@ -48,13 +47,17 @@ namespace GLUI
                     uint32_t count );                 //< numbers of colors entries
             void DoLightning();
              uint8_t* Get_bkgd_color();
-             void draw(Arcball* arcball);
-             void draw(Button* button);
-             void draw(ToggleButton* button);
-             void draw(TextButton* button);
-             
+             int draw(Control* ctrl);
+            
         protected : //variables
+             int draw(Arcball* arcball);
+             int draw(Button* button);
+             int draw(ToggleButton* button);
+             int draw(TextButton* button);
             uint8_t    bkgd_color[4];
+             int ThemeMajor;
+             int ThemeMinor;
+             int ThemeRevision;
         private : //methods
             theme( void );
     };

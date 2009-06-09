@@ -46,8 +46,23 @@ Button::Button( Node *parent, const char *name,
     this->resizeable = AdaptThisToFitChilds;
     parent->add_control( this );
 #warning "register on KeyPress, KeyRelease, ButtonPress, ButtonRelease, EnterNotify, LeaveNotify, MotionNotify"
+    this->background = 
 }
 
+/////////////////////////////////////////////////////////////////
+int AddEvent (::XResizeRequestEvent* event)
+{
+        Control::AddEvent(::event);
+        if (this->background != NULL ) delete this->background;
+        if (this->forground_no_pressed != NULL ) delete this->forground_no_pressed;
+        if (this->forground_pressed != NULL ) delete this->forground_pressed;
+
+        this->background = drawinghelpers::raised_box(this->Width(), this->Height(), 0, 3, GL_UNSIGNED_BYTE, blackbox);
+        this->forground_no_pressed =  drawinghelpers::raised_box(this->Width(), this->Height(), 0, 3, GL_UNSIGNED_BYTE, blackbox);
+        this->forground_pressed = drawinghelpers::raised_box(this->Width(), this->Height(), 0, 3, GL_UNSIGNED_BYTE, blackbox);
+}
+
+/////////////////////////////////////////////////////////////////
 int Button::AddEvent (::XEvent *event)
 {
     EventInterpreter::AddEvent(event);

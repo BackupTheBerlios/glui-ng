@@ -91,10 +91,13 @@ void theme::FillglColorPointer(GLint size,
 ////////////////////////////////////////////////////////////
 theme::theme()
 {
-	bkgd_color[0] = 236; //red
-	bkgd_color[1] = 233; //green
-	bkgd_color[2] = 216; //blue
-    bkgd_color[3] = 0; //alpha
+        bkgd_color[0] = 236; //red
+        bkgd_color[1] = 233; //green
+        bkgd_color[2] = 216; //blue
+        bkgd_color[3] = 0; //alpha
+        ThemeMajor    = 0;
+        ThemeMinor    = 0;
+        ThemeRevision = 0;
 }
 ////////////////////////////////////////////////////////////
 theme* theme::Instance()
@@ -131,5 +134,44 @@ void theme::DoLightning()
     glLightfv(GL_LIGHT1, GL_POSITION,LightPosition);
     glEnable(GL_LIGHT1);
 */
+}
+////////////////////////////////////////////////////////////
+int theme::draw(Control* ctrl)
+{
+        if (ctrl != NULL)
+        {
+                Arcball* arcb = dynamic_cast<Arcball*>(ctrl);
+                if (arcb != NULL) return draw(arcb);
+                Button* button = dynamic_cast<Button*>(ctrl);
+                if (button != NULL) return draw(button);
+                ToggleButton* tbutton = dynamic_cast<ToggleButton*>(ctrl);
+                if (tbutton != NULL) return draw(tbutton);
+                TextButton* textbutton = dynamic_cast<TextButton*>(ctrl);
+                if (textbutton != NULL) return draw(textbutton);
+                //default : ask the widget to redisplay
+                ::XExposeEvent event;
+                event.x = ctrl->X();
+                event.y = ctrl->Y();
+                event.width = ctrl->Width();
+                event.height = ctrl->Height();
+                event.type = Expose;
+                return ctrl->AddEvent (&event);
+        }
+}
+////////////////////////////////////////////////////////////
+int theme::draw(Arcball* arcball)
+{
+}
+////////////////////////////////////////////////////////////
+int theme::draw(Button* button)
+{
+}
+////////////////////////////////////////////////////////////
+int theme::draw(ToggleButton* button)
+{
+}
+////////////////////////////////////////////////////////////
+int theme::draw(TextButton* button)
+{
 }
 

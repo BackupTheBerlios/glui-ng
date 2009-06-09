@@ -24,7 +24,6 @@ namespace GLUI
 		public:
 			//LiveInt value;
 		public:
-			void draw( void );
 			/**
 			  Create a new button.
 
@@ -42,6 +41,10 @@ namespace GLUI
 			void draw_pressed( void );
 			void common_init(void) ;
                 protected: //variable
+                        VertexObject* background;
+                        VertexObject* forground_no_pressed;
+                        VertexObject* forground_pressed;
+
 	};
 
 

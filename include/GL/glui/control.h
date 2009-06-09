@@ -121,8 +121,6 @@ namespace GLUI
             virtual void activate( int how )     { active = true; }
             virtual void deactivate( void )     { active = false; }
 
-            virtual void draw(void)=0;
-
             //event interfaces
             virtual int AddEvent (::XEvent* event);
             virtual int AddEvent (::XKeyEvent* event);
@@ -173,6 +171,7 @@ namespace GLUI
 
             bool CheckWidgetApiRevision(int Major, int Minor, int Revision);
         protected: //variables
+            bool dirty; ///< a component is dirty if some variable needed to display it 
             static Control* focussed;
             SizePolicy resizeable;
             Size CurrentSize;
