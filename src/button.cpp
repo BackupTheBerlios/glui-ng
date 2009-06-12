@@ -46,24 +46,10 @@ Button::Button( Node *parent, const char *name,
     this->resizeable = AdaptThisToFitChilds;
     parent->add_control( this );
 #warning "register on KeyPress, KeyRelease, ButtonPress, ButtonRelease, EnterNotify, LeaveNotify, MotionNotify"
-    this->background = 
 }
 
 /////////////////////////////////////////////////////////////////
-int AddEvent (::XResizeRequestEvent* event)
-{
-        Control::AddEvent(::event);
-        if (this->background != NULL ) delete this->background;
-        if (this->forground_no_pressed != NULL ) delete this->forground_no_pressed;
-        if (this->forground_pressed != NULL ) delete this->forground_pressed;
-
-        this->background = drawinghelpers::raised_box(this->Width(), this->Height(), 0, 3, GL_UNSIGNED_BYTE, blackbox);
-        this->forground_no_pressed =  drawinghelpers::raised_box(this->Width(), this->Height(), 0, 3, GL_UNSIGNED_BYTE, blackbox);
-        this->forground_pressed = drawinghelpers::raised_box(this->Width(), this->Height(), 0, 3, GL_UNSIGNED_BYTE, blackbox);
-}
-
-/////////////////////////////////////////////////////////////////
-int Button::AddEvent (::XEvent *event)
+int Button::AddEvent(::XEvent *event)
 {
     EventInterpreter::AddEvent(event);
 
@@ -77,23 +63,6 @@ int Button::AddEvent (::XEvent *event)
 
 }
 
-/********************************************** Button::draw() **********/
-
-void   Button::draw()
-{
-    /* TODO
-     * this shall use a VertexObject, that is updated (delete then create a new one) on size update
-    if (GetStatus() & EventInterpreter::buttonpressed)
-    {
-        drawinghelpers::draw_lowered_box( CurrentSize.size.w, CurrentSize.size.h );
-    }
-    else
-    {
-        drawinghelpers::draw_raised_box( CurrentSize.size.w, CurrentSize.size.h );
-    }
-    glTranslatef( 0.0, 0.0, level());
-    */
-}
 
 void Button::common_init(void) {
     CurrentSize.size.h            = GLUI_BUTTON_SIZE;

@@ -28,7 +28,6 @@
 #include <GL/glui/xwrapper.h>
 #include <GL/glui/event_handler.h>
 
-
 #define GLUI_CONTROL_MAX_THICKNESS 4
 
 namespace GLUI
@@ -36,6 +35,7 @@ namespace GLUI
     class LiveVariables;
     class Container;
     class theme;
+    class themeData;
 
     class GLUIAPI Control : public Node, public EventHandler
     {
@@ -171,7 +171,7 @@ namespace GLUI
 
             bool CheckWidgetApiRevision(int Major, int Minor, int Revision);
         protected: //variables
-            bool dirty; ///< a component is dirty if some variable needed to display it 
+            themeData* ThemeData;
             static Control* focussed;
             SizePolicy resizeable;
             Size CurrentSize;

@@ -1,7 +1,7 @@
 
 #define __STDC_LIMIT_MACROS
 #include <GL/gl.h>
-#include <GL/glui/drawinghelpers.h>
+#include <GL/glui/themes.h>
 #include <GL/glui/debug.h>
 #include <string.h>
 #include <GL/glui/container.h>

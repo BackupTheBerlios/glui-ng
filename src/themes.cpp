@@ -136,42 +136,46 @@ void theme::DoLightning()
 */
 }
 ////////////////////////////////////////////////////////////
-int theme::draw(Control* ctrl)
-{
-        if (ctrl != NULL)
-        {
-                Arcball* arcb = dynamic_cast<Arcball*>(ctrl);
-                if (arcb != NULL) return draw(arcb);
-                Button* button = dynamic_cast<Button*>(ctrl);
-                if (button != NULL) return draw(button);
-                ToggleButton* tbutton = dynamic_cast<ToggleButton*>(ctrl);
-                if (tbutton != NULL) return draw(tbutton);
-                TextButton* textbutton = dynamic_cast<TextButton*>(ctrl);
-                if (textbutton != NULL) return draw(textbutton);
-                //default : ask the widget to redisplay
-                ::XExposeEvent event;
-                event.x = ctrl->X();
-                event.y = ctrl->Y();
-                event.width = ctrl->Width();
-                event.height = ctrl->Height();
-                event.type = Expose;
-                return ctrl->AddEvent (&event);
-        }
-}
-////////////////////////////////////////////////////////////
-int theme::draw(Arcball* arcball)
-{
-}
-////////////////////////////////////////////////////////////
-int theme::draw(Button* button)
-{
-}
-////////////////////////////////////////////////////////////
-int theme::draw(ToggleButton* button)
-{
-}
-////////////////////////////////////////////////////////////
-int theme::draw(TextButton* button)
+int DefaultButtonTheme::draw()
 {
 }
 
+int DefaultButtonTheme::update()
+{
+        if (this->background != NULL ) delete this->background;
+        if (this->forground_no_pressed != NULL ) delete this->forground_no_pressed;
+        if (this->forground_pressed != NULL ) delete this->forground_pressed;
+
+        this->background = drawinghelpers::raised_box(this->Width(), this->Height(), 0, 3, GL_UNSIGNED_BYTE, blackbox);
+        this->forground_no_pressed =  drawinghelpers::raised_box(this->Width(), this->Height(), 0, 3, GL_UNSIGNED_BYTE, blackbox);
+        this->forground_pressed = drawinghelpers::raised_box(this->Width(), this->Height(), 0, 3, GL_UNSIGNED_BYTE, blackbox);
+
+}
+////////////////////////////////////////////////////////////
+int DefaultToggleButtonTheme::draw()
+{
+}
+int DefaultToggleButtonTheme::update()
+{
+}
+////////////////////////////////////////////////////////////
+int DefaultTextButtonTheme::draw()
+{
+}
+int DefaultTextButtonTheme::update()
+{
+}
+////////////////////////////////////////////////////////////
+int theme::draw()
+{
+}
+int theme::update()
+{
+}
+////////////////////////////////////////////////////////////
+int DefaultArcballTheme::draw()
+{
+}
+int DefaultArcballTheme::update()
+{
+}

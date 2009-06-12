@@ -42,6 +42,7 @@ parse_opts() {
 		default=$4
 		if [ -n "$default" ]; then
 			eval $var=$default
+                        conf_cache $var
 		fi
 	}
 
@@ -221,6 +222,9 @@ create_include() {
 create_makefile() {
         File=${1};
         shift;
+        for variable in ${MODIFIED_ENV}; do
+                eval echo "export ${variable}=\$${variable}" >> ${File};
+        done
         while [ "$#" -gt 0 ]; do
                 eval echo "export ${1}=\$${1}" >> ${File};
                 shift;
@@ -254,8 +258,8 @@ if which_result=$(${confiserie}/which.sh which); then
 else
     export WHICH="${confiserie}/which.sh"
 fi   &&
-run_init "$@"                                 &&
 runtest ${confiserie}/confiserie.cache.functions.sh &&
+run_init "$@"                                 &&
 find_topsrc_objdir                            &&
 runtest ${confiserie}/plateform_information.sh      &&
 runtest ${confiserie}/tools/test_echo.sh            &&

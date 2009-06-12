@@ -26,7 +26,6 @@
 
 */
 #include <GL/gl.h>
-#include <GL/glui/themes.h>
 #include <GL/glui/VertexObject.h>
 
 namespace GLUI

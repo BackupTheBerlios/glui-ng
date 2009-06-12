@@ -10,6 +10,9 @@
 progname=${0/*\//}
 confiserie=${0/\/$progname/}/confiserie
 
+
+CONFIGURE_OPTS[1]="--enable-headers-dep=,ENABLE_AUTODEPS,enable source dependency generation (disable to faster one shot compilation),no"
+
 #this funtion should clean the file you create with this script
 #it will be automatically done by init.sh
 custom_clean_on_sig() {
@@ -40,6 +43,6 @@ source ${confiserie}/init.sh "$@" &&
 export CC=${CXX}
 export libglui_VERSION=0.0.1
 
-create_makefile Makefile.confiserie TOPSRC_DIR OBJDIR confiserie INSTALL_PREFIX BIN_DIR SBIN_DIR LIB_DIR LIBEXEC_DIR SYS_CONF SHARED_DATA_DIR INCLUDE_DIR WHICH CXX CXXFLAGS CPPFLAGS CXX_LDFLAGS PKG_CONFIG_INSTALL_DIR  SHAREDLIBEXT STATICLIBEXT CC RANLIB ARFLAGS AR libglui_VERSION
+create_makefile Makefile.confiserie libglui_VERSION
 
 finish_confiserie

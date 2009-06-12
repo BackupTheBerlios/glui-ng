@@ -40,10 +40,6 @@ namespace GLUI
                         bool value;
 			void draw_pressed( void );
 			void common_init(void) ;
-                protected: //variable
-                        VertexObject* background;
-                        VertexObject* forground_no_pressed;
-                        VertexObject* forground_pressed;
 
 	};
 

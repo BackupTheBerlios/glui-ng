@@ -29,38 +29,92 @@
 
 */
 #include <GL/gl.h>
+#include <GL/glui/drawinghelpers.h>
+
 namespace GLUI
 {
- class Arcball;
- class Button;
- class ToggleButton;
- class TextButton;
+        class Control;
+        class Container;
+        class Arcball;
+        class Button;
+        class ToggleButton;
+        class TextButton;
 
-    class theme
-    {
-        public : //methods
-            static theme* Instance();
-            void FillglColorPointer(GLint size,       //< numbers of elements per colors (3=RGB 4=RGBA)
-                    GLenum type,                      //< type of the array to fill
-                    GLsizei stride,                   //< if the array is interlaved with vectors
-                    const GLvoid *pointer,            //< pointer to the array
-                    uint32_t count );                 //< numbers of colors entries
-            void DoLightning();
-             uint8_t* Get_bkgd_color();
-             int draw(Control* ctrl);
-            
-        protected : //variables
-             int draw(Arcball* arcball);
-             int draw(Button* button);
-             int draw(ToggleButton* button);
-             int draw(TextButton* button);
-            uint8_t    bkgd_color[4];
-             int ThemeMajor;
-             int ThemeMinor;
-             int ThemeRevision;
-        private : //methods
-            theme( void );
-    };
+        class theme
+        {
+                public : //methods
+                        static theme* Instance();
+                        void FillglColorPointer(GLint size,       //< numbers of elements per colors (3=RGB 4=RGBA)
+                                        GLenum type,                      //< type of the array to fill
+                                        GLsizei stride,                   //< if the array is interlaved with vectors
+                                        const GLvoid *pointer,            //< pointer to the array
+                                        uint32_t count );                 //< numbers of colors entries
+                        void DoLightning();
+                        uint8_t* Get_bkgd_color();
+                        int SetTheme(Control* ctrl);
+                        int SetTheme(Container* cont);
+
+                protected : //variables
+                        uint8_t    bkgd_color[4];
+                        int ThemeMajor;
+                        int ThemeMinor;
+                        int ThemeRevision;
+                private : //methods
+                        theme( void );
+        };
+
+        class themeData
+        {
+                public: //methods
+                        themeData(theme& TheTheme, Control* owner);
+                        virtual int draw() = 0;
+                        virtual int update() = 0;
+                private:
+                        themeData() {};
+        };
+
+        class DefaultButtonTheme : public themeData
+        {
+                public : //methods
+                        DefaultButtonTheme(theme& TheTheme, Button* owner);
+                        virtual int draw();
+                        virtual int update();
+                protected: //variable
+                        VertexObject* background;
+                        VertexObject* forground_no_pressed;
+                        VertexObject* forground_pressed;
+                        Button* owner;
+
+        };
+
+        class DefaultToggleButtonTheme : public themeData
+        {
+                public : //methods
+                        DefaultToggleButtonTheme(theme& TheTheme, ToggleButton* owner);
+                        virtual int draw();
+                        virtual int update();
+                protected: //variable
+
+        };
+
+
+        class DefaultTextButtonTheme : public themeData
+        {
+                public : //methods
+                        virtual int draw();
+                        virtual int update();
+                protected: //variable
+        };
+
+
+        class DefaultArcballTheme : public themeData
+        {
+                public : //methods
+                        virtual int draw();
+                        virtual int update();
+                protected: //variable
+        };
+
 
 
 }

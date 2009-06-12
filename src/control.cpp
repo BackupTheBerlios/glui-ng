@@ -38,6 +38,7 @@ misrepresented as being the original software.
 #include <GL/glui/control.h>
 #include <GL/gl.h>
 #include <GL/glui/window.h>
+#include <GL/glui/themes.h>
 using namespace GLUI;
 
 
@@ -172,7 +173,10 @@ int Control::AddEvent(::XExposeEvent *event)
     glPushMatrix();
     glLoadIdentity();
     glTranslatef(x + x_off_left, y + y_off_bot, BOTTOM_VIEWPORT + GLUI_CONTROL_MAX_THICKNESS * level());
-    theme::Instance()->draw(&this);
+    if (this->ThemeData != NULL)
+    {
+            this->ThemeData->draw();
+    }
     glPopMatrix();
     debug::Instance()->FlushGL();
 }
@@ -242,6 +246,8 @@ void Control::set_alignment(Alignement new_align)
     drawinghelpers::PostRedisplay(this);
 
 }
+
+
 
 
 /********* Control::~Control() **********/
@@ -315,7 +321,7 @@ int Control::SetMargins(int top, int bottom, int left, int right)
 
 }
 ////////////////////////////////////////////////////////////////////////
-bool CheckWidgetApiRevision(int Major, int Minor, int Revision)
+bool Control::CheckWidgetApiRevision(int Major, int Minor, int Revision)
 {
         if (Major != this->APIMajor) return false;
         if (Minor <  this->APIMinor) return false;
