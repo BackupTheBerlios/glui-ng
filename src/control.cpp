@@ -33,7 +33,6 @@ misrepresented as being the original software.
 
 #include <GL/glui/internal_control.h>
 #include <GL/glui/event_handler.h>
-#include <GL/glui/drawinghelpers.h>
 #include <GL/glui/debug.h>
 #include <GL/glui/control.h>
 #include <GL/gl.h>
@@ -108,7 +107,7 @@ int Control::set_size( Size sz, Size min)
         cont->update_size();
         cont->pack (0, 0);
     }
-    drawinghelpers::PostRedisplay(this);
+    ThemeData->update();
 }
 
 
@@ -133,7 +132,7 @@ void Control::enable()
     Control *node;
 
     enabled = true;
-    drawinghelpers::PostRedisplay(this);
+    ThemeData->update();
 
 #warning "this has nothing todo here, move to container class"
     /*** Now recursively enable all buttons below it ***/
@@ -154,8 +153,7 @@ void Control::disable()
 
     enabled = false;
 
-    drawinghelpers::PostRedisplay(this);
-
+    ThemeData->update();
 #warning "this has nothing todo here, move to container class"
     /*** Now recursively disable all buttons below it ***/
     node = (Control*) first_child();
@@ -243,8 +241,7 @@ void Control::set_alignment(Alignement new_align)
 {
     alignment = new_align;
 
-    drawinghelpers::PostRedisplay(this);
-
+    ThemeData->update();
 }
 
 

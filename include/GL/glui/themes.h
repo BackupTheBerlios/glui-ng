@@ -29,7 +29,6 @@
 
 */
 #include <GL/gl.h>
-#include <GL/glui/drawinghelpers.h>
 
 namespace GLUI
 {
@@ -69,6 +68,8 @@ namespace GLUI
                         themeData(theme& TheTheme, Control* owner);
                         virtual int draw() = 0;
                         virtual int update() = 0;
+                protected:
+                        Control* owner;
                 private:
                         themeData() {};
         };
@@ -76,7 +77,7 @@ namespace GLUI
         class DefaultButtonTheme : public themeData
         {
                 public : //methods
-                        DefaultButtonTheme(theme& TheTheme, Button* owner);
+                        DefaultButtonTheme(theme& TheTheme, Control* owner);
                         virtual int draw();
                         virtual int update();
                 protected: //variable
@@ -90,7 +91,7 @@ namespace GLUI
         class DefaultToggleButtonTheme : public themeData
         {
                 public : //methods
-                        DefaultToggleButtonTheme(theme& TheTheme, ToggleButton* owner);
+                        DefaultToggleButtonTheme(theme& TheTheme, Control* owner);
                         virtual int draw();
                         virtual int update();
                 protected: //variable
@@ -101,6 +102,7 @@ namespace GLUI
         class DefaultTextButtonTheme : public themeData
         {
                 public : //methods
+                        DefaultTextButtonTheme(theme& TheTheme, Control* owner);
                         virtual int draw();
                         virtual int update();
                 protected: //variable
@@ -110,25 +112,22 @@ namespace GLUI
         class DefaultArcballTheme : public themeData
         {
                 public : //methods
+                        DefaultArcballTheme(theme& TheTheme, Control* owner);
                         virtual int draw();
                         virtual int update();
                 protected: //variable
+        };
+
+        class DefaultTheme : public theme
+        {
+                public : 
+                        DefaultTheme();
         };
 
 
 
 }
 
-//IDEA :
-//a theme shall be provided as a plugin, this plugin contain a C entry with the name
-//GLUICLASS_new(), that is used to allocate a widget of the class GLUICLASS
-//example Button_new(), CheckBox_new()....
-//all container widgets that have child shall use theme->GLUICLASS_new() instead of new GLUICLASS
-//
-//IDEA :
-//the pointers to GLUICLASS_new() are always defined, if no entry can be resolved into the plugin
-//the default builtin widget is used.
-//
 //IDEA :
 //theme shall be singleton patern, the constructor shall use GLUI_THEME environment variable
 //
