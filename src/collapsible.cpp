@@ -31,7 +31,7 @@
 
 *****************************************************************************/
 #include <GL/glui/collapsible.h>
-#include <GL/glui/drawinghelpers.h>
+#include <GL/glui/themes.h>
 
 using namespace GLUI;
 
@@ -68,7 +68,7 @@ void    Collapsible::open( bool recurse )
 			node=node->next();
 		}
 	}
-    drawinghelpers::PostRedisplay(this);
+        ThemeData->update();
 
 }
 
@@ -100,6 +100,6 @@ void    Collapsible::close( bool recurse )
 			node=node->next();
 		}
 	}
-    drawinghelpers::PostRedisplay(this);
+        ThemeData->update();
 
 }

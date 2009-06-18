@@ -66,61 +66,70 @@
 
 namespace GLUI
 {
-    class _Window;
+        class _Window;
 
-    typedef long unsigned int WindowId;
-    enum ViewPort
-    {
-        BOTTOM_VIEWPORT=-1000,
-        TOP_VIEWPORT= BOTTOM_VIEWPORT + 500 * GLUI_CONTROL_MAX_THICKNESS
-    };
-
-
-    class _Screen
-    {
-        public :
-            virtual int Depth()               =0;
-            virtual WindowId RootWindow()     =0;
-    };
-
-    class _Display
-    {
-        public :
-            virtual _Screen* DefaultScreen()  =0;
-            int DefaultVisual();
-        protected :
-            _Display();
-    };
+        typedef long unsigned int WindowId;
+        enum ViewPort
+        {
+                BOTTOM_VIEWPORT=-1000,
+                TOP_VIEWPORT= BOTTOM_VIEWPORT + 500 * GLUI_CONTROL_MAX_THICKNESS
+        };
 
 
-    class _Window : public Container
-    {
-        public :
-             _Window(const char *name,
-                    Container::orientation orient=Container::TopDown);
-            virtual int AddEvent (::XEvent *event)=0;
-        public :  //operators
-            void  set_ortho_projection( void );
-            void  set_viewport( void );
-        public : //XMethods
-            virtual void XMapWindow()=0;
-            virtual void XMapRaised()=0;
-            virtual void XMapSubwindows()=0;
-            virtual void XUnmapWindow()=0;
-            virtual void XUnmapSubwindows()=0;
-            virtual KeySym XLookupKeysym(::XKeyEvent *key_event, int index)=0; //a KeySym is a 32bit not unicode char
-            static  uint32_t KeySymToUcs4(KeySym keysym);
+        class _Screen
+        {
+                public :
+                        virtual int Depth()               =0;
+                        virtual WindowId RootWindow()     =0;
+        };
 
-             void SetViewport(void);
+        class _Display
+        {
+                public :
+                        virtual _Screen* DefaultScreen()  =0;
+                        int DefaultVisual();
+                protected :
+                        _Display();
+        };
 
-        protected :
-            _Window();
 
-            long flags;
-            int  SetCurrentDrawBuffer( void );
-            void  SetOrthoProjection( void );
+        class _Window : public Container
+        {
+                public : //types
+                        enum buffer_mode_t
+                        {
+                                buffer_front=1, ///< Draw updated controls directly to screen.
+                                buffer_back=2   ///< Double buffering: postpone updates until next redraw.
+                        };
 
-    };
+
+                public :
+                        _Window(const char *name,
+                                        Container::orientation orient=Container::TopDown);
+                        virtual int AddEvent (::XEvent *event)=0;
+                        static buffer_mode_t get_buffer_mode();
+                public :  //operators
+                        void  set_ortho_projection( void );
+                        void  set_viewport( void );
+                public : //XMethods
+                        virtual void XMapWindow()=0;
+                        virtual void XMapRaised()=0;
+                        virtual void XMapSubwindows()=0;
+                        virtual void XUnmapWindow()=0;
+                        virtual void XUnmapSubwindows()=0;
+                        virtual KeySym XLookupKeysym(::XKeyEvent *key_event, int index)=0; //a KeySym is a 32bit not unicode char
+                        static  uint32_t KeySymToUcs4(KeySym keysym);
+
+                        void SetViewport(void);
+
+                protected :
+                        _Window();
+
+                        long flags;
+                        int  SetCurrentDrawBuffer( void );
+                        void  SetOrthoProjection( void );
+
+        };
 
 
 

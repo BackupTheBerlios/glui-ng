@@ -27,8 +27,9 @@
 */
 
 #include <GL/glui/window.h>
-#include <GL/glui/drawinghelpers.h>
 #include <GL/gl.h>
+#include <stdlib.h>
+#include <string.h>
 using namespace GLUI;
 
 /*_Display::operator ::Display*()
@@ -57,14 +58,20 @@ int _Window::SetCurrentDrawBuffer( void )
     GLint state;
     glGetIntegerv( GL_DRAW_BUFFER, &state );
     /* Switch to new buffer */
-    switch (drawinghelpers::get_buffer_mode()) {
-        case drawinghelpers::buffer_front: glDrawBuffer(GL_FRONT); break;
-        case drawinghelpers::buffer_back:  glDrawBuffer(GL_BACK);  break; /* might not be needed... */
+    switch (get_buffer_mode()) {
+        case buffer_front: glDrawBuffer(GL_FRONT); break;
+        case buffer_back:  glDrawBuffer(GL_BACK);  break; /* might not be needed... */
     }
     return (int)state;
 }
 
-
+/////////////////////////////////////////////////////////////////////////////
+_Window::buffer_mode_t _Window::get_buffer_mode() {
+    char* bufferModeEnv = getenv("GLUI_BUFFER_MODE");
+    if ( bufferModeEnv != NULL &&
+            0 ==  strcmp(bufferModeEnv, "buffer_front") ) return buffer_front;
+    else return buffer_back;
+}
 /******************************* GLUI_Main::set_ortho_projection() **********/
 
 void  _Window::SetOrthoProjection( void )

@@ -32,6 +32,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include <GL/glui/button.h>
 #include <GL/glui/MasterObject.h>
 #include <GL/glui/window.h>
+#include <GL/glui/themes.h>
 
 using namespace GLUI;
 /****************************** Button::Button() **********/

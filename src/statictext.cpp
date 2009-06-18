@@ -33,8 +33,8 @@
 
 #include <GL/glui/statictext.h>
 #include <GL/glui/debug.h>
-#include <GL/glui/drawinghelpers.h>
 #include <GL/glui/window.h>
+#include <GL/glui/themes.h>
 
 using namespace GLUI;
 ///////////////////////////////////////////////////////////////////////////////
@@ -54,7 +54,7 @@ StaticText::StaticText( Node *parent, const char *name )
 void    StaticText::draw( )
 {
 
-    drawinghelpers::draw_box(Width(), Height()); //erase text
+//    drawinghelpers::draw_box(Width(), Height()); //erase text
   glColor3ubv( Color );
   glRasterPos3f(0.0, 0.0, 0.1);
   //glRasterPos store the color and translate, since glut drawing routine use
@@ -68,7 +68,7 @@ void    StaticText::draw( )
 void    StaticText::set_text(const char *text )
 {
     *(dynamic_cast<std::string*>(this)) = text;
-    drawinghelpers::PostRedisplay(this);
+    ThemeData->update();
 }
 
 

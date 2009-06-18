@@ -23,14 +23,18 @@
 
 */
 #include <GL/glui/themes.h>
-#include <GL/glui/drawinghelpers.h>
+#include <GL/glui/DefaultTheme.h>
 #include <string.h>
 #include <stdint.h>
 
 using namespace GLUI;
 
 ////////////////////////////////////////////////////////////
-void theme::FillglColorPointer(GLint size,
+// fill a array of pixels with the same color
+// a color is a pointer to an array of uint8_t
+void theme::FillglColorPointer(
+        uint8_t *inColor,
+        GLint size,
         GLenum type,
         GLsizei stride,
         const GLvoid *pointer,
@@ -84,17 +88,14 @@ void theme::FillglColorPointer(GLint size,
         }
 
 
-        drawinghelpers::ConvertglColorPointer(size, GL_UNSIGNED_BYTE, bkgd_color, type, CurrentPos);
+        ConvertglColorPointer(size, GL_UNSIGNED_BYTE, inColor, type, CurrentPos);
     }
     return;
 }
 ////////////////////////////////////////////////////////////
 theme::theme()
 {
-        bkgd_color[0] = 236; //red
-        bkgd_color[1] = 233; //green
-        bkgd_color[2] = 216; //blue
-        bkgd_color[3] = 0; //alpha
+
         ThemeMajor    = 0;
         ThemeMinor    = 0;
         ThemeRevision = 0;
@@ -106,76 +107,299 @@ theme* theme::Instance()
 	return &TheTheme;
 }
 ////////////////////////////////////////////////////////////
-uint8_t* theme::Get_bkgd_color()
-{
-#warning "protect this with a const cast"
-    return bkgd_color;
-}
-////////////////////////////////////////////////////////////
-void theme::GetVersion(uint32_t* Major, uint32_t* Minor, uint32_t* revision)
-{
-    *Major = 0;
-    *Minor = 0;
-    *revision = 0;
-}
-////////////////////////////////////////////////////////////
-void theme::DoLightning()
-{
-#warning "glPushAttrib"
-/*    glDisable ( GL_LIGHTING );
 
-    //< http://jerome.jouvie.free.fr/OpenGl/Tutorials/Tutorial13.php
-    glEnable ( GL_LIGHTING );
-    GLfloat LightAmbient[]= { 0.5f, 0.5f, 0.5f, 1.0f };
-    GLfloat LightDiffuse[]= { 0.2f, 0.5f, 0.5f, 1.0f };
-    GLfloat LightPosition[]= { 1.0f, 1.0f, 1.0f, 0.0f };
-    glLightfv(GL_LIGHT1, GL_AMBIENT, LightAmbient);
-    glLightfv(GL_LIGHT1, GL_DIFFUSE, LightDiffuse);
-    glLightfv(GL_LIGHT1, GL_POSITION,LightPosition);
-    glEnable(GL_LIGHT1);
-*/
-}
-////////////////////////////////////////////////////////////
-int DefaultButtonTheme::draw()
+////////////////////////////////////////////////////////////////////////////
+// convert a pointer to a pixel color type to another type
+// a pixel is an array of components (RGB or RGBA)
+void theme::ConvertglColorPointer(GLint size, //<  how many components 3 (RGB) or 4(RGBA)
+                    GLenum intype,  //< type of the input
+                    const GLvoid *inpointer, //< pointer of the datas
+                    GLenum outype,  //< type of the output
+                    const GLvoid *outpointer  //<pointer to the outputdata
+                    )
 {
+    if (!(
+                (size >= 3 || size <= 4) &&
+                (intype == GL_BYTE           ||
+                 intype == GL_UNSIGNED_BYTE  ||
+                 intype == GL_SHORT          ||
+                 intype == GL_UNSIGNED_SHORT ||
+                 intype == GL_INT            ||
+                 intype == GL_UNSIGNED_INT   ||
+                 intype == GL_FLOAT          ||
+                 intype == GL_DOUBLE)    &&
+                (outype == GL_BYTE           ||
+                 outype == GL_UNSIGNED_BYTE  ||
+                 outype == GL_SHORT          ||
+                 outype == GL_UNSIGNED_SHORT ||
+                 outype == GL_INT            ||
+                 outype == GL_UNSIGNED_INT   ||
+                 outype == GL_FLOAT          ||
+                 outype == GL_DOUBLE)    &&
+                ( inpointer != NULL )    &&
+                ( outpointer != NULL )
+         )
+         )
+         {
+        throw(GL_INVALID_VALUE);
+    }
+    double colorelem[4];
+    colorelem[3] = 0.0;
+    switch (intype)
+    {
+        case GL_BYTE :
+            {
+                int8_t *bkgd_color = (int8_t*) inpointer;
+                colorelem[0] = (double)bkgd_color[0] * 1.0 / INT8_MAX;
+                colorelem[1] = (double)bkgd_color[1] * 1.0 / INT8_MAX;
+                colorelem[2] = (double)bkgd_color[2] * 1.0 / INT8_MAX;
+                if (size==4) colorelem[3] = (double)bkgd_color[3] * 1.0 / INT8_MAX;
+            }
+            break;
+        case GL_UNSIGNED_BYTE :
+            {
+                uint8_t *bkgd_color = (uint8_t*) inpointer;
+                colorelem[0] = (double)bkgd_color[0] * 1.0 / UINT8_MAX;
+                colorelem[1] = (double)bkgd_color[1] * 1.0 / UINT8_MAX;
+                colorelem[2] = (double)bkgd_color[2] * 1.0 / UINT8_MAX;
+                if (size==4) colorelem[3] = (double)bkgd_color[3] * 1.0 / UINT8_MAX;
+            }
+            break;
+        case GL_SHORT:
+            {
+                int16_t *bkgd_color = (int16_t*) inpointer;
+                colorelem[0] = (double)bkgd_color[0] * 1.0 / INT16_MAX;
+                colorelem[1] = (double)bkgd_color[1] * 1.0 / INT16_MAX;
+                colorelem[2] = (double)bkgd_color[2] * 1.0 / INT16_MAX;
+                if (size==4) colorelem[3] = (double)bkgd_color[3] * 1.0 / INT16_MAX;
+            }
+            break;
+        case GL_UNSIGNED_SHORT:
+            {
+                uint16_t *bkgd_color = (uint16_t*) inpointer;
+                colorelem[0] = (double)bkgd_color[0] * 1.0 / UINT16_MAX;
+                colorelem[1] = (double)bkgd_color[1] * 1.0 / UINT16_MAX;
+                colorelem[2] = (double)bkgd_color[2] * 1.0 / UINT16_MAX;
+                if (size==4) colorelem[3] = (double)bkgd_color[3] * 1.0 / UINT16_MAX;
+            }
+            break;
+        case GL_INT:
+            {
+                int32_t *bkgd_color = (int32_t*) inpointer;
+                colorelem[0] = (double)bkgd_color[0] * 1.0 / INT32_MAX;
+                colorelem[1] = (double)bkgd_color[1] * 1.0 / INT32_MAX;
+                colorelem[2] = (double)bkgd_color[2] * 1.0 / INT32_MAX;
+                if (size==4) colorelem[3] = (double)bkgd_color[3] * 1.0 / INT32_MAX;
+            }
+            break;
+        case GL_UNSIGNED_INT:
+            {
+                uint32_t *bkgd_color = (uint32_t*) inpointer;
+                colorelem[0] = (double)bkgd_color[0] * 1.0 / UINT32_MAX;
+                colorelem[1] = (double)bkgd_color[1] * 1.0 / UINT32_MAX;
+                colorelem[2] = (double)bkgd_color[2] * 1.0 / UINT32_MAX;
+                if (size==4) colorelem[3] = (double)bkgd_color[3] * 1.0 / UINT32_MAX;
+            }
+            break;
+        case GL_FLOAT:
+            {
+                float *bkgd_color = (float*) inpointer;
+                colorelem[0] = (double)bkgd_color[0];
+                colorelem[1] = (double)bkgd_color[1];
+                colorelem[2] = (double)bkgd_color[2];
+                if (size==4) colorelem[3] = (double)bkgd_color[3];
+            }
+            break;
+        case GL_DOUBLE:
+            {
+                double *bkgd_color = (double*) inpointer;
+                colorelem[0] = (double)bkgd_color[0];
+                colorelem[1] = (double)bkgd_color[1];
+                colorelem[2] = (double)bkgd_color[2];
+                if (size==4) colorelem[3] = (double)bkgd_color[3];
+            }
+            break;
+        default:
+            throw(GL_INVALID_VALUE);
+    }
+    switch (outype)
+    {
+        case GL_BYTE :
+            {
+                int8_t *bkgd_color = (int8_t*) outpointer;
+                bkgd_color[0] = (int8_t)(colorelem[0] * INT8_MAX);
+                bkgd_color[1] = (int8_t)(colorelem[1] * INT8_MAX);
+                bkgd_color[2] = (int8_t)(colorelem[2] * INT8_MAX);
+                if (size==4) bkgd_color[3] = (int8_t)(colorelem[3] * INT8_MAX);
+            }
+            break;
+        case GL_UNSIGNED_BYTE :
+            {
+                uint8_t *bkgd_color = (uint8_t*) outpointer;
+                bkgd_color[0] = (uint8_t)(colorelem[0] * UINT8_MAX);
+                bkgd_color[1] = (uint8_t)(colorelem[1] * UINT8_MAX);
+                bkgd_color[2] = (uint8_t)(colorelem[2] * UINT8_MAX);
+                if (size==4) bkgd_color[3] = (uint8_t)(colorelem[3] * UINT8_MAX);
+            }
+            break;
+        case GL_SHORT:
+            {
+                int16_t *bkgd_color = (int16_t*) outpointer;
+                bkgd_color[0] = (int16_t)(colorelem[0] * INT16_MAX);
+                bkgd_color[1] = (int16_t)(colorelem[1] * INT16_MAX);
+                bkgd_color[2] = (int16_t)(colorelem[2] * INT16_MAX);
+                if (size==4) bkgd_color[3] = (int16_t)(colorelem[3] * INT16_MAX);
+            }
+            break;
+        case GL_UNSIGNED_SHORT:
+            {
+                uint16_t *bkgd_color = (uint16_t*) outpointer;
+                bkgd_color[0] = (uint16_t)(colorelem[0] * UINT16_MAX);
+                bkgd_color[1] = (uint16_t)(colorelem[1] * UINT16_MAX);
+                bkgd_color[2] = (uint16_t)(colorelem[2] * UINT16_MAX);
+                if (size==4) bkgd_color[3] = (uint16_t)(colorelem[3] * UINT16_MAX);
+            }
+            break;
+        case GL_INT:
+            {
+                int32_t *bkgd_color = (int32_t*) outpointer;
+                bkgd_color[0] = (int32_t)(colorelem[0] * INT32_MAX);
+                bkgd_color[1] = (int32_t)(colorelem[1] * INT32_MAX);
+                bkgd_color[2] = (int32_t)(colorelem[2] * INT32_MAX);
+                if (size==4) bkgd_color[3] = (int32_t)(colorelem[3] * INT32_MAX);
+            }
+            break;
+        case GL_UNSIGNED_INT:
+            {
+                uint32_t *bkgd_color = (uint32_t*) outpointer;
+                bkgd_color[0] = (uint32_t)(colorelem[0] * UINT32_MAX);
+                bkgd_color[1] = (uint32_t)(colorelem[1] * UINT32_MAX);
+                bkgd_color[2] = (uint32_t)(colorelem[2] * UINT32_MAX);
+                if (size==4) bkgd_color[3] = (uint32_t)(colorelem[3] * UINT32_MAX);
+            }
+            break;
+        case GL_FLOAT:
+            {
+                float *bkgd_color = (float*) outpointer;
+                bkgd_color[0] = (float)colorelem[0];
+                bkgd_color[1] = (float)colorelem[1];
+                bkgd_color[2] = (float)colorelem[2];
+                if (size==4) bkgd_color[3] = (float)colorelem[3];
+            }
+            break;
+        case GL_DOUBLE:
+            {
+                double *bkgd_color = (double*) outpointer;
+                bkgd_color[0] = (double)colorelem[0];
+                bkgd_color[1] = (double)colorelem[1];
+                bkgd_color[2] = (double)colorelem[2];
+                if (size==4) bkgd_color[3] = (double)colorelem[3];
+            }
+            break;
+        default:
+            throw(GL_INVALID_VALUE);
+    }
 }
 
-int DefaultButtonTheme::update()
+////////////////////////////////////////////////////////////////////////////
+// convert an array of pixels from one type into another
+// a pixel is an array of components (RGB or RGBA)
+void theme::ConvertglColorArray(
+                    GLint size, //<  how many components 3 (RGB) or 4(RGBA)
+                    GLenum intype,  //< type of the input
+                    const GLvoid *inpointer, //< pointer of the datas
+                    GLenum outype,  //< type of the output
+                    const GLvoid *outpointer,  //<pointer to the outputdata
+                    uint32_t count //< count of the numbers of elements in the array (an element in 3 or 4 components)
+                    )
 {
-        if (this->background != NULL ) delete this->background;
-        if (this->forground_no_pressed != NULL ) delete this->forground_no_pressed;
-        if (this->forground_pressed != NULL ) delete this->forground_pressed;
+    if (!(
+                (size >= 3 || size <= 4) &&
+                (intype == GL_BYTE           ||
+                 intype == GL_UNSIGNED_BYTE  ||
+                 intype == GL_SHORT          ||
+                 intype == GL_UNSIGNED_SHORT ||
+                 intype == GL_INT            ||
+                 intype == GL_UNSIGNED_INT   ||
+                 intype == GL_FLOAT          ||
+                 intype == GL_DOUBLE)    &&
+                (outype == GL_BYTE           ||
+                 outype == GL_UNSIGNED_BYTE  ||
+                 outype == GL_SHORT          ||
+                 outype == GL_UNSIGNED_SHORT ||
+                 outype == GL_INT            ||
+                 outype == GL_UNSIGNED_INT   ||
+                 outype == GL_FLOAT          ||
+                 outype == GL_DOUBLE)    &&
+                ( inpointer != NULL )    &&
+                ( outpointer != NULL )
+         )
+         )
+           {
+             throw(GL_INVALID_VALUE);
+           }
 
-        this->background = drawinghelpers::raised_box(this->Width(), this->Height(), 0, 3, GL_UNSIGNED_BYTE, blackbox);
-        this->forground_no_pressed =  drawinghelpers::raised_box(this->Width(), this->Height(), 0, 3, GL_UNSIGNED_BYTE, blackbox);
-        this->forground_pressed = drawinghelpers::raised_box(this->Width(), this->Height(), 0, 3, GL_UNSIGNED_BYTE, blackbox);
+    void *CurrentInPos;
+    void *CurrentOutPos;
+    for (uint32_t i=0; i<count; i++)
+    {
+        switch (intype)
+        {
+            case GL_BYTE:
+                CurrentInPos = (void*)(((int8_t *) inpointer ) + i * size);
+                break;
+            case GL_SHORT:
+                CurrentInPos = (void*)(((int16_t *) inpointer ) + i * size);
+                break;
+            case GL_INT:
+                CurrentInPos = (void*)(((int32_t *) inpointer ) + i * size);
+                break;
+            case GL_UNSIGNED_BYTE:
+                CurrentInPos = (void*)(((uint8_t *) inpointer ) + i * size);
+                break;
+            case GL_UNSIGNED_SHORT:
+                CurrentInPos = (void*)(((uint16_t *) inpointer ) + i * size);
+                break;
+            case GL_UNSIGNED_INT:
+                CurrentInPos = (void*)(((uint32_t *) inpointer ) + i * size);
+                break;
+            case GL_FLOAT:
+                CurrentInPos = (void*)(((float *) inpointer ) + i * size);
+                break;
+            case GL_DOUBLE:
+                CurrentInPos = (void*)(((double *) inpointer ) + i * size);
+                break;
+        }
+        switch (outype)
+        {
+            case GL_BYTE:
+                CurrentOutPos = (void*)(((int8_t *) outpointer ) + i * size);
+                break;
+            case GL_SHORT:
+                CurrentOutPos = (void*)(((int16_t *) outpointer ) + i * size);
+                break;
+            case GL_INT:
+                CurrentOutPos = (void*)(((int32_t *) outpointer ) + i * size);
+                break;
+            case GL_UNSIGNED_BYTE:
+                CurrentOutPos = (void*)(((uint8_t *) outpointer ) + i * size);
+                break;
+            case GL_UNSIGNED_SHORT:
+                CurrentOutPos = (void*)(((uint16_t *) outpointer ) + i * size);
+                break;
+            case GL_UNSIGNED_INT:
+                CurrentOutPos = (void*)(((uint32_t *) outpointer ) + i * size);
+                break;
+            case GL_FLOAT:
+                CurrentOutPos = (void*)(((float *) outpointer ) + i * size);
+                break;
+            case GL_DOUBLE:
+                CurrentOutPos = (void*)(((double *) outpointer ) + i * size);
+                break;
+        }
+        ConvertglColorPointer(size, intype, CurrentInPos, outype, CurrentOutPos);
+    }
+    return;
 
 }
-////////////////////////////////////////////////////////////
-int DefaultToggleButtonTheme::draw()
-{
-}
-int DefaultToggleButtonTheme::update()
-{
-}
-////////////////////////////////////////////////////////////
-int DefaultTextButtonTheme::draw()
-{
-}
-int DefaultTextButtonTheme::update()
-{
-}
-////////////////////////////////////////////////////////////
-int theme::draw()
-{
-}
-int theme::update()
-{
-}
-////////////////////////////////////////////////////////////
-int DefaultArcballTheme::draw()
-{
-}
-int DefaultArcballTheme::update()
-{
-}
+

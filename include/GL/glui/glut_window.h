@@ -44,7 +44,6 @@
   of GLUI.
   */
 #include <GL/glui/window.h>
-#include <GL/glui/drawinghelpers.h>
 namespace GLUI
 {
     class GlutDisplay;

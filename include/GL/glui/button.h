@@ -35,10 +35,10 @@ namespace GLUI
 			Button( Node *parent, const char *name,
 					int id=-1, CB cb=CB() );
 			virtual int AddEvent(::XEvent *event);
+                        bool GetValue();
 
 		protected:
                         bool value;
-			void draw_pressed( void );
 			void common_init(void) ;
 
 	};

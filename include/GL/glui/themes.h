@@ -34,96 +34,58 @@ namespace GLUI
 {
         class Control;
         class Container;
-        class Arcball;
-        class Button;
-        class ToggleButton;
-        class TextButton;
 
         class theme
         {
                 public : //methods
                         static theme* Instance();
-                        void FillglColorPointer(GLint size,       //< numbers of elements per colors (3=RGB 4=RGBA)
-                                        GLenum type,                      //< type of the array to fill
-                                        GLsizei stride,                   //< if the array is interlaved with vectors
-                                        const GLvoid *pointer,            //< pointer to the array
-                                        uint32_t count );                 //< numbers of colors entries
-                        void DoLightning();
-                        uint8_t* Get_bkgd_color();
                         int SetTheme(Control* ctrl);
                         int SetTheme(Container* cont);
 
                 protected : //variables
-                        uint8_t    bkgd_color[4];
                         int ThemeMajor;
                         int ThemeMinor;
                         int ThemeRevision;
-                private : //methods
+                protected :
                         theme( void );
+                        void FillglColorPointer(
+                                        uint8_t *inColor, //< array of 4 uint8_t color elements
+                                        GLint size,       //< numbers of elements per colors (3=RGB 4=RGBA)
+                                        GLenum type,                      //< type of the array to fill
+                                        GLsizei stride,                   //< if the array is interlaved with vectors
+                                        const GLvoid *pointer,            //< pointer to the array
+                                        uint32_t count );                 //< numbers of colors entries
+                        static void ConvertglColorPointer(
+                                        GLint size, //<  how many components 3 (RGB) or 4(RGBA)
+                                        GLenum intype,  //< type of the input
+                                        const GLvoid *inpointer, //< pointer of the datas
+                                        GLenum outype,  //< type of the output
+                                        const GLvoid *outpointer  //<pointer to the outputdata
+                                        );
+                        static void ConvertglColorArray(
+                                        GLint size, //<  how many components 3 (RGB) or 4(RGBA)
+                                        GLenum intype,  //< type of the input
+                                        const GLvoid *inpointer, //< pointer of the datas
+                                        GLenum outype,  //< type of the output
+                                        const GLvoid *outpointer,  //<pointer to the outputdata
+                                        uint32_t count //< count of the numbers of elements in the array (an element in 3 or 4 components)
+                                        );
         };
 
         class themeData
         {
                 public: //methods
-                        themeData(theme& TheTheme, Control* owner);
+                        themeData(Control& owner);
                         virtual int draw() = 0;
                         virtual int update() = 0;
                 protected:
-                        Control* owner;
+                        Control& owner;
                 private:
-                        themeData() {};
-        };
-
-        class DefaultButtonTheme : public themeData
-        {
-                public : //methods
-                        DefaultButtonTheme(theme& TheTheme, Control* owner);
-                        virtual int draw();
-                        virtual int update();
-                protected: //variable
-                        VertexObject* background;
-                        VertexObject* forground_no_pressed;
-                        VertexObject* forground_pressed;
-                        Button* owner;
-
-        };
-
-        class DefaultToggleButtonTheme : public themeData
-        {
-                public : //methods
-                        DefaultToggleButtonTheme(theme& TheTheme, Control* owner);
-                        virtual int draw();
-                        virtual int update();
-                protected: //variable
-
+                        themeData();
         };
 
 
-        class DefaultTextButtonTheme : public themeData
-        {
-                public : //methods
-                        DefaultTextButtonTheme(theme& TheTheme, Control* owner);
-                        virtual int draw();
-                        virtual int update();
-                protected: //variable
-        };
-
-
-        class DefaultArcballTheme : public themeData
-        {
-                public : //methods
-                        DefaultArcballTheme(theme& TheTheme, Control* owner);
-                        virtual int draw();
-                        virtual int update();
-                protected: //variable
-        };
-
-        class DefaultTheme : public theme
-        {
-                public : 
-                        DefaultTheme();
-        };
-
+ 
 
 
 }
