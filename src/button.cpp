@@ -70,6 +70,10 @@ void Button::common_init(void) {
     alignment    = Control::CENTER;
 }
 
+bool Button::GetValue()
+{
+        return value;
+}
 
 TextButton::TextButton (Node *parent, const char *name,
         int id, CB cb ) :

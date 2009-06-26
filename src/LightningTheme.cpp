@@ -20,7 +20,9 @@ int LigthningWindowTheme::draw()
     glEnable(GL_LIGHT1);
 */
 }
-
+int LigthningWindowTheme::update()
+{
+}
 /////////////////////////////////////////////////////////////////////////
 VertexObject* LigthningTheme::raised_box( uint32_t w, uint32_t h, uint32_t thickness, uint8_t size, GLenum intype, void *color_array)
 {
