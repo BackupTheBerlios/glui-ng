@@ -49,7 +49,7 @@ namespace GLUI
                         int ThemeRevision;
                 protected :
                         theme( void );
-                        ~theme();
+                        virtual ~theme();
                         void FillglColorPointer(
                                         uint8_t *inColor, //< array of 4 uint8_t color elements
                                         GLint size,       //< numbers of elements per colors (3=RGB 4=RGBA)
@@ -81,7 +81,7 @@ namespace GLUI
         {
                 public: //methods
                         themeData(Control& owner, theme* NewTheme);
-                        ~themeData();
+                        virtual ~themeData();
                         virtual int draw()=0;
                         virtual int update()=0;
                 protected:
