@@ -110,6 +110,12 @@ int Control::set_size( Size sz, Size min)
     ThemeData->update();
 }
 
+///////////////////////////////////////////////////////////////////////////////////////
+int Control::UpdateTheme( void )
+{
+        return theme::SetTheme(*this);
+
+}
 
 /*************************** Drawing Utility routines *********************/
 
@@ -252,6 +258,7 @@ void Control::set_alignment(Alignement new_align)
 Control::~Control()
 {
     if (focussed == this) focussed = NULL;
+    delete this->ThemeData;
 }
 
 Control::Control(const char* name) : Node(name)
@@ -273,6 +280,7 @@ Control::Control(const char* name) : Node(name)
     APIMajor       = 0;
     APIMinor       = 0;
     APIRevision    = 0;
+    theme::SetTheme(*this);
 
 }
 

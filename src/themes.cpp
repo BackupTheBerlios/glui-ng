@@ -24,10 +24,67 @@
 */
 #include <GL/glui/themes.h>
 #include <GL/glui/DefaultTheme.h>
+#include <GL/glui/Control.h>
+#include <GL/glui/Exception.h>
 #include <string.h>
 #include <stdint.h>
+#include <stdlib.h>
+
 
 using namespace GLUI;
+//////////////////////////////////////////////////////////////////////////
+theme* theme::TheTheme = NULL;
+int theme::InstanceCounter = 0;
+////////////////////////////////////////////////////////////
+int theme::SetTheme(Control& ctrl)
+{
+        if ( NULL == TheTheme )
+        {
+                if (NULL != getenv("GLUI_THEME"))
+                {
+                        //todo dlopen the theme,
+                        // get the handle,
+                        // update currentTheme
+                }
+                else
+                {
+                        TheTheme = new DefaultTheme;
+                }
+        }
+        InstanceCounter ++;
+        if (ctrl.ThemeData != NULL)
+        {
+                delete ctrl.ThemeData;
+                ctrl.ThemeData = NULL;
+        }
+        ctrl.ThemeData = TheTheme->GetData(ctrl);
+}
+////////////////////////////////////////////////////////////
+void theme::Release()
+{
+        InstanceCounter --;
+        if (0 == InstanceCounter )
+        {
+                delete TheTheme;
+                TheTheme = NULL;
+        }
+}
+////////////////////////////////////////////////////////////
+theme::theme()
+{
+
+        ThemeMajor    = 0;
+        ThemeMinor    = 0;
+        ThemeRevision = 0;
+}
+////////////////////////////////////////////////////////////
+theme::~theme()
+{
+        if (InstanceCounter != 0)
+        {
+                throw new Exception(-1, "deleting the theme singleton while still have users");
+        }
+}
 
 ////////////////////////////////////////////////////////////
 // fill a array of pixels with the same color
@@ -92,22 +149,6 @@ void theme::FillglColorPointer(
     }
     return;
 }
-////////////////////////////////////////////////////////////
-theme::theme()
-{
-
-        ThemeMajor    = 0;
-        ThemeMinor    = 0;
-        ThemeRevision = 0;
-}
-////////////////////////////////////////////////////////////
-theme* theme::Instance()
-{
-	static DefaultTheme TheTheme;
-	return &TheTheme;
-}
-////////////////////////////////////////////////////////////
-
 ////////////////////////////////////////////////////////////////////////////
 // convert a pointer to a pixel color type to another type
 // a pixel is an array of components (RGB or RGBA)
@@ -402,4 +443,25 @@ void theme::ConvertglColorArray(
     return;
 
 }
+//////////////////////////////////////////////////////////////////////////
+
+
+themeData::themeData(Control& owner, theme* NewTheme) : TheOwner(owner)
+{
+        if (NewTheme == NULL  )
+        {
+                throw new Exception(EINVAL, "trying to set a NULL theme");
+        }
+        TheTheme = NewTheme;
+//        TheOwner = owner;
+
+}
+
+themeData::~themeData()
+{
+        TheTheme->Release();
+        TheTheme = NULL;
+}
+
+
 

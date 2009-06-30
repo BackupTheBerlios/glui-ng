@@ -2,12 +2,13 @@
 #include <GL/glui/Container.h>
 #include <GL/glui/VertexObject.h>
 #include <GL/glui/button.h>
+#include <GL/glui/arcball.h>
 
 using namespace GLUI;
 ////////////////////////////////////////////////////////////
 int DefaultButtonTheme::draw()
 {
-        if (((Button&)owner).GetValue())
+        if (((Button&)TheOwner).GetValue())
         {
                 this->pressed->draw();
         }
@@ -22,8 +23,8 @@ int DefaultButtonTheme::update()
         if (this->un_pressed != NULL ) delete this->un_pressed;
         if (this->pressed != NULL ) delete this->pressed;
 
-        this->un_pressed =  TheTheme.lowered_box(owner.Width(), owner.Height());
-        this->pressed = TheTheme.raised_box(owner.Width(), owner.Height());
+        this->un_pressed =  TheDefaultTheme->lowered_box(TheOwner.Width(), TheOwner.Height());
+        this->pressed = TheDefaultTheme->raised_box(TheOwner.Width(), TheOwner.Height());
 
 }
 
@@ -32,13 +33,13 @@ DefaultButtonTheme::~DefaultButtonTheme()
         if (this->un_pressed != NULL ) delete this->un_pressed;
         if (this->pressed != NULL ) delete this->pressed;
 }
-////////////////////////////////////////////////////////////
+/*////////////////////////////////////////////////////////////
 int DefaultToggleButtonTheme::draw()
 {
 }
 int DefaultToggleButtonTheme::update()
 {
-}
+}*/
 ////////////////////////////////////////////////////////////
 int DefaultTextButtonTheme::draw()
 {
@@ -198,4 +199,39 @@ DefaultTheme::DefaultTheme()
         bkgd_color[2] = 216; //blue
         bkgd_color[3] = 0; //alpha
 }
+
+
+////////////////////////////////////////////////////////////////////
+themeData* DefaultTheme::GetData(Control& ctrl)
+{
+        Arcball* arcb = dynamic_cast<Arcball*>(&ctrl);
+        if (arcb != NULL) 
+        {
+                return new DefaultArcballTheme(ctrl, this);
+        }
+        Button* but = dynamic_cast<Button*>(&ctrl);
+        if (but != NULL) 
+        {
+                return new DefaultButtonTheme(ctrl, this);
+        }
+/*        ToggleButton* tbut = dynamic_cast<ToggleButton*>(&ctrl);
+        if (tbut != NULL) 
+        {
+                return = new DefaultToggleButtonTheme(ctrl);
+        }*/
+        TextButton* tebut = dynamic_cast<TextButton*>(&ctrl);
+        if (tebut != NULL) 
+        {
+                return new DefaultTextButtonTheme(ctrl, this);
+        }
+        return NULL;
+
+}
+
+////////////////////////////////////////////////////////////////////
+DefaultThemeData::DefaultThemeData(Control& owner, theme* NewTheme) : themeData(owner,NewTheme) 
+{
+        TheDefaultTheme = dynamic_cast<DefaultTheme*>(TheTheme);
+}
+
 

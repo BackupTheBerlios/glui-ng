@@ -113,6 +113,7 @@ namespace GLUI
 
             virtual void pack (int x, int y);
             virtual void update_size( void );
+            virtual int  UpdateTheme( void );
             virtual void idle( void )            { }
             virtual int  mouse_over( int state, int x, int y ) { return false; }
 

@@ -34,13 +34,14 @@ namespace GLUI
 {
         class Control;
         class Container;
+        class themeData;
 
         class theme
         {
                 public : //methods
-                        static theme* Instance();
-                        int SetTheme(Control* ctrl);
-                        int SetTheme(Container* cont);
+                        static int SetTheme(Control& ctrl);
+                        void Release();
+                        virtual themeData* GetData(Control& ctrl)=0;
 
                 protected : //variables
                         int ThemeMajor;
@@ -48,6 +49,7 @@ namespace GLUI
                         int ThemeRevision;
                 protected :
                         theme( void );
+                        ~theme();
                         void FillglColorPointer(
                                         uint8_t *inColor, //< array of 4 uint8_t color elements
                                         GLint size,       //< numbers of elements per colors (3=RGB 4=RGBA)
@@ -70,16 +72,21 @@ namespace GLUI
                                         const GLvoid *outpointer,  //<pointer to the outputdata
                                         uint32_t count //< count of the numbers of elements in the array (an element in 3 or 4 components)
                                         );
+                private:
+                        static theme* TheTheme;
+                        static int InstanceCounter;
         };
 
         class themeData
         {
                 public: //methods
-                        themeData(Control& owner);
-                        virtual int draw() = 0;
-                        virtual int update() = 0;
+                        themeData(Control& owner, theme* NewTheme);
+                        ~themeData();
+                        virtual int draw()=0;
+                        virtual int update()=0;
                 protected:
-                        Control& owner;
+                        Control& TheOwner;
+                        theme* TheTheme;
                 private:
                         themeData();
         };

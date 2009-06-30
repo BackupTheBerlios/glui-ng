@@ -5,7 +5,7 @@ namespace GLUI
 {
         class Arcball;
         class Button;
-        class ToggleButton;
+        //class ToggleButton;
         class TextButton;
         class VertexObject;
         class DefaultTheme;
@@ -15,15 +15,15 @@ namespace GLUI
                 private :
                         DefaultThemeData();
                 public:
-                        DefaultThemeData(DefaultTheme& TheTheme);
+                        DefaultThemeData(Control& owner, theme* NewTheme);
                 protected:
-                        DefaultTheme& TheTheme;
+                        DefaultTheme* TheDefaultTheme;
         };
 
         class DefaultButtonTheme : public DefaultThemeData
         {
                 public : //methods
-                        DefaultButtonTheme(theme& TheTheme, Control& owner);
+                        DefaultButtonTheme(Control& owner, theme* NewTheme) : DefaultThemeData(owner,NewTheme) {};
                         ~DefaultButtonTheme();
                         virtual int draw();
                         virtual int update();
@@ -33,21 +33,22 @@ namespace GLUI
                         VertexObject* pressed;
         };
 
-        class DefaultToggleButtonTheme : public DefaultThemeData
+/*        class DefaultToggleButtonTheme : public DefaultThemeData
         {
                 public : //methods
-                        DefaultToggleButtonTheme(theme& TheTheme, Control& owner);
+                        DefaultToggleButtonTheme(Control& owner, theme* NewTheme) : DefaultThemeData(owner,NewTheme);
                         virtual int draw();
                         virtual int update();
                 protected: //variable
 
         };
+        */
 
 
         class DefaultTextButtonTheme : public DefaultThemeData
         {
                 public : //methods
-                        DefaultTextButtonTheme(theme& TheTheme, Control& owner);
+                        DefaultTextButtonTheme(Control& owner, theme* NewTheme) : DefaultThemeData(owner,NewTheme) {};
                         virtual int draw();
                         virtual int update();
                 protected: //variable
@@ -57,7 +58,7 @@ namespace GLUI
         class DefaultArcballTheme : public DefaultThemeData
         {
                 public : //methods
-                        DefaultArcballTheme(theme& TheTheme, Control& owner);
+                        DefaultArcballTheme(Control& owner, theme* NewTheme) : DefaultThemeData(owner,NewTheme) {};
                         virtual int draw();
                         virtual int update();
                 protected: //variable
@@ -67,6 +68,7 @@ namespace GLUI
         {
                 public : 
                         DefaultTheme();
+                        virtual themeData* GetData(Control& ctrl);
                         void PostRedisplay(Control* ctrl);
                         virtual VertexObject* raised_box( uint32_t w,
                                                           uint32_t h,

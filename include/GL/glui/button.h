@@ -44,12 +44,12 @@ namespace GLUI
 	};
 
 
-	/*class GLUIAPI ToggleButton : public Button
+/*	class GLUIAPI ToggleButton : public Button
 	  {
 	  protected :
 	  int state;
-	  };*/
-
+	  };
+*/
 
 	class GLUIAPI TextButton : public Button
 	{
