@@ -18,7 +18,6 @@ CONFIGURE_OPTS[1]="--enable-headers-dep=,ENABLE_AUTODEPS,enable source dependenc
 custom_clean_on_sig() {
     rm -f Makefile.confiserie
 }
-
 source ${confiserie}/init.sh "$@" &&
 
 #the additional included Makefiles
