@@ -5,7 +5,7 @@
 #* http://www.gnu.org/copyleft/lesser.html
 #************************************************************************/
 all:
-
+ifneq (${MAKECMDGOALS},clean)
 ifdef CONFISERIE_DEBUG
 $(warning SHAREDLIBEXT : ${SHAREDLIBEXT})
 $(warning STATICLIBEXT : ${STATICLIBEXT})
@@ -83,7 +83,7 @@ autolibapp=yes
 include $(foreach lib,${custom_LIBRARIES},$(shell confiserie=${confiserie} ${confiserie}/Makefiles/make_lib_mk.sh CUSTOM_LIB_DIR ${lib} ${STATICLIBEXT}) )
 endif
 
-
+endif #MAKECMDGOALS
 
 #######################################################################################
 ifdef autolibapp

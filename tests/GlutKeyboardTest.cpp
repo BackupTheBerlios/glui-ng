@@ -36,7 +36,7 @@ int myControl::AddEvent(::XKeyEvent* event)
     float previous_red = fColors[0];
     fColors[0] = fColors[2];
     fColors[2] = previous_red;
-    drawinghelpers::PostRedisplay(this);
+    ThemeData->update();
 }
 
 void myControl::draw()
@@ -81,7 +81,7 @@ int myGluiWin::AddEvent(::XKeyEvent* event)
 {
     Angle += 5.0f;
     Container::AddEvent((::XEvent*) event);
-    drawinghelpers::PostRedisplay(this);
+    ThemeData->update();
 }
 
 #if defined(GLUI_FREEGLUT)

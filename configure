@@ -11,7 +11,7 @@ progname=${0/*\//}
 confiserie=${0/\/$progname/}/confiserie
 
 
-CONFIGURE_OPTS[1]="--enable-headers-dep=,ENABLE_AUTODEPS,enable source dependency generation (disable to faster one shot compilation),no"
+CONFIGURE_OPTS[1]="--enable-headers-dep=,ENABLE_AUTODEPS,enable source dependency generation (disable to faster one shot compilation),[yes|no],no"
 
 #this funtion should clean the file you create with this script
 #it will be automatically done by init.sh

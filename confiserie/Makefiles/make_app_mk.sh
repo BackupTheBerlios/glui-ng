@@ -81,7 +81,10 @@ clean_${name} :
 	\${CLEANINGMSG} GENERATED
 	rm -rf GENERATED
 
+ifneq (\${MAKECMDGOALS},clean)
 -include \${${name}_SOURCES:%=GENERATED/%.d}
+endif
+
 else
 install :${name}_install
 
