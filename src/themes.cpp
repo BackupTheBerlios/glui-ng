@@ -24,7 +24,7 @@
 */
 #include <GL/glui/themes.h>
 #include <GL/glui/DefaultTheme.h>
-#include <GL/glui/Control.h>
+#include <GL/glui/container.h>
 #include <GL/glui/Exception.h>
 #include <string.h>
 #include <stdint.h>
@@ -33,57 +33,23 @@
 
 using namespace GLUI;
 //////////////////////////////////////////////////////////////////////////
-theme* theme::TheTheme = NULL;
-int theme::InstanceCounter = 0;
-////////////////////////////////////////////////////////////
-int theme::SetTheme(Control& ctrl)
+themeData* GLUI::GetTheme(const Control& ctrl)
 {
-        if ( NULL == TheTheme )
+        if (NULL != getenv("GLUI_THEME"))
         {
-                if (NULL != getenv("GLUI_THEME"))
-                {
-                        //todo dlopen the theme,
-                        // get the handle,
-                        // update currentTheme
-                }
-                else
-                {
-                        TheTheme = new DefaultTheme;
-                }
+                //todo dlopen the theme,
+                // get the handle,
+                // update currentTheme
         }
-        InstanceCounter ++;
-        if (ctrl.ThemeData != NULL)
-        {
-                delete ctrl.ThemeData;
-                ctrl.ThemeData = NULL;
-        }
-        ctrl.ThemeData = TheTheme->GetData(ctrl);
-}
-////////////////////////////////////////////////////////////
-void theme::Release()
-{
-        InstanceCounter --;
-        if (0 == InstanceCounter )
-        {
-                delete TheTheme;
-                TheTheme = NULL;
-        }
+        return NULL;
 }
 ////////////////////////////////////////////////////////////
 theme::theme()
 {
-
-        ThemeMajor    = 0;
-        ThemeMinor    = 0;
-        ThemeRevision = 0;
 }
 ////////////////////////////////////////////////////////////
 theme::~theme()
 {
-        if (InstanceCounter != 0)
-        {
-                throw new Exception(-1, "deleting the theme singleton while still have users");
-        }
 }
 
 ////////////////////////////////////////////////////////////
@@ -443,25 +409,30 @@ void theme::ConvertglColorArray(
     return;
 
 }
-//////////////////////////////////////////////////////////////////////////
-
-
-themeData::themeData(Control& owner, theme* NewTheme) : TheOwner(owner)
+/////////////////////////////////////////////////////////////////////////////
+void theme::PostRedisplay(Control* ctrl)
 {
-        if (NewTheme == NULL  )
+        ::XEvent EventToForward;
+        //ask for redisplay of window
+        EventToForward.xexpose.type=Expose;
+        EventToForward.xexpose.send_event=true;
+        EventToForward.xexpose.x = ctrl->X();
+        EventToForward.xexpose.y = ctrl->Y();
+        EventToForward.xexpose.width = ctrl->Width();
+        EventToForward.xexpose.height = ctrl->Height();
+        Container* cont  = dynamic_cast<Container*>(ctrl->GetRootNode());
+        if ( cont != NULL)
         {
-                throw new Exception(EINVAL, "trying to set a NULL theme");
+                cont->AddEvent(&EventToForward);
         }
-        TheTheme = NewTheme;
-//        TheOwner = owner;
-
 }
 
+//////////////////////////////////////////////////////////////////////////
+themeData::themeData()
+{
+}
+/////////////////////////////////////////////////////////////////////////////
 themeData::~themeData()
 {
-        TheTheme->Release();
-        TheTheme = NULL;
 }
-
-
 

@@ -36,17 +36,10 @@ namespace GLUI
         class Container;
         class themeData;
 
+        themeData* GetTheme(const Control& ctrl);
+
         class theme
         {
-                public : //methods
-                        static int SetTheme(Control& ctrl);
-                        void Release();
-                        virtual themeData* GetData(Control& ctrl)=0;
-
-                protected : //variables
-                        int ThemeMajor;
-                        int ThemeMinor;
-                        int ThemeRevision;
                 protected :
                         theme( void );
                         virtual ~theme();
@@ -72,23 +65,18 @@ namespace GLUI
                                         const GLvoid *outpointer,  //<pointer to the outputdata
                                         uint32_t count //< count of the numbers of elements in the array (an element in 3 or 4 components)
                                         );
+                        virtual void PostRedisplay(Control* ctrl);
                 private:
-                        static theme* TheTheme;
-                        static int InstanceCounter;
         };
 
         class themeData
         {
                 public: //methods
-                        themeData(Control& owner, theme* NewTheme);
+                        themeData();
                         virtual ~themeData();
                         virtual int draw()=0;
                         virtual int update()=0;
                 protected:
-                        Control& TheOwner;
-                        theme* TheTheme;
-                private:
-                        themeData();
         };
 
 

@@ -98,7 +98,6 @@ namespace GLUI
             virtual ~GlutWindow();
             virtual int AddEvent (::XEvent* event);
              WindowId GetWindowId();
-             virtual void draw();
             virtual void idle(); //< shall not rely on that, it binds you to GLUT
 
         public: //XMethods

@@ -1,10 +1,13 @@
 #include <GL/glui/window.h>
+#include <GL/glui/DefaultTheme.h>
+#include <GL/glui/VertexObject.h>
 #include <unistd.h>
 #include <assert.h>
 #include <time.h>
 #include <stdlib.h>
 
 using namespace GLUI;
+class myControl;
 
 #if (__USE_XLIB == 1 || __USE_WIN32 == 1 )
 int main(int argc, char* argv[])
@@ -13,24 +16,70 @@ int main(int argc, char* argv[])
 }
 #else
 /////////////////////////////////////////////////////////////////////
+class myControltheme : public DefaultThemeData
+{
+        public :
+                myControltheme(myControl& owner);
+                ~myControltheme();
+                int draw();
+                int update();
+        protected :
+                VertexObject* drawing;
+                myControl& Owner;
+};
+///////////////////////////////////////////////////////////////////////
 class myControl : public Control
 {
+    friend class myControltheme;
     public :
         myControl(const char* name);
-        virtual void draw();
         virtual int AddEvent(::XKeyEvent* event);
     private:
         float fColors[3];
 };
+///////////////////////////////////////////////////////////////////////
+myControltheme::myControltheme(myControl& owner) : Owner(owner)
+{
+        drawing = NULL;
+}
 
+///////////////////////////////////////////////////////////////////////
+myControltheme::~myControltheme()
+{
+        if (drawing != NULL) delete drawing;
+}
+
+///////////////////////////////////////////////////////////////////////
+int myControltheme::update()
+{
+    GLint iColorArray[4][3];
+    float fColorArray[4][3] = { {Owner.fColors[0], 0.0, Owner.fColors[2]},
+                                {Owner.fColors[0], 0.0, Owner.fColors[2]},
+                                {Owner.fColors[0], 0.0, Owner.fColors[2]},
+                                {Owner.fColors[0], 0.0, Owner.fColors[2]} };
+    drawing = TheDefaultTheme.raised_box(Owner.Width(), Owner.Height());
+}
+
+///////////////////////////////////////////////////////////////////////
+int myControltheme::draw()
+{
+        drawing->draw();
+}
+
+
+
+
+///////////////////////////////////////////////////////////////////////
 myControl::myControl(const char* name) :
     Control(name)
 {
     fColors[0] = 1.0;
     fColors[2] = 0.0;
     set_size(Size(200u,10u));
+    this->SetThemeData(new myControltheme(*this));
 }
 
+///////////////////////////////////////////////////////////////////////
 int myControl::AddEvent(::XKeyEvent* event)
 {
     float previous_red = fColors[0];
@@ -39,15 +88,7 @@ int myControl::AddEvent(::XKeyEvent* event)
     ThemeData->update();
 }
 
-void myControl::draw()
-{
-    GLint iColorArray[4][3];
-    float fColorArray[4][3] = { fColors[0], 0.0, fColors[2],
-        fColors[0], 0.0, fColors[2],
-        fColors[0], 0.0, fColors[2],
-        fColors[0], 0.0, fColors[2] };
-    drawinghelpers::draw_box(CurrentSize.size.w, CurrentSize.size.h, 3, GL_FLOAT,  &(fColorArray[0][0]));
-}
+
 
 
 ////////////////////////////////////////////////////////////////////
@@ -67,7 +108,6 @@ class myGluiWin : public GLUIWindow
         add_control(&ctrl);
     }
         virtual int AddEvent(::XKeyEvent* event);
-       virtual void draw(void);
        void simulatekey();
        virtual void idle(void);
 

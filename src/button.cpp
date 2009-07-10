@@ -33,6 +33,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include <GL/glui/MasterObject.h>
 #include <GL/glui/window.h>
 #include <GL/glui/themes.h>
+#include <GL/glui/VertexObject.h>
 
 using namespace GLUI;
 /****************************** Button::Button() **********/
@@ -75,6 +76,56 @@ bool Button::GetValue()
         return value;
 }
 
+themeData* Button::GetDefaultTheme()
+{
+        return new Button::DefaultTheme(*this);
+}
+
+////////////////////////////////////////////////////////////
+int Button::DefaultTheme::draw()
+{
+        if (((Button&)Owner).GetValue())
+        {
+                this->pressed->draw();
+        }
+        else
+        {
+                this->un_pressed->draw();
+        }
+}
+
+int Button::DefaultTheme::update()
+{
+        if (this->un_pressed != NULL ) delete this->un_pressed;
+        if (this->pressed != NULL ) delete this->pressed;
+
+        this->un_pressed =  TheDefaultTheme.lowered_box(Owner.Width(), Owner.Height());
+        this->pressed = TheDefaultTheme.raised_box(Owner.Width(), Owner.Height());
+
+}
+
+Button::DefaultTheme::~DefaultTheme()
+{
+        if (this->un_pressed != NULL ) delete this->un_pressed;
+        if (this->pressed != NULL ) delete this->pressed;
+}
+/*////////////////////////////////////////////////////////////
+int DefaultToggleButtonTheme::draw()
+{
+}
+int DefaultToggleButtonTheme::update()
+{
+}*/
+////////////////////////////////////////////////////////////
+int TextButton::DefaultTheme::draw()
+{
+}
+int TextButton::DefaultTheme::update()
+{
+}
+
+
+
 TextButton::TextButton (Node *parent, const char *name,
         int id, CB cb ) :
     Button(parent, name, id, cb),
@@ -86,5 +137,10 @@ TextButton::TextButton (Node *parent, const char *name,
 void TextButton::SetText(char* newtext)
 {
     text.set_text(newtext);
+}
+
+themeData* TextButton::GetDefaultTheme()
+{
+        return new TextButton::DefaultTheme(*this);
 }
 

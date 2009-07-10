@@ -60,11 +60,24 @@
 #include <GL/glui/internal.h>
 #include <GL/glui/algebra3.h>
 #include <GL/glui/quaternion.h>
+#include <GL/glui/DefaultTheme.h>
 
 namespace GLUI
 {
 	class Arcball 
 	{
+                public://types
+                        class DefaultTheme : public DefaultThemeData
+                        {
+                                public : //methods
+                                        DefaultTheme(Arcball& owner) : Owner(owner) {};
+                                        virtual int draw();
+                                        virtual int update();
+                                protected: //variable
+                                        Arcball& Owner;
+                        };
+
+
 		public:
 			Arcball();
 			Arcball(mat4 *mtx);

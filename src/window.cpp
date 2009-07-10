@@ -31,27 +31,27 @@
 #include <stdlib.h>
 #include <string.h>
 using namespace GLUI;
-
+/////////////////////////////////////////////////////////////////////////////
+_Display::_Display()
+{
+}
+/////////////////////////////////////////////////////////////////////////////
 /*_Display::operator ::Display*()
 {
     return disp;
 }*/
-
+/////////////////////////////////////////////////////////////////////////////
 _Window::_Window() :
     Container("window")
 {
 }
 
-
-void _Window::SetViewport()
+/////////////////////////////////////////////////////////////////////////////
+void _Window::DefaultTheme::SetViewport()
 {
-    glViewport( 0, 0, this->Width(), this->Height() );
+    glViewport( 0, 0, Owner.Width(), Owner.Height() );
 }
-
-_Display::_Display()
-{
-}
-
+/////////////////////////////////////////////////////////////////////////////
 int _Window::SetCurrentDrawBuffer( void )
 {
     /* Save old buffer */
@@ -72,20 +72,30 @@ _Window::buffer_mode_t _Window::get_buffer_mode() {
             0 ==  strcmp(bufferModeEnv, "buffer_front") ) return buffer_front;
     else return buffer_back;
 }
-/******************************* GLUI_Main::set_ortho_projection() **********/
-
-void  _Window::SetOrthoProjection( void )
+/////////////////////////////////////////////////////////////////////////////
+void  _Window::DefaultTheme::SetOrthoProjection( void )
 {
 
 
     glMatrixMode( GL_PROJECTION );
     glLoadIdentity();
     /*  gluOrtho2D( 0.0, (float) win_w, 0.0, (float) win_h );          */
-    glOrtho( 0.0, (float)this->Width(), 0.0, (float)this->Height(), GLUI_BOTTOM_VIEWPORT, GLUI_TOP_VIEWPORT );
+    glOrtho( 0.0, (float)Owner.Width(), 0.0, (float)Owner.Height(), GLUI_BOTTOM_VIEWPORT, GLUI_TOP_VIEWPORT );
     glMatrixMode( GL_MODELVIEW );
 
 
 }
 
-
+///////////////////////////////////////////////////////////////////////
+int _Window::DefaultTheme::draw()
+{
+    //    Draw GLUI window
+    glLoadIdentity();
+    this->SetOrthoProjection();
+    glTranslatef(Owner.X(), Owner.Y(), BOTTOM_VIEWPORT + 1);
+}
+///////////////////////////////////////////////////////////////////////
+int _Window::DefaultTheme::update()
+{
+}
 

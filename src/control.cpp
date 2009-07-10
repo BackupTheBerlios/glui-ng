@@ -113,8 +113,7 @@ int Control::set_size( Size sz, Size min)
 ///////////////////////////////////////////////////////////////////////////////////////
 int Control::UpdateTheme( void )
 {
-        return theme::SetTheme(*this);
-
+        return Control::SetThemeData(GLUI::GetTheme(*this));
 }
 
 /*************************** Drawing Utility routines *********************/
@@ -249,8 +248,16 @@ void Control::set_alignment(Alignement new_align)
 
     ThemeData->update();
 }
-
-
+///////////////////////////////////////////////////////////////////////////
+int Control::SetThemeData(themeData* data)
+{
+        if (data != NULL)
+        {
+                if (this->ThemeData != NULL) delete this->ThemeData;
+                this->ThemeData = data;
+        }
+        return EINVAL;
+}
 
 
 /********* Control::~Control() **********/
@@ -280,7 +287,11 @@ Control::Control(const char* name) : Node(name)
     APIMajor       = 0;
     APIMinor       = 0;
     APIRevision    = 0;
-    theme::SetTheme(*this);
+    this->ThemeData = GLUI::GetTheme(*this);
+    if (NULL == this->ThemeData)
+    {
+        this->ThemeData = this->GetDefaultTheme();
+    }
 
 }
 

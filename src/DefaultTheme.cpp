@@ -1,78 +1,12 @@
 #include <GL/glui/DefaultTheme.h>
-#include <GL/glui/Container.h>
 #include <GL/glui/VertexObject.h>
-#include <GL/glui/button.h>
-#include <GL/glui/arcball.h>
+#include <string.h>
 
 using namespace GLUI;
-////////////////////////////////////////////////////////////
-int DefaultButtonTheme::draw()
-{
-        if (((Button&)TheOwner).GetValue())
-        {
-                this->pressed->draw();
-        }
-        else
-        {
-                this->un_pressed->draw();
-        }
-}
 
-int DefaultButtonTheme::update()
-{
-        if (this->un_pressed != NULL ) delete this->un_pressed;
-        if (this->pressed != NULL ) delete this->pressed;
 
-        this->un_pressed =  TheDefaultTheme->lowered_box(TheOwner.Width(), TheOwner.Height());
-        this->pressed = TheDefaultTheme->raised_box(TheOwner.Width(), TheOwner.Height());
 
-}
 
-DefaultButtonTheme::~DefaultButtonTheme()
-{
-        if (this->un_pressed != NULL ) delete this->un_pressed;
-        if (this->pressed != NULL ) delete this->pressed;
-}
-/*////////////////////////////////////////////////////////////
-int DefaultToggleButtonTheme::draw()
-{
-}
-int DefaultToggleButtonTheme::update()
-{
-}*/
-////////////////////////////////////////////////////////////
-int DefaultTextButtonTheme::draw()
-{
-}
-int DefaultTextButtonTheme::update()
-{
-}
-
-////////////////////////////////////////////////////////////
-int DefaultArcballTheme::draw()
-{
-}
-int DefaultArcballTheme::update()
-{
-}
-
-/////////////////////////////////////////////////////////////////////////////
-void DefaultTheme::PostRedisplay(Control* ctrl)
-{
-        ::XEvent EventToForward;
-        //ask for redisplay of window
-        EventToForward.xexpose.type=Expose;
-        EventToForward.xexpose.send_event=true;
-        EventToForward.xexpose.x = ctrl->X();
-        EventToForward.xexpose.y = ctrl->Y();
-        EventToForward.xexpose.width = ctrl->Width();
-        EventToForward.xexpose.height = ctrl->Height();
-        Container* cont  = dynamic_cast<Container*>(ctrl->GetRootNode());
-        if ( cont != NULL)
-        {
-                cont->AddEvent(&EventToForward);
-        }
-}
 /////////////////////////////////////////////////////////////////////////
 VertexObject* DefaultTheme::raised_box( uint32_t w, uint32_t h, uint32_t thickness)
 {
@@ -190,48 +124,15 @@ VertexObject* DefaultTheme::lowered_box( uint32_t w, uint32_t h, uint32_t thickn
 // constructor
 DefaultTheme::DefaultTheme()
 {
-        border_color[0] = 0; //red
-        border_color[1] = 0; //green
-        border_color[2] = 0; //blue
-        border_color[3] = 0; //alpha
-        bkgd_color[0] = 236; //red
-        bkgd_color[1] = 233; //green
-        bkgd_color[2] = 216; //blue
-        bkgd_color[3] = 0; //alpha
+
 }
+        uint8_t DefaultTheme::border_color[4] = { 0, 0, 0, 0 };
+        uint8_t DefaultTheme::bkgd_color[4] = { 236, 233, 216, 0};
 
 
 ////////////////////////////////////////////////////////////////////
-themeData* DefaultTheme::GetData(Control& ctrl)
+DefaultThemeData::DefaultThemeData()
 {
-        Arcball* arcb = dynamic_cast<Arcball*>(&ctrl);
-        if (arcb != NULL) 
-        {
-                return new DefaultArcballTheme(ctrl, this);
-        }
-        Button* but = dynamic_cast<Button*>(&ctrl);
-        if (but != NULL) 
-        {
-                return new DefaultButtonTheme(ctrl, this);
-        }
-/*        ToggleButton* tbut = dynamic_cast<ToggleButton*>(&ctrl);
-        if (tbut != NULL) 
-        {
-                return = new DefaultToggleButtonTheme(ctrl);
-        }*/
-        TextButton* tebut = dynamic_cast<TextButton*>(&ctrl);
-        if (tebut != NULL) 
-        {
-                return new DefaultTextButtonTheme(ctrl, this);
-        }
-        return NULL;
-
-}
-
-////////////////////////////////////////////////////////////////////
-DefaultThemeData::DefaultThemeData(Control& owner, theme* NewTheme) : themeData(owner,NewTheme) 
-{
-        TheDefaultTheme = dynamic_cast<DefaultTheme*>(TheTheme);
 }
 
 

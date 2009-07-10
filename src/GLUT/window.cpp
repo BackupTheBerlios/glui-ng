@@ -65,16 +65,7 @@ using namespace GLUI;
 GlutDisplay::GlutDisplay(char* name)
 {
 }
-///////////////////////////////////////////////////////////////////////
-void GlutWindow::draw()
-{
-    //    Draw GLUI window
-    glLoadIdentity();
-    this->SetOrthoProjection();
-    glTranslatef(x, y, BOTTOM_VIEWPORT + 1);
-    //drawinghelpers::draw_box( this->Width(),
-    //        this->Height());
-}
+
 ///////////////////////////////////////////////////////////////////////
 WindowId GlutWindow::GetWindowId()
 {
@@ -473,7 +464,7 @@ void GlutWindow::reshape_func (int w, int h)
 
 
 
-#warning "factorise
+#warning "factorise"
 /********************************************** glui_keyboard_func() ********/
 //GLUI use Y axis up (0,0) is bottom left corner as in OpenGl
 void GlutWindow::keyboard_func (unsigned char key, int x, int y)

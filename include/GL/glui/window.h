@@ -44,6 +44,7 @@
 */
 
 #include <GL/glui/container.h>
+#include <GL/glui/DefaultTheme.h>
 #include <X11/Xlib.h>
 #include <GL/gl.h>
 
@@ -101,6 +102,19 @@ namespace GLUI
                                 buffer_front=1, ///< Draw updated controls directly to screen.
                                 buffer_back=2   ///< Double buffering: postpone updates until next redraw.
                         };
+                        class DefaultTheme : public DefaultThemeData
+                        {
+                                public : //methods
+                                        DefaultTheme(_Window& owner) : Owner(owner) {};
+                                        ~DefaultTheme();
+                                        virtual int draw();
+                                        virtual int update();
+                                protected: //variable
+                                        _Window& Owner;
+                                protected: //methods
+                                        void  SetOrthoProjection( void );
+                                        void SetViewport(void);
+                        };
 
 
                 public :
@@ -109,8 +123,6 @@ namespace GLUI
                         virtual int AddEvent (::XEvent *event)=0;
                         static buffer_mode_t get_buffer_mode();
                 public :  //operators
-                        void  set_ortho_projection( void );
-                        void  set_viewport( void );
                 public : //XMethods
                         virtual void XMapWindow()=0;
                         virtual void XMapRaised()=0;
@@ -120,14 +132,12 @@ namespace GLUI
                         virtual KeySym XLookupKeysym(::XKeyEvent *key_event, int index)=0; //a KeySym is a 32bit not unicode char
                         static  uint32_t KeySymToUcs4(KeySym keysym);
 
-                        void SetViewport(void);
 
                 protected :
                         _Window();
 
                         long flags;
                         int  SetCurrentDrawBuffer( void );
-                        void  SetOrthoProjection( void );
 
         };
 
@@ -141,13 +151,10 @@ int GLUIInit(int* argc, char** argv); //optional
 //now select automatically the window class according to the
 //window manager we use
 #ifdef __USE_XLIB
-#warning "using Xlib"
 #include <GL/glui/x11_window.h>
 #elif  __USE_WIN32
-#warning "using win32"
 #include <GL/glui/win32_window.h>
 #else
-#warning "using glut"
 #include <GL/glui/glut_window.h>
 #endif
 

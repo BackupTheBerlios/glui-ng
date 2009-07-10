@@ -39,11 +39,6 @@ namespace GLUI
 
     class GLUIAPI Control : public Node, public EventHandler
     {
-        friend class theme; //< theme class will contain the drawing functions
-                            //< widget still have to implement a default drawing function
-                            //< it's up to the widget object to draw the theme::Instance()->draw(this)
-                            //< and draw it default as a fallback
-
         public : //types
             enum SizePolicy {
                 FixedSize,
@@ -161,6 +156,7 @@ namespace GLUI
             void         set_alignment( Alignement align );
             void         set_resize_policy( SizePolicy policy) { resizeable = policy; }
             SizePolicy   get_resize_policy( void ) { return resizeable;}
+            int SetThemeData(themeData* data);
 
             int  add_control( Node *control ); //<prevent adding subsequent controls
 
@@ -169,6 +165,8 @@ namespace GLUI
         protected: //methods
             Control(const char* name);
             Control();
+            virtual themeData* GetDefaultTheme() = 0;
+
 
             bool CheckWidgetApiRevision(int Major, int Minor, int Revision);
         protected: //variables

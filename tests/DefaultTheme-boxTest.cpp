@@ -12,29 +12,6 @@ int main(int argc, char* argv[])
 }
 #else
 
-#if defined(GLUI_FREEGLUT)
-
-// FreeGLUT does not yet work perfectly with GLUI
-//  - use at your own risk.
-
-
-#include <GL/freeglut.h>
-
-#elif defined(GLUI_OPENGLUT)
-
-// OpenGLUT does not yet work properly with GLUI
-//  - use at your own risk.
-
-#include <GL/openglut.h>
-
-#else
-
-#ifdef __APPLE__
-#include <GLUT/glut.h>
-#else
-#include <GL/glut.h>
-#endif
-#endif
 
 
 class myGluiWin : public GLUIWindow
