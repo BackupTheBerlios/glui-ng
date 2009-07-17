@@ -45,7 +45,6 @@ _Window::_Window() :
     Container("window")
 {
 }
-
 /////////////////////////////////////////////////////////////////////////////
 void _Window::DefaultTheme::SetViewport()
 {
@@ -64,13 +63,21 @@ int _Window::SetCurrentDrawBuffer( void )
     }
     return (int)state;
 }
-
 /////////////////////////////////////////////////////////////////////////////
 _Window::buffer_mode_t _Window::get_buffer_mode() {
     char* bufferModeEnv = getenv("GLUI_BUFFER_MODE");
     if ( bufferModeEnv != NULL &&
             0 ==  strcmp(bufferModeEnv, "buffer_front") ) return buffer_front;
     else return buffer_back;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+_Window::DefaultTheme::DefaultTheme(_Window& owner) : Owner(owner) 
+{
+}
+/////////////////////////////////////////////////////////////////////////////
+_Window::DefaultTheme::~DefaultTheme()
+{
 }
 /////////////////////////////////////////////////////////////////////////////
 void  _Window::DefaultTheme::SetOrthoProjection( void )
@@ -85,7 +92,6 @@ void  _Window::DefaultTheme::SetOrthoProjection( void )
 
 
 }
-
 ///////////////////////////////////////////////////////////////////////
 int _Window::DefaultTheme::draw()
 {

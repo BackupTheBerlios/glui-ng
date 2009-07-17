@@ -102,10 +102,10 @@ namespace GLUI
                                 buffer_front=1, ///< Draw updated controls directly to screen.
                                 buffer_back=2   ///< Double buffering: postpone updates until next redraw.
                         };
-                        class DefaultTheme : public DefaultThemeData
+                        class DefaultTheme : public _DefaultTheme
                         {
                                 public : //methods
-                                        DefaultTheme(_Window& owner) : Owner(owner) {};
+                                        DefaultTheme(_Window& owner);
                                         ~DefaultTheme();
                                         virtual int draw();
                                         virtual int update();

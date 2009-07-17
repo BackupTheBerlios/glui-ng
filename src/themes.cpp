@@ -33,7 +33,7 @@
 
 using namespace GLUI;
 //////////////////////////////////////////////////////////////////////////
-themeData* GLUI::GetTheme(const Control& ctrl)
+theme* GLUI::GetTheme(const Control& ctrl)
 {
         if (NULL != getenv("GLUI_THEME"))
         {
@@ -427,12 +427,4 @@ void theme::PostRedisplay(Control* ctrl)
         }
 }
 
-//////////////////////////////////////////////////////////////////////////
-themeData::themeData()
-{
-}
-/////////////////////////////////////////////////////////////////////////////
-themeData::~themeData()
-{
-}
 

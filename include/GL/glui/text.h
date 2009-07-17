@@ -20,7 +20,7 @@ namespace GLUI
           */
 #define CHAR_WIDTH_HASH_SIZE 128
 
-        class GLUIAPI Text : public std::string, public DefaultThemeData
+        class GLUIAPI Text : public std::string, public _DefaultTheme
         {
 
 
@@ -45,7 +45,6 @@ namespace GLUI
                 protected:
                         void           *font;       //< Our glutbitmap font
                         GLubyte Color[3];
-                        DefaultTheme data;
                         int          char_widths[CHAR_WIDTH_HASH_SIZE][2]; // Character width hash table
                         int tests;
 

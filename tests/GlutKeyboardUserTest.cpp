@@ -1,10 +1,13 @@
 #include <GL/glui/window.h>
+#include <GL/glui/DefaultTheme.h>
+#include <GL/glui/VertexObject.h>
 #include <unistd.h>
 #include <assert.h>
 #include <time.h>
 #include <stdlib.h>
 
 using namespace GLUI;
+class myControl;
 
 #if (__USE_XLIB == 1 || __USE_WIN32 == 1 )
 int main(int argc, char* argv[])
@@ -13,78 +16,113 @@ int main(int argc, char* argv[])
 }
 #else
 /////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////
 class myControl : public Control
 {
-    public :
-        myControl(const char* name);
-        virtual void draw();
-        virtual int AddEvent(::XKeyEvent* event);
-    private:
-        float fColors[3];
+        public:
+                class myControltheme : public _DefaultTheme
+                {
+                        public :
+                                myControltheme(myControl& owner);
+                                ~myControltheme();
+                                int draw();
+                                int update();
+                        protected :
+                                VertexObject* drawing;
+                                myControl& Owner;
+                };
+        public :
+                myControl(const char* name);
+                virtual int AddEvent(::XKeyEvent* event);
 };
+///////////////////////////////////////////////////////////////////////
+myControl::myControltheme::myControltheme(myControl& owner) : Owner(owner)
+{
+        update();
+}
 
+///////////////////////////////////////////////////////////////////////
+myControl::myControltheme::~myControltheme()
+{
+        if (drawing != NULL) delete drawing;
+}
+
+///////////////////////////////////////////////////////////////////////
+int myControl::myControltheme::update()
+{
+    drawing = raised_box(Owner.Width(), Owner.Height());
+}
+
+///////////////////////////////////////////////////////////////////////
+int myControl::myControltheme::draw()
+{
+        drawing->draw();
+}
+
+
+
+
+///////////////////////////////////////////////////////////////////////
 myControl::myControl(const char* name) :
     Control(name)
 {
-    fColors[0] = 1.0;
-    fColors[2] = 0.0;
+    ((myControltheme*)this->ThemeData)->bkgd_color[0] = 255;
+    ((myControltheme*)this->ThemeData)->bkgd_color[2] = 0;
     set_size(Size(200u,10u));
-    x_off_left = 0;
-    x_off_right = 0;
-    y_off_top  = 0;
-    y_off_bot = 0;
+    this->SetTheme(new myControl::myControltheme(*this));
 }
 
+///////////////////////////////////////////////////////////////////////
 int myControl::AddEvent(::XKeyEvent* event)
 {
-    float previous_red = fColors[0];
-    fColors[0] = fColors[2];
-    fColors[2] = previous_red;
-    drawinghelpers::PostRedisplay(this);
+    uint8_t previous_red = ((myControltheme*)this->ThemeData)->bkgd_color[0];
+    ((myControltheme*)this->ThemeData)->bkgd_color[0] = ((myControltheme*)this->ThemeData)->bkgd_color[2];
+    ((myControltheme*)this->ThemeData)->bkgd_color[2] = previous_red;
+    ThemeData->update();
 }
 
-void myControl::draw()
-{
-    float fColorArray[4][3] = { fColors[0], 0.0, fColors[2],
-        fColors[0], 0.0, fColors[2],
-        fColors[0], 0.0, fColors[2],
-        fColors[0], 0.0, fColors[2] };
-    drawinghelpers::draw_box(CurrentSize.size.w, CurrentSize.size.h, 3, GL_FLOAT,  &(fColorArray[0][0]));
-}
+
 
 
 ////////////////////////////////////////////////////////////////////
 class myGluiWin : public GLUIWindow
 {
-    public :
-        myGluiWin(Display* glutDisplay) : GLUIWindow(glutDisplay,
-                                            glutDisplay->DefaultScreen()->RootWindow(),
-                                            0, 0,
-                                            200, 200,
-                                            1,
-                                            1,
-                0),
-            ctrl("top box")
-            {
-                Angle = 0;
-        add_control(&ctrl);
-            }
-        virtual int AddEvent(::XKeyEvent* event);
-       virtual void draw(void);
-       void simulatekey();
-       virtual void idle(void);
+        public :
+                class theme : public _Window::DefaultTheme
+                { 
+                        public :
+                                theme(myGluiWin& owner): _Window::DefaultTheme(owner) {};
+                                int draw();
+                };
+        public :
+                myGluiWin(Display* glutDisplay) : GLUIWindow(glutDisplay,
+                                glutDisplay->DefaultScreen()->RootWindow(),
+                                0, 0,
+                                200, 200,
+                                1,
+                                1,
+                                0),
+                ctrl("top box")
+                {
+                        Angle = 0;
+                        add_control(&ctrl);
+                }
+                virtual int AddEvent(::XKeyEvent* event);
+                void simulatekey();
+                virtual void idle(void);
 
 
-    public : //variables
-        float Angle;
-        myControl ctrl;
+        public : //variables
+                float Angle;
+                myControl ctrl;
 };
 
 int myGluiWin::AddEvent(::XKeyEvent* event)
 {
     Angle += 5.0f;
     Container::AddEvent((::XEvent*) event);
-    drawinghelpers::PostRedisplay(this);
+    ThemeData->update();
 }
 
 #if defined(GLUI_FREEGLUT)
@@ -114,11 +152,17 @@ int myGluiWin::AddEvent(::XKeyEvent* event)
 
 void myGluiWin::simulatekey(void)
 {
+    static int count = 0;
+
+    count ++;
     keyboard_func (GLUT_KEY_UP, 100, 100);
+    if (count % 10 == 0)
+      {
+        keyboard_func (GLUT_KEY_UP, ctrl.X() + ctrl.Width()/2, this->Height() -  ctrl.Y() - ctrl.Height()/2 );
+      }
 }
 
-
-void myGluiWin::draw(void)
+int myGluiWin::theme::draw(void)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear Screen And Depth Buffer
     glLoadIdentity();									// Reset The Current Modelview Matrix
@@ -142,7 +186,7 @@ void myGluiWin::draw(void)
     glEnd();											// Done Drawing The Quad
     glFlush();
     glTranslatef(100.0f,100.0f,-6.0f);				// Move Right 1.5 Units And Into The Screen 6.0
-    glRotatef(Angle,1.0f,1.0f,0.0f);			// Rotate The Quad On The X axis
+    glRotatef(((myGluiWin&)Owner).Angle,1.0f,1.0f,0.0f);			// Rotate The Quad On The X axis
     glColor3f(0.5f,0.5f,1.0f);							// Set The Color To Blue One Time Only
     glBegin(GL_QUADS);									// Draw A Quad
         glColor3f(0.0f,1.0f,0.0f);			// Set The Color To Blue
@@ -178,10 +222,12 @@ void myGluiWin::draw(void)
     glEnd();						// Done Drawing The Quad
     glFlush();
     //#error "pb dans le calcul de la taille de la fenêtre"
-    GLUIWindow::draw();
+    return _Window::DefaultTheme::draw();
 
 
 }
+
+
 
 void myGluiWin::idle(void)
 {

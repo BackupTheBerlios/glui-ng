@@ -68,7 +68,7 @@ void   StaticText::update_size( void )
 }
 
 //////////////////////////////////////////////////////////////////////////////
-themeData* StaticText::GetDefaultTheme()
+theme* StaticText::GetDefaultTheme()
 {
         return new StaticText::DefaultTheme(*this);
 }

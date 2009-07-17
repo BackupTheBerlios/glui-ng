@@ -30,7 +30,7 @@ namespace GLUI
 			StaticText(Node *parent, const char *name);
 
 		protected:
-                        virtual themeData* GetDefaultTheme();
+                        virtual theme* GetDefaultTheme();
 
 	};
 }

@@ -35,7 +35,6 @@ namespace GLUI
     class LiveVariables;
     class Container;
     class theme;
-    class themeData;
 
     class GLUIAPI Control : public Node, public EventHandler
     {
@@ -156,7 +155,7 @@ namespace GLUI
             void         set_alignment( Alignement align );
             void         set_resize_policy( SizePolicy policy) { resizeable = policy; }
             SizePolicy   get_resize_policy( void ) { return resizeable;}
-            int SetThemeData(themeData* data);
+            int SetTheme(theme* data);
 
             int  add_control( Node *control ); //<prevent adding subsequent controls
 
@@ -165,12 +164,12 @@ namespace GLUI
         protected: //methods
             Control(const char* name);
             Control();
-            virtual themeData* GetDefaultTheme() = 0;
+            virtual theme* GetDefaultTheme();
 
 
             bool CheckWidgetApiRevision(int Major, int Minor, int Revision);
         protected: //variables
-            themeData* ThemeData;
+            theme* ThemeData;
             static Control* focussed;
             SizePolicy resizeable;
             Size CurrentSize;

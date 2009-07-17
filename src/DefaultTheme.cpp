@@ -8,7 +8,7 @@ using namespace GLUI;
 
 
 /////////////////////////////////////////////////////////////////////////
-VertexObject* DefaultTheme::raised_box( uint32_t w, uint32_t h, uint32_t thickness)
+VertexObject* _DefaultTheme::raised_box( uint32_t w, uint32_t h, uint32_t thickness)
 {
         GLfloat Vertices[8][3] = { {  0.0,   0.0, 0.0}, //0
                 {    w,   0.0, 0.0}, //1
@@ -66,7 +66,7 @@ VertexObject* DefaultTheme::raised_box( uint32_t w, uint32_t h, uint32_t thickne
 
 
 /////////////////////////////////////////////////////////////////////////////
-VertexObject* DefaultTheme::lowered_box( uint32_t w, uint32_t h, uint32_t thickness)
+VertexObject* _DefaultTheme::lowered_box( uint32_t w, uint32_t h, uint32_t thickness)
 {
         GLfloat Vertices[8][3] = { {  0.0,   0.0, 0.0}, //0
                 {    w,   0.0, 0.0}, //1
@@ -122,17 +122,67 @@ VertexObject* DefaultTheme::lowered_box( uint32_t w, uint32_t h, uint32_t thickn
 
 ////////////////////////////////////////////////////////////////////
 // constructor
-DefaultTheme::DefaultTheme()
+_DefaultTheme::_DefaultTheme()
 {
-
+        border_color[0] = 0;
+        border_color[1] = 0;
+        border_color[2] = 0;
+        border_color[3] = 0;
+        bkgd_color[0] = 236;
+        bkgd_color[1] = 233;
+        bkgd_color[2] = 216;
+        bkgd_color[3] = 0;
 }
-        uint8_t DefaultTheme::border_color[4] = { 0, 0, 0, 0 };
-        uint8_t DefaultTheme::bkgd_color[4] = { 236, 233, 216, 0};
 
 
 ////////////////////////////////////////////////////////////////////
-DefaultThemeData::DefaultThemeData()
+int _DefaultTheme::draw()
 {
+        return 0;
+}
+////////////////////////////////////////////////////////////////////
+int _DefaultTheme::update()
+{
+        return 0;
 }
 
-
+////////////////////////////////////////////////////////////////////
+void _DefaultTheme::SetBorderColor(uint8_t border_color[4])
+{
+        memcpy(this->border_color,border_color,4*sizeof(uint8_t));
+}
+////////////////////////////////////////////////////////////////////
+void _DefaultTheme::SetBkgdColor(uint8_t bkgd_color[4])
+{
+        memcpy(this->bkgd_color,bkgd_color,4*sizeof(uint8_t));
+}
+////////////////////////////////////////////////////////////////////
+void _DefaultTheme::SetActivatedColor(uint8_t activated_color[4])
+{
+        memcpy(this->activated_color,activated_color,4*sizeof(uint8_t));
+}
+////////////////////////////////////////////////////////////////////
+void _DefaultTheme::SetHoverColor(uint8_t hover_color[4])
+{
+        memcpy(this->hover_color,hover_color,4*sizeof(uint8_t));
+}
+////////////////////////////////////////////////////////////////////
+void _DefaultTheme::GetBorderColor(uint8_t border_color[4])
+{
+        memcpy(border_color,this->border_color,4*sizeof(uint8_t));
+}
+////////////////////////////////////////////////////////////////////
+void _DefaultTheme::GetBkgdColor(uint8_t bkgd_color[4])
+{
+        memcpy(bkgd_color,this->bkgd_color,4*sizeof(uint8_t));
+}
+////////////////////////////////////////////////////////////////////
+void _DefaultTheme::GetActivatedColor(uint8_t activated_color[4])
+{
+        memcpy(activated_color,this->activated_color,4*sizeof(uint8_t));
+}
+////////////////////////////////////////////////////////////////////
+void _DefaultTheme::GetHoverColor(uint8_t hover_color[4])
+{
+        memcpy(hover_color,this->hover_color,4*sizeof(uint8_t));
+}

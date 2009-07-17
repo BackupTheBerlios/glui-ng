@@ -29,25 +29,13 @@ namespace GLUI
 
         };
 
-        class LigthningThemeData : public themeData
+        class LigthningWindowTheme : public LigthningTheme
         {
-                private :
-                        LigthningThemeData();
-                public:
-                        LigthningThemeData(LigthningTheme& TheTheme);
-                protected:
-                        LigthningTheme& TheTheme;
-        };
-
-
-        class LigthningWindowTheme : public LigthningThemeData
-        {
-                public : //methods
-                        LigthningWindowTheme(theme& TheTheme, Control& owner);
+                public :
                         virtual int draw();
                         virtual int update();
-                protected: //variable
         };
+
 
 }
 #endif

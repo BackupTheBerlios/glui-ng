@@ -39,23 +39,29 @@ int main(int argc, char* argv[])
 
 class myGluiWin : public GLUIWindow
 {
-    public :
-        myGluiWin(Display* glutDisplay) : GLUIWindow(glutDisplay,
-                                            glutDisplay->DefaultScreen()->RootWindow(),
-                                            -1, -1,
-                                            200, 200,
-                                            1,
-                                            1,
-                                            0)
-    {
-        set_resize_policy(FixedSize);
-    }
-       virtual void draw(void);
-       virtual void idle(void);
+        public :
+                myGluiWin(Display* glutDisplay) : GLUIWindow(glutDisplay,
+                                glutDisplay->DefaultScreen()->RootWindow(),
+                                -1, -1,
+                                200, 200,
+                                1,
+                                1,
+                                0)
+                {
+                        set_resize_policy(FixedSize);
+                }
+                virtual void idle(void);
+                class myGluiWinTheme : public _Window::DefaultTheme
+                {
+                        public:
+                                myGluiWinTheme(myGluiWin& owner) : _Window::DefaultTheme(owner) {}
+                                int draw();
+                };
+                theme* GetDefaultTheme() { return new myGluiWinTheme(*this); }
+
 };
 
-
-void myGluiWin::draw(void)
+int myGluiWin::myGluiWinTheme::draw(void)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear Screen And Depth Buffer
     glLoadIdentity();									// Reset The Current Modelview Matrix
@@ -115,9 +121,7 @@ void myGluiWin::draw(void)
     glEnd();						// Done Drawing The Quad
     glFlush();
     //#error "pb dans le calcul de la taille de la fenêtre"
-    GLUIWindow::draw();
-
-
+    return DefaultTheme::draw();
 }
 
 

@@ -76,7 +76,7 @@ bool Button::GetValue()
         return value;
 }
 
-themeData* Button::GetDefaultTheme()
+theme* Button::GetDefaultTheme()
 {
         return new Button::DefaultTheme(*this);
 }
@@ -99,8 +99,8 @@ int Button::DefaultTheme::update()
         if (this->un_pressed != NULL ) delete this->un_pressed;
         if (this->pressed != NULL ) delete this->pressed;
 
-        this->un_pressed =  TheDefaultTheme.lowered_box(Owner.Width(), Owner.Height());
-        this->pressed = TheDefaultTheme.raised_box(Owner.Width(), Owner.Height());
+        this->un_pressed =  lowered_box(Owner.Width(), Owner.Height());
+        this->pressed = raised_box(Owner.Width(), Owner.Height());
 
 }
 
@@ -139,7 +139,7 @@ void TextButton::SetText(char* newtext)
     text.set_text(newtext);
 }
 
-themeData* TextButton::GetDefaultTheme()
+theme* TextButton::GetDefaultTheme()
 {
         return new TextButton::DefaultTheme(*this);
 }

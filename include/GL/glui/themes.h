@@ -34,15 +34,16 @@ namespace GLUI
 {
         class Control;
         class Container;
-        class themeData;
 
-        themeData* GetTheme(const Control& ctrl);
 
         class theme
         {
-                protected :
-                        theme( void );
+                public:
+                        virtual int draw()=0;
+                        virtual int update()=0;
                         virtual ~theme();
+               protected :
+                        theme( void );
                         void FillglColorPointer(
                                         uint8_t *inColor, //< array of 4 uint8_t color elements
                                         GLint size,       //< numbers of elements per colors (3=RGB 4=RGBA)
@@ -69,18 +70,9 @@ namespace GLUI
                 private:
         };
 
-        class themeData
-        {
-                public: //methods
-                        themeData();
-                        virtual ~themeData();
-                        virtual int draw()=0;
-                        virtual int update()=0;
-                protected:
-        };
-
 
  
+        theme* GetTheme(const Control& ctrl);
 
 
 }

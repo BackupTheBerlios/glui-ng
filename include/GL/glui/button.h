@@ -22,7 +22,7 @@ namespace GLUI
 	class GLUIAPI Button : public Container, public EventInterpreter
 	{
                 public: //types
-                        class DefaultTheme : public DefaultThemeData
+                        class DefaultTheme : public _DefaultTheme
                         {
                                 public : //methods
                                         DefaultTheme(Button& owner) : Owner(owner) {};
@@ -53,7 +53,7 @@ namespace GLUI
 		protected:
                         bool value;
 			void common_init(void) ;
-                        virtual themeData* GetDefaultTheme();
+                        virtual theme* GetDefaultTheme();
 
 	};
 
@@ -80,7 +80,7 @@ namespace GLUI
 	class GLUIAPI TextButton : public Button
 	{
                 public : //types
-                        class DefaultTheme : public DefaultThemeData
+                        class DefaultTheme : public _DefaultTheme
                         {
                                 public : //methods
                                         DefaultTheme(TextButton& owner) : Owner(owner) {};
@@ -98,7 +98,7 @@ namespace GLUI
 		protected:
 			//		void draw_text( int sunken );
 			StaticText text;
-                        virtual themeData* GetDefaultTheme();
+                        virtual theme* GetDefaultTheme();
 	};
 
 

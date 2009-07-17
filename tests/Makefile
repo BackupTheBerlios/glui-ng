@@ -32,7 +32,7 @@ endif
 
 #addition to environnement variable, be carefull when nesting subdirs in this makefile
 CXX_LDFLAGS  += -lpthread -lGLU -lGL
-CXXFLAGS   += -Wall -fPIC -Werror-implicit-function-declaration
+CXXFLAGS   += -Wall -fPIC
 CPPFLAGS += -I../include
 
 # programs to install in ${prefix}/bin directory
@@ -40,7 +40,7 @@ CPPFLAGS += -I../include
 # it then has to be set before including of Makefiles.autoapp
 noinst_CXXPROGRAMS = SizeComputationTest PackingTest ContainerEventTest
 noinst_CXXPROGRAMS+= GlutWindowTest GlutKeyboardTest GlutKeyboardUserTest
-noinst_CXXPROGRAMS+= DrawingHelpsTest DrawingHelps-boxTest Lightning_test
+#noinst_CXXPROGRAMS+= Lightning_test
 
 #sources and additional variables for myapp1
 SizeComputationTest_SOURCES = SizeComputationTest.cpp
@@ -72,16 +72,6 @@ GlutKeyboardUserTest_LDADD   = ${LIBGLUIDLL}  -lglut
 GlutKeyboardUserTest_ARADD   = ${LIBGLUIA}
 
 
-DrawingHelpsTest_SOURCES = DrawingHelpsTest.cpp
-DrawingHelpsTest_LDADD   = ${LIBGLUIDLL}  -lglut
-DrawingHelpsTest_ARADD   = ${LIBGLUIA}
-
-
-DrawingHelps_boxTest_SOURCES = DrawingHelps-boxTest.cpp
-DrawingHelps_boxTest_LDADD   = ${LIBGLUIDLL}  -lglut
-DrawingHelps_boxTest_ARADD   = ${LIBGLUIA}
-
-
 Lightning_test_SOURCES = Lightning_test.cpp
 Lightning_test_LDADD   = ${LIBGLUIDLL}  -lglut
 Lightning_test_ARADD   = ${LIBGLUIA}
@@ -89,7 +79,7 @@ Lightning_test_ARADD   = ${LIBGLUIA}
 
 
 #a special target : it only modify CFLAGS variables before making it the standard way
-debug : CFLAGS+= -g3 -gdwarf-2 -O0
+debug : CXXFLAGS+= -g3 -gdwarf-2 -O0
 debug : all
 	
 clean : 

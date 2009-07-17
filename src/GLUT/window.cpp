@@ -330,8 +330,6 @@ int GlutWindow::AddEvent(::XExposeEvent *event)
         glShadeModel(GL_SMOOTH);
 
         ThemeData->draw();
-        SetOrthoProjection();
-
 
         this->SetCurrentDrawBuffer();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear Screen And Depth Buffer

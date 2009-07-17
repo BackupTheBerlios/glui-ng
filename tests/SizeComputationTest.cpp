@@ -8,47 +8,53 @@ using namespace std;
 /////////////////////////////////////////////////////////////////
 class LeefOk : public Control
 {
-    public :
-        LeefOk(char* name) : Control(name) {}
-        virtual int AddEvent (::XEvent* event);
-        void draw() {};
+        public :
+                LeefOk(char* name) : Control(name) {}
+                virtual int AddEvent (::XEvent* event);
+                virtual theme* GetDefaultTheme();
 };
 
 class LeefKo : public Control
 {
-    public :
-        LeefKo(char* name) : Control(name) {}
-        virtual int AddEvent (::XEvent* event);
-        void draw() {};
+        public :
+                LeefKo(char* name) : Control(name) {}
+                virtual int AddEvent (::XEvent* event);
+                virtual theme* GetDefaultTheme();
 };
+
+
+theme* LeefOk::GetDefaultTheme() {return NULL;}
+theme* LeefKo::GetDefaultTheme() {return NULL;}
 
 int LeefOk::AddEvent(::XEvent* event)
 {
-    if (event->type == KeyPress)
-      return 0;
+        if (event->type == KeyPress)
+                return 0;
 }
 
 int LeefKo::AddEvent(::XEvent* event)
 {
-    return 1;
+        return 1;
 }
 
 ///////////////////////////////////////////////////////////////
 class DoNotForward : public Container
 {
-    public :
-    DoNotForward(char* name) : Container(name)
-         { DoNotPropagateMask = KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask; }
-    void draw() {}
+        public :
+                DoNotForward(char* name) : Container(name)
+        { DoNotPropagateMask = KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask; }
+                virtual theme* GetDefaultTheme();
 };
+theme* DoNotForward::GetDefaultTheme() {return NULL;}
 
 class DoForward : public Container
 {
-    public :
-    DoForward(char* name) : Container(name)
-    { DoNotPropagateMask = 0; }
-    void draw() {}
+        public :
+                DoForward(char* name) : Container(name)
+        { DoNotPropagateMask = 0; }
+                virtual theme* GetDefaultTheme();
 };
+theme* DoForward::GetDefaultTheme() {return NULL;}
 
 
 //////////////////////////////////////////////////////////////

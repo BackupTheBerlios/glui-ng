@@ -11,12 +11,12 @@ dir=${0%/*}
 echo ${dir}
 pushd ${dir}
 
-check ./GENERATED/bin/PackingTest
-check ./GENERATED/bin/SizeComputationTest
-check ./GENERATED/bin/ContainerEventTest
-check ./GENERATED/bin/GlutWindowTest
-check ./GENERATED/bin/GlutKeyboardTest
-check ./GENERATED/bin/DrawingHelpsTest
+check ./GENERATED/PackingTest
+check ./GENERATED/SizeComputationTest
+check ./GENERATED/ContainerEventTest
+check ./GENERATED/GlutWindowTest
+check ./GENERATED/GlutKeyboardTest
+check ./GENERATED/DrawingHelpsTest
 
 popd
 
