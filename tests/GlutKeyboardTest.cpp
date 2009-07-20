@@ -67,7 +67,8 @@ int myControl::myControltheme::draw()
 myControl::myControl(const char* name) :
     Control(name)
 {
-    ((myControltheme*)this->ThemeData)->bkgd_color[0] = 255;
+    ((myControltheme*)this->ThemeData)->bkgd_color[0] = 253;
+    ((myControltheme*)this->ThemeData)->bkgd_color[1] = 0;
     ((myControltheme*)this->ThemeData)->bkgd_color[2] = 0;
     set_size(Size(200u,10u));
     this->SetTheme(new myControl::myControltheme(*this));
@@ -107,6 +108,7 @@ class myGluiWin : public GLUIWindow
                 {
                         Angle = 0;
                         add_control(&ctrl);
+                        SetTheme(new theme(*this));
                 }
                 virtual int AddEvent(::XKeyEvent* event);
                 void simulatekey();
@@ -164,6 +166,7 @@ void myGluiWin::simulatekey(void)
 
 int myGluiWin::theme::draw(void)
 {
+        _Window::DefaultTheme::draw();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear Screen And Depth Buffer
     glLoadIdentity();									// Reset The Current Modelview Matrix
     glTranslatef(40.0f,40.0f,-6.0f);						// Move Left 1.5 Units And Into The Screen 6.0
@@ -222,7 +225,7 @@ int myGluiWin::theme::draw(void)
     glEnd();						// Done Drawing The Quad
     glFlush();
     //#error "pb dans le calcul de la taille de la fenêtre"
-    return _Window::DefaultTheme::draw();
+    return 0;
 
 
 }

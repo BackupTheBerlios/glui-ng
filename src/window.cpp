@@ -44,11 +44,7 @@ _Display::_Display()
 _Window::_Window() :
     Container("window")
 {
-}
-/////////////////////////////////////////////////////////////////////////////
-void _Window::DefaultTheme::SetViewport()
-{
-    glViewport( 0, 0, Owner.Width(), Owner.Height() );
+        SetTheme(new _Window::DefaultTheme(*this));
 }
 /////////////////////////////////////////////////////////////////////////////
 int _Window::SetCurrentDrawBuffer( void )
@@ -79,6 +75,12 @@ _Window::DefaultTheme::DefaultTheme(_Window& owner) : Owner(owner)
 _Window::DefaultTheme::~DefaultTheme()
 {
 }
+/////////////////////////////////////////////////////////////////////////////
+void _Window::DefaultTheme::SetViewport()
+{
+    glViewport( 0, 0, Owner.Width(), Owner.Height() );
+}
+
 /////////////////////////////////////////////////////////////////////////////
 void  _Window::DefaultTheme::SetOrthoProjection( void )
 {

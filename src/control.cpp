@@ -288,7 +288,7 @@ Control::Control(const char* name) : Node(name)
     APIMinor       = 0;
     APIRevision    = 0;
     this->ThemeData = GLUI::GetTheme(*this);
-    if (this->ThemeData == NULL) this->ThemeData = new _DefaultTheme;
+    SetTheme(new _DefaultTheme);
 }
 
 ////////////////////////////////////////////////////////////////////////
