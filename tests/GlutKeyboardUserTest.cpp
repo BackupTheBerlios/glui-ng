@@ -67,10 +67,11 @@ int myControl::myControltheme::draw()
 myControl::myControl(const char* name) :
     Control(name)
 {
+    this->SetTheme(new myControl::myControltheme(*this));
     ((myControltheme*)this->ThemeData)->bkgd_color[0] = 255;
+    ((myControltheme*)this->ThemeData)->bkgd_color[1] = 0;
     ((myControltheme*)this->ThemeData)->bkgd_color[2] = 0;
     set_size(Size(200u,10u));
-    this->SetTheme(new myControl::myControltheme(*this));
 }
 
 ///////////////////////////////////////////////////////////////////////
