@@ -49,7 +49,7 @@
 #endif
 
 #endif
-#include <GL/glui/glut_window.h>
+#include <GL/glui/window.h>
 #include <GL/glui/MasterObject.h>
 #include <GL/glui/debug.h>
 #include <GL/glui/themes.h>
@@ -93,8 +93,6 @@ _Screen* GlutDisplay::DefaultScreen()
 }
 
 ///////////////////////////////////////////////////////////////////////
-//
-
 bool GlutWindow::glutinitialized = false;
 
 ///////////////////////////////////////////////////////////////////////
@@ -108,12 +106,12 @@ void  GlutWindow::XMapWindow()
         expose.type = Expose;
         this->AddEvent(&expose);
 }
-
+///////////////////////////////////////////////////////////////////////////////
 void GlutWindow::XMapRaised()
 {
 #warning "TODO"
 }
-
+///////////////////////////////////////////////////////////////////////////////
 void GlutWindow::XMapSubwindows()
 {
 #warning "TODO"
@@ -122,11 +120,15 @@ void GlutWindow::XMapSubwindows()
 ///////////////////////////////////////////////////////////////////////
 void GlutWindow::XUnmapWindow( void )
 {
-  this->focussed = NULL;
-  glutSetWindow(GlutWindowId);
-  glutHideWindow();
+        if (mapped)
+        {
+                this->focussed = NULL;
+                glutSetWindow(GlutWindowId);
+                glutHideWindow();
+                mapped      = false;
+        }
 }
-
+///////////////////////////////////////////////////////////////////////////////
 void GlutWindow::XUnmapSubwindows()
 {
 #warning "TODO"
@@ -150,7 +152,7 @@ GlutWindow::GlutWindow(Display* display, WindowId parent,
         _class, visual, valuemask,
         attributes );
 }
-
+///////////////////////////////////////////////////////////////////////////////
 GlutWindow::GlutWindow(Display *display, WindowId parent,
         int x, int y,
         unsigned int width, unsigned int height,
@@ -170,7 +172,7 @@ GlutWindow::GlutWindow(Display *display, WindowId parent,
 }
 
 #warning "TODO: copy constructor using WindowId, throw EINVAL if already registered"
-
+///////////////////////////////////////////////////////////////////////////////
 int GlutWindow::_GlutWindow(Display* display, WindowId parent,
         int x, int y,
         unsigned int width, unsigned int height,
@@ -246,14 +248,22 @@ int GlutWindow::_GlutWindow(Display* display, WindowId parent,
     glutEntryFunc (entry_func);
     glutVisibilityFunc (visibility_func);
     glutIdleFunc (idle_func);
+    Start(NULL);
 
 }
 
+void* GlutWindow::start_routine(void* args)
+{
+    glutMainLoop ();
+}
+///////////////////////////////////////////////////////////////////////////////
 GlutWindow::~GlutWindow()
 {
-#warning "Todo : delete childs. close the window"
+        GlutWindow::XUnmapWindow();
+        glutDestroyWindow(this->GlutWindowId);
+        //child deletion is performed by ~Container
 }
-
+///////////////////////////////////////////////////////////////////////////////
 int GlutWindow::init(int* argc, char** argv)
 {
   if(glutinitialized == false)

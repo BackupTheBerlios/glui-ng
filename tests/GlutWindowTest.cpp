@@ -5,38 +5,6 @@
 #include <stdlib.h>
 using namespace GLUI;
 
-#if (__USE_XLIB == 1 || __USE_WIN32 == 1 )
-int main(int argc, char* argv[])
-{
-    return 0;
-}
-#else
-
-#if defined(GLUI_FREEGLUT)
-
-// FreeGLUT does not yet work perfectly with GLUI
-//  - use at your own risk.
-
-
-#include <GL/freeglut.h>
-
-#elif defined(GLUI_OPENGLUT)
-
-// OpenGLUT does not yet work properly with GLUI
-//  - use at your own risk.
-
-#include <GL/openglut.h>
-
-#else
-
-#ifdef __APPLE__
-#include <GLUT/glut.h>
-#else
-#include <GL/glut.h>
-#endif
-#endif
-
-
 class myGluiWin : public GLUIWindow
 {
         public :
@@ -47,8 +15,8 @@ class myGluiWin : public GLUIWindow
                                 int draw();
                 };
         public :
-                myGluiWin(Display* glutDisplay) : GLUIWindow(glutDisplay,
-                                glutDisplay->DefaultScreen()->RootWindow(),
+                myGluiWin(Display* TheDisplay) : GLUIWindow(TheDisplay,
+                                TheDisplay->DefaultScreen()->RootWindow(),
                                 -1, -1,
                                 200, 200,
                                 1,
@@ -58,7 +26,6 @@ class myGluiWin : public GLUIWindow
                         set_resize_policy(FixedSize);
                         SetTheme(new myGluiWinTheme(*this));
                 }
-                virtual void idle(void);
 
                 theme* GetDefaultTheme() { return new myGluiWinTheme(*this); }
 
@@ -129,33 +96,20 @@ int myGluiWin::myGluiWinTheme::draw(void)
 }
 
 
-void myGluiWin::idle(void)
-{
-    struct timespec sleeptime = { 0, 100000000 };
-    static int count = 0;
 
-    if (count < 50)
-      {
-        count++;
-        nanosleep(&sleeptime, NULL);
-      }
-    else
-      {
-        XUnmapWindow();
-        delete(this); 
-        exit(0);
-      }
-
-}
 
 int main(int argc, char** argv)
 {
+    struct timespec sleeptime = { 5, 0 };
     GLUIWindow::init(&argc, argv);  //optional
-    Display*    glutDisplay = new Display("glut display");
-    GLUIWindow* glutWindow = new myGluiWin(glutDisplay);
-    glutWindow->XMapWindow();
-    glutMainLoop ();
+    Display*    TheDisplay = new Display(" display");
+    GLUIWindow* Window = new myGluiWin(TheDisplay);
+    Window->XMapWindow();
+    nanosleep(&sleeptime, NULL);
+    Window->XUnmapWindow();
+    delete(Window); 
+    delete(TheDisplay);
+    exit(0);
 
 }
-#endif
 

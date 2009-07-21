@@ -27,9 +27,11 @@
 */
 
 #include <GL/glui/window.h>
+#include <GL/glui/Exception.h>
 #include <GL/gl.h>
 #include <stdlib.h>
 #include <string.h>
+#include <pthread.h>
 using namespace GLUI;
 /////////////////////////////////////////////////////////////////////////////
 _Display::_Display()
@@ -65,6 +67,23 @@ _Window::buffer_mode_t _Window::get_buffer_mode() {
     if ( bufferModeEnv != NULL &&
             0 ==  strcmp(bufferModeEnv, "buffer_front") ) return buffer_front;
     else return buffer_back;
+}
+/////////////////////////////////////////////////////////////////////////////
+void _Window::Start(void* arg)
+{
+        ThreadArgs args;
+        args.TheWindow=this;
+        args.args=arg;
+        int err = pthread_create(&main_thread,NULL,_Start, (void*)&args);
+        if (err)
+        {
+                throw new  Exception(err, "window thread creation error");
+        }
+}
+void* _Window::_Start(void* arg)
+{
+        ThreadArgs* args = (ThreadArgs*) arg;
+        return args->TheWindow->start_routine(args->args);
 }
 
 /////////////////////////////////////////////////////////////////////////////

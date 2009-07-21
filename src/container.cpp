@@ -53,8 +53,6 @@ Container::Container(const char *name ,
 ///////////////////////////////////////////////////////////////////////////////////////
 Container::~Container()
 {
-#warning "to check"
-    /*
     Control *item = (Control*) this->first_child();
 
     while (item)
@@ -63,8 +61,6 @@ Container::~Container()
         item = (Control*) item->next();
         delete tmp;
     }
-    */
-
 }
 
 

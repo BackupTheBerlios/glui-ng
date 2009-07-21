@@ -43,7 +43,6 @@
   This entire approach seems to be superceded by the "subwindow" flavor
   of GLUI.
   */
-#include <GL/glui/window.h>
 namespace GLUI
 {
     class GlutDisplay;
@@ -134,6 +133,7 @@ namespace GLUI
                     Visual *visual,
                     unsigned long valuemask,
                     XSetWindowAttributes *attributes );
+            void* start_routine(void* args);
             /*********** Pointers to GLUT callthrough functions *****/
             static void keyboard_func(unsigned char, int, int);
             static void special_func(int, int, int);
