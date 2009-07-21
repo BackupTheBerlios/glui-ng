@@ -8,7 +8,6 @@ class LeefOk : public Control
     public :
         LeefOk(char* name) : Control(name) {}
         virtual int AddEvent (::XEvent* event);
-        void draw() {};
 };
 
 class LeefKo : public Control
@@ -16,7 +15,6 @@ class LeefKo : public Control
     public :
         LeefKo(char* name) : Control(name) {}
         virtual int AddEvent (::XEvent* event);
-        void draw() {};
 };
 
 int LeefOk::AddEvent(::XEvent* event)
@@ -25,10 +23,12 @@ int LeefOk::AddEvent(::XEvent* event)
       return 0;
 }
 
+
 int LeefKo::AddEvent(::XEvent* event)
 {
     return 1;
 }
+
 
 ///////////////////////////////////////////////////////////////
 class DoNotForward : public Container
@@ -36,16 +36,16 @@ class DoNotForward : public Container
     public :
     DoNotForward(char* name) : Container(name)
          { DoNotPropagateMask = KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask; }
-    void draw() {}
 };
+
 
 class DoForward : public Container
 {
     public :
     DoForward(char* name) : Container(name)
     { DoNotPropagateMask = 0; }
-    void draw() {}
 };
+
 
 
 //////////////////////////////////////////////////////////////

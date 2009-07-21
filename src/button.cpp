@@ -31,8 +31,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include <GL/glui/internal_control.h>
 #include <GL/glui/button.h>
 #include <GL/glui/MasterObject.h>
-#include <GL/glui/drawinghelpers.h>
 #include <GL/glui/window.h>
+#include <GL/glui/themes.h>
+#include <GL/glui/VertexObject.h>
 
 using namespace GLUI;
 /****************************** Button::Button() **********/
@@ -48,7 +49,8 @@ Button::Button( Node *parent, const char *name,
 #warning "register on KeyPress, KeyRelease, ButtonPress, ButtonRelease, EnterNotify, LeaveNotify, MotionNotify"
 }
 
-int Button::AddEvent (::XEvent *event)
+/////////////////////////////////////////////////////////////////
+int Button::AddEvent(::XEvent *event)
 {
     EventInterpreter::AddEvent(event);
 
@@ -56,35 +58,72 @@ int Button::AddEvent (::XEvent *event)
     {
         //value.SetVal(true);
         value = true;
-        drawinghelpers::PostRedisplay(this);
+        ThemeData->update();
     }
 
 
 }
 
-/********************************************** Button::draw() **********/
-
-void   Button::draw()
-{
-    /* TODO
-     * this shall use a VertexObject, that is updated (delete then create a new one) on size update
-    if (GetStatus() & EventInterpreter::buttonpressed)
-    {
-        drawinghelpers::draw_lowered_box( CurrentSize.size.w, CurrentSize.size.h );
-    }
-    else
-    {
-        drawinghelpers::draw_raised_box( CurrentSize.size.w, CurrentSize.size.h );
-    }
-    glTranslatef( 0.0, 0.0, level());
-    */
-}
 
 void Button::common_init(void) {
     CurrentSize.size.h            = GLUI_BUTTON_SIZE;
     CurrentSize.size.w            = 100;
     alignment    = Control::CENTER;
 }
+
+bool Button::GetValue()
+{
+        return value;
+}
+
+theme* Button::GetDefaultTheme()
+{
+        return new Button::DefaultTheme(*this);
+}
+
+////////////////////////////////////////////////////////////
+int Button::DefaultTheme::draw()
+{
+        if (((Button&)Owner).GetValue())
+        {
+                this->pressed->draw();
+        }
+        else
+        {
+                this->un_pressed->draw();
+        }
+}
+
+int Button::DefaultTheme::update()
+{
+        if (this->un_pressed != NULL ) delete this->un_pressed;
+        if (this->pressed != NULL ) delete this->pressed;
+
+        this->un_pressed =  lowered_box(Owner.Width(), Owner.Height());
+        this->pressed = raised_box(Owner.Width(), Owner.Height());
+
+}
+
+Button::DefaultTheme::~DefaultTheme()
+{
+        if (this->un_pressed != NULL ) delete this->un_pressed;
+        if (this->pressed != NULL ) delete this->pressed;
+}
+/*////////////////////////////////////////////////////////////
+int DefaultToggleButtonTheme::draw()
+{
+}
+int DefaultToggleButtonTheme::update()
+{
+}*/
+////////////////////////////////////////////////////////////
+int TextButton::DefaultTheme::draw()
+{
+}
+int TextButton::DefaultTheme::update()
+{
+}
+
 
 
 TextButton::TextButton (Node *parent, const char *name,
@@ -98,5 +137,10 @@ TextButton::TextButton (Node *parent, const char *name,
 void TextButton::SetText(char* newtext)
 {
     text.set_text(newtext);
+}
+
+theme* TextButton::GetDefaultTheme()
+{
+        return new TextButton::DefaultTheme(*this);
 }
 

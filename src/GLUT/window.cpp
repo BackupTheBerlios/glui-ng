@@ -53,7 +53,6 @@
 #include <GL/glui/MasterObject.h>
 #include <GL/glui/debug.h>
 #include <GL/glui/themes.h>
-#include <GL/glui/drawinghelpers.h>
 
 #define XK_MISCELLANY
 #define XK_LATIN1
@@ -66,16 +65,7 @@ using namespace GLUI;
 GlutDisplay::GlutDisplay(char* name)
 {
 }
-///////////////////////////////////////////////////////////////////////
-void GlutWindow::draw()
-{
-    //    Draw GLUI window
-    glLoadIdentity();
-    this->SetOrthoProjection();
-    glTranslatef(x, y, BOTTOM_VIEWPORT + 1);
-    drawinghelpers::draw_box( this->Width(),
-            this->Height());
-}
+
 ///////////////////////////////////////////////////////////////////////
 WindowId GlutWindow::GetWindowId()
 {
@@ -110,11 +100,13 @@ bool GlutWindow::glutinitialized = false;
 ///////////////////////////////////////////////////////////////////////
 void  GlutWindow::XMapWindow()
 {
-  glutSetWindow(GlutWindowId);
-  MasterObject::Instance()->pack(0, 0); //repack all master windows
-  glutShowWindow();
-  mapped = true;
-  drawinghelpers::PostRedisplay(this);
+        glutSetWindow(GlutWindowId);
+        MasterObject::Instance()->pack(0, 0); //repack all master windows
+        glutShowWindow();
+        mapped = true;
+        ::XExposeEvent expose;
+        expose.type = Expose;
+        this->AddEvent(&expose);
 }
 
 void GlutWindow::XMapRaised()
@@ -337,9 +329,7 @@ int GlutWindow::AddEvent(::XExposeEvent *event)
         glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
         glShadeModel(GL_SMOOTH);
 
-        theme::Instance()->DoLightning();
-        SetOrthoProjection();
-
+        ThemeData->draw();
 
         this->SetCurrentDrawBuffer();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear Screen And Depth Buffer
@@ -356,11 +346,11 @@ int GlutWindow::AddEvent(::XExposeEvent *event)
 
         Container::AddEvent (event);
 
-        switch (drawinghelpers::get_buffer_mode()) {
-            case drawinghelpers::buffer_front: // Make sure drawing gets to screen
+        switch (get_buffer_mode()) {
+            case buffer_front: // Make sure drawing gets to screen
                 glFlush();
                 break;
-            case drawinghelpers::buffer_back: // Bring back buffer to front
+            case buffer_back: // Bring back buffer to front
                 glutSwapBuffers();
                 break;
         }
@@ -472,7 +462,7 @@ void GlutWindow::reshape_func (int w, int h)
 
 
 
-#warning "factorise
+#warning "factorise"
 /********************************************** glui_keyboard_func() ********/
 //GLUI use Y axis up (0,0) is bottom left corner as in OpenGl
 void GlutWindow::keyboard_func (unsigned char key, int x, int y)
@@ -698,7 +688,7 @@ void GlutWindow::idle_func (void)
 ////////////////////////////////////////////////////////////////////
 KeySym GlutWindow::XLookupKeysym(::XKeyEvent *key_event, int index)
 {
-    switch (key_event->keycode)
+/*    switch (key_event->keycode)
     {
 
         case GLUT_KEY_F1 << KeyModifierShift : return XK_F1;
@@ -817,6 +807,8 @@ KeySym GlutWindow::XLookupKeysym(::XKeyEvent *key_event, int index)
         case '}' : return XK_braceright;
         case '~' : return XK_asciitilde;
         default: return XK_VoidSymbol;
+
     }
+*/
 }
 

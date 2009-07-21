@@ -13,12 +13,11 @@ confiserie=${confiserie:=.}
 
 unset MODIFIED_ENV
 
-PACKAGE_OPTS_COUNT=${#CONFIGURE_OPTS[@]}
-CONFIGURE_OPTS[$((PACKAGE_OPTS_COUNT+1))]="--prefix=,PREFIX,configure package to be located in prefix [path],/usr/local"
-CONFIGURE_OPTS[$((PACKAGE_OPTS_COUNT+2))]="--crosscompiling=,CROSSCOMPILING,the package is crosscompiled [YES|NO],NO"
-CONFIGURE_OPTS[$((PACKAGE_OPTS_COUNT+3))]="--enable-link-farm=,ENABLE_LINK_FARM,enable link farm creation [YES|NO],NO"
-PACKAGE_OPTS_COUNT=${#CONFIGURE_OPTS[@]}
-
+__opts() {
+CONFIGURE_OPTS[__idx__]="--prefix=,PREFIX,configure package to be located in prefix,[path],/usr/local"
+CONFIGURE_OPTS[__idx__]="--crosscompiling=,CROSSCOMPILING,the package is crosscompiled,[YES|NO],NO"
+CONFIGURE_OPTS[__idx__]="--enable-link-farm=,ENABLE_LINK_FARM,enable link farm creation,[YES|NO],NO"
+}
 
 #interactive_conf() {
 #	
@@ -39,22 +38,27 @@ parse_opts() {
 
 	assign_defaults() {
 		var=$2
-		default=$4
+		default=$5
 		if [ -n "$default" ]; then
 			eval $var=$default
+                        conf_cache $var
 		fi
 	}
 
 	read_vars() {
 		long=$1
 		var=$2
+                possibilities=$(echo $4| tr -t '|[]' '   ')
 	}
 	
 	local cur_pos
 	OLDIFS=${IFS}
 
+        [ -f "${confiserie}/options.sh" ] && source ${confiserie}/options.sh
+
 	IFS=$','
 	cur_pos=1
+        PACKAGE_OPTS_COUNT=${#CONFIGURE_OPTS[@]}
 	while [ ${cur_pos} -le ${PACKAGE_OPTS_COUNT} ]; do
 		assign_defaults ${CONFIGURE_OPTS[$cur_pos]}
 		cur_pos=$(($cur_pos + 1))
@@ -69,7 +73,16 @@ parse_opts() {
 				-h|--help) display_help >&2; exit 0;;
 				-V|--version*) echo "$0 : 0.0.2"; exit 0;;
 				--interactive) interactive_conf;;
-				$long*) eval export $var=${1##$long}; conf_cache $var;;
+				$long*) 
+                                        if [ "$(echo $possibilities | wc -w)" -gt 1 ]; then
+                                                echo $possibilities | grep -q ${1##$long} ||
+                                                {
+                                                        echo "$long need : $possibilities"
+                                                        exit 1;
+                                                }
+                                        fi
+                                        eval export $var=${1##$long}; 
+                                        conf_cache $var;;
 			esac
 			cur_pos=$(($cur_pos + 1))
 		done
@@ -85,7 +98,7 @@ display_help() {
 
 
 	format_option() {
-		echo -e "\t$1\n\t\tresult in $2, $3, default:$4"
+		echo -e "\t$1\n\t\tresult in $2, $3, $4 default:$5"
 	}
 
 	cat <<-EOF
@@ -221,6 +234,9 @@ create_include() {
 create_makefile() {
         File=${1};
         shift;
+        for variable in ${MODIFIED_ENV}; do
+                eval echo "export ${variable}=\$${variable}" >> ${File};
+        done
         while [ "$#" -gt 0 ]; do
                 eval echo "export ${1}=\$${1}" >> ${File};
                 shift;
@@ -254,8 +270,8 @@ if which_result=$(${confiserie}/which.sh which); then
 else
     export WHICH="${confiserie}/which.sh"
 fi   &&
-run_init "$@"                                 &&
 runtest ${confiserie}/confiserie.cache.functions.sh &&
+run_init "$@"                                 &&
 find_topsrc_objdir                            &&
 runtest ${confiserie}/plateform_information.sh      &&
 runtest ${confiserie}/tools/test_echo.sh            &&

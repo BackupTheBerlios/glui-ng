@@ -28,13 +28,13 @@
 #include <GL/glui/xwrapper.h>
 #include <GL/glui/event_handler.h>
 
-
 #define GLUI_CONTROL_MAX_THICKNESS 4
 
 namespace GLUI
 {
     class LiveVariables;
     class Container;
+    class theme;
 
     class GLUIAPI Control : public Node, public EventHandler
     {
@@ -107,6 +107,7 @@ namespace GLUI
 
             virtual void pack (int x, int y);
             virtual void update_size( void );
+            virtual int  UpdateTheme( void );
             virtual void idle( void )            { }
             virtual int  mouse_over( int state, int x, int y ) { return false; }
 
@@ -114,8 +115,6 @@ namespace GLUI
             virtual void disable( void );
             virtual void activate( int how )     { active = true; }
             virtual void deactivate( void )     { active = false; }
-
-            virtual void draw(void)=0;
 
             //event interfaces
             virtual int AddEvent (::XEvent* event);
@@ -156,15 +155,21 @@ namespace GLUI
             void         set_alignment( Alignement align );
             void         set_resize_policy( SizePolicy policy) { resizeable = policy; }
             SizePolicy   get_resize_policy( void ) { return resizeable;}
+            int SetTheme(theme* data);
 
             int  add_control( Node *control ); //<prevent adding subsequent controls
 
-            Control(const char* name);
             virtual ~Control();
 
         protected: //methods
+            Control(const char* name);
             Control();
+            virtual theme* GetDefaultTheme();
+
+
+            bool CheckWidgetApiRevision(int Major, int Minor, int Revision);
         protected: //variables
+            theme* ThemeData;
             static Control* focussed;
             SizePolicy resizeable;
             Size CurrentSize;
@@ -175,6 +180,9 @@ namespace GLUI
             int             x, y;         //relative position from parent
             int  y_off_top, y_off_bot;    // top and bottom margin inside the control
             int  x_off_left, x_off_right; // right and left inner margin
+            int APIMajor, APIMinor, APIRevision; //< API of this component, check is performed
+                                                 //< by theme class to know if it can render the
+                                                 //< object
     };
 
 

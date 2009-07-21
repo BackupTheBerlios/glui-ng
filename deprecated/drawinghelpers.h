@@ -26,12 +26,11 @@
 
 */
 #include <GL/gl.h>
-#include <GL/glui/themes.h>
-#include <GL/glui/VertexObject.h>
 
 namespace GLUI
 {
     class Control;
+    class VertexObject;
 
 
     class drawinghelpers
@@ -43,8 +42,6 @@ namespace GLUI
                 buffer_back=2   ///< Double buffering: postpone updates until next redraw.
             };
         public :
-            static VertexObject* raised_box( uint32_t w, uint32_t h, uint32_t thickness = 1, uint8_t size = 3, GLenum intype = GL_BYTE, void *color_array = NULL );
-            static VertexObject* lowered_box( uint32_t w, uint32_t h, uint32_t thickness = 1, uint8_t size = 3, GLenum intype = GL_BYTE, void *color_array = NULL );
             static void draw_box_inwards_outline(int enabled, int x_min, int x_max,
                                                  int y_min, int y_max );
             static void draw_box(uint32_t w, uint32_t h, uint8_t size = 3, GLenum intype = GL_BYTE, void *color_array = NULL);
@@ -53,22 +50,6 @@ namespace GLUI
             static void draw_active_box(int active,  int x_min, int x_max, int y_min, int y_max );
             static void set_to_bkgd_color( void );
             static buffer_mode_t get_buffer_mode();
-            static void PostRedisplay(Control* ctrl);
-            static void ConvertglColorPointer(
-                    GLint size, //<  how many components 3 (RGB) or 4(RGBA)
-                    GLenum intype,  //< type of the input
-                    const GLvoid *inpointer, //< pointer of the datas
-                    GLenum outype,  //< type of the output
-                    const GLvoid *outpointer  //<pointer to the outputdata
-                    );
-            static void ConvertglColorArray(
-                    GLint size, //<  how many components 3 (RGB) or 4(RGBA)
-                    GLenum intype,  //< type of the input
-                    const GLvoid *inpointer, //< pointer of the datas
-                    GLenum outype,  //< type of the output
-                    const GLvoid *outpointer,  //<pointer to the outputdata
-                    uint32_t count //< count of the numbers of elements in the array (an element in 3 or 4 components)
-                    );
 
     };
 

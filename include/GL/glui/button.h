@@ -14,16 +14,29 @@
 #include <GL/glui/statictext.h>
 #include <GL/glui/callback.h>
 #include <GL/glui/live.h>
+#include <GL/glui/DefaultTheme.h>
 namespace GLUI
 {
 	class Node;
 
 	class GLUIAPI Button : public Container, public EventInterpreter
 	{
+                public: //types
+                        class DefaultTheme : public _DefaultTheme
+                        {
+                                public : //methods
+                                        DefaultTheme(Button& owner) : Owner(owner) {};
+                                        ~DefaultTheme();
+                                        virtual int draw();
+                                        virtual int update();
+                                protected: //variable
+                                        Button& Owner;
+                                        VertexObject* un_pressed;
+                                        VertexObject* pressed;
+                        };
 		public:
 			//LiveInt value;
 		public:
-			void draw( void );
 			/**
 			  Create a new button.
 
@@ -35,33 +48,57 @@ namespace GLUI
 			Button( Node *parent, const char *name,
 					int id=-1, CB cb=CB() );
 			virtual int AddEvent(::XEvent *event);
+                        bool GetValue();
 
 		protected:
                         bool value;
-			void draw_pressed( void );
 			void common_init(void) ;
+                        virtual theme* GetDefaultTheme();
+
 	};
 
 
-	/*class GLUIAPI ToggleButton : public Button
-	  {
-	  protected :
-	  int state;
-	  };*/
+/*        class GLUIAPI ToggleButton : public Button
+        {
+                public://types
+                        class DefaultToggleButtonTheme : public DefaultThemeData
+                {
+                        public : //methods
+                                DefaultToggleButtonTheme(ToggleButton& owner) : Owner(owner) {};
+                                virtual int draw();
+                                virtual int update();
+                        protected: //variable
+                                ToggleButton& Owner;
 
+                };
+
+                protected :
+                        int state;
+        };
+*/
 
 	class GLUIAPI TextButton : public Button
 	{
+                public : //types
+                        class DefaultTheme : public _DefaultTheme
+                        {
+                                public : //methods
+                                        DefaultTheme(TextButton& owner) : Owner(owner) {};
+                                        virtual int draw();
+                                        virtual int update();
+                                protected: //variable
+                                        TextButton& Owner;
+                        };
+
 		public :
 			 void SetText(char* newtext);
 			 TextButton (Node *parent, const char *name,
 					int id=-1, CB cb=CB() ) ;
 
-		private:
+		protected:
 			//		void draw_text( int sunken );
 			StaticText text;
-
-
+                        virtual theme* GetDefaultTheme();
 	};
 
 

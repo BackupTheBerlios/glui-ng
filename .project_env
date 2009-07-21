@@ -33,7 +33,6 @@ function restoresession() {
 	fi
 }
 
-pushd src
 
 
 # for debug

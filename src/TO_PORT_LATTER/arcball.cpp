@@ -234,6 +234,12 @@ void Arcball::set_damping(float d)
 }
 
 
-
+////////////////////////////////////////////////////////////
+int Arcball::DefaultTheme::draw()
+{
+}
+int Arcball::DefaultTheme::update()
+{
+}
 
 

@@ -65,7 +65,7 @@ libglui_LDADD   =  -lGLU -lGL ${LIBGLUT}
 
 
 #a special target : it only modify CFLAGS variables before making it the standard way
-debug : CFLAGS+= -g3 -gdwarf-2 -O0
+debug : CXXFLAGS+= -g3 -gdwarf-2 -O0
 debug : all
 	
 clean : 

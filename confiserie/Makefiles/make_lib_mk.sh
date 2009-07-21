@@ -118,8 +118,10 @@ else
 install_${complete_name} :
 	echo \${INSTALLMSG} ${complete_name} : $1 not defined... skipping install
 endif
-	
+
+ifneq (\${MAKECMDGOALS},clean)
 -include \${${name}_SOURCES:%=GENERATED/%.d}
+endif
 
 else 
 

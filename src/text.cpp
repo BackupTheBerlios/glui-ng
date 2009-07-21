@@ -124,7 +124,7 @@ int Text::graph_Length( )
 /* Displays the contents of a string using GLUT's bitmap character function */
 /* Does not handle newlines                                             */
 
-void Text::draw()
+int Text::draw()
 {
   const char *p = this->c_str();
   glPushMatrix();

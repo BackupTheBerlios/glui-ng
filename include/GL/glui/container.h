@@ -56,6 +56,7 @@ namespace GLUI
             virtual ~Container();
 
             virtual void update_size( void ); //<recursively update all control sizes
+            virtual int  UpdateTheme( void );
             virtual void pack ( int x, int y); //<recursively update positions
              void set_orientation( orientation new_orientation);
             virtual void align( void );

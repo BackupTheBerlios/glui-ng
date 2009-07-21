@@ -1,0 +1,11 @@
+PACKAGE_OPTS_COUNT=${#CONFIGURE_OPTS[@]}
+CONFIGURE_OPTS[$((PACKAGE_OPTS_COUNT+1))]="--prefix=,PREFIX,configure package to be located in prefix,[path],/usr/local"
+PACKAGE_OPTS_COUNT=$((PACKAGE_OPTS_COUNT+1))
+CONFIGURE_OPTS[$((PACKAGE_OPTS_COUNT+1))]="--crosscompiling=,CROSSCOMPILING,the package is crosscompiled,[YES|NO],NO"
+PACKAGE_OPTS_COUNT=$((PACKAGE_OPTS_COUNT+1))
+CONFIGURE_OPTS[$((PACKAGE_OPTS_COUNT+1))]="--enable-link-farm=,ENABLE_LINK_FARM,enable link farm creation,[YES|NO],NO"
+PACKAGE_OPTS_COUNT=$((PACKAGE_OPTS_COUNT+1))
+CONFIGURE_OPTS[$((PACKAGE_OPTS_COUNT+1))]="--static=,ENABLE_STATIC_LIBS,enable static lib build,[yes|no],no"
+PACKAGE_OPTS_COUNT=$((PACKAGE_OPTS_COUNT+1))
+CONFIGURE_OPTS[$((PACKAGE_OPTS_COUNT+1))]="--dynamic=,ENABLE_DYNAMIC_LIBS,enable static lib build,[yes|no],yes"
+PACKAGE_OPTS_COUNT=$((PACKAGE_OPTS_COUNT+1))

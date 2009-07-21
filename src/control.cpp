@@ -33,11 +33,11 @@ misrepresented as being the original software.
 
 #include <GL/glui/internal_control.h>
 #include <GL/glui/event_handler.h>
-#include <GL/glui/drawinghelpers.h>
 #include <GL/glui/debug.h>
 #include <GL/glui/control.h>
 #include <GL/gl.h>
 #include <GL/glui/window.h>
+#include <GL/glui/themes.h>
 using namespace GLUI;
 
 
@@ -84,6 +84,38 @@ void Control::update_size( void )
         return; //nothing to do since we already have a fixed size
     }
 }
+/******* Control::set_w() **************/
+int Control::set_size( Size sz, Size min)
+{
+    Size dontchange(0u, 0u);
+    if (dontchange != min)
+    {
+        this->Min = min;
+    }
+    if (sz > this->Min)
+    {
+        this->CurrentSize = sz;
+    }
+    else
+    {
+        return EINVAL;
+    }
+#warning "use a bottom to top approach : child shall ask parent to update size only if size did change"
+    Control* cont  = dynamic_cast<Control*>(GetRootNode());
+    if ( cont != NULL)
+    {
+        cont->update_size();
+        cont->pack (0, 0);
+    }
+    ThemeData->update();
+}
+
+///////////////////////////////////////////////////////////////////////////////////////
+int Control::UpdateTheme( void )
+{
+        return Control::SetTheme(GLUI::GetTheme(*this));
+}
+
 /*************************** Drawing Utility routines *********************/
 
 
@@ -105,7 +137,7 @@ void Control::enable()
     Control *node;
 
     enabled = true;
-    drawinghelpers::PostRedisplay(this);
+    ThemeData->update();
 
 #warning "this has nothing todo here, move to container class"
     /*** Now recursively enable all buttons below it ***/
@@ -126,8 +158,7 @@ void Control::disable()
 
     enabled = false;
 
-    drawinghelpers::PostRedisplay(this);
-
+    ThemeData->update();
 #warning "this has nothing todo here, move to container class"
     /*** Now recursively disable all buttons below it ***/
     node = (Control*) first_child();
@@ -137,6 +168,7 @@ void Control::disable()
     }
 }
 
+////////////////////////////////////////////////////////////////////////////
 int Control::AddEvent(::XExposeEvent *event)
 {
     //we have been exposed, redraw ourself
@@ -144,12 +176,15 @@ int Control::AddEvent(::XExposeEvent *event)
     glPushMatrix();
     glLoadIdentity();
     glTranslatef(x + x_off_left, y + y_off_bot, BOTTOM_VIEWPORT + GLUI_CONTROL_MAX_THICKNESS * level());
-    draw();
+    if (this->ThemeData != NULL)
+    {
+            this->ThemeData->draw();
+    }
     glPopMatrix();
     debug::Instance()->FlushGL();
 }
 
-
+///////////////////////////////////////////////////////////////////////////
 int Control::AddEvent(::XEvent *event)
 {
     switch ( event->type )
@@ -192,7 +227,7 @@ int Control::AddEvent(::XEvent *event)
 
 }
 
-
+///////////////////////////////////////////////////////////////////////////
 int Control::AddEvent (::XKeyEvent* event)
 {
 #warning "TODO : if key is tab or backtab or this control don't support..."
@@ -201,32 +236,7 @@ int Control::AddEvent (::XKeyEvent* event)
     //    do the same
 }
 
-
-/******* Control::set_w() **************/
-int Control::set_size( Size sz, Size min)
-{
-    Size dontchange(0u, 0u);
-    if (dontchange != min)
-    {
-        this->Min = min;
-    }
-    if (sz > this->Min)
-    {
-        this->CurrentSize = sz;
-    }
-    else
-    {
-        return EINVAL;
-    }
-#warning "use a bottom to top approach : child shall ask parent to update size only if size did change"
-    Control* cont  = dynamic_cast<Control*>(GetRootNode());
-    if ( cont != NULL)
-    {
-        cont->update_size();
-        cont->pack (0, 0);
-    }
-    drawinghelpers::PostRedisplay(this);
-}
+///////////////////////////////////////////////////////////////////////////
 
 
 
@@ -236,8 +246,17 @@ void Control::set_alignment(Alignement new_align)
 {
     alignment = new_align;
 
-    drawinghelpers::PostRedisplay(this);
-
+    ThemeData->update();
+}
+///////////////////////////////////////////////////////////////////////////
+int Control::SetTheme(theme* data)
+{
+        if (data != NULL)
+        {
+                if (this->ThemeData != NULL) delete this->ThemeData;
+                this->ThemeData = data;
+        }
+        return EINVAL;
 }
 
 
@@ -246,6 +265,7 @@ void Control::set_alignment(Alignement new_align)
 Control::~Control()
 {
     if (focussed == this) focussed = NULL;
+    delete this->ThemeData;
 }
 
 Control::Control(const char* name) : Node(name)
@@ -264,10 +284,18 @@ Control::Control(const char* name) : Node(name)
     x_off_right    = GLUI_XOFF;
     x              = 0;
     y              = 0;
+    APIMajor       = 0;
+    APIMinor       = 0;
+    APIRevision    = 0;
+    this->ThemeData = GLUI::GetTheme(*this);
+    SetTheme(new _DefaultTheme);
 }
 
-
-
+////////////////////////////////////////////////////////////////////////
+theme* Control::GetDefaultTheme()
+{
+        return new _DefaultTheme;
+}
 
 ////////////////////////////////////////////////////////////////////////
 int Control::Width() const
@@ -307,3 +335,10 @@ int Control::SetMargins(int top, int bottom, int left, int right)
     return 0;
 
 }
+////////////////////////////////////////////////////////////////////////
+bool Control::CheckWidgetApiRevision(int Major, int Minor, int Revision)
+{
+        if (Major != this->APIMajor) return false;
+        if (Minor <  this->APIMinor) return false;
+}
+

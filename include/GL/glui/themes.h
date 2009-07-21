@@ -29,39 +29,54 @@
 
 */
 #include <GL/gl.h>
+
 namespace GLUI
 {
-    class theme
-    {
-        public : //methods
-            static theme* Instance();
-            void GetVersion(uint32_t* Major, uint32_t* Minor, uint32_t* revision);
-            void FillglColorPointer(GLint size,       //< numbers of elements per colors (3=RGB 4=RGBA)
-                    GLenum type,                      //< type of the array to fill
-                    GLsizei stride,                   //< if the array is interlaved with vectors
-                    const GLvoid *pointer,            //< pointer to the array
-                    uint32_t count );                 //< numbers of colors entries
-            void DoLightning();
-             uint8_t* Get_bkgd_color();
-        protected : //variables
-            uint8_t    bkgd_color[4];
-        private : //methods
-            theme( void );
-    };
+        class Control;
+        class Container;
+
+
+        class theme
+        {
+                public:
+                        virtual int draw()=0;
+                        virtual int update()=0;
+                        virtual ~theme();
+               protected :
+                        theme( void );
+                        void FillglColorPointer(
+                                        uint8_t *inColor, //< array of 4 uint8_t color elements
+                                        GLint size,       //< numbers of elements per colors (3=RGB 4=RGBA)
+                                        GLenum type,                      //< type of the array to fill
+                                        GLsizei stride,                   //< if the array is interlaved with vectors
+                                        const GLvoid *pointer,            //< pointer to the array
+                                        uint32_t count );                 //< numbers of colors entries
+                        static void ConvertglColorPointer(
+                                        GLint size, //<  how many components 3 (RGB) or 4(RGBA)
+                                        GLenum intype,  //< type of the input
+                                        const GLvoid *inpointer, //< pointer of the datas
+                                        GLenum outype,  //< type of the output
+                                        const GLvoid *outpointer  //<pointer to the outputdata
+                                        );
+                        static void ConvertglColorArray(
+                                        GLint size, //<  how many components 3 (RGB) or 4(RGBA)
+                                        GLenum intype,  //< type of the input
+                                        const GLvoid *inpointer, //< pointer of the datas
+                                        GLenum outype,  //< type of the output
+                                        const GLvoid *outpointer,  //<pointer to the outputdata
+                                        uint32_t count //< count of the numbers of elements in the array (an element in 3 or 4 components)
+                                        );
+                        virtual void PostRedisplay(Control* ctrl);
+                private:
+        };
+
+
+ 
+        theme* GetTheme(const Control& ctrl);
 
 
 }
 
-//IDEA :
-//a theme shall be provided as a plugin, this plugin contain a C entry with the name
-//GLUICLASS_new(), that is used to allocate a widget of the class GLUICLASS
-//example Button_new(), CheckBox_new()....
-//all container widgets that have child shall use theme->GLUICLASS_new() instead of new GLUICLASS
-//
-//IDEA :
-//the pointers to GLUICLASS_new() are always defined, if no entry can be resolved into the plugin
-//the default builtin widget is used.
-//
 //IDEA :
 //theme shall be singleton patern, the constructor shall use GLUI_THEME environment variable
 //
