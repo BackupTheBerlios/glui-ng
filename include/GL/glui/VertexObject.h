@@ -141,7 +141,7 @@ namespace GLUI
 
 
 
-            void draw();                        //< draw the object at current place current opengl state
+            int draw();                        //< draw the object at current place current opengl state
 
       };
 

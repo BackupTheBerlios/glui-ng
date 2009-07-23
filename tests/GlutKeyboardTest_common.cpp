@@ -1,39 +1,153 @@
 #include <GL/glui/window.h>
+#include <GL/glui/DefaultTheme.h>
+#include <GL/glui/VertexObject.h>
 #include <unistd.h>
 #include <assert.h>
 #include <time.h>
 #include <stdlib.h>
-using namespace GLUI;
 
+using namespace GLUI;
+class myControl;
+
+/////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////
+class myControl : public Control
+{
+        public:
+                class myControltheme : public _DefaultTheme
+                {
+                        public :
+                                myControltheme(myControl& owner);
+                                ~myControltheme();
+                                int draw();
+                                int update();
+                        protected :
+                                VertexObject* drawing;
+                                myControl& Owner;
+                };
+        public :
+                myControl(const char* name);
+                virtual int AddEvent(::XKeyEvent* event);
+};
+///////////////////////////////////////////////////////////////////////
+myControl::myControltheme::myControltheme(myControl& owner) : Owner(owner)
+{
+        drawing = NULL;
+        update();
+}
+
+///////////////////////////////////////////////////////////////////////
+myControl::myControltheme::~myControltheme()
+{
+        if (drawing != NULL) delete drawing;
+}
+
+///////////////////////////////////////////////////////////////////////
+int myControl::myControltheme::update()
+{
+        if (drawing != NULL) delete drawing;
+        drawing = raised_box(Owner.Width(), Owner.Height());
+        return 0;
+}
+
+///////////////////////////////////////////////////////////////////////
+int myControl::myControltheme::draw()
+{
+        return drawing->draw();
+}
+
+
+
+
+///////////////////////////////////////////////////////////////////////
+myControl::myControl(const char* name) :
+    Control(name)
+{
+    this->SetTheme(new myControl::myControltheme(*this));
+    ((myControltheme*)this->ThemeData)->bkgd_color[0] = 255;
+    ((myControltheme*)this->ThemeData)->bkgd_color[1] = 0;
+    ((myControltheme*)this->ThemeData)->bkgd_color[2] = 0;
+    set_size(Size(200u,10u));
+}
+
+///////////////////////////////////////////////////////////////////////
+int myControl::AddEvent(::XKeyEvent* event)
+{
+    uint8_t previous_red = ((myControltheme*)this->ThemeData)->bkgd_color[0];
+    ((myControltheme*)this->ThemeData)->bkgd_color[0] = ((myControltheme*)this->ThemeData)->bkgd_color[2];
+    ((myControltheme*)this->ThemeData)->bkgd_color[2] = previous_red;
+    return ThemeData->update();
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////
 class myGluiWin : public GLUIWindow
 {
         public :
-                class myGluiWinTheme : public _Window::DefaultTheme
-                {
-                        public:
-                                myGluiWinTheme(myGluiWin& owner) : _Window::DefaultTheme(owner) {}
+                class theme : public _Window::DefaultTheme
+                { 
+                        public :
+                                theme(myGluiWin& owner): _Window::DefaultTheme(owner) {};
                                 int draw();
                 };
         public :
                 myGluiWin(Display* TheDisplay) : GLUIWindow(TheDisplay,
                                 TheDisplay->DefaultScreen()->RootWindow(),
-                                -1, -1,
+                                0, 0,
                                 200, 200,
                                 1,
                                 1,
                                 0)
                 {
-                        set_resize_policy(FixedSize);
-                        SetTheme(new myGluiWinTheme(*this));
+                        Angle = 0;
+                        ctrl = new myControl("top box");
+                        add_control(ctrl);
+                        SetTheme(new theme(*this));
                 }
+                ~myGluiWin()
+                {
+                        delete ctrl;
+                }
+                virtual int AddEvent(::XKeyEvent* event);
+                void simulatekey();
 
-                theme* GetDefaultTheme() { return new myGluiWinTheme(*this); }
 
+        public : //variables
+                float Angle;
+                myControl* ctrl;
 };
 
-int myGluiWin::myGluiWinTheme::draw(void)
+int myGluiWin::AddEvent(::XKeyEvent* event)
 {
-        DefaultTheme::draw();
+    Angle += 5.0f;
+    Container::AddEvent((::XEvent*) event);
+    return ThemeData->update();
+}
+#ifdef __USE_XLIB
+#include <GL/glui/x11_window.h>
+#elif  __USE_WIN32
+#include <GL/glui/win32_window.h>
+#else
+#include <GL/glui/glut_window.h>
+void myGluiWin::simulatekey(void)
+{
+    static int count = 0;
+
+    count ++;
+    keyboard_func (GLUT_KEY_UP, 100, 100);
+    if (count % 10 == 0)
+      {
+        keyboard_func (GLUT_KEY_UP, ctrl->X() + ctrl->Width()/2, this->Height() -  ctrl->Y() - ctrl->Height()/2 );
+      }
+}
+#endif
+
+int myGluiWin::theme::draw(void)
+{
+        _Window::DefaultTheme::draw();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear Screen And Depth Buffer
     glLoadIdentity();									// Reset The Current Modelview Matrix
     glTranslatef(40.0f,40.0f,-6.0f);						// Move Left 1.5 Units And Into The Screen 6.0
@@ -56,7 +170,7 @@ int myGluiWin::myGluiWinTheme::draw(void)
     glEnd();											// Done Drawing The Quad
     glFlush();
     glTranslatef(100.0f,100.0f,-6.0f);				// Move Right 1.5 Units And Into The Screen 6.0
-    glRotatef(45.0,1.0f,1.0f,0.0f);			// Rotate The Quad On The X axis
+    glRotatef(((myGluiWin&)Owner).Angle,1.0f,1.0f,0.0f);			// Rotate The Quad On The X axis
     glColor3f(0.5f,0.5f,1.0f);							// Set The Color To Blue One Time Only
     glBegin(GL_QUADS);									// Draw A Quad
         glColor3f(0.0f,1.0f,0.0f);			// Set The Color To Blue
@@ -93,26 +207,8 @@ int myGluiWin::myGluiWinTheme::draw(void)
     glFlush();
     //#error "pb dans le calcul de la taille de la fenêtre"
     return 0;
+
+
 }
 
-
-
-
-int main(int argc, char** argv)
-{
-        struct timespec sleeptime = { 1, 0 };
-        GLUIWindow::init(&argc, argv);  //optional
-        Display*    TheDisplay = new Display(" display");
-        GLUIWindow* Window = new myGluiWin(TheDisplay);
-        for (int count=0; count < 5; count++ )
-        {
-                Window->XMapWindow();
-                nanosleep(&sleeptime, NULL);
-                Window->XUnmapWindow();
-        }
-        delete(Window); 
-        delete(TheDisplay);
-        exit(0);
-
-}
 

@@ -48,6 +48,19 @@ _Window::_Window() :
 {
         SetTheme(new _Window::DefaultTheme(*this));
 }
+
+///////////////////////////////////////////////////////////////////////////////
+int _Window::Wait()
+{
+        int res;
+        int err;
+        err = pthread_join(main_thread, (void**)&res);
+        if (err)
+        {
+                return err;
+        }
+        return res;
+}
 /////////////////////////////////////////////////////////////////////////////
 int _Window::SetCurrentDrawBuffer( void )
 {
@@ -71,10 +84,10 @@ _Window::buffer_mode_t _Window::get_buffer_mode() {
 /////////////////////////////////////////////////////////////////////////////
 void _Window::Start(void* arg)
 {
-        ThreadArgs args;
-        args.TheWindow=this;
-        args.args=arg;
-        int err = pthread_create(&main_thread,NULL,_Start, (void*)&args);
+        ThreadArgs* args = new ThreadArgs;
+        args->TheWindow=this;
+        args->args=arg;
+        int err = pthread_create(&main_thread,NULL,_Start, (void*)args);
         if (err)
         {
                 throw new  Exception(err, "window thread creation error");
@@ -82,8 +95,11 @@ void _Window::Start(void* arg)
 }
 void* _Window::_Start(void* arg)
 {
+        int res;
         ThreadArgs* args = (ThreadArgs*) arg;
-        return args->TheWindow->start_routine(args->args);
+        res = args->TheWindow->start_routine(args->args);
+        delete args;
+        pthread_exit((void*)res);
 }
 
 /////////////////////////////////////////////////////////////////////////////

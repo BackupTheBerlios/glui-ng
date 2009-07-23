@@ -44,6 +44,7 @@
 */
 
 #include <GL/glui/container.h>
+#include <GL/glui/Exception.h>
 #include <GL/glui/DefaultTheme.h>
 #include <X11/Xlib.h>
 #include <GL/gl.h>
@@ -108,6 +109,7 @@ namespace GLUI
                 public :
                         _Window(const char *name,
                                         Container::orientation orient=Container::TopDown);
+                        int Wait();
                         virtual int AddEvent (::XEvent *event)=0;
                         static buffer_mode_t get_buffer_mode();
                 public :  //operators
@@ -143,7 +145,7 @@ namespace GLUI
                         _Window();
                         void Start(void* args); //start event handler, shall be started in child constructor;
                         static void* _Start(void* args);
-                        virtual void *start_routine(void* args)=0; //< the thead main routine;
+                        virtual int start_routine(void* args)=0; //< the thead main routine;
 
                         long flags;
                         int  SetCurrentDrawBuffer( void );
