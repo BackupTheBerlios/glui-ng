@@ -552,17 +552,11 @@ void GlutWindow::reshape_func (int w, int h)
 //GLUI use Y axis up (0,0) is bottom left corner as in OpenGl
 void GlutWindow::keyboard_func (unsigned char key, int x, int y)
 {
-
+	int win_w;
+	int win_h;
+	::XKeyEvent event;
+	GlutWindow* win;
     IN("");
-    int win_w = glutGet (GLUT_WINDOW_WIDTH);
-    int win_h = glutGet (GLUT_WINDOW_HEIGHT);
-    y = win_h - y;
-    ::XKeyEvent event;
-    event.type=KeyPress;
-    event.keycode=key; //first 256 char are reserved for non modifier keys
-    event.x=x;
-    event.y=y;
-    GlutWindow* win;
     int err = pthread_mutex_lock (&glut_mutex);
     if (err)
     {
@@ -570,7 +564,14 @@ void GlutWindow::keyboard_func (unsigned char key, int x, int y)
     }
     else
     {
-            win= MasterObject::Instance()->FindWindow(glutGetWindow ());
+	    int win_w = glutGet (GLUT_WINDOW_WIDTH);
+	    int win_h = glutGet (GLUT_WINDOW_HEIGHT);
+	    y = win_h - y;
+	    event.type=KeyPress;
+	    event.keycode=key; //first 256 char are reserved for non modifier keys
+	    event.x=x;
+	    event.y=y;
+	    win= MasterObject::Instance()->FindWindow(glutGetWindow ());
             pthread_mutex_unlock(&glut_mutex);
     }
 
@@ -684,17 +685,11 @@ void GlutWindow::mouse_func (int button, int state, int x, int y)
 //GLUI use Y axis up (0,0) is bottom left corner as in OpenGl
 void GlutWindow::motion_func (int x, int y)
 {
-        int win_w = glutGet (GLUT_WINDOW_WIDTH);
-    int win_h = glutGet (GLUT_WINDOW_HEIGHT);
+	int win_w;
+	int win_h;
 
-    y = win_h - y;
-    ::XMotionEvent event;
-    event.type = MotionNotify;
-
-    event.x=x;
-    event.y=y;
-
-    GlutWindow* win;
+	::XMotionEvent event;
+	GlutWindow* win;
     int err = pthread_mutex_lock (&glut_mutex);
     if (err)
     {
@@ -702,6 +697,12 @@ void GlutWindow::motion_func (int x, int y)
     }
     else
     {
+	    win_w = glutGet (GLUT_WINDOW_WIDTH);
+	    win_h = glutGet (GLUT_WINDOW_HEIGHT);
+	    y = win_h - y;
+	    event.type = MotionNotify;
+	    event.x=x;
+	    event.y=y;
             win= MasterObject::Instance()->FindWindow(glutGetWindow ());
             pthread_mutex_unlock(&glut_mutex);
     }
