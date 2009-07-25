@@ -10,20 +10,22 @@ confiserie=${confiserie:=..}
 . ${confiserie}/confiserie.cache.functions.sh
 
 mytest() {
-	if [ "${LDFLAGS:0:3}" == "-Wl" ]; then
-		echo "......................................................................" >&2
-		echo "WARNING use of -Wl (CC instruction) inside LDFLAGS... using workaround" >&2
-		echo "......................................................................" >&2
-		export CC_LDFLAGS=$LDFLAGS
-		LDFLAGS=${LDFLAGS/-Wl/}
-		LDFLAGS=${LDFLAGS/,/ }
-	fi
+
+	split_linker_flags()
+	{
+		while [ $# -gt 0 ]; do
+			[ $1 = "-Wl" ] && continue;
+			printf "$1 "
+		done
+	}
+
+	OLD_IFS="${IFS}"
+	LINKERFLAGS=$(IFS=', ' split_linker_flags ${LDFLAGS})
 	conf_cache LDFLAGS
-	conf_cache CC_LDFLAGS
+	conf_cache LINKERFLAGS
 
 	LD=$(${WHICH} ld)
 	conf_cache LD
 
 }
-
 mytest

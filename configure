@@ -6,19 +6,18 @@
 #those lines can't be provided as separate scripts, and are required to make link farms
 #confiserie will works only if this script is called configure
 
+progname=${0##*/}
+confiserie=${0%/*}/confiserie
 
-progname=${0/*\//}
-confiserie=${0/\/$progname/}/confiserie
 
-
-CONFIGURE_OPTS[1]="--enable-headers-dep=,ENABLE_AUTODEPS,enable source dependency generation (disable to faster one shot compilation),[yes|no],no"
+##CONFIGURE_OPTS --enable-headers-dep= ENABLE_AUTODEPS "enable source dependency generation (disable to faster one shot compilation)" "yes no" no
 
 #this funtion should clean the file you create with this script
 #it will be automatically done by init.sh
 custom_clean_on_sig() {
     rm -f Makefile.confiserie
 }
-source ${confiserie}/init.sh "$@" &&
+. ${confiserie}/init.sh "$@" &&
 
 #the additional included Makefiles
 {

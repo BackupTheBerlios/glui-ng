@@ -10,15 +10,14 @@
 #* it under the terms of the LGPL v2.1 or latter at your option
 #* http://www.gnu.org/copyleft/lesser.html
 #************************************************************************/
-
 . ${confiserie}/format_name.sh
 name=$( format_name "$2")
 
 if test -n "${CONFISERIE_DEBUG}"; then
-        echo generating GENERATED/${without_version_name}.d >&2
-        echo \${1} : ${1} >&2
-        echo \${2} : ${2} >&2
-        echo \${3} : ${3} >&2
+        printf generating GENERATED/${without_version_name}.d >&2
+        printf \${1} : ${1} >&2
+        printf \${2} : ${2} >&2
+        printf \${3} : ${3} >&2
 fi
 
 
@@ -42,18 +41,18 @@ case $1 in
 esac
 
 
-version=$(eval echo ${name}_VERSION)
+version=$(eval printf ${name}_VERSION)
 complete_name="${2}-\${${version}}${3}"
 without_version_name="${2}${3}"
 
-if [ "${3}" == ".so" ]; then
+if [ "${3}" = ".so" ]; then
 	cmd="\${LD} \${LDFLAGS} \${${name}_LDADD} -shared -Bdynamic -soname \$@ -o \$@ \${${name}_OBJ} \${${name}_ARADD} "
-elif [ "${3}" == ".dll" ]; then
+elif [ "${3}" = ".dll" ]; then
         cmd="\${CC} \${CC_LDFLAGS} -shared \
                 -o \$@ -Wl,--out-implib=\$@.a\
                 -Wl,--export-all-symbols -Wl,--enable-auto-import \
                 -Wl,--no-whole-archive  \${${name}_LDADD} \${${name}_OBJ} \${${name}_ARADD}"
-elif [ "${3}" == ".a" ]; then
+elif [ "${3}" = ".a" ]; then
 	cmd="\${AR} r \${ARFLAGS} \$@ \${${name}_OBJ} \${${name}_ARADD} && \${RANLIB} \$@"
 fi
 
@@ -113,10 +112,10 @@ install_${complete_name} :
 	newmode=\${${name}_MODE}; chmod \$\${newmode:=\${defaultmode}} \${$1}/${complete_name}
 	newown=\${${name}_OWNER}; chown "\$\${newown:=\${defaultown}}" \${$1}/${complete_name}
 	\${confiserie}/Makefiles/make_lib_links.sh \${$1}/${complete_name}
-	echo "${LIB_INSTALL_MESSAGE_LD}"
+	printf "${LIB_INSTALL_MESSAGE_LD}"
 else
 install_${complete_name} :
-	echo \${INSTALLMSG} ${complete_name} : $1 not defined... skipping install
+	printf \${INSTALLMSG} ${complete_name} : $1 not defined... skipping install
 endif
 
 ifneq (\${MAKECMDGOALS},clean)
@@ -126,9 +125,9 @@ endif
 else 
 
 GENERATED/${complete_name} : 
-	echo LD variable is not defined.... aborting
+	printf LD variable is not defined.... aborting
 	exit 1
 
 endif
 EOF
-echo GENERATED/${without_version_name}.d
+printf GENERATED/${without_version_name}.d

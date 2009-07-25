@@ -17,13 +17,12 @@ if test -z "${__UNIQ_TEST}"; then
 
 
         #now the test
-        echo "${TEST_SEPARATOR}"
-        echo "checking for uniq"
+        printf "checking for uniq "
         if test -z "$UNIQ"; then
             if UNIQ=$(${WHICH} uniq 2>/dev/null); then
                 conf_cache UNIQ
             else
-                echo "not found..." >&2
+                printf "not found...\n" >&2
                 return 1
             fi
         fi

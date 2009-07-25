@@ -13,7 +13,7 @@ mytest() {
 
 	create_CXX_LDFLAGS() {
 		while [ $# -gt 0 ]; do
-			echo -n "-Wl,$1 "
+			printf "-Wl,$1 "
 			shift
 		done
 	}
@@ -21,24 +21,23 @@ mytest() {
 	clean_LDFLAGS() {
 		while [ $# -gt 0 ]; do
             if test "${1:0:4}" = "-Wl,"; then
-                echo -n "${1:4} "
+                printf "${1:4} "
             else
-                echo -n "$1 "
+                printf "$1 "
             fi
 			shift
 		done
 	}
 
-  echo ${TEST_SEPARATOR} >&2
   if [ -z "${CXX}" ]; then
     {
-			echo "CXX not set trying autodetection"
+			printf "CXX not set trying autodetection \n"
 			CXX=$(${WHICH} g++) ||
 			CXX=$(${WHICH} c++) ||
 			{
-				echo "this package require a C++ compiler and no CXX variable exported!"
-				echo "g++ or c++ are not found in PATH"
-				echo "please setup a decent environnement before trying to compile"
+				printf "this package require a C++ compiler and no CXX variable exported!\n"
+				printf "g++ or c++ are not found in PATH\n"
+				printf "please setup a decent environnement before trying to compile\n"
 				return 1
 			}
     } >&2
@@ -48,7 +47,7 @@ mytest() {
   if [ -z "$CXXFLAGS" ]; then 
     {
 			CXXFLAGS="-O2"
-			echo "CXXFLAGS not set, using default '-O2'"
+			printf "CXXFLAGS not set, using default '-O2'\n"
     } >&2
   fi
 	conf_cache CXXFLAGS
@@ -59,18 +58,18 @@ mytest() {
 	conf_cache CXX_LDFLAGS
 
   {
-    echo "checking for C++ compiler version" 
-    echo "$($CXX --version </dev/null 2>/dev/null ||
+    printf "checking for C++ compiler version\n" 
+    printf "$($CXX --version </dev/null 2>/dev/null ||
     $CXX -v </dev/null  2>/dev/null ||
-    $CXX -V </dev/null 2>/dev/null )" 
+    $CXX -V </dev/null 2>/dev/null )\n" 
   }>&2 
 
   if ! ${CXX} -o mytest ${CPPFLAGS} ${CXXFLAGS} ${CXX_LDFLAGS} ${confiserie}/CXX/simple.cpp 1>/dev/null; 
   then
     {
-      echo "error in compiling CXX/simple.cpp" 
-      echo "the command issued was "
-      echo "${CXX} -o test ${CPPFLAGS} ${CFLAGS} ${CXX_LDFLAGS} ${confiserie}/CXX/simple.cpp" 
+      printf "error in compiling CXX/simple.cpp\n" 
+      printf "the command issued was \n"
+      printf "${CXX} -o test ${CPPFLAGS} ${CFLAGS} ${CXX_LDFLAGS} ${confiserie}/CXX/simple.cpp\n" 
     }>&2
     rm -f mytest
 		
@@ -79,19 +78,19 @@ mytest() {
 
   # Check the compiler produces executables we can run.  If not, either
   # the compiler is broken, or we cross compile.
-  echo -n "checking whether the CXX compiler works : " >&2
+  printf "checking whether the CXX compiler works : " >&2
   if test "$cross_compiling" != yes; then
     if ! ./mytest; then
       {
-        echo "no" 
-        echo "$0: error: cannot run CXX compiled programs. " 
-        echo "If you meant to cross compile, use --crosscompile". 
+        printf "no\n" 
+        printf "$0: error: cannot run CXX compiled programs. \n" 
+        printf "If you meant to cross compile, use --crosscompile\n". 
       } >&2
       rm -f mytest
       return 1;
     fi
   fi
-  echo "yes" >&2
+  printf "yes\n" >&2
   rm -f mytest
 
   return 0

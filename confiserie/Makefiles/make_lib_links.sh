@@ -26,15 +26,14 @@ create_links() {
 	done
 }
 oldifs=$IFS
-
 while [ "$#" -gt "0" ]; do
-	basename=${1/*\//}
-	dirname=${1/$basename/}
-	extension=${1/*./}
-	basename=${basename/.${extension}/}
-	version=${basename/*-/}
-	test "${version}" == "${basename}"  && exit 0
-	basename=${basename/-$version/}
+	basename=${1##*/}
+	dirname=${1%/*}
+	extension=${1##*.}
+	basename=${basename%.${extension}}
+	version=${basename##*-}
+	test "${version}" = "${basename}"  && exit 0
+	basename=${basename%-$version}
 
 	IFS=$'.'
 

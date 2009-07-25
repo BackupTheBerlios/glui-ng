@@ -20,9 +20,9 @@ ifdef AWK
 
 
 ifndef COLOR
-	export GENMSG?=echo -e [ GEN ]\\t
+	export GENMSG?=printf [ GEN ]\\t
 else
-	export GENMSG?=echo -e [ \\e[33m GEN\\e[0m ]\\t
+	export GENMSG?=printf [ \\e[33m GEN\\e[0m ]\\t
 endif
 
 clean : clean_auto_cxx_dep
