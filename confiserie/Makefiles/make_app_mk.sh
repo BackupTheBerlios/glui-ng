@@ -16,10 +16,10 @@ name=$( format_name "$2")
 name="${name}${EXE}"
 
 if test -n "${CONFISERIE_DEBUG}"; then
-        echo generating GENERATED/${name}.${3}.d >&2
-        echo \${1} : ${1} >&2
-        echo \${2} : ${2} >&2
-        echo \${3} : ${3} >&2
+        printf generating GENERATED/${name}.${3}.d >&2
+        printf \${1} : ${1} >&2
+        printf \${2} : ${2} >&2
+        printf \${3} : ${3} >&2
 fi
 
 cmd="\${${3}} \${${3}FLAGS} \${CPPFLAGS} -o \$@ \${${name}_OBJ} \${${name}_ARADD} \${${3}_LDFLAGS} \${${name}_LDADD} "
@@ -104,16 +104,16 @@ install_${name} :
 	\${confiserie}/Makefiles/make_lib_links.sh \${$1}/${name}
 else
 install_${name} :
-	echo \${INSTALLMSG} ${name} $1 not defined... skipping install
+	printf \${INSTALLMSG} ${name} $1 not defined... skipping install
 endif
 
 
 else 
 
 ${name} : 
-	echo ${3} variable is not defined.... aborting
+	printf ${3} variable is not defined.... aborting
 	exit 1
 
 endif
 EOF
-echo GENERATED/${name}.${3}.d
+printf GENERATED/${name}.${3}.d

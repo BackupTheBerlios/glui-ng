@@ -6,15 +6,14 @@
 #************************************************************************/
 
 
-#testing echo towards POSIX wanted behaviour
+#testing printf towards POSIX wanted behaviour
 mytest() {
-  if 	test $(echo "hello\thella") = "hello\thella" &&
-    test $(echo -n "hello"; echo "hella") = "hellohella" &&
-    test "$(echo -e 'hello\thella')" != "hello\thella"; then
-    echo "echo seems to be Posix compliant" >&2
+  if [ "$(printf "hello\thella")" = "hello	hella" ] &&
+    [ "$(printf "hello"; printf "hella")" = "hellohella" ]; then
+    printf "printf seems to be Posix compliant\n"
     return 0
   else
-    echo "echo isn't Posix compliant. use GNU echo or ask your OS maintainer" >&2
+    printf "printf isn't Posix compliant. use GNU printf or ask your OS maintainer\n" >&2
     return 1
   fi
 }

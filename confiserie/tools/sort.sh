@@ -17,13 +17,12 @@ if test -z "${__SORT_TEST}"; then
 
 
         #now the test
-        echo "${TEST_SEPARATOR}"
-        echo "checking for sort"
+        printf "checking for sort "
         if test -z "$SORT"; then
             if SORT=$(${WHICH} sort 2>/dev/null); then
                 conf_cache SORT
             else
-                echo "not found..." >&2
+                printf "not found...\n" >&2
                 return 1
             fi
         fi

@@ -87,12 +87,12 @@ endif #MAKECMDGOALS
 
 #######################################################################################
 ifdef autolibapp
-GENMSG ?= echo "[ GEN ]"
-LDMESG ?= echo "[ LNK ]"
-ARMSG ?= echo "[ AR ]"
-INSTALLMSG ?= echo "[ INSTALL ]"
-SUCCESSMSG ?= echo "[ SUCCESS ]"
-CLEANINGMSG ?= echo "[CLEANING]"
+GENMSG ?= printf "[ GEN ]\\t%b\n"
+LDMESG ?= printf "[ LNK ]\\t%b\n"
+ARMSG ?= printf "[ AR ]\\t%b\n"
+INSTALLMSG ?= printf "[ INSTALL ]\\t%b\n"
+SUCCESSMSG ?= printf "[ SUCCESS ]\\t%b\n"
+CLEANINGMSG ?= printf "[CLEANING]\\t%b\n"
 #don't forget to include the generated makefiles
 
 

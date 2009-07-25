@@ -33,7 +33,7 @@
 		if you are a library&nbsp; maintainer you don't need to send me the
 		tests I prefer that you continue to maintain it....<br>
 		simply include your tests into you development's package and install it
-		in the right place.... (look for /etc/confiser.conf&nbsp;
+		in the right place.... (look for /etc/confiserie.conf&nbsp;
 		or&nbsp;
 		$CONFISERIE_SCRIPTS_DIR) <br>
 		this will ensure that your tests are consistant with your current
@@ -41,12 +41,6 @@
 		contribution....
 		<br>
 		<br>
-		<ul class="note">note:<br> 
-			I'm currently working with pkg-config maintainers to fix the crosscompile issue of
-			such tools.... maybe in near futur pkg-config will be the best tool to
-			check for libraries/tools<br>
-			anyway using pkg-config in confiserie is straightforward...<br>
-		</ul>
 		<a
 			href="file:///home/jlm/devel/devel/confiserie.dev/doc/confiserie_extension.html"></a>
 		<h1>HOW	can I extend it ?</h1>
@@ -102,13 +96,6 @@
 			confiserie script directory, a good way is to add a line <br>
 			<pre>confiserie=${confiserie:=.}</pre>
 			</li>
-			at top of your test <li>begin the test by outputing
-			the "$TEST_SEPARATOR" string,
-			since a confiserie script create a lot of output (rather than storing
-			them into a file that is hard to read) then a delimiter is
-			needed. Provide information information about the script too : echo -e
-			"$TEST_SEPARATOR \n$0 : testing for XXXX" <br>
-			</li>
 			<li>try&nbsp; to use already
 			present script like <a
 				href="http://svn.berlios.de/viewcvs/confiserie/trunk/confiserie/tests/C/test_c_headers.sh?view=markup">test_c_headers.sh</a>
@@ -133,23 +120,7 @@
 		<h1>Options	handling</h1>
 		confiserie script can use some environment variables to help users have
 		the test succeed... <br>
-		The best way is to add comment at the top of your script so that the
-		"end user" that require your test can easely know what option to include<br>
-		for exemple&nbsp; add a line like <br>
-		<p class="code">
-		# add this line into your CONFIGURE_OPTS array to allow user to tune XXX (don't forget to uncomment it ^_^)<br>
-		# CONFIGURE_OPTS[1]="--test=,TEST,test option [string],/usr/local"
-		</p>
-		<ul class="note"> STRONGLY recommanded <br>
-			not to provide
-			--enable-feature
-			--disable-feature in tests : the only one that knows which feature is
-			optional is the package maintainer, and this should be set in main 
-			configure script. So a test if runned should test the functionality and 
-			nothing else. <br>
-			however a test that have variables that can be used to help it success
-			may display a message on faillure "set XXX env variable to ...."
-		</ul>
+		see <a href="confiserie_usage.html">how can I add optional features in my configure</a>
 		<ul class="note">it's	strongly recommanded<br>
 			to abuse of functions.... this will
 			increase readability and help debug/maintain the script

@@ -28,11 +28,12 @@ mytest() {
 		fi
   }
 
-  echo $TEST_SEPARATOR >&2
-  echo "test_ar.sh:checking for a ar : " >&2
 	run_test 
+	printf "checking for an ar : "
 	conf_cache AR
+	printf "checking for a ranlib : "
 	conf_cache RANLIB
+	printf "checking for ARFLAGS : "
 	conf_cache ARFLAGS
 
 }

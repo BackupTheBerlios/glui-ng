@@ -23,7 +23,7 @@
 tags :: clean_tags
 	cd ${TOPSRC_DIR}
 	IFS=','; for tags in $${TAGS}; do \
-	    echo "tags : $${tags}";\
+	    printf "tags : $${tags}";\
 	    tagname=$$(basename $${tags});\
 	    dirname=$${tagname//_/\/};\
 	    dirname=$$(dirname $${dirname});\

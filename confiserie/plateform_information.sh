@@ -5,22 +5,20 @@
 #* http://www.gnu.org/copyleft/lesser.html
 #************************************************************************/
 
-echo "${TEST_SEPARATOR}"
-
 cat >&2 <<EOF
 ## --------- ##
 ## Platform. ##
 ## --------- ##
 
-uname -a = `(uname -m) 2>/dev/null || echo unknown`
+uname -a = `(uname -m) 2>/dev/null || printf unknown`
 
-/bin/arch              = `(/bin/arch) 2>/dev/null              || echo unknown`
-/usr/bin/arch -k       = `(/usr/bin/arch -k) 2>/dev/null       || echo unknown`
-/usr/convex/getsysinfo = `(/usr/convex/getsysinfo) 2>/dev/null || echo unknown`
-hostinfo               = `(hostinfo) 2>/dev/null               || echo unknown`
-/bin/machine           = `(/bin/machine) 2>/dev/null           || echo unknown`
-/usr/bin/oslevel       = `(/usr/bin/oslevel) 2>/dev/null       || echo unknown`
-/bin/universe          = `(/bin/universe) 2>/dev/null          || echo unknown`
+/bin/arch              = `(/bin/arch) 2>/dev/null              || printf unknown`
+/usr/bin/arch -k       = `(/usr/bin/arch -k) 2>/dev/null       || printf unknown`
+/usr/convex/getsysinfo = `(/usr/convex/getsysinfo) 2>/dev/null || printf unknown`
+hostinfo               = `(hostinfo) 2>/dev/null               || printf unknown`
+/bin/machine           = `(/bin/machine) 2>/dev/null           || printf unknown`
+/usr/bin/oslevel       = `(/usr/bin/oslevel) 2>/dev/null       || printf unknown`
+/bin/universe          = `(/bin/universe) 2>/dev/null          || printf unknown`
 
 $PATH
 EOF

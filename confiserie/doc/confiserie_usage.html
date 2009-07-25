@@ -143,13 +143,11 @@
 		with and without the config file....<br>
 	</ul>
 	<h1>how can I add optional features in my configure</h1>
-	there is a special variable called CONFIGURE_OPTS which is an erray
-	containing strings...
+	you have to put a special comment ##CONFIGURE_OPTS in your file following the format
 	<p class="code">
-	CONFIGURE_OPTS[index]="option,variable_to_set,description,defaultvalue"
+	##CONFIGURE_OPTS option variable_to_set "description" "allowedValues" defaultvalue
 	</p>
 	<ul>
-		<li>index is an integer beginning at 1</li>
 		<li>option is string identifier like <span class="code">--prefix=</span>
 		it has been chosen to follow autoconf behaviour and then to not use
 		<span class="code">option &lt;space&gt; value</span> but 
@@ -158,17 +156,21 @@
 		<li>variable to set is the name of the variable to modify for example PREFIX</li>
 		<li>description is the description of the option, it's an arbritary string
 		displayed into help<br> 
-		for example : configure package to be located in prefix [path]<br>
-		it's advised to give a hint of the possible values inside [] (like
-		[path], [YES|NO]....)<br>
+		for example : configure package to be located in prefix<br>
+		<li> allowedValues is a space separated list of allowed values, if the content is
+		an arbitrary string just provide a hint of the possible values (like
+		"path"). example : <br>
+		<span class="code">"YES NO"</span>
+		<span class="code">"path"</span>
+		<span class="code">"openssl gnutls mozilla"</span>
 		</li>
 		<li>
 		the last option is the default value to use, if this string is empty no
 		value is stored
 		</li>
 	</ul>
-	init.sh provide 3 additional options : --prefix=, -h, -V, which are the
-	configuration prefix, display help and exit, version and exit<br>
+	init.sh provide additional options : --prefix=, -h, -V, --interactive which are the
+	configuration prefix, display help and exit, version and exit, do interactive configuration<br>
 	display help will create the help according to the values in
 	CONFIGURE_OPTS<br>
 	<br>

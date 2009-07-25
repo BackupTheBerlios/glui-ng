@@ -10,13 +10,13 @@ if test -z "${__CACHE_FUNC}"; then
     __CACHE_FUNC=sourced
     conf_cache() {
         eval export $1=\$$1
-        export MODIFIED_ENV="$(echo ${MODIFIED_ENV} $1 |sort |uniq)"
-        eval echo "$1=\$$1" >&2
+        export MODIFIED_ENV="$(printf "${MODIFIED_ENV}\n$1" |${SORT} |${UNIQ})"
+        eval printf "$1=\$$1\\\\n"
     }
 
     mytest() {
-        . ${confiserie}/tools/sort.sh &&
-        . ${confiserie}/tools/uniq.sh
+        [ -z "${SORT}" ] && runtest ${confiserie}/tools/sort.sh                 &&
+        [ -z "${UNIQ}" ] && runtest ${confiserie}/tools/uniq.sh
     }
 
     mytest

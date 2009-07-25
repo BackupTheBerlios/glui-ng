@@ -12,7 +12,7 @@ which() {
   for dir in $PATH
   do
     if  [ -f $dir/$1 ] && [ -x $dir/$1 ]; then 
-      echo $dir/$1;
+      printf $dir/$1;
       $ALL || return 0
 			NOTFOUND=0
     fi

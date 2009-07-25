@@ -15,7 +15,7 @@
 #           the provious function definition will be discarded
 #        -> it prevent namespace polution : you won't have a previous script that
 #           defined the same function name, conflict with yours....
-#note the two line 'echo AWK=$AWK' and 'export AWK=$AWK' this allow sourcing the 
+#note the two line 'printf AWK=$AWK' and 'export AWK=$AWK' this allow sourcing the 
 #     script and have the result available to later scripts, and keep the possibilty
 #     to simply write the result to a file (makefile for exemple)
 #note the WHICH=${WHICH:=which} that allow to have the test self runnable provided that
@@ -28,20 +28,18 @@ if test -z "${__TEST_AWK}"; then
         confiserie=${confiserie:=..}
         . ${confiserie}/confiserie.cache.functions.sh
 
-        echo "${TEST_SEPARATOR}"
         if test -z "$AWK"; then
             for prog in gawk mawk nawk awk
             do
-                echo -n "test_awk.sh : checking for $prog : " >&2
+                printf "\ntest_awk.sh : checking for $prog : " >&2
                 if AWK=$(${WHICH} $prog 2>/dev/null); then
-                    echo >&2
                     conf_cache AWK
                     return 0
                 else
-                    echo "not found..." >&2
+                    printf "not found..." >&2
                 fi
             done
-            echo "no AWK found"
+            printf "\nno AWK found\n"
             return 1
         fi
     }
