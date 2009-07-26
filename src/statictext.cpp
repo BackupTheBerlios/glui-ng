@@ -33,8 +33,8 @@
 
 #include <GL/glui/statictext.h>
 #include <GL/glui/debug.h>
-#include <GL/glui/drawinghelpers.h>
 #include <GL/glui/window.h>
+#include <GL/glui/themes.h>
 
 using namespace GLUI;
 ///////////////////////////////////////////////////////////////////////////////
@@ -49,26 +49,13 @@ StaticText::StaticText( Node *parent, const char *name )
   //set_font(theme::Instance()->font);
 }
 
-///////////////////////////////////////////////////////////////////////////////
-
-void    StaticText::draw( )
-{
-
-    drawinghelpers::draw_box(Width(), Height()); //erase text
-  glColor3ubv( Color );
-  glRasterPos3f(0.0, 0.0, 0.1);
-  //glRasterPos store the color and translate, since glut drawing routine use
-  //y axis up, we need to translate down before drawing
-  Text::draw();
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////
 
 void    StaticText::set_text(const char *text )
 {
     *(dynamic_cast<std::string*>(this)) = text;
-    drawinghelpers::PostRedisplay(this);
+    ThemeData->update();
 }
 
 
@@ -76,9 +63,28 @@ void    StaticText::set_text(const char *text )
 
 void   StaticText::update_size( void )
 {
-	CurrentSize.size.w = Text::graph_Length( );
-	CurrentSize.size.h = Text::graph_Width( );
+	CurrentSize.size.w = dynamic_cast<Text*>(ThemeData)->graph_Length( );
+	CurrentSize.size.h = dynamic_cast<Text*>(ThemeData)->graph_Width( );
 }
 
+//////////////////////////////////////////////////////////////////////////////
+theme* StaticText::GetDefaultTheme()
+{
+        return new StaticText::DefaultTheme(*this);
+}
+///////////////////////////////////////////////////////////////////////////////
 
+int StaticText::DefaultTheme::draw( )
+{
 
+//    drawinghelpers::draw_box(Width(), Height()); //erase text
+  glColor3ubv( Color );
+  glRasterPos3f(0.0, 0.0, 0.1);
+  //glRasterPos store the color and translate, since glut drawing routine use
+  //y axis up, we need to translate down before drawing
+  Text::draw();
+}
+
+int StaticText::DefaultTheme::update( )
+{
+}

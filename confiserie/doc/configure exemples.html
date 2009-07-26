@@ -1,0 +1,119 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>configure exemples</title>
+	<link rel="stylesheet" type="text/css" href="mystyle.css">
+</head>
+<body>
+<h1> Mininal ./configure :<br>
+</h1>
+<br>
+ <pre class="code">
+#!/bin/sh
+progname=${0/*\//}
+confiserie=${0/\/$progname/}/confiserie
+
+source ${confiserie}/init.sh "$@" &&
+exit 0
+</pre>
+<br>
+<br>
+<h1><a name="real_exemple"></a>real exemple</h1>
+
+<pre class=code>
+1  #!/bin/sh 
+2   
+3  #those lines are mandatory to perform 1rst step init
+4  progname=${0/*\//}
+5  confiserie=${0/\/$progname/}/confiserie
+6  
+7  #a "mandatory" function to clean everything on faillure, will be called by clean_on_sig handler
+8  custom_clean_on_sig() {
+9  	rm -f  confiserie.mk
+10  }
+11  
+12  source ${confiserie}/init.sh"$@" &&
+13  (
+14  	#this shows you how to take advantage of some confiserie provided makefiles
+15  	include ${confiserie}/Makefile.beautifull_rules" &&
+16  	
+17  	${confiserie}/test_cc.sh                         &&
+18  	${confiserie}/test_install.sh                   
+19  ) >confiserie.mk||clean_on_sig &&
+20  
+21  
+22  # this is a grouped test : OpenMLDep.c is a C file that the Package maintainer has created,
+23  # that contain everything he really need to compile..... a "one for all" test
+24  ${confiserie}/test_compile_c.sh ${confiserie}/OpenMLDep.c &&
+25  finish_confiserie
+</pre>
+
+<ul class="note">note the mandatory parts :<br>
+	<li> we're sourcing the $confiserie/init.sh script : this ensure that exported variables here 
+	are correctly set and exported this is theonly sourced test.... </li>
+	<li> the script ends with finish_confiserie this point should be reached 
+	<u>only if every tests were successfull</u></li>
+</ul>
+
+<ul class="note"> some notes<br>
+	<li>look at "include" line : this shows you how to take advantage of some
+	confiserie provided makefiles</li>
+	<li>look at line 24 : this is a grouped test : OpenMLDep.c is a C
+	file that the Package maintainer has created, that contain everything
+	he really need to compile..... a "one for all" test</li>
+</ul>
+
+<h1><a name="templates"></a>Templates</h1>
+
+all in one <a
+ href="http://svn.berlios.de/viewcvs/confiserie/trunk/confiserie/configure_templates/configure.template?view=markup">template
+</a>(well suited for small tests)<br>
+or <a
+ href="http://svn.berlios.de/viewcvs/confiserie/trunk/confiserie/configure_templates/configure.template.frac?view=markup">splited
+configure</a> <br>
+copy the <a
+ href="http://svn.berlios.de/viewcvs/confiserie/trunk/confiserie/configure_templates/confiserie/">subtests
+</a>into confiserie directory<br>
+this is well suited for big tests, and this is the recommanded&nbsp;
+behaviour <br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+
+</body>
+</html>

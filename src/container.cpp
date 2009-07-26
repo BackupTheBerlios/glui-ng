@@ -32,6 +32,7 @@
 *****************************************************************************/
 #include <GL/glui/container.h>
 #include <GL/glui/debug.h>
+#include <GL/glui/themes.h>
 #include <GL/gl.h>
 using namespace std;
 #include <algorithm>
@@ -52,8 +53,6 @@ Container::Container(const char *name ,
 ///////////////////////////////////////////////////////////////////////////////////////
 Container::~Container()
 {
-#warning "to check"
-    /*
     Control *item = (Control*) this->first_child();
 
     while (item)
@@ -62,8 +61,6 @@ Container::~Container()
         item = (Control*) item->next();
         delete tmp;
     }
-    */
-
 }
 
 
@@ -180,7 +177,22 @@ void Container::update_size( void )
         this->CurrentSize.size.h = height;
     }
 }
+///////////////////////////////////////////////////////////////////////////////////////
+int Container::UpdateTheme( void )
+{
+        Control::UpdateTheme();
+        Control* child = dynamic_cast<Control*>(first_child());
+        while (child != NULL)
+        {
+                int  rc;
+                rc = child->UpdateTheme();
+                if(rc) return rc;
+                Node* sibling = child->next();
+                child = dynamic_cast<Control*>(sibling);
+        }
+        return 0;
 
+}
 ////////////////////////////////////////////////////////////////////////////////////////
 void Container::pack (int x, int y)
 {

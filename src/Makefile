@@ -1,35 +1,35 @@
-.SUFFIXES: .cpp
-include ./conf.mk
+# (C) 2005-2005 MALET Jean-Luc aka cityhunter
+#this file is provided under the thermes of the BSD licence, you can use it, modify it
+#include it into your commercial software as you want
 
-#comment this for verbose make
-MAKEFLAGS+= -s
-#uncomment this if you want to know about Compiler extension
-# CPPFLAGS += -pedantic
+# as a general rule to avoid issues
+#    make variables first
+#    make rules following (first appearing rule is the default when issuing 'make')
+#    includes last
 
 
-#for sgi   -- comment out the lines below to use on HP
-#CC=CC -g0 -o32
-#CC=gcc
+#general variables
+.PHONY : all lib clean tests
 
-# Compiler options
-OPTS+=-g
-OPTS+=-O0
-#OPTS+=-O2
-OPTS+=-DDEBUG=1
+export TOPSRC_DIR?=${PWD}
+export VPATH=${TOPSRC_DIR}/${MSGSUBDIR}
+include ${TOPSRC_DIR}/Makefile.confiserie
 
-UNAME = $(shell uname)
+#default  target :
+all :
 
-ifeq ($(UNAME), Linux)
-CXX       = g++
-CPPFLAGS += $(OPTS) -Wall
+#addition to environnement variable, be carefull when nesting subdirs in this makefile
+LDFLAGS  += -lpthread
+CFLAGS   += -Wall -fPIC -Werror-implicit-function-declaration
+CPPFLAGS += -I../include -I./
+ARFLAGS   =
+
+########################################################################################
+ifeq (${DebugBuild},yes)
+CXXFLAGS+= -g3 -gdwarf-2 -O0
 endif
 
-#######################################
-
-CPPFLAGS += -I./ -I./include $(OPTS)
-
 LIBGLUI = -L./lib -lglui
-LIBGL   = -lGLU -lGL
 LIBS    = -lXext -lX11 -lm
 
 # One of the following options only...
@@ -43,112 +43,33 @@ LIBS    = -lXext -lX11 -lm
 # CPPFLAGS += -I/usr/X11R6/include -DGLUI_FREEGLUT
 
 # (3) GLUT
-LIBGLUT   = -L/usr/X11R6/lib -lglut
+LIBGLUT   = -L/usr/X11R6/lib -lglut -L/bin
 CPPFLAGS += -I/usr/X11R6/include
 
-GLUI_HEADERS = $(shell find include -type f)
 
-#######################################
-GLUI_SRC = $(shell find  -maxdepth 1 -regex '.*\.cpp\|.*\.c' -printf '%f\n')
+lib_LIBRARIES += libglui
 
+libglui_SOURCES = $(shell find  -maxdepth 1 -regex '.*\.cpp\|.*\.c' -printf '%f\n')
 ifeq (${BackEnd},XGL)
-GLUI_SRC+= $(shell find XGL -maxdepth 1 -regex '.*\.cpp\|.*\.c' )
+libglui_SOURCES+= $(shell find XGL -maxdepth 1 -regex '.*\.cpp\|.*\.c' )
 endif
 ifeq (${BackEnd},GLUT)
-GLUI_SRC+= $(shell find GLUT -maxdepth 1 -regex '.*\.cpp\|.*\.c' )
+libglui_SOURCES+= $(shell find GLUT -maxdepth 1 -regex '.*\.cpp\|.*\.c' )
 endif
 ifeq (${BackEnd},WGL)
-GLUI_SRC+= $(shell find WGL -maxdepth 1 -regex '.*\.cpp\|.*\.c' )
+libglui_SOURCES+= $(shell find WGL -maxdepth 1 -regex '.*\.cpp\|.*\.c' )
 endif
 
-GLUI_OBJS = $(addprefix GENERATED/,$(addsuffix .o,$(basename ${GLUI_SRC})))
-
-GLUI_LIB = GENERATED/lib/libglui.a
-
-GLUI_TOOLS = GENERATED/bin/ppm2array
-
-.PHONY: all setup examples tools clean depend doc doc-pdf doc-dist dist tests
-
-all: $(GLUI_LIB) examples tools
-
-testplan : tests
-	./tests/testplan.sh
-
-tests : $(GLUI_LIB)
-	make -C tests $@ DIRPREFIX=./tests/
-
-examples: $(GLUI_LIB)
-	make -C example $@
-
-tools: $(GLUI_TOOLS) $(GLUI_LIB)
-
-GENERATED/bin/ppm2array: tools/ppm2array.cpp tools/ppm.cpp
-	mkdir -p $(dir $@)
-	$(CXX) $(CPPFLAGS) -o $@ $^
-
-GENERATED/bin/%: example/%.cpp $(GLUI_LIB)
-	mkdir -p $(dir $@)
-	$(CXX) $(CPPFLAGS) -o $@ $<  $(LIBGLUI) $(LIBGLUT) $(LIBGL) $(LIBS)
-
-$(GLUI_LIB): $(GLUI_OBJS)
-	mkdir -p $(dir $@)
-	ar -r $(GLUI_LIB) $(GLUI_OBJS)
-
-${GLUI_OBJS}: ${GLUI_HEADERS}
+libglui_LDADD   =  -lGLU -lGL ${LIBGLUT}
+#########################################################################################
 
 
+clean : 
+	${CLEANINGMSG} ${MSGSUBDIR}
 
 
-GENERATED/%.o: %.cpp ${GLUI_HEADERS}
-	echo "    [CXX] $<"
-	mkdir -p $(dir $@)
-	$(CXX) $(CPPFLAGS) -c $< -o $@
+#includes
+include ${confiserie}/CXX/Makefile.auto_headers_deps
+include ${confiserie}/Makefiles/Makefile.autolib
+include ${confiserie}/CXX/Makefile.beautifull_rules
 
-GENERATED/%.o: %.c ${GLUI_HEADERS}
-	echo "    [CC ] $<"
-	mkdir -p $(dir $@)
-	$(CXX) $(CPPFLAGS) -c $< -o $@
-
-
-docs:
-	doxygen doc/doxygen.cfg
-
-clean:
-	rm -rf GENERATED
-	rm -f $(GLUI_LIB) $(GLUI_TOOLS)
-	rm -fr doc/doxygen
-	make -C tests $@
-
-DIST = glui-experiments2.35
-
-doc:
-	doxygen doc/doxygen.cfg
-
-doc-pdf:
-	cd doc/doxygen/latex &&	pdflatex refman.tex && pdflatex refman.tex && pdflatex refman.tex
-
-doc-dist:
-	mkdir -p $(DIST)/doc
-	cp `find doc/doxygen/html -type f` $(DIST)/doc
-	tar cv $(DIST) | gzip -9 - > $(DIST)-doc.tgz
-	zip -vr9 $(DIST)-doc.zip $(DIST)
-	rm -Rf $(DIST)
-	
-dist: clean
-	mkdir -p $(DIST)
-	cp --parents \
-		`find -type f -name "*.cpp"` \
-		`find -type f -name "*.c"` \
-		`find -type f -name "*.h"` \
-		`find -type f -name "*.dev"` \
-		`find -type f -name "*.dsp"` \
-		`find -type f -name "*.dsw"` \
-		`find -type f -name "*.vcproj"` \
-		`find -type f -name "*.sln"` \
-		`find -type f -name "*.txt"` \
-		makefile \
-		$(DIST)
-	tar cv $(DIST) | gzip -9 - > $(DIST).tgz
-	rm -Rf $(DIST)
-
-# DO NOT DELETE THIS LINE -- make depend depends on it.

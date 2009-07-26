@@ -277,7 +277,7 @@ int VertexObject::SetTextureArray (datatype texture_t, void* texture, uint32_t c
     OUT("");
 }
 /////////////////////////////////////////////////////////////////
-void VertexObject::draw()
+int VertexObject::draw()
 {
     IN("");
     glPushClientAttrib(0);
@@ -315,6 +315,7 @@ void VertexObject::draw()
     glPopClientAttrib();
 
     debug::Instance()->FlushGL();
+    return 0;
     OUT("");
 }
 //////////////////////////////////////////////////////////////////

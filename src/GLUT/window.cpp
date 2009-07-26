@@ -26,54 +26,26 @@
   3. This notice may not be removed or altered from any source distribution.
 
  *****************************************************************************/
-#if defined(GLUI_FREEGLUT)
-
-// FreeGLUT does not yet work perfectly with GLUI
-//  - use at your own risk.
-
-#include <GL/freeglut.h>
-
-#elif defined(GLUI_OPENGLUT)
-
-// OpenGLUT does not yet work properly with GLUI
-//  - use at your own risk.
-
-#include <GL/openglut.h>
-
-#else
-
-#ifdef __APPLE__
-#include <GLUT/glut.h>
-#else
-#include <GL/glut.h>
-#endif
-
-#endif
-#include <GL/glui/glut_window.h>
+#include <GL/glui/window.h>
 #include <GL/glui/MasterObject.h>
 #include <GL/glui/debug.h>
 #include <GL/glui/themes.h>
-#include <GL/glui/drawinghelpers.h>
-#include <X11/keysym.h>
-using namespace GLUI;
 
+#define XK_MISCELLANY
+#define XK_LATIN1
+#include <X11/keysymdef.h>
+using namespace GLUI;
 
 #define MODULE_KEY  "GLUI_DEBUG_GLUTWINDOW"
 
 ///////////////////////////////////////////////////////////////////////
+bool GlutWindow::glutinitialized = false;
+pthread_mutex_t GlutWindow::glut_mutex = PTHREAD_MUTEX_INITIALIZER;
+///////////////////////////////////////////////////////////////////////
 GlutDisplay::GlutDisplay(char* name)
 {
 }
-///////////////////////////////////////////////////////////////////////
-void GlutWindow::draw()
-{
-    //    Draw GLUI window
-    glLoadIdentity();
-    this->SetOrthoProjection();
-    glTranslatef(x, y, BOTTOM_VIEWPORT + 1);
-    drawinghelpers::draw_box( this->Width(),
-            this->Height());
-}
+
 ///////////////////////////////////////////////////////////////////////
 WindowId GlutWindow::GetWindowId()
 {
@@ -100,26 +72,34 @@ _Screen* GlutDisplay::DefaultScreen()
     return     &defaultscreen;
 }
 
-///////////////////////////////////////////////////////////////////////
-//
-
-bool GlutWindow::glutinitialized = false;
 
 ///////////////////////////////////////////////////////////////////////
 void  GlutWindow::XMapWindow()
 {
-  glutSetWindow(GlutWindowId);
-  MasterObject::Instance()->pack(0, 0); //repack all master windows
-  glutShowWindow();
-  mapped = true;
-  drawinghelpers::PostRedisplay(this);
-}
+        MasterObject::Instance()->pack(0, 0); //repack all master windows
+        int err = pthread_mutex_lock (&glut_mutex);
+        if (err)
+        {
+                throw Exception(err,"glut_mutex locking error");
+        }
+        else
+        {
 
+                glutSetWindow(GlutWindowId);
+                glutShowWindow();
+                mapped = true;
+                pthread_mutex_unlock (&glut_mutex);
+        }
+        ::XExposeEvent expose;
+        expose.type = Expose;
+        this->AddEvent(&expose);
+}
+///////////////////////////////////////////////////////////////////////////////
 void GlutWindow::XMapRaised()
 {
 #warning "TODO"
 }
-
+///////////////////////////////////////////////////////////////////////////////
 void GlutWindow::XMapSubwindows()
 {
 #warning "TODO"
@@ -128,11 +108,25 @@ void GlutWindow::XMapSubwindows()
 ///////////////////////////////////////////////////////////////////////
 void GlutWindow::XUnmapWindow( void )
 {
-  this->focussed = NULL;
-  glutSetWindow(GlutWindowId);
-  glutHideWindow();
-}
+        if (mapped)
+        {
+                this->focussed = NULL;
+                int err = pthread_mutex_lock (&glut_mutex);
+                if (err)
+                {
+                        throw Exception(err,"glut_mutex locking error");
+                }
+                else
+                {
 
+                        glutSetWindow(GlutWindowId);
+                        glutHideWindow();
+                        mapped      = false;
+                        pthread_mutex_unlock (&glut_mutex);
+                }
+        }
+}
+///////////////////////////////////////////////////////////////////////////////
 void GlutWindow::XUnmapSubwindows()
 {
 #warning "TODO"
@@ -156,7 +150,7 @@ GlutWindow::GlutWindow(Display* display, WindowId parent,
         _class, visual, valuemask,
         attributes );
 }
-
+///////////////////////////////////////////////////////////////////////////////
 GlutWindow::GlutWindow(Display *display, WindowId parent,
         int x, int y,
         unsigned int width, unsigned int height,
@@ -176,96 +170,125 @@ GlutWindow::GlutWindow(Display *display, WindowId parent,
 }
 
 #warning "TODO: copy constructor using WindowId, throw EINVAL if already registered"
-
-void GlutWindow::_GlutWindow(Display* display, WindowId parent,
-        int x, int y,
-        unsigned int width, unsigned int height,
-        unsigned int border_width,
-        int depth,
-        class_type _class,
-        Visual *visual,
-        unsigned long valuemask,
-        XSetWindowAttributes *attributes )
+///////////////////////////////////////////////////////////////////////////////
+int GlutWindow::_GlutWindow(Display* display, WindowId parent,
+                int x, int y,
+                unsigned int width, unsigned int height,
+                unsigned int border_width,
+                int depth,
+                class_type _class,
+                Visual *visual,
+                unsigned long valuemask,
+                XSetWindowAttributes *attributes )
 {
-    GlutWindow* win= MasterObject::Instance()->FindWindow(parent);
-    mapped      = false;
-    y_off_top   = 0;
-    y_off_bot   = 0;
-    x_off_left  = 0;
-    x_off_right = 0;
-      {
-        int argc=1;
-        char* argv[1] = { "glutnoname" };
-        GlutWindow::init(&argc, argv);
-      }
-    if ( win == NULL ) {  // not a subwindow, creating a new top-level window
-        int old_glut_window = glutGetWindow();
-
-        glutInitWindowSize( width, height);
-        if ( x >= 0 || y >= 0 )
-            glutInitWindowPosition( x, y );
-        glutInitDisplayMode( GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
-        this->GlutWindowId = glutCreateWindow(" ");
-
-
-        if ( old_glut_window > 0 )
-            glutSetWindow( old_glut_window );
+        GlutWindow* win= MasterObject::Instance()->FindWindow(parent);
+        mapped      = false;
+        y_off_top   = 0;
+        y_off_bot   = 0;
+        x_off_left  = 0;
+        x_off_right = 0;
+        {
+                int argc=1;
+                char* argv[1] = { "glutnoname" };
+                GlutWindow::init(&argc, argv);
+        }
+        int err = pthread_mutex_lock (&glut_mutex);
+        if (err)
+        {
+                throw Exception(err,"glut_mutex locking error");
+        }
         else
-            glutSetWindow(GlutWindowId);
+        {
+                if ( win == NULL ) {  // not a subwindow, creating a new top-level window
+                        int old_glut_window = glutGetWindow();
 
-    }
-    else // *is* a subwindow
-    {
-        int old_glut_window = glutGetWindow();
+                        glutInitWindowSize( width, height);
+                        if ( x >= 0 || y >= 0 )
+                                glutInitWindowPosition( x, y );
+                        glutInitDisplayMode( GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
+                        this->GlutWindowId = glutCreateWindow(" ");
 
-        GlutWindowId = glutCreateSubWindow(win->GetWindowId(), x, y, width, height);
-        win->add_control(this);
 
-        if ( old_glut_window > 0 )
-            glutSetWindow( old_glut_window );
+                        if ( old_glut_window > 0 )
+                                glutSetWindow( old_glut_window );
+                        else
+                                glutSetWindow(GlutWindowId);
 
-    }
-    int rc = MasterObject::Instance()->add_control(this);
-    if (rc)
-    {
-        throw rc;
-    }
-    if (width != 0  && height != 0)
-    {
-        set_resize_policy(FixedSize);
-        set_size(Size(width, height));
-    }
-    else
-    {
-        update_size();
-        pack(x,y);
-    }
+                }
+                else // *is* a subwindow
+                {
+                        int old_glut_window = glutGetWindow();
 
-    //init glut callbacks
-    glutDisplayFunc (display_func);
-    glutReshapeFunc (reshape_func);
-    glutKeyboardFunc (keyboard_func);
-    glutSpecialFunc (special_func);
-    glutMouseFunc (mouse_func);
-    glutMotionFunc (motion_func);
-    glutPassiveMotionFunc (passive_motion_func);
-    glutEntryFunc (entry_func);
-    glutVisibilityFunc (visibility_func);
-    glutIdleFunc (idle_func);
+                        GlutWindowId = glutCreateSubWindow(win->GetWindowId(), x, y, width, height);
+                        win->add_control(this);
+
+                        if ( old_glut_window > 0 )
+                                glutSetWindow( old_glut_window );
+
+                }
+                //init glut callbacks
+                glutDisplayFunc (display_func);
+                glutReshapeFunc (reshape_func);
+                glutKeyboardFunc (keyboard_func);
+                glutSpecialFunc (special_func);
+                glutMouseFunc (mouse_func);
+                glutMotionFunc (motion_func);
+                glutPassiveMotionFunc (passive_motion_func);
+                glutEntryFunc (entry_func);
+                glutVisibilityFunc (visibility_func);
+                glutIdleFunc (idle_func);
+
+                pthread_mutex_unlock (&glut_mutex);
+        }
+        int rc = MasterObject::Instance()->add_control(this);
+        if (rc)
+        {
+                throw rc;
+        }
+        if (width != 0  && height != 0)
+        {
+                set_resize_policy(FixedSize);
+                set_size(Size(width, height));
+        }
+        else
+        {
+                update_size();
+                pack(x,y);
+        }
+        Start(NULL);
 
 }
-
+///////////////////////////////////////////////////////////////////////////////
+int GlutWindow::start_routine(void* args)
+{
+        int res=0;
+        glutMainLoop ();
+        return res;
+}
+///////////////////////////////////////////////////////////////////////////////
 GlutWindow::~GlutWindow()
 {
-#warning "Todo : delete childs. close the window"
+        GlutWindow::XUnmapWindow();
+        int err = pthread_mutex_lock (&glut_mutex);
+        if (err)
+        {
+                throw Exception(err,"glut_mutex locking error");
+        }
+        else
+        {
+                glutDestroyWindow(this->GlutWindowId);
+                pthread_mutex_unlock(&glut_mutex);
+        }
+        //child deletion is performed by ~Container
 }
-
+///////////////////////////////////////////////////////////////////////////////
 int GlutWindow::init(int* argc, char** argv)
 {
   if(glutinitialized == false)
     {
         glutInit(argc, argv);
         glutinitialized = true;
+        int err = pthread_mutex_init (&glut_mutex, NULL);
     }
 
 }
@@ -273,6 +296,194 @@ int GlutWindow::init(int* argc, char** argv)
 int GLUIInit(int* argc, char** argv)
 {
    return GlutWindow::init(argc, argv);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+int GlutWindow::AddEvent (::XEvent *event)
+{
+    switch (event->type)
+    {
+        case Expose : return AddEvent((::XExposeEvent*) event);
+        case DestroyNotify :  return AddEvent((::XDestroyWindowEvent*) event);
+        case ResizeRequest: return AddEvent((::XResizeRequestEvent*) event);
+    }
+
+    return EINVAL;
+}
+
+int GlutWindow::AddEvent(::XResizeRequestEvent *event)
+{
+        int err;
+    IN("");
+    this->pack(x, y);
+
+    if ( event->width  != this->CurrentSize.size.w ||
+                    event->height != this->CurrentSize.size.h ) {
+            this->CurrentSize.size.w = event->width;
+            this->CurrentSize.size.h = event->height;
+            err = pthread_mutex_lock (&glut_mutex);
+            if (err)
+            {
+                    throw Exception(err,"glut_mutex locking error");
+            }
+            else
+            {
+                    glutSetWindow( this->GlutWindowId );
+                    MSG("%d: %d\n", glutGetWindow(), this->flags );
+                    glutReshapeWindow( this->CurrentSize.size.w, this->CurrentSize.size.h );
+                    pthread_mutex_unlock(&glut_mutex);
+            }
+    }
+    else {
+    }
+
+    glViewport( 0, 0, this->CurrentSize.size.w, this->CurrentSize.size.h);
+
+    err = pthread_mutex_lock (&glut_mutex);
+    if (err)
+    {
+            throw Exception(err,"glut_mutex locking error");
+    }
+    else
+    {
+            glutPostRedisplay();
+            pthread_mutex_unlock(&glut_mutex);
+    }
+    OUT("");
+    return 0;
+}
+
+
+int GlutWindow::AddEvent(::XExposeEvent *event)
+{
+        IN("");
+        int err = pthread_mutex_lock (&glut_mutex);
+        if (err)
+        {
+                throw Exception(err,"glut_mutex locking error");
+        }
+        else
+        {
+                if (mapped)
+                {
+                        int       win_w, win_h;
+
+                        // SUBTLE: on freeGLUT, the correct window is always already set.
+                        // But older versions of GLUT need this call, or else subwindows
+                        // don't update properly when resizing or damage-painting.
+                        glutSetWindow( this->GlutWindowId );
+
+                        // Set up OpenGL state for widget drawing
+                        glEnable( GL_DEPTH_TEST );
+                        glDepthFunc(GL_LEQUAL);
+                        //glCullFace( GL_BACK );
+                        //glDisable( GL_CULL_FACE );
+                        glEnable ( GL_COLOR_MATERIAL );
+                        glEnable ( GL_NORMALIZE );
+                        glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+                        glShadeModel(GL_SMOOTH);
+
+                        ThemeData->draw();
+
+                        this->SetCurrentDrawBuffer();
+                        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear Screen And Depth Buffer
+
+                        //update sizes and positions
+                        this->update_size();
+
+                        // Check here if the window needs resizing
+                        win_w = glutGet( GLUT_WINDOW_WIDTH );
+                        win_h = glutGet( GLUT_WINDOW_HEIGHT );
+                        if ( win_w != this->Width() || win_h != this->Height() ) {
+                                glutReshapeWindow( this->Width(), this->Height() );
+                        }
+
+                        Container::AddEvent (event);
+
+                        switch (get_buffer_mode()) {
+                                case buffer_front: // Make sure drawing gets to screen
+                                        glFlush();
+                                        break;
+                                case buffer_back: // Bring back buffer to front
+                                        glutSwapBuffers();
+                                        break;
+                        }
+                        glutPostRedisplay();
+                }
+                pthread_mutex_unlock(&glut_mutex);
+        }
+
+        OUT("");
+        return 0;
+}
+
+int GlutWindow::AddEvent(::XDestroyWindowEvent *event)
+{
+#warning "USE container destructor"
+    Node* child = first_child();
+    while (child)
+    {
+        Node* next = child->next();
+        delete child;
+        child = next;
+    }
+    delete this;
+    return 0;
+}
+
+
+int GlutWindow::AddEvent(::XKeyEvent* event)
+{
+    Container::AddEvent((::XEvent*) event);
+}
+
+
+int GlutWindow::AddEvent(::XButtonEvent* event)
+{
+    Container::AddEvent((::XEvent*) event);
+}
+
+
+int GlutWindow::AddEvent(::XMotionEvent* event)
+{
+    Container::AddEvent((::XEvent*) event);
+}
+
+
+int GlutWindow::AddEvent(::XCrossingEvent* event)
+{
+    Container::AddEvent((::XEvent*) event);
+}
+
+
+int GlutWindow::AddEvent(::XMapEvent* event)
+{
+    ::XExposeEvent expose;
+    expose.type = Expose;
+    Container::AddEvent((::XEvent*) event);
+    this->AddEvent(&expose);
+}
+
+
+int GlutWindow::AddEvent(::XUnmapEvent* event)
+{
+    Container::AddEvent((::XEvent*) event);
+}
+
+int GlutWindow::set_size( Size sz, Size min) //replace with a XResizeRequestEvent
+{
+        Control::set_size(sz,min);
+        int err = pthread_mutex_lock (&glut_mutex);
+        if (err)
+        {
+                throw Exception(err,"glut_mutex locking error");
+        }
+        else
+        {
+                glutReshapeWindow( this->Width(), this->Height() );
+                pthread_mutex_unlock(&glut_mutex);
+        }
+
 }
 
 
@@ -283,8 +494,17 @@ void GlutWindow::display_func (void)
     ::XExposeEvent event;
         event.type   = Expose;
     IN("");
-    GlutWindow* win= MasterObject::Instance()->FindWindow(glutGetWindow ());
-
+    GlutWindow* win;
+    int err = pthread_mutex_lock (&glut_mutex);
+    if (err)
+    {
+            throw Exception(err,"glut_mutex locking error");
+    }
+    else
+    {
+            win= MasterObject::Instance()->FindWindow(glutGetWindow ());
+            pthread_mutex_unlock(&glut_mutex);
+    }
     if (win)
     {
         win->AddEvent(&event);
@@ -305,101 +525,63 @@ void GlutWindow::reshape_func (int w, int h)
     IN("");
 
     /***  First check if this is main glut window ***/
-    GlutWindow* glut_window = MasterObject::Instance()->FindWindow(glutGetWindow ());
-    if (glut_window)
+    GlutWindow* win;
+    int err = pthread_mutex_lock (&glut_mutex);
+    if (err)
     {
-        glut_window->AddEvent(&event);
+            throw Exception(err,"glut_mutex locking error");
     }
-    OUT("");
-}
-
-
-int GlutWindow::AddEvent(::XResizeRequestEvent *event)
-{
-    IN("");
-    this->pack(x, y);
-
-    if ( event->width  != this->CurrentSize.size.w ||
-            event->height != this->CurrentSize.size.h ) {
-        glutSetWindow( this->GlutWindowId );
-        glutReshapeWindow( event->width, event->height );
-        MSG("%d: %d\n", glutGetWindow(), this->flags );
-        _Window::AddEvent(event);
-        glutPostRedisplay();
-    }
-    OUT("");
-    return 0;
-}
-
-int GlutWindow::AddEvent(::XExposeEvent *event)
-{
-    IN("");
-    if (mapped)
+    else
     {
-        int       win_w, win_h;
-
-        // SUBTLE: on freeGLUT, the correct window is always already set.
-        // But older versions of GLUT need this call, or else subwindows
-        // don't update properly when resizing or damage-painting.
-        glutSetWindow( this->GlutWindowId );
-
-        // Check here if the window needs resizing
-        win_w = glutGet( GLUT_WINDOW_WIDTH );
-        win_h = glutGet( GLUT_WINDOW_HEIGHT );
-        if ( win_w != this->Width() || win_h != this->Height() ) {
-            glutReshapeWindow( this->Width(), this->Height() );
-        }
-
-        _Window::AddEvent (event);
-        switch (drawinghelpers::get_buffer_mode()) {
-            case drawinghelpers::buffer_front: // Make sure drawing gets to screen
-                glFlush();
-                break;
-            case drawinghelpers::buffer_back: // Bring back buffer to front
-                glutSwapBuffers();
-                break;
-        }
-
-
-        glutPostRedisplay();
+            win= MasterObject::Instance()->FindWindow(glutGetWindow ());
+            pthread_mutex_unlock(&glut_mutex);
+    }
+    if (win)
+    {
+        win->AddEvent(&event);
     }
     OUT("");
     return 0;
 }
 
-int GlutWindow::set_size( Size sz, Size min) //replace with a XResizeRequestEvent
-{
-    Control::set_size(sz,min);
-    glutReshapeWindow( this->Width(), this->Height() );
-    return 0;
-}
 
 
 
-#warning "factorise
+
+#warning "factorise"
 /********************************************** glui_keyboard_func() ********/
 //GLUI use Y axis up (0,0) is bottom left corner as in OpenGl
 void GlutWindow::keyboard_func (unsigned char key, int x, int y)
 {
-
+	int win_w;
+	int win_h;
+	::XKeyEvent event;
+	GlutWindow* win;
     IN("");
-    int win_h = glutGet (GLUT_WINDOW_HEIGHT);
-    y = win_h - y;
-    ::XKeyEvent event;
-    event.type=KeyPress;
-    event.keycode=key; //first 256 char are reserved for non modifier keys
-    event.x=x;
-    event.y=y;
+    int err = pthread_mutex_lock (&glut_mutex);
+    if (err)
+    {
+            throw Exception(err,"glut_mutex locking error");
+    }
+    else
+    {
+	    int win_w = glutGet (GLUT_WINDOW_WIDTH);
+	    int win_h = glutGet (GLUT_WINDOW_HEIGHT);
+	    y = win_h - y;
+	    event.type=KeyPress;
+	    event.keycode=key; //first 256 char are reserved for non modifier keys
+	    event.x=x;
+	    event.y=y;
+	    win= MasterObject::Instance()->FindWindow(glutGetWindow ());
+            pthread_mutex_unlock(&glut_mutex);
+    }
 
-    int current_window = glutGetWindow ();
-    GlutWindow* glut_window = MasterObject::Instance()->FindWindow(glutGetWindow());
 
-
-    if (glut_window)
+    if (win)
     {
         MSG("key: %d(%d,%d) modifier %d\n", key, x, y, glutGetModifiers());
-        event.state=glut_window->KeyModifierState;
-        dynamic_cast<_Window*>(glut_window)->AddEvent(&event);
+        event.state=win->KeyModifierState;
+        win->AddEvent(&event);
     }
     OUT("");
 }
@@ -410,28 +592,40 @@ void GlutWindow::keyboard_func (unsigned char key, int x, int y)
 void GlutWindow::special_func (int key, int x, int y)
 {
 
-    int win_h = glutGet (GLUT_WINDOW_HEIGHT);
-    y = win_h - y;
+    int win_w;
+    int win_h;
+    int glutModifiers;
     ::XKeyEvent event;
-    event.type = KeyPress;
-    event.keycode = key << KeyModifierShift ; //first 256 char are reserved for non modifier keys
-    event.x = x;
-    event.y = y;
 
-
-    GlutWindow* glut_window = MasterObject::Instance()->FindWindow(glutGetWindow());
-
-    if (glut_window)
+    GlutWindow* win;
+    int err = pthread_mutex_lock (&glut_mutex);
+    if (err)
     {
-            int glutModifiers = glutGetModifiers();
-            glut_window->KeyModifierState &= ! ( ControlMask | ShiftMask | Mod1Mask );
-            if ( glutModifiers | GLUT_ACTIVE_SHIFT ) glut_window->KeyModifierState |= ShiftMask;
-            if ( glutModifiers | GLUT_ACTIVE_CTRL  ) glut_window->KeyModifierState |= ControlMask;
-            if ( glutModifiers | GLUT_ACTIVE_ALT   ) glut_window->KeyModifierState |= Mod1Mask;
+            throw Exception(err,"glut_mutex locking error");
+    }
+    else
+    {
+            win= MasterObject::Instance()->FindWindow(glutGetWindow ());
+            win_w = glutGet (GLUT_WINDOW_WIDTH);
+            win_h = glutGet (GLUT_WINDOW_HEIGHT);
+            y = win_h - y;
+            event.type = KeyPress;
+            event.keycode = key << KeyModifierShift ; //first 256 char are reserved for non modifier keys
+            event.x = x;
+            event.y = y;
+            pthread_mutex_unlock(&glut_mutex);
+    }
 
-            MSG("key: %d(%d,%d) modifier %d\n", key, x, y, glutModifiers/*glut_window->KeyModifierState*/);
-            event.state=glut_window->KeyModifierState;
-            dynamic_cast<_Window*>(glut_window)->AddEvent(&event);
+    if (win)
+    {
+            win->KeyModifierState &= ! ( ControlMask | ShiftMask | Mod1Mask );
+            if ( glutModifiers | GLUT_ACTIVE_SHIFT ) win->KeyModifierState | ShiftMask;
+            if ( glutModifiers | GLUT_ACTIVE_CTRL  ) win->KeyModifierState | ControlMask;
+            if ( glutModifiers | GLUT_ACTIVE_ALT   ) win->KeyModifierState | Mod1Mask;
+
+            MSG("key: %d(%d,%d) modifier %d\n", key, x, y, glutModifiers/*win->KeyModifierState*/);
+            event.state=win->KeyModifierState;
+            win->AddEvent(&event);
 
     }
 }
@@ -440,38 +634,50 @@ void GlutWindow::special_func (int key, int x, int y)
 //GLUI use Y axis up (0,0) is bottom left corner as in OpenGl
 void GlutWindow::mouse_func (int button, int state, int x, int y)
 {
-    int win_h = glutGet (GLUT_WINDOW_HEIGHT);
+    int win_w;
+    int win_h;
+    int glutModifiers;
 
-    y = win_h - y;
     ::XButtonEvent event;
-    event.type =
 
-    event.x=x;
-    event.y=y;
+    GlutWindow* win;
+    int err = pthread_mutex_lock (&glut_mutex);
+    if (err)
+    {
+            throw Exception(err,"glut_mutex locking error");
+    }
+    else
+    {
+            win= MasterObject::Instance()->FindWindow(glutGetWindow ());
+            win_w = glutGet (GLUT_WINDOW_WIDTH);
+            win_h = glutGet (GLUT_WINDOW_HEIGHT);
+            y = win_h - y;
+            event.type = ButtonPressMask;
+            event.button = button ; //first 256 char are reserved for non modifier keys
+            event.x = x;
+            event.y = y;
+            pthread_mutex_unlock(&glut_mutex);
+    }
 
-
-    GlutWindow *glut_window = MasterObject::Instance()->FindWindow(glutGetWindow());
-
-    if (glut_window)
+    if (win)
     {
         if (state == GLUT_DOWN)
         {
             event.type = ButtonPress;
-            glut_window->KeyModifierState |= (Button1Mask << ( button - Button1 ) );
+            win->KeyModifierState |= (Button1Mask << ( button - Button1 ) );
         }
         else
         {
             event.type = ButtonRelease;
-            glut_window->KeyModifierState &= ! (Button1Mask << ( button - Button1 ) );
+            win->KeyModifierState &= ! (Button1Mask << ( button - Button1 ) );
         }
-        int glutModifiers = glutGetModifiers();
-        glut_window->KeyModifierState &= ! ( ControlMask | ShiftMask | Mod1Mask );
-        if ( glutModifiers | GLUT_ACTIVE_SHIFT ) glut_window->KeyModifierState |= ShiftMask;
-        if ( glutModifiers | GLUT_ACTIVE_CTRL  ) glut_window->KeyModifierState |= ControlMask;
-        if ( glutModifiers | GLUT_ACTIVE_ALT   ) glut_window->KeyModifierState |= Mod1Mask;
+        win->KeyModifierState &= ! ( ControlMask | ShiftMask | Mod1Mask );
+        if ( glutModifiers | GLUT_ACTIVE_SHIFT ) win->KeyModifierState | ShiftMask;
+        if ( glutModifiers | GLUT_ACTIVE_CTRL  ) win->KeyModifierState | ControlMask;
+        if ( glutModifiers | GLUT_ACTIVE_ALT   ) win->KeyModifierState | Mod1Mask;
 
-        event.state=glut_window->KeyModifierState;
-        dynamic_cast<_Window*>(glut_window)->AddEvent(&event);
+        event.state=win->KeyModifierState;
+        win->AddEvent(&event);
     }
 }
 
@@ -480,22 +686,32 @@ void GlutWindow::mouse_func (int button, int state, int x, int y)
 //GLUI use Y axis up (0,0) is bottom left corner as in OpenGl
 void GlutWindow::motion_func (int x, int y)
 {
-    int win_h = glutGet (GLUT_WINDOW_HEIGHT);
+	int win_w;
+	int win_h;
 
-    y = win_h - y;
-    ::XMotionEvent event;
-    event.type = MotionNotify;
-
-    event.x=x;
-    event.y=y;
-
-
-    GlutWindow *glut_window = MasterObject::Instance()->FindWindow(glutGetWindow());
-
-    if (glut_window)
+	::XMotionEvent event;
+	GlutWindow* win;
+    int err = pthread_mutex_lock (&glut_mutex);
+    if (err)
     {
-        event.state=glut_window->KeyModifierState;
-        dynamic_cast<_Window*>(glut_window)->AddEvent(&event);
+            throw Exception(err,"glut_mutex locking error");
+    }
+    else
+    {
+	    win_w = glutGet (GLUT_WINDOW_WIDTH);
+	    win_h = glutGet (GLUT_WINDOW_HEIGHT);
+	    y = win_h - y;
+	    event.type = MotionNotify;
+	    event.x=x;
+	    event.y=y;
+            win= MasterObject::Instance()->FindWindow(glutGetWindow ());
+            pthread_mutex_unlock(&glut_mutex);
+    }
+
+    if (win)
+    {
+        event.state=win->KeyModifierState;
+        win->AddEvent(&event);
     }
 }
 
@@ -522,13 +738,22 @@ void GlutWindow::entry_func (int state)
     }
 #warning "complete the structure with other information"
 
-
-    GlutWindow *glut_window = MasterObject::Instance()->FindWindow(glutGetWindow());
-
-    if (glut_window)
+    GlutWindow* win;
+    int err = pthread_mutex_lock (&glut_mutex);
+    if (err)
     {
-        event.state=glut_window->KeyModifierState;
-        dynamic_cast<_Window*>(glut_window)->AddEvent(&event);
+            throw Exception(err,"glut_mutex locking error");
+    }
+    else
+    {
+            win= MasterObject::Instance()->FindWindow(glutGetWindow ());
+            pthread_mutex_unlock(&glut_mutex);
+    }
+
+    if (win)
+    {
+        event.state=win->KeyModifierState;
+        win->AddEvent(&event);
     }
 
 }
@@ -549,18 +774,27 @@ void GlutWindow::visibility_func (int state)
 
     IN("");
     /*  fflush( stdout );          */
+    GlutWindow* win;
+    int err = pthread_mutex_lock (&glut_mutex);
+    if (err)
+    {
+            throw Exception(err,"glut_mutex locking error");
+    }
+    else
+    {
+            win= MasterObject::Instance()->FindWindow(glutGetWindow ());
+            pthread_mutex_unlock(&glut_mutex);
+    }
 
-    GlutWindow *glut_window = MasterObject::Instance()->FindWindow(glutGetWindow());
-
-    if (glut_window)
+    if (win)
     {
         if ( state == GLUT_VISIBLE )
         {
-            dynamic_cast<_Window*>(glut_window)->AddEvent(&mapevent);
+            win->AddEvent(&mapevent);
         }
         else
         {
-            dynamic_cast<_Window*>(glut_window)->AddEvent(&unmapevent);
+            win->AddEvent(&unmapevent);
         }
     }
     OUT("");
@@ -580,11 +814,21 @@ void GlutWindow::idle (void)
 
 void GlutWindow::idle_func (void)
 {
-    GlutWindow *glut_window = MasterObject::Instance()->FindWindow(glutGetWindow());
-
-    if (glut_window)
+        GlutWindow* win;
+    int err = pthread_mutex_lock (&glut_mutex);
+    if (err)
     {
-        glut_window->idle();
+            throw Exception(err,"glut_mutex locking error");
+    }
+    else
+    {
+            win= MasterObject::Instance()->FindWindow(glutGetWindow ());
+            pthread_mutex_unlock(&glut_mutex);
+    }
+
+    if (win)
+    {
+        win->idle();
     }
 
 }
@@ -592,7 +836,7 @@ void GlutWindow::idle_func (void)
 ////////////////////////////////////////////////////////////////////
 KeySym GlutWindow::XLookupKeysym(::XKeyEvent *key_event, int index)
 {
-    switch (key_event->keycode)
+/*    switch (key_event->keycode)
     {
 
         case GLUT_KEY_F1 << KeyModifierShift : return XK_F1;
@@ -711,6 +955,8 @@ KeySym GlutWindow::XLookupKeysym(::XKeyEvent *key_event, int index)
         case '}' : return XK_braceright;
         case '~' : return XK_asciitilde;
         default: return XK_VoidSymbol;
+
     }
+*/
 }
 

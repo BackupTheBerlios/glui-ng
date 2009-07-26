@@ -1,0 +1,261 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+	<head>
+		<meta http-equiv="content-type"
+		content="text/html; charset=ISO-8859-1">
+		<link rel="stylesheet" type="text/css" href="mystyle.css">
+		<title>confiserie extension</title>
+	</head>
+	<body>
+		<h1>I'm	not using C/C++ but other language</h1>
+		don't worry : confiserie is really easely extented <br>
+		an exemple is the $confiserie/test_compile_c.sh test that is
+		extensively used to fast testing and extention<br>
+		now if you want to have java supported<br>
+		<br>
+		you'll need to :<br>
+		<ul>
+			<li>check the "java
+			compiler"&nbsp; :verify it's working.... see <a
+				href="http://svn.berlios.de/viewcvs/confiserie/trunk/confiserie/tests/C/test_cc.sh?view=markup">example
+				C Compiler test<br>
+			</a></li>
+			<li>create a
+			test_compile_java.sh script... see <a
+				href="http://svn.berlios.de/viewcvs/confiserie/trunk/confiserie/tests/C/test_compile_c.sh?view=markup">example
+				C compile test</a><br>
+			</li>
+			<li>create java sources files
+			that perform the tests <br>
+			</li>
+			<li>send me the tests ^_^</li>
+		</ul>
+		if you are a library&nbsp; maintainer you don't need to send me the
+		tests I prefer that you continue to maintain it....<br>
+		simply include your tests into you development's package and install it
+		in the right place.... (look for /etc/confiserie.conf&nbsp;
+		or&nbsp;
+		$CONFISERIE_SCRIPTS_DIR) <br>
+		this will ensure that your tests are consistant with your current
+		development... confiserie is well suited for distributed
+		contribution....
+		<br>
+		<br>
+		<a
+			href="file:///home/jlm/devel/devel/confiserie.dev/doc/confiserie_extension.html"></a>
+		<h1>HOW	can I extend it ?</h1>
+		create a script that :
+		<ul>
+			<li>return 0 on success,
+			anything else on
+			failure</li>
+			<li>follow the <a href="confiserie_extension.html#tests">utilities
+				test
+				behaviour or the
+				compile test behaviour</a></li>
+			<li><span style="text-decoration: underline;">have test and </span><span
+				style="font-weight: bold; text-decoration: underline;">all</span><span
+				style="text-decoration: underline;"> test function
+				inside a function named 'mytest'</span>
+			(this is for namespace polution prevention when sourcing the test) and
+			run it at end of the testscript</li>
+			<li>use local keyword for local variables</li>
+			<li>source <a
+				href="http://svn.berlios.de/viewcvs/confiserie/trunk/confiserie/tests/confiserie.cache.functions.sh?view=markup">cache
+				script</a> and call "conf_cache variable_name" this will<br>
+			</li>
+			<ul>
+				<li>echo the result of the variable with variable's name to stdout</li>
+				<li>echo information regarding the variable to stderr</li>
+				<li>save information to a .config.cache.new file</li>
+				<li>export to subshell (when sourcing for example)<br>
+				</li>
+			</ul>
+			<li> use if possible shell substitutions, at least resort use awk (that
+			will be tested into
+			${confiserie}/init.sh) to do string subtitutions/modifications</li>
+			<li>try to use ${variable} syntaxe rather than $variable.... this is
+			cleaner ^_^<br>
+			</li>
+			<li> NEVER forget : make the
+			tests the simpliest, don't try to make
+			it generical unless there are obvious reasons.... this will help
+			maintaining it, name it so it easy to remember like "test_ld" or
+			whatever utility you're using, <br>
+			</li>
+			<li>the scripts must be
+			autocleaning : it remove it's output but not
+			what we feed it with</li>
+			<li>the scripts must be self
+			runnable : you <span style="font-weight: bold;">MUST</span>
+			provide a script
+			that can be runned independantly of confiserie for this use
+			WHICH=${WHICH:=which} like syntax which use which if $WHICH isn't
+			defined (optionaly with a warning). Test can rely on other confiserie
+			tests, that's why test are supposed to be self's runnable into
+			confiserie script directory, a good way is to add a line <br>
+			<pre>confiserie=${confiserie:=.}</pre>
+			</li>
+			<li>try&nbsp; to use already
+			present script like <a
+				href="http://svn.berlios.de/viewcvs/confiserie/trunk/confiserie/tests/C/test_c_headers.sh?view=markup">test_c_headers.sh</a>
+			....</li>
+		</ul>
+		see an  <a
+			href="http://svn.berlios.de/viewcvs/confiserie/trunk/confiserie/tests/tools/test_awk.sh?view=markup">exemple
+			utility test</a><br>
+		<br>
+		that's all. test it, post it to the Mailing List or to the maintainer,
+		or install it when installing your package.... confiserie is designed
+		to be a distributed testcreation environement. I simply ask you to
+		make,
+		if possible, a little advertisement ^_^<br>
+		<ul class="note"> note<br>
+			your tests	provided by your package does not fall automatically under <a
+				href="http://www.gnu.org/copyleft/lgpl.html">lgpl
+				licence</a>, you can use any licence
+			you want, OSI ones, compatible with GPL are HIGLY recommended ^_^
+		</ul>
+
+		<h1>Options	handling</h1>
+		confiserie script can use some environment variables to help users have
+		the test succeed... <br>
+		see <a href="confiserie_usage.html">how can I add optional features in my configure</a>
+		<ul class="note">it's	strongly recommanded<br>
+			to abuse of functions.... this will
+			increase readability and help debug/maintain the script
+		</ul>
+		<a name="tests"></a>
+		<a name="output"></a>
+		<h1>Utilities	tests</h1>
+		utilities tests has the following behaviour :<br>
+		<ul>
+			<li>stdout is used to output the
+			test result, ie "AWK=/usr/bin/gawk"</li>
+			<li>stderr is used to output
+			every information usefull to the user /
+			errors<br>
+			</li>
+			<li>stdin has no special use</li>
+			<li>the test must export the
+			variable too, so that sourcing the test will export the variable</li>
+			<li>return 0 on success and
+			other values on faillure</li>
+		</ul>
+		&nbsp;
+		they are used to test the presence of utilities used for
+		compilation <br>
+		<br>
+		&nbsp; typically you'll use:<br>
+		<p class="code">
+		if ! ${confiserie}/test_ld.sh &gt;&gt;mymakefile; then<br>
+    &nbsp;&nbsp;&nbsp; echo "no ld found"&nbsp;&gt;&amp;2 <br>
+		&nbsp;&nbsp;&nbsp; exit 1;<br>
+		fi
+		</p>
+		or&nbsp;
+		<p class="code">
+		export $(${confiserie}/test_ld.sh)&amp;&amp;<br>
+		....<br>
+		</p>
+		or (recommanded)
+		<p class="code">
+		source ${confiserie}/test_ld.sh &gt;mymakefile &amp;&amp;<br>
+		....<br>
+		</p>
+		<a href="configure%20exemples.html">
+			see configure exemple to know how to factorise output and make smaller
+			tests</a><br>
+		<br>
+		<ul class="note">note<br>
+			that the test don't	usually expect any arguments, see the comments
+			on top of the tests to see how to use it.
+		</ul>
+		<ul class="note">note<br>
+			the test don't write any result to disk, this is for flexibility, the
+			user has the choice of doing what he wants.... and this is more KISS
+		</ul>
+		<h1>compilation	tests</h1>
+		compilation tests has the following behaviour :<br>
+		<ul>
+			<li>stdout is used to output the test result, ie "#define HAVE_STD_H"</li>
+			<li>stderr is used to output every information usefull to the user / errors	</li>
+			<li>stdin has no special use</li>
+			<li>no export is expected</li>
+			<li>return 0 on success and	other values on faillure</li>
+		</ul>
+		they are used to test the presence of partial software requirement used
+		for	compilation <br>
+		<ul class="note">note <br>
+				the test don't write any result to disk,
+				this is for flexibility, the user has the choice of doing what he
+				wants.... and this is more KISS
+		</ul>
+		typically you'll use:
+		<p class=code>
+		if ! ${confiserie}/test_header.sh	unistd.h &gt;myconfig.h; then<br>
+		&nbsp;&nbsp;&nbsp; echo "no unistd.h found" &gt;&amp;2<br>
+		&nbsp;&nbsp;&nbsp; exit 1;<br>
+		fi
+		</p>
+		or
+		<p class=code>
+		${confiserie}/test_header.sh	unistd.h &gt;&gt; myconfig.h &amp;&amp;<br>
+		....<br>
+		</p>
+		or<br>
+		<p class=code>
+		${confiserie}/test_header.sh	unistd.h &gt;/dev/null &amp;&amp; echo
+		"#define HAVE_UNISTD_H" &gt;&gt; myconfig.h &amp;&amp;<br>
+		....
+		</p>
+		<a href="configure%20exemples.html"><br>
+			see configure exemple to know how to factorise output and make smaller
+			tests</a><br>
+		<br>
+		<ul class="note">note<br>
+			that the test don't
+			usually expect any arguments, see the comments
+			on top of the tests to see how to use it.
+		</ul>
+		<ul class="note">note<br>
+				the test don't write any result to disk, this is for flexibility, the
+				user has the choice of doing what he wants.... and this is more KISS
+		</ul>
+		<br>
+		<h1><a
+						href="confiserie_usage.html#outofspeed">How
+						can
+						make it run
+						outofspeed/extend it intelligently?</a></h1>
+		<br>
+		<h1>what		init.sh will export?</h1>
+		at this time init.sh export the following variables<br>
+		PREFIX<br>
+		CROSSCOMPILING<br>
+		ENABLE_LINK_FARM<br>
+		INSTALL_PREFIX<br>
+		BIN_DIR<br>
+		SBIN_DIR<br>
+		LIB_DIR<br>
+		LIBEXEC_DIR<br>
+		SYS_CONF<br>
+		SHARED_DATA_DIR<br>
+		INCLUDE_DIR<br>
+		TOPSRC_DIR<br>
+		OBJDIR<br>
+		confiserie<br>
+		WHICH<br>
+		<br>
+		theses functions are provided through $confiserie/init.sh<br>
+		finish_confiserie()<br>
+		clean_on_sig() <br>
+		include()<br>
+		<br>
+		&nbsp;<big><span style="color: rgb(255, 0, 0);"><span
+					style="font-style: italic;"><span style="text-decoration: underline;"><span
+							style="font-weight: bold;">YOUR
+							tests are welcome, send me them ^_^
+							you'll be on the contributor page</span></span></span></span></big><br>
+	</body>
+</html>

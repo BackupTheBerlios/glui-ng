@@ -1,0 +1,62 @@
+#/***********************************************************************
+#* copyright (c) 2004-2006 MALET Jean-luc aka cityhunter
+#* This library is free software; you can redistribute it and/or modify
+#* it under the terms of the LGPL v2.1 or latter at your option
+#* http://www.gnu.org/copyleft/lesser.html
+#************************************************************************/
+
+
+ifdef CONFISERIE_DEBUG
+$(warning ENABLE_AUTODEPS: ${ENABLE_AUTODEPS})
+$(warning AWK : ${AWK})
+endif #CONFISERIE_DEBUG
+
+
+#this test only run if the variable ENABLE_AUTODEPS is set to yes
+ifeq (${ENABLE_AUTODEPS}, yes)
+
+#require awk and sed tests
+ifdef AWK
+
+
+ifndef COLOR
+	export GENMSG?=printf "[ GEN ]\\t%b\n"
+else
+	export GENMSG?=printf "[ \\e[33m GEN\\e[0m ]\\t%b\n"
+endif
+
+clean : clean_auto_cxx_dep
+
+clean_auto_cxx_dep :
+	rm -rf GENERATED
+
+
+
+#automatic dependencies generation
+#this is really usefull : this let you not bothering of which include to track into 
+#the dependency : this rules will create automatically the dependencies in a Makefile
+#format in GENERATED/%.d file where % is the name of the .c (ie toto.c %=toto}
+# to use this add a 
+#-include ${sources:%.cxx=GENERATED/%.d}
+#in your Makefile, where sources is the variable listing your .c
+define cc_dep_macro
+	${GENMSG} ${MSGSUBDIR}$<
+	mkdir -p $(dir $@)
+	${CXX} ${CXXFLAGS} -M ${CPPFLAGS} $< | ${AWK} '{gsub("$(addsuffix .o, $(basename $<))","GENERATED/$<.d GENERATED/$(addsuffix .o, $(basename $<))"); print;}' >$@
+
+endef
+
+GENERATED/%.cc.d: %.cc
+	$(call cc_dep_macro)
+GENERATED/%.cpp.d: %.cpp
+	$(call cc_dep_macro)
+GENERATED/%.C.d: %.C
+	$(call cc_dep_macro)
+GENERATED/%.cxx.d: %.cxx
+	$(call cc_dep_macro)
+
+else
+$(error AWK must be set if ENABLE_AUTODEPS is set)
+endif #AWK
+
+endif #ENABLE_AUTODEPS

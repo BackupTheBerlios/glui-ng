@@ -32,7 +32,7 @@
 *****************************************************************************/
 #include <GL/gl.h>
 #include <GL/glui/debug.h>
-#include <GL/glui/drawinghelpers.h>
+#include <GL/glui/window.h>
 
 
 #ifdef _MSC_VER
@@ -116,7 +116,7 @@ void debug::print(const char* key,
 void debug::FlushGL(void)
 {
       if (NULL != getenv("GLUI_SYNC") &&
-              drawinghelpers::get_buffer_mode() == drawinghelpers::buffer_front)
+              _Window::get_buffer_mode() == _Window::buffer_front)
       {
           glFlush();
       }

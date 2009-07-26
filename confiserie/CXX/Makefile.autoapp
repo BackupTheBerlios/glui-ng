@@ -1,0 +1,43 @@
+#/***********************************************************************
+#* copyright (c) 2004-2006 MALET Jean-luc aka cityhunter
+#* This library is free software; you can redistribute it and/or modify
+#* it under the terms of the LGPL v2.1 or latter at your option
+#* http://www.gnu.org/copyleft/lesser.html
+#************************************************************************/
+ifneq (${MAKECMDGOALS},clean)
+ifdef CONFISERIE_DEBUG
+$(warning "available targets : noinst_CXXPROGRAMS bin_CXXPROGRAMS sbin_CXXPROGRAMS custom_CXXPROGRAMS")
+$(warning "noinst_CXXPROGRAMS = ${noinst_CXXPROGRAMS} ")
+$(warning "bin_CXXPROGRAMS = ${bin_CXXPROGRAMS} ")
+$(warning "sbin_CXXPROGRAMS = ${sbin_CXXPROGRAMS} ")
+$(warning "custom_CXXPROGRAMS = ${custom_CXXPROGRAMS} ")
+$(warning "if the variable isn't defined makefile won't be built")
+endif
+
+#programms created for compilation purpose but not installed
+ifdef noinst_CXXPROGRAMS
+autolibapp=yes
+include $(foreach app,${noinst_CXXPROGRAMS},$(shell confiserie=${confiserie} ${confiserie}/Makefiles/make_app_mk.sh NOINST_DIR ${app} CXX) )
+endif
+
+#programms installed into bin dir
+ifdef bin_CXXPROGRAMS
+autolibapp=yes
+include $(foreach app,${bin_CXXPROGRAMS},$(shell confiserie=${confiserie} ${confiserie}/Makefiles/make_app_mk.sh BIN_DIR ${app} CXX))
+endif
+
+#programms installed into sbin dir
+ifdef sbin_CXXPROGRAMS
+autolibapp=yes
+include $(foreach app,${sbin_CXXPROGRAMS},$(shell confiserie=${confiserie} ${confiserie}/Makefiles/make_app_mk.sh SBIN_DIR ${app} CXX) )
+endif
+
+#programms installed into bin dir
+ifdef custom_CXXPROGRAMS
+autolibapp=yes
+include $(foreach app,${custom_CXXPROGRAMS},$(shell confiserie=${confiserie} ${confiserie}/Makefiles/make_app_mk.sh CUSTOM_BIN_DIR ${app} CXX) )
+endif
+
+endif #MAKECMDGOALS
+
+
