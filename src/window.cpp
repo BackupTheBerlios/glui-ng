@@ -48,7 +48,10 @@ _Window::_Window() :
 {
         SetTheme(new _Window::DefaultTheme(*this));
 }
-
+_Window::~_Window()
+{
+        Wait();
+}
 ///////////////////////////////////////////////////////////////////////////////
 int _Window::Wait()
 {

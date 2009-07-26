@@ -109,6 +109,7 @@ namespace GLUI
                 public :
                         _Window(const char *name,
                                         Container::orientation orient=Container::TopDown);
+                        virtual ~_Window();
                         int Wait();
                         virtual int AddEvent (::XEvent *event)=0;
                         static buffer_mode_t get_buffer_mode();
