@@ -43,7 +43,29 @@
   This entire approach seems to be superceded by the "subwindow" flavor
   of GLUI.
   */
-#include <GL/glui/window.h>
+#if defined(GLUI_FREEGLUT)
+
+// FreeGLUT does not yet work perfectly with GLUI
+//  - use at your own risk.
+
+
+#include <GL/freeglut.h>
+
+#elif defined(GLUI_OPENGLUT)
+
+// OpenGLUT does not yet work properly with GLUI
+//  - use at your own risk.
+
+#include <GL/openglut.h>
+
+#else
+
+#ifdef __APPLE__
+#include <GLUT/glut.h>
+#else
+#include <GL/glut.h>
+#endif
+#endif
 namespace GLUI
 {
     class GlutDisplay;
@@ -134,6 +156,7 @@ namespace GLUI
                     Visual *visual,
                     unsigned long valuemask,
                     XSetWindowAttributes *attributes );
+            int start_routine(void* args);
             /*********** Pointers to GLUT callthrough functions *****/
             static void keyboard_func(unsigned char, int, int);
             static void special_func(int, int, int);
@@ -151,6 +174,7 @@ namespace GLUI
             long unsigned int GlutWindowId;
             bool mapped;
             static bool glutinitialized;
+            static pthread_mutex_t glut_mutex;
         protected: //defines
             enum _KeyModifierShift { KeyModifierShift=8 }; //256 first chars are already used in keyboard functions of glut
     };

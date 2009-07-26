@@ -19,6 +19,7 @@ unset MODIFIED_ENV
 
 interactive_conf() {
 	ask_user() {
+                option=$1
 		var=$2
 		default=$5
 		printf " $1? ($3) [$4] default to $5\n"
@@ -37,6 +38,7 @@ interactive_conf() {
                 done
 		eval $var=${REPLY}
 		conf_cache $var
+                CONFIGURE_LINE="${CONFIGURE_LINE} $option${REPLY}"
 	}
 
 	option_flags=$(cut -d ' ' -f 1  <${confiserie}/options| grep -v '^[[:space:]]*#.*')
@@ -47,12 +49,14 @@ interactive_conf() {
 
 parse_opts() {
 	assign_defaults() {
+                option=$1
 		var=$2
 		default=$5
 		is_allready_set=$(printf "${MODIFIED_ENV}" | grep $var)
 		if [ -n "$default" ] && [ -z "${is_allready_set}" ]; then
 			eval $var=$default
                         conf_cache $var
+                        CONFIGURE_LINE="${CONFIGURE_LINE} $option$default"
 		fi
 	}
 
@@ -62,6 +66,7 @@ parse_opts() {
                 possibilities=${4}
 	}
 	
+        CONFIGURE_LINE="./configure"
 
         if [ -f "${confiserie}/options" ]; then
 		option_flags=$(cut -d ' ' -f 1  <${confiserie}/options | grep -v '^[[:space:]]*#.*')
@@ -83,6 +88,7 @@ parse_opts() {
 							}
 						fi
 						eval export $var=${1##$long}; 
+                                                CONFIGURE_LINE="${CONFIGURE_LINE} $1"
 						conf_cache $var ;;
                                         *)
                                                 printf "unknow option $1\n"
@@ -95,6 +101,7 @@ parse_opts() {
 		for opt in ${option_flags}; do
 			eval assign_defaults $(grep -- ${opt} <${confiserie}/options)
 		done
+                printf "configure line used : ${CONFIGURE_LINE}\n"
 	fi
 }
 

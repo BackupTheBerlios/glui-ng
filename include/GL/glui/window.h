@@ -44,6 +44,7 @@
 */
 
 #include <GL/glui/container.h>
+#include <GL/glui/Exception.h>
 #include <GL/glui/DefaultTheme.h>
 #include <X11/Xlib.h>
 #include <GL/gl.h>
@@ -102,6 +103,27 @@ namespace GLUI
                                 buffer_front=1, ///< Draw updated controls directly to screen.
                                 buffer_back=2   ///< Double buffering: postpone updates until next redraw.
                         };
+
+
+
+                public :
+                        _Window(const char *name,
+                                        Container::orientation orient=Container::TopDown);
+                        virtual ~_Window();
+                        int Wait();
+                        virtual int AddEvent (::XEvent *event)=0;
+                        static buffer_mode_t get_buffer_mode();
+                public :  //operators
+                public : //XMethods
+                        virtual void XMapWindow()=0;
+                        virtual void XMapRaised()=0;
+                        virtual void XMapSubwindows()=0;
+                        virtual void XUnmapWindow()=0;
+                        virtual void XUnmapSubwindows()=0;
+                        virtual KeySym XLookupKeysym(::XKeyEvent *key_event, int index)=0; //a KeySym is a 32bit not unicode char
+                        static  uint32_t KeySymToUcs4(KeySym keysym);
+
+                protected : //types
                         class DefaultTheme : public _DefaultTheme
                         {
                                 public : //methods
@@ -115,29 +137,21 @@ namespace GLUI
                                         void  SetOrthoProjection( void );
                                         void SetViewport(void);
                         };
-
-
-                public :
-                        _Window(const char *name,
-                                        Container::orientation orient=Container::TopDown);
-                        virtual int AddEvent (::XEvent *event)=0;
-                        static buffer_mode_t get_buffer_mode();
-                public :  //operators
-                public : //XMethods
-                        virtual void XMapWindow()=0;
-                        virtual void XMapRaised()=0;
-                        virtual void XMapSubwindows()=0;
-                        virtual void XUnmapWindow()=0;
-                        virtual void XUnmapSubwindows()=0;
-                        virtual KeySym XLookupKeysym(::XKeyEvent *key_event, int index)=0; //a KeySym is a 32bit not unicode char
-                        static  uint32_t KeySymToUcs4(KeySym keysym);
-
-
+                        struct ThreadArgs
+                        {
+                                _Window* TheWindow;
+                                void* args;
+                        };
                 protected :
                         _Window();
+                        void Start(void* args); //start event handler, shall be started in child constructor;
+                        static void* _Start(void* args);
+                        virtual int start_routine(void* args)=0; //< the thead main routine;
 
                         long flags;
                         int  SetCurrentDrawBuffer( void );
+                protected:
+                        pthread_t main_thread;
 
         };
 

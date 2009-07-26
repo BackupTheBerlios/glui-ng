@@ -22,6 +22,7 @@
   3. This notice may not be removed or altered from any source distribution.
 
 */
+#define __STDC_LIMIT_MACROS
 #include <GL/glui/themes.h>
 #include <GL/glui/DefaultTheme.h>
 #include <GL/glui/container.h>

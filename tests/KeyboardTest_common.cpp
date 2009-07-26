@@ -9,12 +9,6 @@
 using namespace GLUI;
 class myControl;
 
-#if (__USE_XLIB == 1 || __USE_WIN32 == 1 )
-int main(int argc, char* argv[])
-{
-    return 0;
-}
-#else
 /////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////
@@ -39,6 +33,7 @@ class myControl : public Control
 ///////////////////////////////////////////////////////////////////////
 myControl::myControltheme::myControltheme(myControl& owner) : Owner(owner)
 {
+        drawing = NULL;
         update();
 }
 
@@ -51,13 +46,15 @@ myControl::myControltheme::~myControltheme()
 ///////////////////////////////////////////////////////////////////////
 int myControl::myControltheme::update()
 {
-    drawing = raised_box(Owner.Width(), Owner.Height());
+        if (drawing != NULL) delete drawing;
+        drawing = raised_box(Owner.Width(), Owner.Height());
+        return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////
 int myControl::myControltheme::draw()
 {
-        drawing->draw();
+        return drawing->draw();
 }
 
 
@@ -68,7 +65,7 @@ myControl::myControl(const char* name) :
     Control(name)
 {
     this->SetTheme(new myControl::myControltheme(*this));
-    ((myControltheme*)this->ThemeData)->bkgd_color[0] = 253;
+    ((myControltheme*)this->ThemeData)->bkgd_color[0] = 255;
     ((myControltheme*)this->ThemeData)->bkgd_color[1] = 0;
     ((myControltheme*)this->ThemeData)->bkgd_color[2] = 0;
     set_size(Size(200u,10u));
@@ -80,7 +77,7 @@ int myControl::AddEvent(::XKeyEvent* event)
     uint8_t previous_red = ((myControltheme*)this->ThemeData)->bkgd_color[0];
     ((myControltheme*)this->ThemeData)->bkgd_color[0] = ((myControltheme*)this->ThemeData)->bkgd_color[2];
     ((myControltheme*)this->ThemeData)->bkgd_color[2] = previous_red;
-    ThemeData->update();
+    return ThemeData->update();
 }
 
 
@@ -97,61 +94,44 @@ class myGluiWin : public GLUIWindow
                                 int draw();
                 };
         public :
-                myGluiWin(Display* glutDisplay) : GLUIWindow(glutDisplay,
-                                glutDisplay->DefaultScreen()->RootWindow(),
+                myGluiWin(Display* TheDisplay) : GLUIWindow(TheDisplay,
+                                TheDisplay->DefaultScreen()->RootWindow(),
                                 0, 0,
                                 200, 200,
                                 1,
                                 1,
-                                0),
-                ctrl("top box")
+                                0)
                 {
                         Angle = 0;
-                        add_control(&ctrl);
+                        ctrl = new myControl("top box");
+                        add_control(ctrl);
                         SetTheme(new theme(*this));
+                }
+                ~myGluiWin()
+                {
+                        delete ctrl;
                 }
                 virtual int AddEvent(::XKeyEvent* event);
                 void simulatekey();
-                virtual void idle(void);
 
 
         public : //variables
                 float Angle;
-                myControl ctrl;
+                myControl* ctrl;
 };
 
 int myGluiWin::AddEvent(::XKeyEvent* event)
 {
     Angle += 5.0f;
     Container::AddEvent((::XEvent*) event);
-    ThemeData->update();
+    return ThemeData->update();
 }
-
-#if defined(GLUI_FREEGLUT)
-
-// FreeGLUT does not yet work perfectly with GLUI
-//  - use at your own risk.
-
-
-#include <GL/freeglut.h>
-
-#elif defined(GLUI_OPENGLUT)
-
-// OpenGLUT does not yet work properly with GLUI
-//  - use at your own risk.
-
-#include <GL/openglut.h>
-
+#ifdef __USE_XLIB
+#include <GL/glui/x11_window.h>
+#elif  __USE_WIN32
+#include <GL/glui/win32_window.h>
 #else
-
-#ifdef __APPLE__
-#include <GLUT/glut.h>
-#else
-#include <GL/glut.h>
-#endif
-#endif
-
-
+#include <GL/glui/glut_window.h>
 void myGluiWin::simulatekey(void)
 {
     static int count = 0;
@@ -160,9 +140,10 @@ void myGluiWin::simulatekey(void)
     keyboard_func (GLUT_KEY_UP, 100, 100);
     if (count % 10 == 0)
       {
-        keyboard_func (GLUT_KEY_UP, ctrl.X() + ctrl.Width()/2, this->Height() -  ctrl.Y() - ctrl.Height()/2 );
+        keyboard_func (GLUT_KEY_UP, ctrl->X() + ctrl->Width()/2, this->Height() -  ctrl->Y() - ctrl->Height()/2 );
       }
 }
+#endif
 
 int myGluiWin::theme::draw(void)
 {
@@ -230,36 +211,4 @@ int myGluiWin::theme::draw(void)
 
 }
 
-void myGluiWin::idle(void)
-{
-    struct timespec sleeptime = { 0, 100000000 };
-    static int count = 0;
-
-    if (count < 50)
-      {
-        struct timespec sleeptime = { 0, 100000000 };
-        this->simulatekey();
-        nanosleep(&sleeptime, NULL);
-        count++;
-      }
-    else
-      {
-        this->XUnmapWindow();
-        delete(this); 
-        exit(0);
-      }
-
-}
-
-//////////////////////////////////////////////////////////////////////////////////////
-int main(int argc, char** argv)
-{
-    //glutWindow->init(&argc, argv);  //optional
-    Display*    glutDisplay = new Display("glut display");
-    myGluiWin* glutWindow = new myGluiWin(glutDisplay);
-    glutWindow->XMapWindow();
-    glutMainLoop ();
-
-}
-#endif
 

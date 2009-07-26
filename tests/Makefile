@@ -9,7 +9,7 @@
 
 
 #general variables
-.PHONY : all lib clean debug tests
+.PHONY : all lib clean tests
 
 export TOPSRC_DIR?=..
 
@@ -23,7 +23,9 @@ export VPATH=${TOPSRC_DIR}/${MSGSUBDIR}
 #default target (make execute by defaut the first target he find):
 all :
 
-
+ifeq (${DebugBuild},yes)
+CXXFLAGS+= -g3 -gdwarf-2 -O0
+endif
 ifneq (${SHAREDLIBEXT},)
 LIBGLUIDLL = -L../src/GENERATED/ -lglui-${libglui_VERSION}
 else
@@ -39,7 +41,7 @@ CPPFLAGS += -I../include
 # this variable is used in Makefile.autoapp to create the required Makefiles
 # it then has to be set before including of Makefiles.autoapp
 noinst_CXXPROGRAMS = SizeComputationTest PackingTest ContainerEventTest
-noinst_CXXPROGRAMS+= GlutWindowTest GlutKeyboardTest GlutKeyboardUserTest
+noinst_CXXPROGRAMS+= WindowTest KeyboardTest KeyboardUserTest
 #noinst_CXXPROGRAMS+= Lightning_test
 
 #sources and additional variables for myapp1
@@ -57,19 +59,19 @@ ContainerEventTest_LDADD   = ${LIBGLUIDLL}  -lglut
 ContainerEventTest_ARADD   = ${LIBGLUIA}
 
 
-GlutWindowTest_SOURCES = GlutWindowTest.cpp
-GlutWindowTest_LDADD   = ${LIBGLUIDLL} -lglut
-GlutWindowTest_ARADD   = ${LIBGLUIA}
+WindowTest_SOURCES = WindowTest.cpp
+WindowTest_LDADD   = ${LIBGLUIDLL} -lglut
+WindowTest_ARADD   = ${LIBGLUIA}
 
 
-GlutKeyboardTest_SOURCES = GlutKeyboardTest.cpp
-GlutKeyboardTest_LDADD   = ${LIBGLUIDLL}  -lglut
-GlutKeyboardTest_ARADD   = ${LIBGLUIA}
+KeyboardTest_SOURCES = KeyboardTest.cpp
+KeyboardTest_LDADD   = ${LIBGLUIDLL}  -lglut
+KeyboardTest_ARADD   = ${LIBGLUIA}
 
 
-GlutKeyboardUserTest_SOURCES = GlutKeyboardUserTest.cpp
-GlutKeyboardUserTest_LDADD   = ${LIBGLUIDLL}  -lglut
-GlutKeyboardUserTest_ARADD   = ${LIBGLUIA}
+KeyboardUserTest_SOURCES = KeyboardUserTest.cpp
+KeyboardUserTest_LDADD   = ${LIBGLUIDLL}  -lglut
+KeyboardUserTest_ARADD   = ${LIBGLUIA}
 
 
 Lightning_test_SOURCES = Lightning_test.cpp
@@ -78,10 +80,6 @@ Lightning_test_ARADD   = ${LIBGLUIA}
 
 
 
-#a special target : it only modify CFLAGS variables before making it the standard way
-debug : CXXFLAGS+= -g3 -gdwarf-2 -O0
-debug : all
-	
 clean : 
 	${CLEANINGMSG} ${MSGSUBDIR}
 

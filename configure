@@ -11,6 +11,8 @@ confiserie=${0%/*}/confiserie
 
 
 ##CONFIGURE_OPTS --enable-headers-dep= ENABLE_AUTODEPS "enable source dependency generation (disable to faster one shot compilation)" "yes no" no
+##CONFIGURE_OPTS --backend= BackEnd "choose the GL backend to use" "XGL GLUT WGL" GLUT
+##CONFIGURE_OPTS --debug= DebugBuild "enable debug build" "yes no" no
 
 #this funtion should clean the file you create with this script
 #it will be automatically done by init.sh
