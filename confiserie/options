@@ -1,5 +1,7 @@
 #auto generated file by ../confiserie/napper
 --enable-headers-dep= ENABLE_AUTODEPS "enable source dependency generation (disable to faster one shot compilation)" "yes no" no
+--backend= BackEnd "choose the GL backend to use" "XGL GLUT WGL" GLUT
+--debug= DebugBuild "enable debug build" "yes no" no
 --prefix= PREFIX "configure package to be located in prefix" "path" /usr/local
 --crosscompiling= CROSSCOMPILING "the package is crosscompiled" "YES NO" NO
 --enable-link-farm= ENABLE_LINK_FARM "enable link farm creation" "YES NO" NO

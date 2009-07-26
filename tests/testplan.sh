@@ -9,14 +9,15 @@ check() {
 echo ${0}
 dir=${0%/*}
 echo ${dir}
-pushd ${dir}
+OLDPWD=$PWD
+cd ${dir}
 
 check ./GENERATED/PackingTest
 check ./GENERATED/SizeComputationTest
 check ./GENERATED/ContainerEventTest
-check ./GENERATED/GlutWindowTest
-check ./GENERATED/GlutKeyboardTest
+check ./GENERATED/WindowTest
+check ./GENERATED/KeyboardTest
 check ./GENERATED/DrawingHelpsTest
 
-popd
+cd $OLDPWD
 

@@ -9,7 +9,7 @@
 
 
 #general variables
-.PHONY : all lib clean debug tests
+.PHONY : all lib clean tests
 
 export TOPSRC_DIR?=${PWD}
 export VPATH=${TOPSRC_DIR}/${MSGSUBDIR}
@@ -25,9 +25,9 @@ CPPFLAGS += -I../include -I./
 ARFLAGS   =
 
 ########################################################################################
-#here goes your sources :
-BackEnd = GLUT
-
+ifeq (${DebugBuild},yes)
+CXXFLAGS+= -g3 -gdwarf-2 -O0
+endif
 
 LIBGLUI = -L./lib -lglui
 LIBS    = -lXext -lX11 -lm
@@ -64,10 +64,6 @@ libglui_LDADD   =  -lGLU -lGL ${LIBGLUT}
 #########################################################################################
 
 
-#a special target : it only modify CFLAGS variables before making it the standard way
-debug : CXXFLAGS+= -g3 -gdwarf-2 -O0
-debug : all
-	
 clean : 
 	${CLEANINGMSG} ${MSGSUBDIR}
 
