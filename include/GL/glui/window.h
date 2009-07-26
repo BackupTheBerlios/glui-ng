@@ -111,7 +111,6 @@ namespace GLUI
                                         Container::orientation orient=Container::TopDown);
                         virtual ~_Window();
                         int Wait();
-                        virtual int AddEvent (::XEvent *event)=0;
                         static buffer_mode_t get_buffer_mode();
                 public :  //operators
                 public : //XMethods
@@ -122,6 +121,18 @@ namespace GLUI
                         virtual void XUnmapSubwindows()=0;
                         virtual KeySym XLookupKeysym(::XKeyEvent *key_event, int index)=0; //a KeySym is a 32bit not unicode char
                         static  uint32_t KeySymToUcs4(KeySym keysym);
+                public: //event handlers
+                        virtual int AddEvent(::XEvent *event);
+                        virtual int AddEvent(::XResizeRequestEvent* event);
+                        virtual int AddEvent(::XExposeEvent* event);
+                        virtual int AddEvent(::XDestroyWindowEvent* event);
+                        virtual int AddEvent(::XKeyEvent* event);
+                        virtual int AddEvent(::XButtonEvent* event);
+                        virtual int AddEvent(::XMotionEvent* event);
+                        virtual int AddEvent(::XCrossingEvent* event);
+                        virtual int AddEvent(::XMapEvent* event);
+                        virtual int AddEvent(::XUnmapEvent* event);
+                        //virtual int         set_size( Size sz, Size min=Size(0u,0u) ); //replace with a XResizeRequestEvent                        
 
                 protected : //types
                         class DefaultTheme : public _DefaultTheme
@@ -152,6 +163,7 @@ namespace GLUI
                         int  SetCurrentDrawBuffer( void );
                 protected:
                         pthread_t main_thread;
+                        bool mapped;
 
         };
 

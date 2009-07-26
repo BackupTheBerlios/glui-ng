@@ -137,7 +137,7 @@ namespace GLUI
         protected: //methods
 
             GlutWindow();
-            void _GlutWindow(Display* display, Window parent,
+            int _GlutWindow(Display* display, Window parent,
                     int x, int y,
                     unsigned int width, unsigned int height,
                     unsigned int border_width,

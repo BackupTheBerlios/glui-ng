@@ -23,9 +23,9 @@
 tags :: clean_tags
 	cd ${TOPSRC_DIR}
 	IFS=','; for tags in $${TAGS}; do \
-	    printf "tags : $${tags}";\
+	    printf "tags : $${tags}\n";\
 	    tagname=$$(basename $${tags});\
-	    dirname=$${tagname//_/\/};\
+	    dirname=$$( printf "$${tagname}" | sed "s:_:/:g");\
 	    dirname=$$(dirname $${dirname});\
 	    ctags -R --c++-kinds=+p --fields=+iaS --extra=+q -f $${tags}\
 	                                                        $${dirname};\

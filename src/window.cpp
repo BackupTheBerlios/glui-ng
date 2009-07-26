@@ -28,11 +28,13 @@
 
 #include <GL/glui/window.h>
 #include <GL/glui/Exception.h>
+#include <GL/glui/debug.h>
 #include <GL/gl.h>
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
 using namespace GLUI;
+#define MODULE_KEY "_Display"
 /////////////////////////////////////////////////////////////////////////////
 _Display::_Display()
 {
@@ -42,6 +44,11 @@ _Display::_Display()
 {
     return disp;
 }*/
+
+/////////////////////////////////////////////////////////////////////////////
+#undef MODULE_KEY
+#define MODULE_KEY "_Window"
+
 /////////////////////////////////////////////////////////////////////////////
 _Window::_Window() :
     Container("window")
@@ -180,37 +187,40 @@ int _Window::AddEvent(::XExposeEvent *event)
     IN("");
     if (mapped)
     {
-        // Set up OpenGL state for widget drawing
-        glEnable( GL_DEPTH_TEST );
-        glDepthFunc(GL_LEQUAL);
-        //glCullFace( GL_BACK );
-        //glDisable( GL_CULL_FACE );
-        glEnable ( GL_COLOR_MATERIAL );
-        glEnable ( GL_NORMALIZE );
-        glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-        glShadeModel(GL_SMOOTH);
-
-        theme::Instance()->DoLightning();
-        SetOrthoProjection();
 
 
-        this->SetCurrentDrawBuffer();
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear Screen And Depth Buffer
+            // Set up OpenGL state for widget drawing
+            glEnable( GL_DEPTH_TEST );
+            glDepthFunc(GL_LEQUAL);
+            //glCullFace( GL_BACK );
+            //glDisable( GL_CULL_FACE );
+            glEnable ( GL_COLOR_MATERIAL );
+            glEnable ( GL_NORMALIZE );
+            glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+            glShadeModel(GL_SMOOTH);
 
-        //update sizes and positions
-        this->update_size();
+            ThemeData->draw();
 
-        Container::AddEvent (event);
+            this->SetCurrentDrawBuffer();
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear Screen And Depth Buffer
 
-        switch (drawinghelpers::get_buffer_mode()) {
-            case drawinghelpers::buffer_front: // Make sure drawing gets to screen
-                glFlush();
-                break;
-            case drawinghelpers::buffer_back: // Bring back buffer to front
+            //update sizes and positions
+            this->update_size();
+
+
+
+            Container::AddEvent (event);
+
+            switch (get_buffer_mode()) {
+                    case buffer_front: // Make sure drawing gets to screen
+                            glFlush();
+                            break;
+                    case buffer_back: // Bring back buffer to front
 #warning "check how other *GL are doing swapbuffer"
-                //glutSwapBuffers();
-                break;
-        }
+                            //                                        glutSwapBuffers();
+                            break;
+            }
+
     }
     OUT("");
     return 0;
@@ -220,14 +230,6 @@ int _Window::AddEvent(::XExposeEvent *event)
 
 int _Window::AddEvent(::XDestroyWindowEvent *event)
 {
-#warning "USE container destructor"
-    Node* child = first_child();
-    while (child)
-    {
-        Node* next = child->next();
-        delete child;
-        child = next;
-    }
     delete this;
     return 0;
 }
