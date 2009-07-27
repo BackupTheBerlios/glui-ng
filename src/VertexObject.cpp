@@ -315,8 +315,8 @@ int VertexObject::draw()
     glPopClientAttrib();
 
     debug::Instance()->FlushGL();
-    return 0;
     OUT("");
+    return 0;
 }
 //////////////////////////////////////////////////////////////////
 VertexObject::V3List::V3List()
