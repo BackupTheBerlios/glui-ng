@@ -92,17 +92,6 @@ _Window::buffer_mode_t _Window::get_buffer_mode() {
     else return buffer_back;
 }
 /////////////////////////////////////////////////////////////////////////////
-void _Window::Start(void* arg)
-{
-        ThreadArgs* args = new ThreadArgs;
-        args->TheWindow=this;
-        args->args=arg;
-        int err = pthread_create(&main_thread,NULL,_Start, (void*)args);
-        if (err)
-        {
-                throw new  Exception(err, "window thread creation error");
-        }
-}
 void* _Window::_Start(void* arg)
 {
         int res;
@@ -111,6 +100,16 @@ void* _Window::_Start(void* arg)
         delete args;
         pthread_exit((void*)res);
 }
+int _Window::_Stop(void* arg)
+{
+        int res = pthread_kill(main_thread, SIGTERM);
+        if (res) 
+        {
+                throw Exception(res,"pthread_kill\n");
+        }
+        Wait();
+}
+
 
 /////////////////////////////////////////////////////////////////////////////
 _Window::DefaultTheme::DefaultTheme(_Window& owner) : Owner(owner) 
@@ -153,18 +152,6 @@ int _Window::DefaultTheme::update()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int _Window::AddEvent (::XEvent *event)
-{
-    switch (event->type)
-    {
-        case Expose : return AddEvent((::XExposeEvent*) event);
-        case DestroyNotify :  return AddEvent((::XDestroyWindowEvent*) event);
-        case ResizeRequest: return AddEvent((::XResizeRequestEvent*) event);
-    }
-
-    return EINVAL;
-}
-
 int _Window::AddEvent(::XResizeRequestEvent *event)
 {
     IN("");
@@ -230,7 +217,6 @@ int _Window::AddEvent(::XExposeEvent *event)
 
 int _Window::AddEvent(::XDestroyWindowEvent *event)
 {
-    delete this;
     return 0;
 }
 
@@ -261,19 +247,29 @@ int _Window::AddEvent(::XCrossingEvent* event)
 
 int _Window::AddEvent(::XMapEvent* event)
 {
+
     ::XExposeEvent expose;
     expose.type = Expose;
     Container::AddEvent((::XEvent*) event);
     this->AddEvent(&expose);
+
+    ThreadArgs* args = new ThreadArgs;
+    args->TheWindow=this;
+    args->args=arg;
+    int err = pthread_create(&main_thread,NULL,_Start, (void*)args);
+    if (err)
+    {
+            throw new  Exception(err, "window thread creation error");
+    }
+
 }
 
 
 int _Window::AddEvent(::XUnmapEvent* event)
 {
     Container::AddEvent((::XEvent*) event);
+    return _Stop();
 }
-
-
 
 
 

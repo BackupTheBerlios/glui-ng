@@ -122,7 +122,7 @@ namespace GLUI
                         virtual KeySym XLookupKeysym(::XKeyEvent *key_event, int index)=0; //a KeySym is a 32bit not unicode char
                         static  uint32_t KeySymToUcs4(KeySym keysym);
                 public: //event handlers
-                        virtual int AddEvent(::XEvent *event);
+                        virtual int AddEvent(::XClientMessageEvent *event);
                         virtual int AddEvent(::XResizeRequestEvent* event);
                         virtual int AddEvent(::XExposeEvent* event);
                         virtual int AddEvent(::XDestroyWindowEvent* event);
