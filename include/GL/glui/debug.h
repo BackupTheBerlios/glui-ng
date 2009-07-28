@@ -38,36 +38,54 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <X11/Xlib.h>
 using namespace std;
 
 const size_t ISIZE = 500;
 namespace GLUI
 {
-	class debug
-	{
-		public :
-			static debug* Instance();
+        class debug
+        {
+                public :
+                        static debug* Instance();
 
-			~debug();
-            void rawprint(const char* key, const char* format,...); //< raw print debug message
-			void print(
-                    const char* key,    //< the key in the env to enable this trace
-                    const char* file,   //< the file where the trace is located
-                    int line,           //< the line of the debug string
-                    const char* func,   //< the function that call debug::print
-                    int levelshift,     //< relative indent (-1 unindent, 1 indent, 0 keep same indent)
-                    const char* format, //< printf like format
-                    ...);               //< additional args
-			void FlushGL(void);
+                        ~debug();
+                        void rawprint(const char* key, const char* format,...); //< raw print debug message
+                        void print(
+                                        const char* key,    //< the key in the env to enable this trace
+                                        const char* file,   //< the file where the trace is located
+                                        int line,           //< the line of the debug string
+                                        const char* func,   //< the function that call debug::print
+                                        int levelshift,     //< relative indent (-1 unindent, 1 indent, 0 keep same indent)
+                                        const char* format, //< printf like format
+                                        ...);               //< additional args
+                        void FlushGL(void);
+                        void PrintEvent(const char* key,const ::XEvent& event);
 
-		private:
-			debug();
-			char* use_debug;
-            char* glui_enable_fileandline;
-            char* glui_enable_indent_traces;
-			char* buf;
-            int shift;
-	};
+                private:
+                        debug();
+                        char* use_debug;
+                        char* glui_enable_fileandline;
+                        char* glui_enable_indent_traces;
+                        char* buf;
+                        int shift;
+
+                private : //methods
+                        void createString( const char* format,...);  //<just fill the string buffer
+                        static const char* EventTypeToString( int type );
+                        static const char* EventBoolToString( Bool b );
+                        static const char* EventNotifyHintToString( char is_hint );
+                        static const char* EventNotifyModeToString( int mode );
+                        static const char* EventNotifyDetailToString( int detail );
+                        static const char* EventVisibilityToString( int state );
+                        static const char* EventConfigureDetailToString( int detail );
+                        static const char* EventPlaceToString( int place );
+                        static const char* EventMappingRequestToString( int request );
+                        static const char* EventPropertyStateToString( int state );
+                        static const char* EventColormapStateToString( int state );
+
+
+        };
 #define IN(format, ...) debug::Instance()->print(MODULE_KEY, __FILE__, __LINE__, __func__,  1, format, ## __VA_ARGS__)
 #define OUT(format, ...) debug::Instance()->print(MODULE_KEY, __FILE__, __LINE__, __func__,  -1, format, ## __VA_ARGS__)
 #define MSG(format, ...) debug::Instance()->print(MODULE_KEY, __FILE__, __LINE__, __func__,  0, format, ## __VA_ARGS__)

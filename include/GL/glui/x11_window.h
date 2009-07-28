@@ -47,22 +47,23 @@
 #include <errno.h>
 namespace GLUI
 {
-#define GLUIWindow X11Window
-#define Display X11Display
+
 
     class GLUIAPI X11Display : public _Display
     {
         public :
-            inline X11Display(char* name);
-        private:
             X11Display();
+            X11Display(char* name);
+        private:
+            void _X11Display(char* name);
+            ::Display disp;
     };
 
 
     class GLUIAPI X11Window : public _Window
     {
         public:
-            X11Window(Display* display, int parent_window,
+            X11Window(X11Display* display, int parent_window,
                     int x, int y,
                     unsigned int width, unsigned int height,
                     unsigned int border_width,
@@ -71,19 +72,22 @@ namespace GLUI
                     Visual *visual,
                     unsigned long valuemask,
                     XSetWindowAttributes *attributes );
-            X11Window(Display *display, Window parent,
+            X11Window(X11Display *display, Window parent,
                     int x, int y,
                     unsigned int width, unsigned int height,
                     unsigned int border_width,
                     unsigned long border,
                     unsigned long background );
+            virtual int start_routine(void* args);
         public : //operators
             bool operator== (::Window target);
         protected:
             ::Window* window;
+            X11Display* disp;
             X11Window();
     };
 
-
+#define GLUIWindow X11Window
+#define Display X11Display
 }
 #endif //__GLUI_GLUT_WINDOW_H

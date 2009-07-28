@@ -153,7 +153,7 @@ namespace GLUI
                                 _Window* TheWindow;
                                 void* args;
                         };
-                protected :
+                protected : //methods
                         _Window();
                         void Start(void* args); //start event handler, shall be started in child constructor;
                         static void* _Start(void* args);
@@ -161,7 +161,7 @@ namespace GLUI
 
                         long flags;
                         int  SetCurrentDrawBuffer( void );
-                protected:
+                protected: //variables
                         pthread_t main_thread;
                         bool mapped;
 
