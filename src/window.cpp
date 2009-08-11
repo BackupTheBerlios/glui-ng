@@ -33,17 +33,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
+#include <signal.h>
 using namespace GLUI;
 #define MODULE_KEY "_Display"
 /////////////////////////////////////////////////////////////////////////////
 _Display::_Display()
 {
 }
-/////////////////////////////////////////////////////////////////////////////
-/*_Display::operator ::Display*()
-{
-    return disp;
-}*/
 
 /////////////////////////////////////////////////////////////////////////////
 #undef MODULE_KEY
@@ -95,19 +91,18 @@ _Window::buffer_mode_t _Window::get_buffer_mode() {
 void* _Window::_Start(void* arg)
 {
         int res;
-        ThreadArgs* args = (ThreadArgs*) arg;
-        res = args->TheWindow->start_routine(args->args);
-        delete args;
+        _Window* win = (_Window*) arg;
+        res = win->start_routine();
         pthread_exit((void*)res);
 }
-int _Window::_Stop(void* arg)
+int _Window::_Stop()
 {
         int res = pthread_kill(main_thread, SIGTERM);
         if (res) 
         {
                 throw Exception(res,"pthread_kill\n");
         }
-        Wait();
+        return Wait();
 }
 
 
@@ -253,10 +248,7 @@ int _Window::AddEvent(::XMapEvent* event)
     Container::AddEvent((::XEvent*) event);
     this->AddEvent(&expose);
 
-    ThreadArgs* args = new ThreadArgs;
-    args->TheWindow=this;
-    args->args=arg;
-    int err = pthread_create(&main_thread,NULL,_Start, (void*)args);
+    int err = pthread_create(&main_thread,NULL,_Start, (void*)this);
     if (err)
     {
             throw new  Exception(err, "window thread creation error");

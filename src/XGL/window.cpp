@@ -28,14 +28,31 @@
  *****************************************************************************/
 #include <GL/glui/debug.h>
 #include <GL/glui/x11_window.h>
+#undef Display
 #define MODULE_KEY "GLUI_DEBUG_XGL"
+using namespace GLUI;
+/////////////////////////////////////////////////////////////////////
+X11Screen::X11Screen(::Screen* screen) : TheScreen(screen)
+{
+}
+int X11Screen::XDefaultDepthOfScreen()
+{
+        return ::XDefaultDepthOfScreen(TheScreen);
+}
+::Window X11Screen::XRootWindowOfScreen()
+{
+        return ::XRootWindowOfScreen(TheScreen);
+}
 
 /////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+
 X11Display::X11Display()
 {
         _X11Display(getenv("DISPLAY"));
 }
-void X11Display::X11Display(char* name)
+
+X11Display::X11Display(char* name)
 {
         _X11Display(name);
 }
@@ -43,17 +60,74 @@ void X11Display::X11Display(char* name)
 void X11Display::_X11Display(char* name)
 {
         disp = XOpenDisplay(name);
-        if (! disp) throw exception(__func__,EINVAL);
+        if (! disp) throw Exception(EINVAL,__func__);
+}
+
+
+X11Display::operator ::Display*()
+{
+        return disp;
+}
+
+_Screen* X11Display::XDefaultScreenOfDisplay()
+{
+        return new X11Screen(::XDefaultScreenOfDisplay(disp));
+}
+_Window* X11Display::XDefaultRootWindow()
+{
+        return new ROWindow(::XDefaultRootWindow(disp));
+}
+_Window* X11Display::XRootWindow(int screen_number)
+{
+        return new ROWindow(::XRootWindow(disp,screen_number));
+}
+/////////////////////////////////////////////////////////////////////
+int X11Window::XMapWindow()
+{
+        return ::XMapWindow(*disp,window);
+}
+
+int X11Window::XMapRaised()
+{
+        return ::XMapRaised(*disp,window);
+}
+
+int X11Window::XMapSubwindows() 
+{
+        return ::XMapSubwindows(*disp,window);
+}
+
+int X11Window::XUnmapWindow()
+{
+        return ::XUnmapWindow(*disp,window);
+}
+
+int X11Window::XUnmapSubwindows()
+{
+        return ::XUnmapSubwindows(*disp,window);
+}
+
+KeySym  X11Window::XLookupKeysym(::XKeyEvent *key_event, int index)
+{
+        return ::XLookupKeysym(key_event, index);
+}
+
+
+::Window X11Window::GetWindowId()
+{
+        return window;
 }
 
 
 int X11Window::AddEvent(::XClientMessageEvent *event)
 {
         /* Destroy the window when the WM_DELETE_WINDOW message arrives */
-        if( (Atom) event->xclient.data.l[ 0 ] == WM_DELETE_WINDOW )
+        if( (Atom) event->data.l[ 0 ] == XInternAtom(*disp, "WM_DELETE_WINDOW", False))
         {
-                XDestroyWindow(dis, window)
-                return;
+                int res = XDestroyWindow(*disp, window);
+                if ( res ) return res;
+                window = -1;
+                return 0;
         }
 
 }
@@ -71,23 +145,23 @@ int X11Window::AddEvent(::XMappingEvent *event)
 
 int X11Window::AddEvent(::XCreateWindowEvent *event)
 {
-        set_size( Size(event->width,event->height) );
+        set_size( Size((unsigned int)event->width,(unsigned int)event->height) );
 }
 
 int X11Window::AddEvent(::XConfigureEvent *event)
 {
-        set_size( Size(event->width,event->height) );
+        set_size( Size((unsigned int)event->width,(unsigned int)event->height) );
 }
 
 
-void X11Window::start_routine(void* args)
+int X11Window::start_routine()
 {
         ::XEvent event;
 
-        while( XWindowEvent(disp, window, EventMask, &event) )
+        while( XWindowEvent(*disp, window, EventMask, &event) )
         {
                 debug::Instance()->PrintEvent(MODULE_KEY, event );
-                AddEvent(&event);
+                Container::AddEvent(&event);
         }
 
 

@@ -5,7 +5,7 @@
 #include <stdlib.h>
 using namespace GLUI;
 
-class myGluiWin : public GLUIWindow
+class myGluiWin : public GLUI::Window
 {
         public :
                 class myGluiWinTheme : public _Window::DefaultTheme
@@ -15,8 +15,8 @@ class myGluiWin : public GLUIWindow
                                 int draw();
                 };
         public :
-                myGluiWin(Display* TheDisplay) : GLUIWindow(TheDisplay,
-                                TheDisplay->DefaultScreen()->RootWindow(),
+                myGluiWin(GLUI::Display* TheDisplay) : GLUI::Window(TheDisplay,
+                                TheDisplay->XDefaultScreenOfDisplay()->XRootWindowOfScreen(),
                                 -1, -1,
                                 200, 200,
                                 1,
@@ -101,9 +101,9 @@ int myGluiWin::myGluiWinTheme::draw(void)
 int main(int argc, char** argv)
 {
         struct timespec sleeptime = { 1, 0 };
-        GLUIWindow::init(&argc, argv);  //optional
-        Display*    TheDisplay = new Display(" display");
-        GLUIWindow* Window = new myGluiWin(TheDisplay);
+        GLUI::Window::init(&argc, argv);  //optional
+        GLUI::Display*    TheDisplay = new GLUI::Display(" display");
+        GLUI::Window* Window = new myGluiWin(TheDisplay);
         for (int count=0; count < 5; count++ )
         {
                 Window->XMapWindow();

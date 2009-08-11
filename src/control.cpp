@@ -284,9 +284,6 @@ Control::Control(const char* name) : Node(name)
     x_off_right    = GLUI_XOFF;
     x              = 0;
     y              = 0;
-    APIMajor       = 0;
-    APIMinor       = 0;
-    APIRevision    = 0;
     this->ThemeData = GLUI::GetTheme(*this);
     SetTheme(new _DefaultTheme);
 }
@@ -334,11 +331,5 @@ int Control::SetMargins(int top, int bottom, int left, int right)
       }
     return 0;
 
-}
-////////////////////////////////////////////////////////////////////////
-bool Control::CheckWidgetApiRevision(int Major, int Minor, int Revision)
-{
-        if (Major != this->APIMajor) return false;
-        if (Minor <  this->APIMinor) return false;
 }
 

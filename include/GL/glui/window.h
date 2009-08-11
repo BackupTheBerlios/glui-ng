@@ -70,7 +70,6 @@ namespace GLUI
 {
         class _Window;
 
-        typedef long unsigned int WindowId;
         enum ViewPort
         {
                 BOTTOM_VIEWPORT=-1000,
@@ -81,14 +80,17 @@ namespace GLUI
         class _Screen
         {
                 public :
-                        virtual int Depth()               =0;
-                        virtual WindowId RootWindow()     =0;
+                        virtual int XDefaultDepthOfScreen()  =0;
+                        virtual ::Window XRootWindowOfScreen() =0;
         };
 
         class _Display
         {
                 public :
-                        virtual _Screen* DefaultScreen()  =0;
+                        virtual _Screen* XDefaultScreenOfDisplay()  =0;
+                        //virtual _Screen* XScreenOfDisplay(int screen_number) =0;
+                        virtual _Window* XDefaultRootWindow() =0;
+                        virtual _Window* XRootWindow(int screen_number) =0;
                         int DefaultVisual();
                 protected :
                         _Display();
@@ -114,15 +116,14 @@ namespace GLUI
                         static buffer_mode_t get_buffer_mode();
                 public :  //operators
                 public : //XMethods
-                        virtual void XMapWindow()=0;
-                        virtual void XMapRaised()=0;
-                        virtual void XMapSubwindows()=0;
-                        virtual void XUnmapWindow()=0;
-                        virtual void XUnmapSubwindows()=0;
+                        virtual int XMapWindow()=0;
+                        virtual int XMapRaised()=0;
+                        virtual int XMapSubwindows()=0;
+                        virtual int XUnmapWindow()=0;
+                        virtual int XUnmapSubwindows()=0;
                         virtual KeySym XLookupKeysym(::XKeyEvent *key_event, int index)=0; //a KeySym is a 32bit not unicode char
                         static  uint32_t KeySymToUcs4(KeySym keysym);
                 public: //event handlers
-                        virtual int AddEvent(::XClientMessageEvent *event);
                         virtual int AddEvent(::XResizeRequestEvent* event);
                         virtual int AddEvent(::XExposeEvent* event);
                         virtual int AddEvent(::XDestroyWindowEvent* event);
@@ -148,23 +149,38 @@ namespace GLUI
                                         void  SetOrthoProjection( void );
                                         void SetViewport(void);
                         };
-                        struct ThreadArgs
-                        {
-                                _Window* TheWindow;
-                                void* args;
-                        };
                 protected : //methods
                         _Window();
                         void Start(void* args); //start event handler, shall be started in child constructor;
                         static void* _Start(void* args);
-                        virtual int start_routine(void* args)=0; //< the thead main routine;
+                        int _Stop();
+                        virtual int start_routine()=0; //< the thead main routine;
 
                         long flags;
                         int  SetCurrentDrawBuffer( void );
                 protected: //variables
+                        ::Window window;
+                        void* args; //arguments to the thread
                         pthread_t main_thread;
                         bool mapped;
 
+        };
+
+        class ROWindow : public _Window
+        {
+                public : 
+                        ROWindow(::Window win) { window = win; }
+                public : //XMethods
+                        virtual int XMapWindow() {return 0;}
+                        virtual int XMapRaised() {return 0;}
+                        virtual int XMapSubwindows() {return 0;}
+                        virtual int XUnmapWindow() {return 0;}
+                        virtual int XUnmapSubwindows() {return 0;}
+                        virtual KeySym XLookupKeysym(::XKeyEvent *key_event, int index) {return 0;}
+                protected:
+                        virtual int start_routine() { return 0; }
+                private:
+                        ROWindow();
         };
 
 
@@ -181,6 +197,7 @@ int GLUIInit(int* argc, char** argv); //optional
 #elif  __USE_WIN32
 #include <GL/glui/win32_window.h>
 #else
+#error shallnotgothere
 #include <GL/glui/glut_window.h>
 #endif
 

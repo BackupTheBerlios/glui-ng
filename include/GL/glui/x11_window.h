@@ -1,5 +1,5 @@
-#ifndef __GLUI_GLUT_WINDOW_H
-#define __GLUI_GLUT_WINDOW_H
+#ifndef __GLUI_X11_WINDOW_H
+#define __GLUI_X11_WINDOW_H
 
 /*
 
@@ -44,50 +44,84 @@
  of GLUI.
 */
 #include <GL/glui/Exception.h>
+#include <GL/glui/window.h>
+#include <X11/Xlib.h>
 #include <errno.h>
 namespace GLUI
 {
 
+        class X11Screen : public _Screen
+        {
+                public :
+                        X11Screen(::Screen* ScreenNumber);
+                        virtual int XDefaultDepthOfScreen();
+                        virtual ::Window XRootWindowOfScreen();
+                protected:
+                        ::Screen* TheScreen;
+                private:
+                        X11Screen();
+        };
 
-    class GLUIAPI X11Display : public _Display
-    {
-        public :
-            X11Display();
-            X11Display(char* name);
-        private:
-            void _X11Display(char* name);
-            ::Display disp;
-    };
+        class X11Display : public _Display
+        {
+                public :
+                        X11Display();
+                        X11Display(char* name);
+                        operator ::Display*();
+                        virtual _Screen* XDefaultScreenOfDisplay();
+                        virtual _Window* XDefaultRootWindow();
+                        virtual _Window* XRootWindow(int screen_number);
+
+                private:
+                        void _X11Display(char* name);
+                        ::Display* disp;
+        };
 
 
-    class GLUIAPI X11Window : public _Window
-    {
-        public:
-            X11Window(X11Display* display, int parent_window,
-                    int x, int y,
-                    unsigned int width, unsigned int height,
-                    unsigned int border_width,
-                    int depth,
-                    unsigned int _class,
-                    Visual *visual,
-                    unsigned long valuemask,
-                    XSetWindowAttributes *attributes );
-            X11Window(X11Display *display, Window parent,
-                    int x, int y,
-                    unsigned int width, unsigned int height,
-                    unsigned int border_width,
-                    unsigned long border,
-                    unsigned long background );
-            virtual int start_routine(void* args);
-        public : //operators
-            bool operator== (::Window target);
-        protected:
-            ::Window* window;
-            X11Display* disp;
-            X11Window();
-    };
+        class X11Window : public _Window
+        {
+                public:
+                        X11Window(X11Display* display, ::Window parent_window,
+                                        int x, int y,
+                                        unsigned int width, unsigned int height,
+                                        unsigned int border_width,
+                                        int depth,
+                                        unsigned int _class,
+                                        Visual *visual,
+                                        unsigned long valuemask,
+                                        XSetWindowAttributes *attributes );
+                        X11Window(X11Display *display, ::Window parent,
+                                        int x, int y,
+                                        unsigned int width, unsigned int height,
+                                        unsigned int border_width,
+                                        unsigned long border,
+                                        unsigned long background );
+                        virtual int start_routine();
+                        ::Window GetWindowId();
+                        static int init(int* argc, char** argv) { return 0;} //optional
+                public : //XMethods
+                        virtual int XMapWindow();
+                        virtual int XMapRaised();
+                        virtual int XMapSubwindows();
+                        virtual int XUnmapWindow();
+                        virtual int XUnmapSubwindows();
+                        virtual KeySym XLookupKeysym(::XKeyEvent *key_event, int index);
+                public: //event handlers
+                        int AddEvent(::XClientMessageEvent* event);
+                        int AddEvent(::XMappingEvent* event);
+                        int AddEvent(::XCreateWindowEvent* event);
+                        int AddEvent(::XConfigureEvent* event);
 
-#define GLUIWindow X11Window
-#define Display X11Display
+                public : //operators
+                        bool operator== (::Window target);
+                protected:
+                        X11Display* disp;
+                        X11Window();
+        };
+        typedef X11Window Window ;
+        typedef X11Display Display;
+        typedef X11Screen Screen;
 }
-#endif //__GLUI_GLUT_WINDOW_H
+
+
+#endif //__GLUI_X11_WINDOW_H

@@ -26,6 +26,18 @@ all :
 ifeq (${DebugBuild},yes)
 CXXFLAGS+= -g3 -gdwarf-2 -O0
 endif
+
+ifeq (${BackEnd},XGL)
+CXXFLAGS+= -D__USE_XLIB
+endif
+ifeq (${BackEnd},GLUT)
+CXXFLAGS+= -D__USE_GLUT
+endif
+ifeq (${BackEnd},WGL)
+CXXFLAGS+= -D__USE_WIN32
+endif
+
+
 ifneq (${SHAREDLIBEXT},)
 LIBGLUIDLL = -L../src/GENERATED/ -lglui-${libglui_VERSION}
 else

@@ -57,37 +57,39 @@ MasterObject::MasterObject(const char *name) : Node (name)
 
 
 //////////////////////////////////////////////////////////////////////////
-GLUIWindow*      MasterObject::FindWindow( WindowId window_id )
+GLUI::Window*      MasterObject::FindWindow( ::Window window_id )
 {
 
-  GLUIWindow* win = dynamic_cast<GLUIWindow*>( this->first_child());
+        GLUI::Window* win = dynamic_cast<GLUI::Window*>( this->first_child());
 
-  while( win ) {
-    if ( win->GetWindowId() == window_id )
-      return win;
+        while( win ) 
+        {
+                if ( win->GetWindowId() == window_id )
+                        return win;
 
-    win = dynamic_cast<GLUIWindow*>(win->next());
-  }
-  return NULL;
+                win = dynamic_cast<GLUI::Window*>(win->next());
+        }
+        return NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////
 int  MasterObject::add_control( Node *window )
 {
-    // only allow first childs of this to be of GLUIWindow type
-    if ( NULL == dynamic_cast<GLUIWindow*>(window)) return EINVAL;
-    return Node::add_control(window);
+        // only allow first childs of this to be of GLUIWindow type
+        if ( NULL == dynamic_cast<GLUI::Window*>(window)) return EINVAL;
+        return Node::add_control(window);
 }
 
 
 void MasterObject::pack( int x, int y)
 {
-    GLUIWindow* win = dynamic_cast<GLUIWindow*>( this->first_child());
+        GLUI::Window* win = dynamic_cast<GLUI::Window*>( this->first_child());
 
-    while( win ) {
-        win->pack(0, 0);
-        win = dynamic_cast<GLUIWindow*>(win->next());
-    }
+        while( win )
+        {
+                win->pack(0, 0);
+                win = dynamic_cast<GLUI::Window*>(win->next());
+        }
 
 }
 

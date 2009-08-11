@@ -52,12 +52,15 @@ lib_LIBRARIES += libglui
 libglui_SOURCES = $(shell find  -maxdepth 1 -regex '.*\.cpp\|.*\.c' -printf '%f\n')
 ifeq (${BackEnd},XGL)
 libglui_SOURCES+= $(shell find XGL -maxdepth 1 -regex '.*\.cpp\|.*\.c' )
+CXXFLAGS+= -D__USE_XLIB
 endif
 ifeq (${BackEnd},GLUT)
 libglui_SOURCES+= $(shell find GLUT -maxdepth 1 -regex '.*\.cpp\|.*\.c' )
+CXXFLAGS+= -D__USE_GLUT
 endif
 ifeq (${BackEnd},WGL)
 libglui_SOURCES+= $(shell find WGL -maxdepth 1 -regex '.*\.cpp\|.*\.c' )
+CXXFLAGS+= -D__USE_WIN32
 endif
 
 libglui_LDADD   =  -lGLU -lGL ${LIBGLUT}

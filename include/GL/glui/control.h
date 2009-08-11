@@ -165,9 +165,6 @@ namespace GLUI
             Control(const char* name);
             Control();
             virtual theme* GetDefaultTheme();
-
-
-            bool CheckWidgetApiRevision(int Major, int Minor, int Revision);
         protected: //variables
             theme* ThemeData;
             static Control* focussed;
