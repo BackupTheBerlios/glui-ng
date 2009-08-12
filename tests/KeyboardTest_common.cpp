@@ -84,7 +84,7 @@ int myControl::AddEvent(::XKeyEvent* event)
 
 
 ////////////////////////////////////////////////////////////////////
-class myGluiWin : public GLUIWindow
+class myGluiWin : public GLUI::Window
 {
         public :
                 class theme : public _Window::DefaultTheme
@@ -94,8 +94,8 @@ class myGluiWin : public GLUIWindow
                                 int draw();
                 };
         public :
-                myGluiWin(Display* TheDisplay) : GLUIWindow(TheDisplay,
-                                TheDisplay->DefaultScreen()->RootWindow(),
+                myGluiWin(GLUI::Display& TheDisplay) : GLUI::Window(TheDisplay,
+                                TheDisplay.XDefaultScreenOfDisplay()->XRootWindowOfScreen(),
                                 0, 0,
                                 200, 200,
                                 1,

@@ -64,10 +64,10 @@ namespace GLUI
 
         class X11Display : public _Display
         {
+                friend class X11Window;
                 public :
                         X11Display();
                         X11Display(char* name);
-                        operator ::Display*();
                         virtual _Screen* XDefaultScreenOfDisplay();
                         virtual _Window* XDefaultRootWindow();
                         virtual _Window* XRootWindow(int screen_number);
@@ -81,7 +81,7 @@ namespace GLUI
         class X11Window : public _Window
         {
                 public:
-                        X11Window(X11Display* display, ::Window parent_window,
+                        X11Window(X11Display& display, ::Window parent_window,
                                         int x, int y,
                                         unsigned int width, unsigned int height,
                                         unsigned int border_width,
@@ -90,7 +90,7 @@ namespace GLUI
                                         Visual *visual,
                                         unsigned long valuemask,
                                         XSetWindowAttributes *attributes );
-                        X11Window(X11Display *display, ::Window parent,
+                        X11Window(X11Display &display, ::Window parent,
                                         int x, int y,
                                         unsigned int width, unsigned int height,
                                         unsigned int border_width,
@@ -115,7 +115,7 @@ namespace GLUI
                 public : //operators
                         bool operator== (::Window target);
                 protected:
-                        X11Display* disp;
+                        X11Display& disp;
                         X11Window();
         };
         typedef X11Window Window ;

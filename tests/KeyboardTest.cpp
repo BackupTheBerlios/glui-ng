@@ -6,8 +6,8 @@ int main(int argc, char** argv)
     int count = 0;
 
     //Window->init(&argc, argv);  //optional
-    Display*    TheDisplay = new Display("display");
-    myGluiWin* Window = new myGluiWin(TheDisplay);
+    GLUI::Display*    TheDisplay = new GLUI::Display("display");
+    myGluiWin* Window = new myGluiWin(*TheDisplay);
     Window->XMapWindow();
 
     while (count < 50)

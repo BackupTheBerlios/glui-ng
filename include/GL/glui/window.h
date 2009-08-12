@@ -46,6 +46,7 @@
 #include <GL/glui/container.h>
 #include <GL/glui/Exception.h>
 #include <GL/glui/DefaultTheme.h>
+#include <GL/glui/NonCopyableClass.h>
 #include <X11/Xlib.h>
 #include <GL/gl.h>
 
@@ -77,14 +78,14 @@ namespace GLUI
         };
 
 
-        class _Screen
+        class _Screen : public NonCopyableClass
         {
                 public :
                         virtual int XDefaultDepthOfScreen()  =0;
                         virtual ::Window XRootWindowOfScreen() =0;
         };
 
-        class _Display
+        class _Display  : public NonCopyableClass
         {
                 public :
                         virtual _Screen* XDefaultScreenOfDisplay()  =0;
@@ -97,7 +98,7 @@ namespace GLUI
         };
 
 
-        class _Window : public Container
+        class _Window : public Container, public NonCopyableClass
         {
                 public : //types
                         enum buffer_mode_t
