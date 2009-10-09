@@ -34,9 +34,25 @@ custom_clean_on_sig() {
 
 #the tests itself
 {
+     #   set -x
     runtest ${confiserie}/CXX/test_cxx.sh                &&
-    runtest ${confiserie}/CXX/test_shared_static.sh        &&
-    runtest ${confiserie}/pkg-config/test_pkg-config.sh
+    runtest ${confiserie}/CXX/test_shared_static.sh      &&
+    runtest ${confiserie}/pkg-config/test_pkg-config.sh  &&
+    {
+            test "${BackEnd}" = "XGL" &&
+            ${confiserie}/pkg-config/pkg-config_wrp.sh --exists x11 &&
+            { ${confiserie}/pkg-config/pkg-config_wrp.sh --exists glproto ||
+              ${confiserie}/pkg-config/pkg-config_wrp.sh --exists gl
+            }
+    } ||
+    {
+            test "${BackEnd}" = "GLUT" &&
+            ${confiserie}/pkg-config/pkg-config_wrp.sh --exists glut
+    } ||
+    {
+            test "${BackEnd}" = "WGL" &&
+            print "WGL unsupported\n" && exit 1;
+    }
 
 } ||clean_on_sig 
 
