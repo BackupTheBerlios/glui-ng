@@ -45,8 +45,13 @@
 */
 #include <GL/glui/Exception.h>
 #include <GL/glui/window.h>
+#define GL_GLEXT_PROTOTYPES 1
+#define GLX_GLXEXT_PROTOTYPES 1
 #include <X11/Xlib.h>
+#include <X11/keysym.h>
 #include <errno.h>
+#include <GL/gl.h>
+#include <GL/glx.h>
 namespace GLUI
 {
 
@@ -56,6 +61,7 @@ namespace GLUI
                         X11Screen(::Screen* ScreenNumber);
                         virtual int XDefaultDepthOfScreen();
                         virtual ::Window XRootWindowOfScreen();
+                        ::Screen* Screen();
                 protected:
                         ::Screen* TheScreen;
                 private:
@@ -64,13 +70,13 @@ namespace GLUI
 
         class X11Display : public _Display
         {
-                friend class X11Window;
                 public :
                         X11Display();
                         X11Display(char* name);
                         virtual _Screen* XDefaultScreenOfDisplay();
                         virtual _Window* XDefaultRootWindow();
                         virtual _Window* XRootWindow(int screen_number);
+                        ::Display* Disp();
 
                 private:
                         void _X11Display(char* name);
@@ -97,7 +103,6 @@ namespace GLUI
                                         unsigned long border,
                                         unsigned long background );
                         virtual int start_routine();
-                        ::Window GetWindowId();
                         static int init(int* argc, char** argv) { return 0;} //optional
                 public : //XMethods
                         virtual int XMapWindow();
@@ -107,16 +112,36 @@ namespace GLUI
                         virtual int XUnmapSubwindows();
                         virtual KeySym XLookupKeysym(::XKeyEvent *key_event, int index);
                 public: //event handlers
-                        int AddEvent(::XClientMessageEvent* event);
-                        int AddEvent(::XMappingEvent* event);
-                        int AddEvent(::XCreateWindowEvent* event);
-                        int AddEvent(::XConfigureEvent* event);
+                        virtual int AddEvent(::XEvent* event);
+                        virtual int AddEvent(::XClientMessageEvent* event);
+                        virtual int AddEvent(::XMappingEvent* event);
+                        virtual int AddEvent(::XCreateWindowEvent* event);
+                        virtual int AddEvent(::XUnmapEvent *event);
+                        virtual int AddEvent(::XMapEvent *event);
+                        virtual int AddEvent(::XConfigureEvent* event);
+                        virtual int AddEvent(::XExposeEvent* event);
+                        virtual int AddEvent(::XResizeRequestEvent* event);
+
 
                 public : //operators
                         bool operator== (::Window target);
-                protected:
+                protected: //variables
                         X11Display& disp;
+                        GLXFBConfig *fbc;
+                        int fbc_id;
+                        GLXContext ctx;
+                protected: //methods
+                        void _X11Window( ::Window parent_window,
+                                        int x, int y,
+                                        unsigned int width, unsigned int height,
+                                        unsigned int border_width,
+                                        int depth,
+                                        unsigned int _class,
+                                        Visual *visual,
+                                        unsigned long valuemask,
+                                        XSetWindowAttributes *attributes );
                         X11Window();
+                        int CreateGLContext();
         };
         typedef X11Window Window ;
         typedef X11Display Display;

@@ -6,6 +6,6 @@ namespace GLUI
                         NonCopyableClass() {}
                 private :
                         NonCopyableClass(NonCopyableClass const& copy) {};
-                        virtual NonCopyableClass& operator= (const NonCopyableClass& n) throw() {};
+                        virtual NonCopyableClass& operator= (const NonCopyableClass& n) throw() {return *this;};
         };
 }

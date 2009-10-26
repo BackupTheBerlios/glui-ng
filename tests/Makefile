@@ -29,6 +29,7 @@ endif
 
 ifeq (${BackEnd},XGL)
 CXXFLAGS+= -D__USE_XLIB
+BACKENDLIB =
 endif
 ifeq (${BackEnd},GLUT)
 CXXFLAGS+= -D__USE_GLUT
@@ -69,7 +70,7 @@ SizeComputationTest_LDADD   = ${LIBGLUIDLL}  ${BACKENDLIB}
 SizeComputationTest_ARADD   = ${LIBGLUIA}
 
 PackingTest_SOURCES = PackingTest.cpp
-PackingTest_LDADD   = ${LIBGLUIDLL}  -lglut
+PackingTest_LDADD   = ${LIBGLUIDLL}  ${BACKENDLIB}
 PackingTest_ARADD   = ${LIBGLUIA}
 
 

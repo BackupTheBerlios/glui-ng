@@ -88,6 +88,19 @@ _Window::buffer_mode_t _Window::get_buffer_mode() {
     else return buffer_back;
 }
 /////////////////////////////////////////////////////////////////////////////
+::Window _Window::GetWindowId()
+{
+        return window;
+}
+/////////////////////////////////////////////////////////////////////////////
+void  _Window::Start()
+{
+    int err = pthread_create(&main_thread,NULL,_Start, (void*)this);
+    if (err)
+    {
+            throw new  Exception(err, "window thread creation error");
+    }
+}
 void* _Window::_Start(void* arg)
 {
         int res;
@@ -248,11 +261,7 @@ int _Window::AddEvent(::XMapEvent* event)
     Container::AddEvent((::XEvent*) event);
     this->AddEvent(&expose);
 
-    int err = pthread_create(&main_thread,NULL,_Start, (void*)this);
-    if (err)
-    {
-            throw new  Exception(err, "window thread creation error");
-    }
+
 
 }
 

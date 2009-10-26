@@ -83,6 +83,7 @@ namespace GLUI
                 public :
                         virtual int XDefaultDepthOfScreen()  =0;
                         virtual ::Window XRootWindowOfScreen() =0;
+                        virtual ::Screen* Screen()=0;
         };
 
         class _Display  : public NonCopyableClass
@@ -115,6 +116,7 @@ namespace GLUI
                         virtual ~_Window();
                         int Wait();
                         static buffer_mode_t get_buffer_mode();
+                        ::Window GetWindowId();
                 public :  //operators
                 public : //XMethods
                         virtual int XMapWindow()=0;
@@ -134,7 +136,7 @@ namespace GLUI
                         virtual int AddEvent(::XCrossingEvent* event);
                         virtual int AddEvent(::XMapEvent* event);
                         virtual int AddEvent(::XUnmapEvent* event);
-                        //virtual int         set_size( Size sz, Size min=Size(0u,0u) ); //replace with a XResizeRequestEvent                        
+                        //virtual int         set_size( Size sz, Size min=Size(0u,0u) ); //replace with a XResizeRequestEvent
 
                 protected : //types
                         class DefaultTheme : public _DefaultTheme
@@ -152,7 +154,7 @@ namespace GLUI
                         };
                 protected : //methods
                         _Window();
-                        void Start(void* args); //start event handler, shall be started in child constructor;
+                        void Start(); //start event handler, shall be started in child constructor;
                         static void* _Start(void* args);
                         int _Stop();
                         virtual int start_routine()=0; //< the thead main routine;

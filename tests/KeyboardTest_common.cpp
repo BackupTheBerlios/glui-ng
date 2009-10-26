@@ -122,12 +122,52 @@ class myGluiWin : public GLUI::Window
 
 int myGluiWin::AddEvent(::XKeyEvent* event)
 {
-    Angle += 5.0f;
-    Container::AddEvent((::XEvent*) event);
-    return ThemeData->update();
+        Angle += 5.0f;
+        Container::AddEvent((::XEvent*) event);
+        return ThemeData->update();
 }
 #ifdef __USE_XLIB
 #include <GL/glui/x11_window.h>
+#include <sys/time.h>
+
+Time get_time(void)
+{       
+     int  tint; 
+     struct timeval  tv;
+     struct timezone tz; /* is not used since ages */
+     gettimeofday(&tv, &tz);
+     tint = (int)tv.tv_sec * 1000;
+     tint = tint/1000 * 1000;
+     tint = tint + tv.tv_usec/1000;
+     return((Time)tint);
+}
+
+void myGluiWin::simulatekey(void)
+{
+        static int count = 0;
+        ::XKeyEvent evt;
+
+        evt.type = KeyPress;
+        evt.display =disp.Disp();
+        evt.window = window;
+        evt.time = get_time();
+        evt.x = 100;
+        evt.y = 100;
+        evt.x_root = 1;
+        evt.y_root = 1;
+        evt.same_screen = True;
+        evt.keycode = XKeysymToKeycode(disp.Disp(),XK_Up);
+
+        count ++;
+        XSendEvent (evt.display, evt.window, True, (KeyPressMask|KeyReleaseMask), (XEvent *) &evt); 
+        if (count % 10 == 0)
+        {
+                evt.x = ctrl->X() + ctrl->Width()/2;
+                evt.y = this->Height() -  ctrl->Y() - ctrl->Height()/2 ;
+                evt.time = CurrentTime;
+                XSendEvent (evt.display, evt.window, True, (KeyPressMask|KeyReleaseMask), (XEvent *) &evt);
+        }
+}
 #elif  __USE_WIN32
 #include <GL/glui/win32_window.h>
 #else

@@ -63,8 +63,8 @@ void    StaticText::set_text(const char *text )
 
 void   StaticText::update_size( void )
 {
-	CurrentSize.size.w = dynamic_cast<Text*>(ThemeData)->graph_Length( );
-	CurrentSize.size.h = dynamic_cast<Text*>(ThemeData)->graph_Width( );
+	CurrentSize.size.w = dynamic_cast<Text*>(ThemeData)->Width();
+	CurrentSize.size.h = dynamic_cast<Text*>(ThemeData)->Height();
 }
 
 //////////////////////////////////////////////////////////////////////////////

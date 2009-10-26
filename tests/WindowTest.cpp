@@ -25,6 +25,7 @@ class myGluiWin : public GLUI::Window
                 {
                         set_resize_policy(FixedSize);
                         SetTheme(new myGluiWinTheme(*this));
+                        Start();
                 }
 
                 theme* GetDefaultTheme() { return new myGluiWinTheme(*this); }
@@ -102,13 +103,14 @@ int main(int argc, char** argv)
 {
         struct timespec sleeptime = { 1, 0 };
         GLUI::Window::init(&argc, argv);  //optional
-        GLUI::Display*    TheDisplay = new GLUI::Display(" display");
+        GLUI::Display*    TheDisplay = new GLUI::Display();
         GLUI::Window* Window = new myGluiWin(*TheDisplay);
         for (int count=0; count < 5; count++ )
         {
                 Window->XMapWindow();
                 nanosleep(&sleeptime, NULL);
                 Window->XUnmapWindow();
+                nanosleep(&sleeptime, NULL);
         }
         delete(Window); 
         delete(TheDisplay);

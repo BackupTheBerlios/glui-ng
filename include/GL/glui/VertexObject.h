@@ -145,6 +145,15 @@ namespace GLUI
 
       };
 
+    //bezier spline class
+    class Bezier : public VertexObject
+        {
+        };
+
+    class Nurbs : public VertexObject
+        {
+        };
+
 
 
 }

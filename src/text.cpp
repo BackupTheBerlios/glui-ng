@@ -31,8 +31,6 @@
 #include <GL/glui/text.h>
 #include <GL/glui/debug.h>
 
-#warning "TODO : remove glut dependency"
-#include <GL/glut.h>
 
 //implement X11 font API
 #warning "TODO : rename this class into FONT, don't derivate from std::string..."
@@ -47,13 +45,25 @@ using namespace GLUI;
 #define vsnprintf _vsnprintf
 #endif
 //////////////////////////////////////////////////////////////////////////////
-Text::Text (const std::string txt) :
-    std::string(txt)
+Text::Text (const std::string txt,const std::string& fontname) :
+    std::string(txt),
+    font(new Font(fontname)) //GLUT_BITMAP_HELVETICA_12;
 {
     memset(char_widths, -1, sizeof(char_widths)); /* JVK */
     tests =0;
-    font           = GLUT_BITMAP_HELVETICA_12;
     memset(Color, 0, sizeof(Color));
+
+    ////begin to implement rendering to texture
+    //glGenTextures( 1, &render_texture );
+    //glBindTexture( GL_TEXTURE_2D, render_texture );
+    //glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+    //                GL_LINEAR_MIPMAP_LINEAR );
+    //glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+    //                GL_LINEAR );
+    //glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
+    //                GL_CLAMP_TO_EDGE );
+    //glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
+    //                GL_CLAMP_TO_EDGE );
 }
 
 
@@ -84,39 +94,30 @@ Text::Text (const std::string txt) :
 }
 
 
-/****************************** Text ***************************/
-
-/*************** Text::set_font() **********/
-
-void Text::set_font(void *new_font)
+/////////////////////////////////////////////////////////////////////////
+void Text::SetFont(const std::string& fontname )
 {
-  font = new_font;
+  font = new Font(fontname);
 }
 
-/*************************************** glutBitmapStringWidth **********/
-int Text::char_width( char c  )
-{
-  return  glutBitmapWidth( font, c );
-}
-
-int Text::graph_Width( )
+//////////////////////////////////////////////////////////////////////////
+int Text::Width( )
 {
   const char *p = this->c_str();
   int  width = 0;
 
   while( *p != '\0' )  {
-    width = max<int>(glutBitmapWidth( font, *p ), width);
+    width += font->GetGlyph(*p)->GlyphWidth();
     p++;
   }
 
   return width;
 }
 
-/*************************************** glutBitmapStringLength **********/
-
-int Text::graph_Length( )
+//////////////////////////////////////////////////////////////////////////
+int Text::Height( )
 {
-    return glutBitmapLength( font, (const unsigned char*)this->c_str() );
+    return font->BaselineToBaseline();
 }
 
 
@@ -128,26 +129,22 @@ int Text::draw()
 {
   const char *p = this->c_str();
   glPushMatrix();
-  glColor3ubv( Color );
-  while( *p != '\0' )  {
-    glutBitmapCharacter( font, *p );
-    debug::Instance()->FlushGL();
-    p++;
-  }
+//  glColor3ubv( Color );
+//  while( *p != '\0' )  {
+//    glutBitmapCharacter( font, *p );
+//    debug::Instance()->FlushGL();
+//    p++;
+//  }
   glPopMatrix();
 }
 
 
-/*************** Text::get_font() **********/
+/*************** Text::GetFont() **********/
 
-void *Text::get_font( void ) const
+std::string& Text::GetFont( void ) const
 {
-  /*** Does this control have its own font? ***/
-  if ( this->font != NULL )
-    return this->font;
-
-  /*** Return the default font ***/
-  return GLUT_BITMAP_HELVETICA_12;
+    return this->font->Name();
+    //return GLUT_BITMAP_HELVETICA_12;
 }
 
 
@@ -184,7 +181,7 @@ void Text::draw_name(int x, int y)
 Text& Text::operator=(Text& copy)
 {
     *(dynamic_cast<std::string*>(this)) = *(dynamic_cast<std::string*>(&copy));
-    this->set_font(copy.get_font());
+    this->SetFont(copy.GetFont());
     return *this;
 }
 

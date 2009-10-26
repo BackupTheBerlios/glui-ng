@@ -60,7 +60,8 @@ namespace GLUI
                                         const char* format, //< printf like format
                                         ...);               //< additional args
                         void FlushGL(void);
-                        void PrintEvent(const char* key,const ::XEvent& event);
+                        void PrintEvent(const char* key,const ::XEvent& event, const char* func);
+                        void EventTypeToString(const char* key, int type, const char* func);
 
                 private:
                         debug();
@@ -71,6 +72,7 @@ namespace GLUI
                         int shift;
 
                 private : //methods
+                        void print(const char* func, const char* file=NULL, int line=0);
                         void createString( const char* format,...);  //<just fill the string buffer
                         static const char* EventTypeToString( int type );
                         static const char* EventBoolToString( Bool b );
@@ -90,6 +92,7 @@ namespace GLUI
 #define OUT(format, ...) debug::Instance()->print(MODULE_KEY, __FILE__, __LINE__, __func__,  -1, format, ## __VA_ARGS__)
 #define MSG(format, ...) debug::Instance()->print(MODULE_KEY, __FILE__, __LINE__, __func__,  0, format, ## __VA_ARGS__)
 #define RAWMSG(format, ...) debug::Instance()->rawprint(MODULE_KEY, format, ## __VA_ARGS__)
+#define EVTMSG(evt); debug::Instance()->PrintEvent(MODULE_KEY, evt, __func__)
 
 }
 

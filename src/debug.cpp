@@ -33,6 +33,7 @@
 #include <GL/gl.h>
 #include <GL/glui/debug.h>
 #include <GL/glui/window.h>
+#include <string.h>
 
 
 #ifdef _MSC_VER
@@ -91,6 +92,25 @@ void debug::rawprint(const char* key, const char* format,...)
 }
 
 
+void debug::print(const char* func, const char* file,int line)
+{
+        if ( glui_enable_indent_traces != NULL )
+        {
+                for (uint32_t i=0; i<shift; i++)
+                {
+                        cerr << "    ";
+                }
+        }
+        if ( NULL != glui_enable_fileandline && file != NULL && line != 0)
+        {
+                cerr << file << ":" << line << "  ";
+        }
+
+
+        cerr << func << ":" << buf;
+        if ( 0 == strlen(buf) ) cerr << endl;
+}
+
 void debug::print(const char* key,
                 const char* file,
                 int line,
@@ -110,20 +130,7 @@ void debug::print(const char* key,
                         cerr << "debug string too long, error :" << ret << '\n';
                         return ;
                 }
-                if ( glui_enable_indent_traces != NULL )
-                {
-                        for (uint32_t i=0; i<shift; i++)
-                        {
-                                cerr << "    ";
-                        }
-                }
-                if ( NULL != glui_enable_fileandline )
-                {
-                        cerr << file << ":" << line << "  ";
-                }
-
-                cerr << func << ":" << buf;
-                if (ret == 0) cerr << endl;
+                print(func);
                 if (level == 1) shift++;
         }
 }
@@ -283,10 +290,11 @@ const char* debug::EventColormapStateToString( int state )
         }
 }
 
-void debug::PrintEvent(const char* key,const ::XEvent& event )
+void debug::PrintEvent(const char* key,const ::XEvent& event, const char* func)
 {
         if (use_debug == NULL || NULL == getenv(key)) return;
-        switch( event.type ) {
+        switch( event.type )
+        {
 
                 case KeyPress:
                 case KeyRelease:
@@ -294,11 +302,10 @@ void debug::PrintEvent(const char* key,const ::XEvent& event )
                                 ::XKeyEvent &e = (::XKeyEvent&)event;
                                 createString( "%s: window=0x%x, root=0x%x, subwindow=0x%x, time=%lu, "
                                                 "(x,y)=(%d,%d), (x_root,y_root)=(%d,%d), state=0x%x, "
-                                                "keycode=%u, same_screen=%s", EventTypeToString( e.type ),
+                                                "keycode=%u, same_screen=%s\ń", EventTypeToString( e.type ),
                                                 e.window, e.root, e.subwindow, (unsigned long)e.time,
                                                 e.x, e.y, e.x_root, e.y_root, e.state, e.keycode,
                                                 EventBoolToString( e.same_screen ) );
-                                cerr<<buf;
                                 break;
                         }
 
@@ -308,7 +315,7 @@ void debug::PrintEvent(const char* key,const ::XEvent& event )
                                 ::XButtonEvent &e = (::XButtonEvent&)event;
                                 createString( "%s: window=0x%x, root=0x%x, subwindow=0x%x, time=%lu, "
                                                 "(x,y)=(%d,%d), (x_root,y_root)=(%d,%d), state=0x%x, "
-                                                "button=%u, same_screen=%d", EventTypeToString( e.type ),
+                                                "button=%u, same_screen=%d\n", EventTypeToString( e.type ),
                                                 e.window, e.root, e.subwindow, (unsigned long)e.time,
                                                 e.x, e.y, e.x_root, e.y_root, e.state, e.button,
                                                 EventBoolToString( e.same_screen ) );
@@ -320,7 +327,7 @@ void debug::PrintEvent(const char* key,const ::XEvent& event )
                                 ::XMotionEvent &e = (::XMotionEvent&)event;
                                 createString( "%s: window=0x%x, root=0x%x, subwindow=0x%x, time=%lu, "
                                                 "(x,y)=(%d,%d), (x_root,y_root)=(%d,%d), state=0x%x, "
-                                                "is_hint=%s, same_screen=%d", EventTypeToString( e.type ),
+                                                "is_hint=%s, same_screen=%d\n", EventTypeToString( e.type ),
                                                 e.window, e.root, e.subwindow, (unsigned long)e.time,
                                                 e.x, e.y, e.x_root, e.y_root, e.state,
                                                 EventNotifyHintToString( e.is_hint ),
@@ -334,7 +341,7 @@ void debug::PrintEvent(const char* key,const ::XEvent& event )
                                 ::XCrossingEvent &e = (::XCrossingEvent&)event;
                                 createString( "%s: window=0x%x, root=0x%x, subwindow=0x%x, time=%lu, "
                                                 "(x,y)=(%d,%d), mode=%s, detail=%s, same_screen=%d, "
-                                                "focus=%d, state=0x%x", EventTypeToString( e.type ),
+                                                "focus=%d, state=0x%x\n", EventTypeToString( e.type ),
                                                 e.window, e.root, e.subwindow, (unsigned long)e.time,
                                                 e.x, e.y, EventNotifyModeToString( e.mode ),
                                                 EventNotifyDetailToString( e.detail ), (int)e.same_screen,
@@ -346,7 +353,7 @@ void debug::PrintEvent(const char* key,const ::XEvent& event )
                 case FocusOut:
                         {
                                 ::XFocusChangeEvent &e = (::XFocusChangeEvent&)event;
-                                createString( "%s: window=0x%x, mode=%s, detail=%s",
+                                createString( "%s: window=0x%x, mode=%s, detail=%s\n",
                                                 EventTypeToString( e.type ), e.window,
                                                 EventNotifyModeToString( e.mode ),
                                                 EventNotifyDetailToString( e.detail ) );
@@ -363,7 +370,7 @@ void debug::PrintEvent(const char* key,const ::XEvent& event )
                                                         "%02x", e.key_vector[ i ] );
                                 }
                                 buf[ i ] = '\0';
-                                createString( "%s: window=0x%x, %s", EventTypeToString( e.type ), e.window,
+                                createString( "%s: window=0x%x, %s\n", EventTypeToString( e.type ), e.window,
                                                 buf );
                                 break;
                         }
@@ -372,7 +379,7 @@ void debug::PrintEvent(const char* key,const ::XEvent& event )
                         {
                                 ::XExposeEvent &e = (::XExposeEvent&)event;
                                 createString( "%s: window=0x%x, (x,y)=(%d,%d), (width,height)=(%d,%d), "
-                                                "count=%d", EventTypeToString( e.type ), e.window, e.x,
+                                                "count=%d\n", EventTypeToString( e.type ), e.window, e.x,
                                                 e.y, e.width, e.height, e.count );
                                 break;
                         }
@@ -381,7 +388,7 @@ void debug::PrintEvent(const char* key,const ::XEvent& event )
                         {
                                 ::XGraphicsExposeEvent &e = (::XGraphicsExposeEvent&)event;
                                 createString( "%s: drawable=0x%x, (x,y)=(%d,%d), (width,height)=(%d,%d), "
-                                                "count=%d, (major_code,minor_code)=(%d,%d)",
+                                                "count=%d, (major_code,minor_code)=(%d,%d)\n",
                                                 EventTypeToString( e.type ), e.drawable, e.x, e.y,
                                                 e.width, e.height, e.count, e.major_code,
                                                 e.minor_code );
@@ -391,7 +398,7 @@ void debug::PrintEvent(const char* key,const ::XEvent& event )
                 case NoExpose:
                         {
                                 ::XNoExposeEvent &e = (::XNoExposeEvent&)event;
-                                createString( "%s: drawable=0x%x, (major_code,minor_code)=(%d,%d)",
+                                createString( "%s: drawable=0x%x, (major_code,minor_code)=(%d,%d)\n",
                                                 EventTypeToString( e.type ), e.drawable, e.major_code,
                                                 e.minor_code );
                                 break;
@@ -400,7 +407,7 @@ void debug::PrintEvent(const char* key,const ::XEvent& event )
                 case VisibilityNotify:
                         {
                                 ::XVisibilityEvent &e = (::XVisibilityEvent&)event;
-                                createString( "%s: window=0x%x, state=%s", EventTypeToString( e.type ),
+                                createString( "%s: window=0x%x, state=%s\n", EventTypeToString( e.type ),
                                                 e.window, EventVisibilityToString( e.state) );
                                 break;
                         }
@@ -409,7 +416,7 @@ void debug::PrintEvent(const char* key,const ::XEvent& event )
                         {
                                 ::XCreateWindowEvent &e = (::XCreateWindowEvent&)event;
                                 createString( "%s: (x,y)=(%d,%d), (width,height)=(%d,%d), border_width=%d, "
-                                                "window=0x%x, override_redirect=%s",
+                                                "window=0x%x, override_redirect=%s\n",
                                                 EventTypeToString( e.type ), e.x, e.y, e.width, e.height,
                                                 e.border_width, e.window,
                                                 EventBoolToString( e.override_redirect ) );
@@ -419,7 +426,7 @@ void debug::PrintEvent(const char* key,const ::XEvent& event )
                 case DestroyNotify:
                         {
                                 ::XDestroyWindowEvent &e = (::XDestroyWindowEvent&)event;
-                                createString( "%s: event=0x%x, window=0x%x",
+                                createString( "%s: event=0x%x, window=0x%x\n",
                                                 EventTypeToString( e.type ), e.event, e.window );
                                 break;
                         }
@@ -427,7 +434,7 @@ void debug::PrintEvent(const char* key,const ::XEvent& event )
                 case UnmapNotify:
                         {
                                 ::XUnmapEvent &e = (::XUnmapEvent&)event;
-                                createString( "%s: event=0x%x, window=0x%x, from_configure=%s",
+                                createString( "%s: event=0x%x, window=0x%x, from_configure=%s\n",
                                                 EventTypeToString( e.type ), e.event, e.window,
                                                 EventBoolToString( e.from_configure ) );
                                 break;
@@ -436,7 +443,7 @@ void debug::PrintEvent(const char* key,const ::XEvent& event )
                 case MapNotify:
                         {
                                 ::XMapEvent &e = (::XMapEvent&)event;
-                                createString( "%s: event=0x%x, window=0x%x, override_redirect=%s",
+                                createString( "%s: event=0x%x, window=0x%x, override_redirect=%s\n",
                                                 EventTypeToString( e.type ), e.event, e.window,
                                                 EventBoolToString( e.override_redirect ) );
                                 break;
@@ -445,7 +452,7 @@ void debug::PrintEvent(const char* key,const ::XEvent& event )
                 case MapRequest:
                         {
                                 ::XMapRequestEvent &e = (::XMapRequestEvent&)event;
-                                createString( "%s: parent=0x%x, window=0x%x",
+                                createString( "%s: parent=0x%x, window=0x%x\n",
                                                 EventTypeToString( e.type ), e.parent, e.window );
                                 break;
                         }
@@ -454,7 +461,7 @@ void debug::PrintEvent(const char* key,const ::XEvent& event )
                         {
                                 ::XReparentEvent &e = (::XReparentEvent&)event;
                                 createString( "%s: event=0x%x, window=0x%x, parent=0x%x, (x,y)=(%d,%d), "
-                                                "override_redirect=%s", EventTypeToString( e.type ),
+                                                "override_redirect=%s\n", EventTypeToString( e.type ),
                                                 e.event, e.window, e.parent, e.x, e.y,
                                                 EventBoolToString( e.override_redirect ) );
                                 break;
@@ -465,7 +472,7 @@ void debug::PrintEvent(const char* key,const ::XEvent& event )
                                 ::XConfigureEvent &e = (::XConfigureEvent&)event;
                                 createString( "%s: event=0x%x, window=0x%x, (x,y)=(%d,%d), "
                                                 "(width,height)=(%d,%d), border_width=%d, above=0x%x, "
-                                                "override_redirect=%s", EventTypeToString( e.type ), e.event,
+                                                "override_redirect=%s\n", EventTypeToString( e.type ), e.event,
                                                 e.window, e.x, e.y, e.width, e.height, e.border_width,
                                                 e.above, EventBoolToString( e.override_redirect ) );
                                 break;
@@ -476,7 +483,7 @@ void debug::PrintEvent(const char* key,const ::XEvent& event )
                                 ::XConfigureRequestEvent &e = (::XConfigureRequestEvent&)event;
                                 createString( "%s: parent=0x%x, window=0x%x, (x,y)=(%d,%d), "
                                                 "(width,height)=(%d,%d), border_width=%d, above=0x%x, "
-                                                "detail=%s, value_mask=%lx", EventTypeToString( e.type ),
+                                                "detail=%s, value_mask=%lx\n", EventTypeToString( e.type ),
                                                 e.parent, e.window, e.x, e.y, e.width, e.height,
                                                 e.border_width, e.above,
                                                 EventConfigureDetailToString( e.detail ), e.value_mask );
@@ -486,7 +493,7 @@ void debug::PrintEvent(const char* key,const ::XEvent& event )
                 case GravityNotify:
                         {
                                 ::XGravityEvent &e = (::XGravityEvent&)event;
-                                createString( "%s: event=0x%x, window=0x%x, (x,y)=(%d,%d)",
+                                createString( "%s: event=0x%x, window=0x%x, (x,y)=(%d,%d)\n",
                                                 EventTypeToString( e.type ), e.event, e.window, e.x, e.y );
                                 break;
                         }
@@ -494,7 +501,7 @@ void debug::PrintEvent(const char* key,const ::XEvent& event )
                 case ResizeRequest:
                         {
                                 ::XResizeRequestEvent &e = (::XResizeRequestEvent&)event;
-                                createString( "%s: window=0x%x, (width,height)=(%d,%d)",
+                                createString( "%s: window=0x%x, (width,height)=(%d,%d)\n",
                                                 EventTypeToString( e.type ), e.window, e.width, e.height );
                                 break;
                         }
@@ -502,7 +509,7 @@ void debug::PrintEvent(const char* key,const ::XEvent& event )
                 case CirculateNotify:
                         {
                                 ::XCirculateEvent &e = (::XCirculateEvent&)event;
-                                createString( "%s: event=0x%x, window=0x%x, place=%s",
+                                createString( "%s: event=0x%x, window=0x%x, place=%s\n",
                                                 EventTypeToString( e.type ), e.event, e.window,
                                                 EventPlaceToString( e.place ) );
                                 break;
@@ -511,7 +518,7 @@ void debug::PrintEvent(const char* key,const ::XEvent& event )
                 case CirculateRequest:
                         {
                                 ::XCirculateRequestEvent &e = (::XCirculateRequestEvent&)event;
-                                createString( "%s: parent=0x%x, window=0x%x, place=%s",
+                                createString( "%s: parent=0x%x, window=0x%x, place=%s\n",
                                                 EventTypeToString( e.type ), e.parent, e.window,
                                                 EventPlaceToString( e.place ) );
                                 break;
@@ -520,7 +527,7 @@ void debug::PrintEvent(const char* key,const ::XEvent& event )
                 case PropertyNotify:
                         {
                                 ::XPropertyEvent &e = (::XPropertyEvent&)event;
-                                createString( "%s: window=0x%x, atom=%lu, time=%lu, state=%s",
+                                createString( "%s: window=0x%x, atom=%lu, time=%lu, state=%s\n",
                                                 EventTypeToString( e.type ), e.window,
                                                 (unsigned long)e.atom, (unsigned long)e.time,
                                                 EventPropertyStateToString( e.state ) );
@@ -530,7 +537,7 @@ void debug::PrintEvent(const char* key,const ::XEvent& event )
                 case SelectionClear:
                         {
                                 ::XSelectionClearEvent &e = (::XSelectionClearEvent&)event;
-                                createString( "%s: window=0x%x, selection=%lu, time=%lu",
+                                createString( "%s: window=0x%x, selection=%lu, time=%lu\n",
                                                 EventTypeToString( e.type ), e.window,
                                                 (unsigned long)e.selection, (unsigned long)e.time );
                                 break;
@@ -540,7 +547,7 @@ void debug::PrintEvent(const char* key,const ::XEvent& event )
                         {
                                 ::XSelectionRequestEvent &e = (::XSelectionRequestEvent&)event;
                                 createString( "%s: owner=0x%x, requestor=0x%x, selection=0x%x, "
-                                                "target=0x%x, property=%lu, time=%lu",
+                                                "target=0x%x, property=%lu, time=%lu\n",
                                                 EventTypeToString( e.type ), e.owner, e.requestor,
                                                 (unsigned long)e.selection, (unsigned long)e.target,
                                                 (unsigned long)e.property, (unsigned long)e.time );
@@ -551,7 +558,7 @@ void debug::PrintEvent(const char* key,const ::XEvent& event )
                         {
                                 ::XSelectionEvent &e = (::XSelectionEvent&)event;
                                 createString( "%s: requestor=0x%x, selection=0x%x, target=0x%x, "
-                                                "property=%lu, time=%lu", EventTypeToString( e.type ),
+                                                "property=%lu, time=%lu\n", EventTypeToString( e.type ),
                                                 e.requestor, (unsigned long)e.selection,
                                                 (unsigned long)e.target, (unsigned long)e.property,
                                                 (unsigned long)e.time );
@@ -561,7 +568,7 @@ void debug::PrintEvent(const char* key,const ::XEvent& event )
                 case ColormapNotify:
                         {
                                 ::XColormapEvent &e = (::XColormapEvent&)event;
-                                createString( "%s: window=0x%x, colormap=%lu, new=%s, state=%s",
+                                createString( "%s: window=0x%x, colormap=%lu, new=%s, state=%s\n",
                                                 EventTypeToString( e.type ), e.window,
                                                 (unsigned long)e.colormap, EventBoolToString( e.c_new ),
                                                 EventColormapStateToString( e.state ) );
@@ -593,7 +600,7 @@ void debug::PrintEvent(const char* key,const ::XEvent& event )
                                                 break;
                                 }
                                 *p = '\0';
-                                createString( "%s: window=0x%x, message_type=%lu, format=%d, data=(%s )",
+                                createString( "%s: window=0x%x, message_type=%lu, format=%d, data=(%s )\n",
                                                 EventTypeToString( e.type ), e.window,
                                                 (unsigned long)e.message_type, e.format, buf );
                                 break;
@@ -602,7 +609,7 @@ void debug::PrintEvent(const char* key,const ::XEvent& event )
                 case MappingNotify:
                         {
                                 ::XMappingEvent &e = (::XMappingEvent&)event;
-                                createString( "%s: window=0x%x, request=%s, first_keycode=%d, count=%d",
+                                createString( "%s: window=0x%x, request=%s, first_keycode=%d, count=%d\n",
                                                 EventTypeToString( e.type ), e.window,
                                                 EventMappingRequestToString( e.request ), e.first_keycode,
                                                 e.count );
@@ -611,9 +618,19 @@ void debug::PrintEvent(const char* key,const ::XEvent& event )
 
                 default:
                         {
-                                createString( "%s", EventTypeToString( event.type ) );
+                                createString( "%s\n", EventTypeToString( event.type ) );
                                 break;
                         }
-    }
+        }
+
+        print(func);
 }
 
+
+void debug::EventTypeToString(const char* key, int type, const char* func)
+{
+        if (use_debug == NULL || NULL == getenv(key)) return;
+
+        createString("%s\n",EventTypeToString(type));
+        print(func);
+}
