@@ -61,6 +61,14 @@ void Control::pack (int x, int y)
 }
 
 ////////////////////////////////////////////////////////////////////////
+ void Control::PostRedisplay()
+{
+        Control* par = dynamic_cast<Control*>(parent());
+        if (par) par->PostRedisplay();
+}
+
+
+////////////////////////////////////////////////////////////////////////
 #warning "use ::XResizeRequestEvent instead for the api"
 void Control::update_size( void )
 {

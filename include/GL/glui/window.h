@@ -42,6 +42,7 @@
  This entire approach seems to be superceded by the "subwindow" flavor
  of GLUI.
 */
+#include <sys/time.h>
 
 #include <GL/glui/container.h>
 #include <GL/glui/Exception.h>
@@ -77,6 +78,7 @@ namespace GLUI
                 TOP_VIEWPORT= BOTTOM_VIEWPORT + 500 * GLUI_CONTROL_MAX_THICKNESS
         };
 
+        Time get_time(void);
 
         class _Screen : public NonCopyableClass
         {
@@ -124,18 +126,14 @@ namespace GLUI
                         virtual int XMapSubwindows()=0;
                         virtual int XUnmapWindow()=0;
                         virtual int XUnmapSubwindows()=0;
+                        virtual int XSendEvent(::XEvent &evt)=0;
                         virtual KeySym XLookupKeysym(::XKeyEvent *key_event, int index)=0; //a KeySym is a 32bit not unicode char
                         static  uint32_t KeySymToUcs4(KeySym keysym);
                 public: //event handlers
                         virtual int AddEvent(::XResizeRequestEvent* event);
                         virtual int AddEvent(::XExposeEvent* event);
                         virtual int AddEvent(::XDestroyWindowEvent* event);
-                        virtual int AddEvent(::XKeyEvent* event);
-                        virtual int AddEvent(::XButtonEvent* event);
-                        virtual int AddEvent(::XMotionEvent* event);
-                        virtual int AddEvent(::XCrossingEvent* event);
                         virtual int AddEvent(::XMapEvent* event);
-                        virtual int AddEvent(::XUnmapEvent* event);
                         //virtual int         set_size( Size sz, Size min=Size(0u,0u) ); //replace with a XResizeRequestEvent
 
                 protected : //types
@@ -166,6 +164,7 @@ namespace GLUI
                         void* args; //arguments to the thread
                         pthread_t main_thread;
                         bool mapped;
+                        bool thread_enabled;
 
         };
 
@@ -180,6 +179,7 @@ namespace GLUI
                         virtual int XUnmapWindow() {return 0;}
                         virtual int XUnmapSubwindows() {return 0;}
                         virtual KeySym XLookupKeysym(::XKeyEvent *key_event, int index) {return 0;}
+                        virtual int XSendEvent(::XEvent &evt) {return 0;};
                 protected:
                         virtual int start_routine() { return 0; }
                 private:

@@ -326,43 +326,44 @@ int Container::AddEvent (::XEvent* event)
 // purpose : when an event is created, use the opengl selection mechanism to know what object shall handle the event
 // then create a list containing all parent (parent can have multiple childrens but only one parent is allowed per child)
 // then use this list to propagate the event rather than the following algorithm
+        EVTMSG((::XEvent) *event);
 
     debug::Instance()->EventTypeToString(MODULE_KEY, event->type,__func__);
     switch ( event->type )
     {
-        case KeyPress : err = Container::AddEvent((::XKeyEvent*) event); break;
-        case KeyRelease: err = Container::AddEvent((::XKeyEvent*) event); break;
-        case ButtonPress: err = Container::AddEvent((::XButtonEvent*) event); break;
-        case ButtonRelease: err = Container::AddEvent((::XButtonEvent*) event); break;
-        case MotionNotify: err = Container::AddEvent((::XMotionEvent*) event); break;
-        case EnterNotify: err = Container::AddEvent((::XCrossingEvent*) event); break;
-        case LeaveNotify: err = Container::AddEvent((::XCrossingEvent*) event); break;
-        case FocusIn: err = Container::AddEvent((::XFocusChangeEvent*) event); break;
-        case FocusOut: err = Container::AddEvent((::XFocusChangeEvent*) event); break;
-        case KeymapNotify: err = Container::AddEvent((::XKeymapEvent*) event); break;
-        case Expose: err = Container::AddEvent((::XExposeEvent*) event); break;
-        case GraphicsExpose: err = Container::AddEvent((::XGraphicsExposeEvent*) event); break;
-        case NoExpose: err = Container::AddEvent((::XNoExposeEvent*) event); break;
-        case VisibilityNotify: err = Container::AddEvent((::XVisibilityEvent*) event); break;
-        case CreateNotify: err = Container::AddEvent((::XCreateWindowEvent*) event); break;
-        case DestroyNotify: err = Container::AddEvent((::XDestroyWindowEvent*) event); break;
-        case UnmapNotify: err = Container::AddEvent((::XUnmapEvent*) event); break;
-        case MapNotify: err = Container::AddEvent((::XMapEvent*) event); break;
-        case MapRequest: err = Container::AddEvent((::XMapRequestEvent*) event); break;
-        case ReparentNotify: err = Container::AddEvent((::XReparentEvent*) event); break;
-        case ConfigureNotify: err = Container::AddEvent((::XConfigureEvent*) event); break;
-        case ConfigureRequest: err = Container::AddEvent((::XConfigureRequestEvent*) event); break;
-        case GravityNotify: err = Container::AddEvent((::XGravityEvent*) event); break;
-        case ResizeRequest: err = Container::AddEvent((::XResizeRequestEvent*) event); break;
-        case CirculateNotify: err = Container::AddEvent((::XCirculateEvent*) event); break;
-        case CirculateRequest: err = Container::AddEvent((::XCirculateRequestEvent*) event); break;
-        case PropertyNotify: err = Container::AddEvent((::XPropertyEvent*) event); break;
-        case SelectionClear: err = Container::AddEvent((::XSelectionClearEvent*) event); break;
-        case SelectionRequest: err = Container::AddEvent((::XSelectionRequestEvent*) event); break;
-        case SelectionNotify: err = Container::AddEvent((::XSelectionEvent*) event); break;
-        case ColormapNotify: err = Container::AddEvent((::XColormapEvent*) event); break;
-        case ClientMessage: err = Container::AddEvent((::XClientMessageEvent*) event); break;
-        case MappingNotify: err = Container::AddEvent((::XMappingEvent*) event); break;
+        case KeyPress : err = AddEvent((::XKeyEvent*) event); break;
+        case KeyRelease: err = AddEvent((::XKeyEvent*) event); break;
+        case ButtonPress: err = AddEvent((::XButtonEvent*) event); break;
+        case ButtonRelease: err = AddEvent((::XButtonEvent*) event); break;
+        case MotionNotify: err = AddEvent((::XMotionEvent*) event); break;
+        case EnterNotify: err = AddEvent((::XCrossingEvent*) event); break;
+        case LeaveNotify: err = AddEvent((::XCrossingEvent*) event); break;
+        case FocusIn: err = AddEvent((::XFocusChangeEvent*) event); break;
+        case FocusOut: err = AddEvent((::XFocusChangeEvent*) event); break;
+        case KeymapNotify: err = AddEvent((::XKeymapEvent*) event); break;
+        case Expose: err = AddEvent((::XExposeEvent*) event); break;
+        case GraphicsExpose: err = AddEvent((::XGraphicsExposeEvent*) event); break;
+        case NoExpose: err = AddEvent((::XNoExposeEvent*) event); break;
+        case VisibilityNotify: err = AddEvent((::XVisibilityEvent*) event); break;
+        case CreateNotify: err = AddEvent((::XCreateWindowEvent*) event); break;
+        case DestroyNotify: err = AddEvent((::XDestroyWindowEvent*) event); break;
+        case UnmapNotify: err = AddEvent((::XUnmapEvent*) event); break;
+        case MapNotify: err = AddEvent((::XMapEvent*) event); break;
+        case MapRequest: err = AddEvent((::XMapRequestEvent*) event); break;
+        case ReparentNotify: err = AddEvent((::XReparentEvent*) event); break;
+        case ConfigureNotify: err = AddEvent((::XConfigureEvent*) event); break;
+        case ConfigureRequest: err = AddEvent((::XConfigureRequestEvent*) event); break;
+        case GravityNotify: err = AddEvent((::XGravityEvent*) event); break;
+        case ResizeRequest: err = AddEvent((::XResizeRequestEvent*) event); break;
+        case CirculateNotify: err = AddEvent((::XCirculateEvent*) event); break;
+        case CirculateRequest: err = AddEvent((::XCirculateRequestEvent*) event); break;
+        case PropertyNotify: err = AddEvent((::XPropertyEvent*) event); break;
+        case SelectionClear: err = AddEvent((::XSelectionClearEvent*) event); break;
+        case SelectionRequest: err = AddEvent((::XSelectionRequestEvent*) event); break;
+        case SelectionNotify: err = AddEvent((::XSelectionEvent*) event); break;
+        case ColormapNotify: err = AddEvent((::XColormapEvent*) event); break;
+        case ClientMessage: err = AddEvent((::XClientMessageEvent*) event); break;
+        case MappingNotify: err = AddEvent((::XMappingEvent*) event); break;
 
         default : err = BroadcastEvent(event, LASTEvent, NoEventMask); break;
     }

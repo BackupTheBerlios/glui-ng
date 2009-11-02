@@ -35,6 +35,20 @@
 #include <pthread.h>
 #include <signal.h>
 using namespace GLUI;
+#define MODULE_KEY "time"
+Time GLUI::get_time(void)
+{       
+     int  tint; 
+     struct timeval  tv;
+     struct timezone tz; /* is not used since ages */
+     gettimeofday(&tv, &tz);
+     tint = (int)tv.tv_sec * 1000;
+     tint = tint/1000 * 1000;
+     tint = tint + tv.tv_usec/1000;
+     return((Time)tint);
+}
+
+#undef MODULE_KEY
 #define MODULE_KEY "_Display"
 /////////////////////////////////////////////////////////////////////////////
 _Display::_Display()
@@ -105,9 +119,11 @@ void* _Window::_Start(void* arg)
 {
         int res;
         _Window* win = (_Window*) arg;
+        win->thread_enabled = true;
         res = win->start_routine();
         pthread_exit((void*)res);
 }
+
 int _Window::_Stop()
 {
         int res = pthread_kill(main_thread, SIGTERM);
@@ -157,6 +173,7 @@ int _Window::DefaultTheme::draw()
 ///////////////////////////////////////////////////////////////////////
 int _Window::DefaultTheme::update()
 {
+        return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -169,7 +186,7 @@ int _Window::AddEvent(::XResizeRequestEvent *event)
         this->CurrentSize.size.h = event->height;
         this->CurrentSize.size.w = event->width;
         this->pack(x, y);
-        glViewport( 0, 0, this->CurrentSize.size.w, this->CurrentSize.size.h);
+        PostRedisplay();
     }
     OUT("");
     return 0;
@@ -193,6 +210,8 @@ int _Window::AddEvent(::XExposeEvent *event)
             glEnable ( GL_NORMALIZE );
             glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
             glShadeModel(GL_SMOOTH);
+
+            glViewport( 0, 0, this->CurrentSize.size.w, this->CurrentSize.size.h);
 
             ThemeData->draw();
 
@@ -229,48 +248,18 @@ int _Window::AddEvent(::XDestroyWindowEvent *event)
 }
 
 
-int _Window::AddEvent(::XKeyEvent* event)
-{
-    Container::AddEvent((::XEvent*) event);
-}
-
-
-int _Window::AddEvent(::XButtonEvent* event)
-{
-    Container::AddEvent((::XEvent*) event);
-}
-
-
-int _Window::AddEvent(::XMotionEvent* event)
-{
-    Container::AddEvent((::XEvent*) event);
-}
-
-
-int _Window::AddEvent(::XCrossingEvent* event)
-{
-    Container::AddEvent((::XEvent*) event);
-}
-
 
 int _Window::AddEvent(::XMapEvent* event)
 {
 
     ::XExposeEvent expose;
     expose.type = Expose;
-    Container::AddEvent((::XEvent*) event);
     this->AddEvent(&expose);
 
 
 
 }
 
-
-int _Window::AddEvent(::XUnmapEvent* event)
-{
-    Container::AddEvent((::XEvent*) event);
-    return _Stop();
-}
 
 
 

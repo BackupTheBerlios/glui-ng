@@ -111,6 +111,8 @@ namespace GLUI
             virtual void idle( void )            { }
             virtual int  mouse_over( int state, int x, int y ) { return false; }
 
+            virtual void PostRedisplay();
+
             virtual void enable( void );
             virtual void disable( void );
             virtual void activate( int how )     { active = true; }

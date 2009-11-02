@@ -102,17 +102,19 @@ namespace GLUI
                                         unsigned int border_width,
                                         unsigned long border,
                                         unsigned long background );
+                        ~X11Window();
                         virtual int start_routine();
                         static int init(int* argc, char** argv) { return 0;} //optional
+                        virtual void PostRedisplay();
                 public : //XMethods
                         virtual int XMapWindow();
                         virtual int XMapRaised();
                         virtual int XMapSubwindows();
                         virtual int XUnmapWindow();
                         virtual int XUnmapSubwindows();
+                        virtual int XSendEvent(::XEvent &evt);
                         virtual KeySym XLookupKeysym(::XKeyEvent *key_event, int index);
                 public: //event handlers
-                        virtual int AddEvent(::XEvent* event);
                         virtual int AddEvent(::XClientMessageEvent* event);
                         virtual int AddEvent(::XMappingEvent* event);
                         virtual int AddEvent(::XCreateWindowEvent* event);
@@ -130,6 +132,7 @@ namespace GLUI
                         GLXFBConfig *fbc;
                         int fbc_id;
                         GLXContext ctx;
+                        bool dirty;
                 protected: //methods
                         void _X11Window( ::Window parent_window,
                                         int x, int y,

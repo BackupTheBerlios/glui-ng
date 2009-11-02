@@ -66,7 +66,6 @@ namespace GLUI
                                         const GLvoid *outpointer,  //<pointer to the outputdata
                                         uint32_t count //< count of the numbers of elements in the array (an element in 3 or 4 components)
                                         );
-                        virtual void PostRedisplay(Control* ctrl);
                 private:
         };
 

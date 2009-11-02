@@ -163,6 +163,7 @@ void X11Window::_X11Window(::Window parent_window,
         if (ctx == 0)
                 throw Exception(ENOTSUP,"Failed to create GLX context.\n");
         XSelectInput(disp.Disp(), window, EventMask);
+        dirty=false;
 }
 X11Window::X11Window(X11Display &display, ::Window parent,
                 int x, int y,
@@ -281,56 +282,109 @@ X11Window::X11Window(X11Display &display, ::Window parent,
 
 }
 
+X11Window::~X11Window()
+{
+        ::XClientMessageEvent wakeup;
+        wakeup.type = ClientMessage;
+        wakeup.data.l[ 0 ] = XInternAtom(disp.Disp(), "WM_DELETE_WINDOW", False);
+
+        this->XSendEvent ((XEvent&)wakeup); 
+}
+
+
 int X11Window::start_routine()
 {
-        int err;
+        int err = 0;
         ::XEvent event;
 
-        while(1) 
+        while(this->thread_enabled && err == 0) 
         {
+                if (dirty)
+                {
+                        ::XExposeEvent EventToForward;
+                        //ask for redisplay of window
+                        EventToForward.type=Expose;
+                        EventToForward.send_event=true;
+                        EventToForward.x = X();
+                        EventToForward.y = Y();
+                        EventToForward.width = Width();
+                        EventToForward.height = Height();
+                        AddEvent(&EventToForward);
+                        dirty=False;
+                }
                 XWindowEvent(disp.Disp(), window, EventMask, &event);
-                err = AddEvent(&event);
+                err = Container::AddEvent(&event);
         }
+        this->thread_enabled = False;
         return err;
 
 
 }
 
-
+///////////////////////////////////////////////////////////////////////////////////
+void X11Window::PostRedisplay()
+{
+        dirty=True;
+}
 
 
 int X11Window::XMapWindow()
 {
-        return ::XMapWindow(disp.Disp(),window);
+        int err;
+        err = ::XMapWindow(disp.Disp(),window);
+        if (err) return err;
+        err = XFlush( disp.Disp() );
+        return err;
               
 }
 
 int X11Window::XMapRaised()
 {
-        return ::XMapRaised(disp.Disp(),window);
+        int err;
+        err = ::XMapRaised(disp.Disp(),window);
+        return err;
 }
 
 int X11Window::XMapSubwindows() 
 {
-        return ::XMapSubwindows(disp.Disp(),window);
+        int err;
+        err = ::XMapSubwindows(disp.Disp(),window);
+        return err;
 }
 
 int X11Window::XUnmapWindow()
 {
-        return ::XUnmapWindow(disp.Disp(),window);
+        int err;
+        err = ::XUnmapWindow(disp.Disp(),window);
+        return err;
 }
 
 int X11Window::XUnmapSubwindows()
 {
-        return ::XUnmapSubwindows(disp.Disp(),window);
+        int err;
+        err = ::XUnmapSubwindows(disp.Disp(),window);
+        return err;
 }
 
 KeySym  X11Window::XLookupKeysym(::XKeyEvent *key_event, int index)
 {
-        return ::XLookupKeysym(key_event, index);
+        int err;
+        err = ::XLookupKeysym(key_event, index);
+        return err;
+}
+
+int X11Window::XSendEvent(::XEvent &evt)
+{
+        ::XAnyEvent *evtp = (::XAnyEvent*) &evt;
+        
+        evtp->display = disp.Disp(); ;
+        evtp->window = window;
+
+        ::XSendEvent (evtp->display, evtp->window, True, (KeyPressMask|KeyReleaseMask), &evt); 
 }
 
 
+/*
 int X11Window::AddEvent(::XEvent *event)
 {
         int err;
@@ -359,8 +413,9 @@ int X11Window::AddEvent(::XEvent *event)
         }
 
         OUT("");
+        return err;
 }
-
+*/
 
 int X11Window::AddEvent(::XClientMessageEvent *event)
 {
@@ -369,10 +424,12 @@ int X11Window::AddEvent(::XClientMessageEvent *event)
         if( (Atom) event->data.l[ 0 ] == XInternAtom(disp.Disp(), "WM_DELETE_WINDOW", False))
         {
                 int res = XDestroyWindow(disp.Disp(), window);
+                this->thread_enabled = false;
                 if ( res ) return res;
-                window = -1;
-                return 0;
+                window = 0;
+                return res;
         }
+        return 0;
         OUT("");
 }
 
@@ -415,25 +472,30 @@ int X11Window::AddEvent(::XUnmapEvent *event)
 
 int X11Window::AddEvent(::XCreateWindowEvent *event)
 {
+        int err;
         IN("");
         set_size( Size((unsigned int)event->width,(unsigned int)event->height) );
-        Container::AddEvent(event);
+        err = Container::AddEvent(event);
         OUT("");
+        return err;
 }
 
 int X11Window::AddEvent(::XConfigureEvent *event)
 {
+        int err;
         IN("");
         set_size( Size((unsigned int)event->width,(unsigned int)event->height) );
-        Container::AddEvent(event);
+        err = Container::AddEvent(event);
         OUT("");
+        return err;
 }
 
 
 int X11Window::AddEvent(::XExposeEvent* event)
 {
+        int err;
         IN("");
-        _Window::AddEvent(event);
+        err = _Window::AddEvent(event);
         switch (get_buffer_mode()) {
                 case buffer_front: // Make sure drawing gets to screen
                         glFlush();
@@ -444,14 +506,17 @@ int X11Window::AddEvent(::XExposeEvent* event)
         }
 
         OUT("");
+        return err;
 }
 
 int X11Window::AddEvent(::XResizeRequestEvent *event)
 {
+        int err;
         IN("");
         set_size( Size((unsigned int)event->width,(unsigned int)event->height) );
-        _Window::AddEvent(event);
+        err = _Window::AddEvent(event);
         OUT("");
+        return err;
 }
 
 #define GLX_CONTEXT_MAJOR_VERSION_ARB       0x2091

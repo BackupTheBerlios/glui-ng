@@ -6,7 +6,7 @@ int main(int argc, char** argv)
     int count = 0;
 
     //Window->init(&argc, argv);  //optional
-    GLUI::Display*    TheDisplay = new GLUI::Display("display");
+    GLUI::Display*    TheDisplay = new GLUI::Display();
     myGluiWin* Window = new myGluiWin(*TheDisplay);
     Window->XMapWindow();
 

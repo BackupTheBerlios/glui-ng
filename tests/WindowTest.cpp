@@ -101,7 +101,7 @@ int myGluiWin::myGluiWinTheme::draw(void)
 
 int main(int argc, char** argv)
 {
-        struct timespec sleeptime = { 1, 0 };
+        struct timespec sleeptime = { 5, 0 };
         GLUI::Window::init(&argc, argv);  //optional
         GLUI::Display*    TheDisplay = new GLUI::Display();
         GLUI::Window* Window = new myGluiWin(*TheDisplay);

@@ -103,9 +103,11 @@ class myGluiWin : public GLUI::Window
                                 0)
                 {
                         Angle = 0;
+                        set_resize_policy(FixedSize);
                         ctrl = new myControl("top box");
                         add_control(ctrl);
                         SetTheme(new theme(*this));
+                        Start();
                 }
                 ~myGluiWin()
                 {
@@ -122,25 +124,22 @@ class myGluiWin : public GLUI::Window
 
 int myGluiWin::AddEvent(::XKeyEvent* event)
 {
+        int err = 0;
         Angle += 5.0f;
-        Container::AddEvent((::XEvent*) event);
-        return ThemeData->update();
+        if (event->type == KeyPress)
+        {
+                err = Container::AddEvent(event);
+                if (err) return err;
+                err = ThemeData->update();
+                if (err) return err;
+                PostRedisplay();
+        }
+        return err;
 }
 #ifdef __USE_XLIB
 #include <GL/glui/x11_window.h>
 #include <sys/time.h>
 
-Time get_time(void)
-{       
-     int  tint; 
-     struct timeval  tv;
-     struct timezone tz; /* is not used since ages */
-     gettimeofday(&tv, &tz);
-     tint = (int)tv.tv_sec * 1000;
-     tint = tint/1000 * 1000;
-     tint = tint + tv.tv_usec/1000;
-     return((Time)tint);
-}
 
 void myGluiWin::simulatekey(void)
 {
@@ -148,8 +147,6 @@ void myGluiWin::simulatekey(void)
         ::XKeyEvent evt;
 
         evt.type = KeyPress;
-        evt.display =disp.Disp();
-        evt.window = window;
         evt.time = get_time();
         evt.x = 100;
         evt.y = 100;
@@ -159,13 +156,13 @@ void myGluiWin::simulatekey(void)
         evt.keycode = XKeysymToKeycode(disp.Disp(),XK_Up);
 
         count ++;
-        XSendEvent (evt.display, evt.window, True, (KeyPressMask|KeyReleaseMask), (XEvent *) &evt); 
+        XSendEvent ((XEvent &) evt); 
         if (count % 10 == 0)
         {
                 evt.x = ctrl->X() + ctrl->Width()/2;
                 evt.y = this->Height() -  ctrl->Y() - ctrl->Height()/2 ;
                 evt.time = CurrentTime;
-                XSendEvent (evt.display, evt.window, True, (KeyPressMask|KeyReleaseMask), (XEvent *) &evt);
+                XSendEvent ((XEvent &) evt);
         }
 }
 #elif  __USE_WIN32
