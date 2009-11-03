@@ -313,6 +313,7 @@ int X11Window::start_routine()
                         dirty=False;
                 }
                 XWindowEvent(disp.Disp(), window, EventMask, &event);
+                EventCoordToGLCoord(event);
                 err = Container::AddEvent(&event);
         }
         this->thread_enabled = False;
@@ -585,3 +586,73 @@ int X11Window::CreateGLContext()
 }
 
 
+void X11Window::EventCoordToGLCoord(::XEvent& evt)
+{
+        int* X;
+        int* Y;
+        switch (evt.type)
+        {
+                case KeyPress :
+                case KeyRelease:
+                        {
+                                ::XKeyEvent* event = (::XKeyEvent*) &evt;
+                                X = &(event->x);
+                                Y = &(event->y);
+                                break;
+                        }
+                case ButtonPress:
+                case ButtonRelease:
+                        {
+                                ::XButtonEvent* event = (::XButtonEvent*) &evt;
+                                X = &(event->x);
+                                Y = &(event->y);
+                                break;
+                        }
+                case EnterNotify:
+                case LeaveNotify:
+                        {
+                                ::XCrossingEvent* event = (::XCrossingEvent*) &evt;
+                                X = &(event->x);
+                                Y = &(event->y);
+                                break;
+                        }
+                case GraphicsExpose:
+                        {
+                                ::XGraphicsExposeEvent* event = (::XGraphicsExposeEvent*) &evt;
+                                X = &(event->x);
+                                Y = &(event->y);
+                                break;
+                        }
+                case ReparentNotify: 
+                        {
+                                ::XReparentEvent* event = (::XReparentEvent*) &evt;
+                                X = &(event->x);
+                                Y = &(event->y);
+                                break;
+                        }
+                case ConfigureNotify: 
+                        {
+                                ::XConfigureEvent* event = (::XConfigureEvent*)&evt;
+                                X = &(event->x);
+                                Y = &(event->y);
+                                break;
+                        }
+                case GravityNotify: 
+                        {
+                                ::XGravityEvent* event = (::XGravityEvent*)&evt;
+                                X = &(event->x);
+                                Y = &(event->y);
+                                break;
+                        }
+                case ConfigureRequest: 
+                        {
+                                ::XConfigureRequestEvent* event = (::XConfigureRequestEvent*)&evt;
+                                X = &(event->x);
+                                Y = &(event->y);
+                                break;
+                        }
+                default :
+                        return;
+        }
+        *Y = this->Height() - *Y;
+}

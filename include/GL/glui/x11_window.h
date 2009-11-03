@@ -145,6 +145,7 @@ namespace GLUI
                                         XSetWindowAttributes *attributes );
                         X11Window();
                         int CreateGLContext();
+                        void EventCoordToGLCoord(::XEvent& evt);
         };
         typedef X11Window Window ;
         typedef X11Display Display;
