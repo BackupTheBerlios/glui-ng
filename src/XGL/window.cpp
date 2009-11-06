@@ -294,6 +294,7 @@ X11Window::~X11Window()
 
 int X11Window::start_routine()
 {
+        IN("\n");
         int err = 0;
         ::XEvent event;
 
@@ -317,7 +318,7 @@ int X11Window::start_routine()
                 err = Container::AddEvent(&event);
         }
         this->thread_enabled = False;
-        return err;
+        ROUT(err,"\n");
 
 
 }
@@ -331,47 +332,53 @@ void X11Window::PostRedisplay()
 
 int X11Window::XMapWindow()
 {
+        IN("\n");
         int err;
         err = ::XMapWindow(disp.Disp(),window);
-        if (err) return err;
+        if (err) ROUT(err,"\n");
         err = XFlush( disp.Disp() );
-        return err;
+        ROUT(err,"\n");
               
 }
 
 int X11Window::XMapRaised()
 {
+        IN("\n");
         int err;
         err = ::XMapRaised(disp.Disp(),window);
-        return err;
+        ROUT(err,"\n");
 }
 
 int X11Window::XMapSubwindows() 
 {
+        IN("\n");
         int err;
         err = ::XMapSubwindows(disp.Disp(),window);
-        return err;
+        ROUT(err,"\n");
 }
 
 int X11Window::XUnmapWindow()
 {
+        IN("\n");
         int err;
         err = ::XUnmapWindow(disp.Disp(),window);
-        return err;
+        ROUT(err,"\n");
 }
 
 int X11Window::XUnmapSubwindows()
 {
+        IN("\n");
         int err;
         err = ::XUnmapSubwindows(disp.Disp(),window);
-        return err;
+        ROUT(err,"\n");
 }
 
 KeySym  X11Window::XLookupKeysym(::XKeyEvent *key_event, int index)
 {
+        IN("\n");
         int err;
         err = ::XLookupKeysym(key_event, index);
-        return err;
+        ROUT(err,"\n");
 }
 
 int X11Window::XSendEvent(::XEvent &evt)
@@ -414,24 +421,23 @@ int X11Window::AddEvent(::XEvent *event)
         }
 
         OUT("");
-        return err;
+        ROUT(err,"\n");
 }
 */
 
 int X11Window::AddEvent(::XClientMessageEvent *event)
 {
-        IN("");
+        IN(debug::Instance()->EventTypeToString(event->type)<<endl);
         /* Destroy the window when the WM_DELETE_WINDOW message arrives */
         if( (Atom) event->data.l[ 0 ] == XInternAtom(disp.Disp(), "WM_DELETE_WINDOW", False))
         {
                 int res = XDestroyWindow(disp.Disp(), window);
                 this->thread_enabled = false;
-                if ( res ) return res;
+                if ( res ) ROUT(res,"\n");
                 window = 0;
-                return res;
+                ROUT(res,"\n");
         }
-        return 0;
-        OUT("");
+        ROUT(0,"\n");
 }
 
 int X11Window::AddEvent(::XMappingEvent *event)
@@ -441,61 +447,56 @@ int X11Window::AddEvent(::XMappingEvent *event)
         //       function when a MappingNotify event with a request member of MappingKeyboard or MappingModifier occurs.  The result
         //       is to update Xlib’s knowledge of the keyboard.
         int err;
-        IN("");
+        IN(debug::Instance()->EventTypeToString(event->type)<<endl);
         XRefreshKeyboardMapping( (XMappingEvent *) event );
         err = Container::AddEvent(event);
-        OUT("");
-        return err;
+        ROUT(err,"\n");
 }
 
 int X11Window::AddEvent(::XMapEvent *event)
 {
         int err;
-        IN("");
+        IN(debug::Instance()->EventTypeToString(event->type)<<endl);
         printf( "Making context current\n" );
         err = glXMakeCurrent( disp.Disp(), window, ctx );
         err = Container::AddEvent(event);
         mapped = True;
-        OUT("");
-        return err;
+        ROUT(err,"\n");
 }
 
 int X11Window::AddEvent(::XUnmapEvent *event)
 {
         int err;
-        IN("");
+        IN(debug::Instance()->EventTypeToString(event->type)<<endl);
         printf( "unsetting context\n" );
         err = glXMakeCurrent( disp.Disp(), None, NULL );
         err = Container::AddEvent(event);
-        OUT("");
-        return err;
+        ROUT(err,"\n");
 }
 
 int X11Window::AddEvent(::XCreateWindowEvent *event)
 {
         int err;
-        IN("");
+        IN(debug::Instance()->EventTypeToString(event->type)<<endl);
         set_size( Size((unsigned int)event->width,(unsigned int)event->height) );
         err = Container::AddEvent(event);
-        OUT("");
-        return err;
+        ROUT(err,"");
 }
 
 int X11Window::AddEvent(::XConfigureEvent *event)
 {
         int err;
-        IN("");
+        IN(debug::Instance()->EventTypeToString(event->type)<<endl);
         set_size( Size((unsigned int)event->width,(unsigned int)event->height) );
         err = Container::AddEvent(event);
-        OUT("");
-        return err;
+        ROUT(err,"\n");
 }
 
 
 int X11Window::AddEvent(::XExposeEvent* event)
 {
         int err;
-        IN("");
+        IN(debug::Instance()->EventTypeToString(event->type)<<endl);
         err = _Window::AddEvent(event);
         switch (get_buffer_mode()) {
                 case buffer_front: // Make sure drawing gets to screen
@@ -506,18 +507,16 @@ int X11Window::AddEvent(::XExposeEvent* event)
                         break;
         }
 
-        OUT("");
-        return err;
+        ROUT(err,"\n");
 }
 
 int X11Window::AddEvent(::XResizeRequestEvent *event)
 {
         int err;
-        IN("");
+        IN(debug::Instance()->EventTypeToString(event->type)<<endl);
         set_size( Size((unsigned int)event->width,(unsigned int)event->height) );
         err = _Window::AddEvent(event);
-        OUT("");
-        return err;
+        ROUT(err,"\n");
 }
 
 #define GLX_CONTEXT_MAJOR_VERSION_ARB       0x2091

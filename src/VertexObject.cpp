@@ -40,7 +40,7 @@ VertexObject::VertexObject (
         uint8_t verticebyfacescount
         )
 {
-    IN("");
+    IN("\n");
     this->VerticesSize = verticessize;
     this->ColorSize = colorsize;
     this->VerticeByFacesCount = verticebyfacescount;
@@ -68,14 +68,14 @@ VertexObject::VertexObject (
     this->no_shininess = 0.0f;
     this->low_shininess = 5.0f;
     this->high_shininess = 100.0f;
-    OUT("");
+    OUT("\n");
 
 };
 
 /////////////////////////////////////////////////////////////////
 VertexObject::~VertexObject()
 {
-    IN("");
+    IN("\n");
     delete this->Vertices;
     this->Vertices = NULL;
     delete this->indices;
@@ -86,13 +86,13 @@ VertexObject::~VertexObject()
     this->Normals = NULL;
     delete this->Texture;
     this->Texture = NULL;
-    OUT("");
+    OUT("\n");
 
 };
 /////////////////////////////////////////////////////////////////
 VertexObject::DataArray::~DataArray()
 {
-    IN("array %x, data@%x\n", this, this->array.all);
+    IN("array " << this << " data@" << this->array.all << endl);
     switch (this->datatype_t)
     {
         case UINT8_T: delete[] this->array.puint8; break;
@@ -107,7 +107,7 @@ VertexObject::DataArray::~DataArray()
     }
     this->count = 0;
     this->array.all = NULL;
-    OUT("");
+    OUT("\n");
 };
 
 
@@ -128,7 +128,7 @@ VertexObject::DataArray::DataArray (uint32_t count, datatype data_t, pointers da
 
 void VertexObject::DataArray::_DataArray (uint32_t count, datatype data_t, pointers data)
 {
-    IN("array %x\n", this);
+    IN("array " << this << endl);
     this->array.all=NULL;
     this->count = count;
     this->datatype_t = data_t;
@@ -180,13 +180,13 @@ void VertexObject::DataArray::_DataArray (uint32_t count, datatype data_t, point
         std::cerr << err->what();
         throw;
     }
-    OUT("data@%x\n", this->array.all);
+    OUT("data" << this->array.all << endl);
 
 }
 /////////////////////////////////////////////////////////////////
 int VertexObject::DataArray::CpyArray(pointers data)
 {
-    IN("");
+    IN("\n");
     if (this->count == 0) GLUI_THROW(EINVAL, "count is zero, cowardly refuse to copy empty array");
     switch (this->datatype_t)
     {
@@ -217,69 +217,69 @@ int VertexObject::DataArray::CpyArray(pointers data)
         default:
             GLUI_THROW(EINVAL, "unkown datatype");
     }
-    OUT("");
+    OUT("\n");
     return 0;
 }
 
 /////////////////////////////////////////////////////////////////
 int VertexObject::SetVerticesArray (datatype vertices_t, void* vertices, uint32_t count)
 {
-    IN("");
+    IN("\n");
     pointers data;
     data.all = vertices;
     if (this->Vertices != NULL) delete this->Vertices;
     this->Vertices = NULL;
     this->Vertices = new DataArray(count*this->VerticesSize, vertices_t, data);
-    OUT("");
+    OUT("\n");
 }
 /////////////////////////////////////////////////////////////////
 int VertexObject::SetFaceIndicesArray (datatype indices_t, void* indices, uint32_t count)
 {
-    IN("");
+    IN("\n");
     pointers data;
     data.all = indices;
     if (this->indices != NULL) delete this->indices;
     this->indices = NULL;
     this->indices = new DataArray(count*this->VerticeByFacesCount, indices_t, data);
-    OUT("");
+    OUT("\n");
 }
 /////////////////////////////////////////////////////////////////
 int VertexObject::SetColorArray (datatype colors_t, void* colors, uint32_t count)
 {
-    IN("");
+    IN("\n");
     pointers data;
     data.all = colors;
     if (this->Colors != NULL) delete this->Colors;
     this->Colors = NULL;
     this->Colors = new DataArray(count*this->ColorSize, colors_t, data);
-    OUT("");
+    OUT("\n");
 }
 /////////////////////////////////////////////////////////////////
 int VertexObject::SetNormalArray (datatype normals_t, void* normals, uint32_t count)
 {
-    IN("");
+    IN("\n");
     pointers data;
     data.all = normals;
     this->Normals = NULL;
     if ( this->Normals != NULL) delete this->Normals;
     this->Normals = new DataArray(count * 3, normals_t, data);
-    OUT("");
+    OUT("\n");
 }
 /////////////////////////////////////////////////////////////////
 int VertexObject::SetTextureArray (datatype texture_t, void* texture, uint32_t count)
 {
-    IN("");
+    IN("\n");
     pointers data;
     data.all = texture;
     if ( this->Texture != NULL) delete this->Texture;
     this->Texture = NULL;
     this->Texture = new DataArray(count, texture_t, data);
-    OUT("");
+    OUT("\n");
 }
 /////////////////////////////////////////////////////////////////
 int VertexObject::draw()
 {
-    IN("");
+    IN("\n");
     glPushClientAttrib(0);
 
     if (this->Colors != NULL)
@@ -315,23 +315,23 @@ int VertexObject::draw()
     glPopClientAttrib();
 
     debug::Instance()->FlushGL();
-    OUT("");
+    OUT("\n");
     return 0;
 }
 //////////////////////////////////////////////////////////////////
 VertexObject::V3List::V3List()
 {
-    IN("");
+    IN("\n");
     next = NULL;
-    OUT("");
+    OUT("\n");
 }
 //////////////////////////////////////////////////////////////////
 VertexObject::V3List::V3List(vec3 vert)
 {
-    IN("");
+    IN("\n");
     next = NULL;
     vertex = vert;
-    OUT("");
+    OUT("\n");
 }
 //////////////////////////////////////////////////////////////////
 void VertexObject::V3List::print()
@@ -339,16 +339,16 @@ void VertexObject::V3List::print()
     V3List* last = this;
     do
       {
-        RAWMSG("%f,%f,%f ",last->vertex[VX],last->vertex[VY],last->vertex[VZ]);
+        MSG(last->vertex[VX] << "," << last->vertex[VY] << "," << last->vertex[VZ] << " " );
         last = last->next;
       }
     while (last != NULL);
-    RAWMSG("\n");
+    MSG("\n");
 }
 //////////////////////////////////////////////////////////////////
 int VertexObject::ComputeNormals()
 {
-    IN("");
+    IN("\n");
     try
     {
         if (this->Normals != NULL) delete this->Normals;
@@ -533,21 +533,21 @@ int VertexObject::ComputeNormals()
 
         vec3 vnormal = vp1 ^ vp2;
         vnormal.normalize();
-        MSG("index : %d\n", index1);
+        MSG("index : " << index1 << endl);
           {
             V3List* backup = VerticeAndNormalsArray[index1];
             VerticeAndNormalsArray[index1] = new V3List(vnormal);
             VerticeAndNormalsArray[index1]->next = backup;
             VerticeAndNormalsArray[index1]->print();
           }
-        MSG("index : %d\n", index2);
+        MSG("index : " << index2 << endl);
           {
             V3List* backup = VerticeAndNormalsArray[index2];
             VerticeAndNormalsArray[index2] = new V3List(vnormal);
             VerticeAndNormalsArray[index2]->next = backup;
             VerticeAndNormalsArray[index2]->print();
           }
-        MSG("index : %d\n", index3);
+        MSG("index : " << index3 << endl);
           {
             V3List* backup = VerticeAndNormalsArray[index3];
             VerticeAndNormalsArray[index3] = new V3List(vnormal);
@@ -556,7 +556,7 @@ int VertexObject::ComputeNormals()
           }
         if (VerticeByFacesCount == 4) 
           {
-            MSG("index : %d\n", index4);
+            MSG("index : " << index4 << endl);
               {
                 V3List* backup = VerticeAndNormalsArray[index4];
                 VerticeAndNormalsArray[index4] = new V3List(vnormal);
@@ -568,14 +568,14 @@ int VertexObject::ComputeNormals()
     //we have processed all the faces and created the normals associated, now compute the average and fill the array
     for (uint32_t i=0; i < Vertices->count/VerticesSize; i++)
       {
-        RAWMSG("vertice %d :",i);
+        MSG("vertice " << i << " :");
         V3List* normals = VerticeAndNormalsArray[i];
         vec3 normal = normals->vertex;
-        RAWMSG("%f,%f,%f ", normal[VX], normal[VY],normal[VZ]);
+        MSG(normal[VX] << "," << normal[VY] << "," << normal[VZ]);
         while (normals->next != NULL)
           {
             normals= normals->next;
-            RAWMSG("%f,%f,%f ", normals->vertex[VX], normals->vertex[VY],normals->vertex[VZ]);
+            MSG(normals->vertex[VX] << "," << normals->vertex[VY] << "," << normals->vertex[VZ]);
             normal = normal + normals->vertex;
           }
         normals = VerticeAndNormalsArray[i];
@@ -585,8 +585,8 @@ int VertexObject::ComputeNormals()
             delete normals;
             normals = next;
           }
-        RAWMSG("\n");
-        RAWMSG("%f,%f,%f\n", normal[VX], normal[VY],normal[VZ]);
+        MSG("\n");
+        MSG(normal[VX] << "," << normal[VY] << "," << normal[VZ] << endl);
         normal.normalize();
         Normals->array.pfloat[i*3 + 0] = normal[VX];
         Normals->array.pfloat[i*3 + 1] = normal[VY];
@@ -596,13 +596,15 @@ int VertexObject::ComputeNormals()
     {
         for (uint32_t i=0; i< Normals->count/3; i++)
         {
-            MSG("%f, %f, %f\n", Normals->array.pfloat[i*3 + 0],  Normals->array.pfloat[i*3 + 1], Normals->array.pfloat[i*3 + 2]);
+            MSG( Normals->array.pfloat[i*3 + 0] << ", " 
+                            << Normals->array.pfloat[i*3 + 1] << ", " 
+                            << Normals->array.pfloat[i*3 + 2] << endl);
         }
     }
     else
     {
         MSG("add GLUI_DEBUG_VERTEXOBJECT_DUMP_COMPUTED_NORMALS into env to dump computed normals on traces\n");
     }
-    OUT("");
+    OUT("\n");
 
 }
