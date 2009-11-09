@@ -284,11 +284,13 @@ X11Window::X11Window(X11Display &display, ::Window parent,
 
 X11Window::~X11Window()
 {
+        IN("\n");
         ::XClientMessageEvent wakeup;
         wakeup.type = ClientMessage;
         wakeup.data.l[ 0 ] = XInternAtom(disp.Disp(), "WM_DELETE_WINDOW", False);
 
         this->XSendEvent ((XEvent&)wakeup); 
+        OUT("\n");
 }
 
 
@@ -383,12 +385,16 @@ KeySym  X11Window::XLookupKeysym(::XKeyEvent *key_event, int index)
 
 int X11Window::XSendEvent(::XEvent &evt)
 {
+        IN(" ");
         ::XAnyEvent *evtp = (::XAnyEvent*) &evt;
         
         evtp->display = disp.Disp(); ;
         evtp->window = window;
+        EVTMSG(evt);
 
-        ::XSendEvent (evtp->display, evtp->window, True, (KeyPressMask|KeyReleaseMask), &evt); 
+        ::XSendEvent (evtp->display, evtp->window, True, 0, &evt); 
+        ::XFlush(evtp->display);
+        ROUT(0,"\n");
 }
 
 
