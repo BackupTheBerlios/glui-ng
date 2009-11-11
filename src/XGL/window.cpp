@@ -163,6 +163,9 @@ void X11Window::_X11Window(::Window parent_window,
         if (ctx == 0)
                 throw Exception(ENOTSUP,"Failed to create GLX context.\n");
         XSelectInput(disp.Disp(), window, EventMask);
+        Atom wmDeleteMessage = ::XInternAtom(disp.Disp(), "WM_DELETE_WINDOW", False);
+        ::XSetWMProtocols(disp.Disp(), window, &wmDeleteMessage, 1);
+
         dirty=false;
 }
 X11Window::X11Window(X11Display &display, ::Window parent,
