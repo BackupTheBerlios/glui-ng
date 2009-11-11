@@ -112,6 +112,7 @@ class myGluiWin : public GLUI::Window
                 ~myGluiWin()
                 {
                         delete ctrl;
+                        ctrl = NULL;
                 }
                 virtual int AddEvent(::XKeyEvent* event);
                 void simulatekey();

@@ -287,6 +287,7 @@ X11Window::~X11Window()
         IN("\n");
         ::XClientMessageEvent wakeup;
         wakeup.type = ClientMessage;
+        wakeup.format = 32;
         wakeup.data.l[ 0 ] = XInternAtom(disp.Disp(), "WM_DELETE_WINDOW", False);
 
         this->XSendEvent ((XEvent&)wakeup); 
@@ -348,6 +349,8 @@ int X11Window::XMapRaised()
         IN("\n");
         int err;
         err = ::XMapRaised(disp.Disp(),window);
+        if (err) ROUT(err,"\n");
+        err = XFlush( disp.Disp() );
         ROUT(err,"\n");
 }
 
@@ -356,6 +359,8 @@ int X11Window::XMapSubwindows()
         IN("\n");
         int err;
         err = ::XMapSubwindows(disp.Disp(),window);
+        if (err) ROUT(err,"\n");
+        err = XFlush( disp.Disp() );
         ROUT(err,"\n");
 }
 
@@ -364,6 +369,8 @@ int X11Window::XUnmapWindow()
         IN("\n");
         int err;
         err = ::XUnmapWindow(disp.Disp(),window);
+        if (err) ROUT(err,"\n");
+        err = XFlush( disp.Disp() );
         ROUT(err,"\n");
 }
 
@@ -372,6 +379,8 @@ int X11Window::XUnmapSubwindows()
         IN("\n");
         int err;
         err = ::XUnmapSubwindows(disp.Disp(),window);
+        if (err) ROUT(err,"\n");
+        err = XFlush( disp.Disp() );
         ROUT(err,"\n");
 }
 

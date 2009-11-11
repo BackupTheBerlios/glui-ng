@@ -61,6 +61,11 @@ Node::Node(const char* name)
     _level = 0;
 }
 
+Node::~Node()
+{
+        unlink();
+}
+
 /********************************************* Node::first() *******/
 /* Returns first sibling in 'this' node's sibling list                  */
 
