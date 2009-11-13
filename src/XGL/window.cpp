@@ -339,6 +339,7 @@ void X11Window::PostRedisplay()
 int X11Window::XMapWindow()
 {
         IN("\n");
+        cerr << "XMapWindow" <<endl;
         int err;
         err = ::XMapWindow(disp.Disp(),window);
         if (err) ROUT(err,"\n");
@@ -370,6 +371,7 @@ int X11Window::XMapSubwindows()
 int X11Window::XUnmapWindow()
 {
         IN("\n");
+        cerr << "XUnmapWindow" <<endl;
         int err;
         err = ::XUnmapWindow(disp.Disp(),window);
         if (err) ROUT(err,"\n");
