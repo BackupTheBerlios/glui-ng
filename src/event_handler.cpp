@@ -288,3 +288,24 @@ void passive_motion (int x, int y)
 }
 */
 
+#warning "detect auto repeat"
+/*
+                                                 if (event.type==KeyRelease)
+                                                {
+                                                        //
+                                                        // Look at X11 keystate to detect repeat mode.
+                                                        // While X11 says the key is actually held down, we'll ignore KeyRelease/KeyPress pairs.
+                                                        //
+
+                                                        char keys[32];
+                                                        XQueryKeymap( fgDisplay.Display, keys ); // Look at X11 keystate to detect repeat mode 
+
+                                                        if ( event.xkey.keycode<256 )            // XQueryKeymap is limited to 256 keycodes    
+                                                        {
+                                                                if ( keys[event.xkey.keycode>>3] & (1<<(event.xkey.keycode%8)) )
+                                                                        window->State.KeyRepeating = GL_TRUE;
+                                                                else
+                                                                        window->State.KeyRepeating = GL_FALSE;
+                                                        }
+                                                }
+*/

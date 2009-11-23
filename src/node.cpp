@@ -61,6 +61,11 @@ Node::Node(const char* name)
     _level = 0;
 }
 
+Node::~Node()
+{
+        unlink();
+}
+
 /********************************************* Node::first() *******/
 /* Returns first sibling in 'this' node's sibling list                  */
 
@@ -241,14 +246,12 @@ void   Node::unlink( void )
 
 void Node::dump( FILE *out, const char *name )
 {
-	MSG( "node: %s\n", name );
-	MSG("   parent: %p     child_head: %p    child_tail: %p\n",
-			(void *) parent_node,
-			(void *) child_head,
-			(void *) child_tail );
-	MSG("   next: %p       prev: %p\n",
-			(void *) next_sibling,
-			(void *) prev_sibling );
+	MSG( "node: " << name << endl );
+	MSG("   parent: " << (void *) parent_node
+                   <<"    child_head: " << (void *) child_head
+                   <<"    child_tail: " << (void *) child_tail
+                   << endl);
+	MSG("   next: " << (void *) next_sibling << "       prev: " << (void *) prev_sibling << endl);
 }
 
 const char* Node::whole_tree(int start)

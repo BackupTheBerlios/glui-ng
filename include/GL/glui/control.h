@@ -111,6 +111,8 @@ namespace GLUI
             virtual void idle( void )            { }
             virtual int  mouse_over( int state, int x, int y ) { return false; }
 
+            virtual void PostRedisplay();
+
             virtual void enable( void );
             virtual void disable( void );
             virtual void activate( int how )     { active = true; }
@@ -165,9 +167,6 @@ namespace GLUI
             Control(const char* name);
             Control();
             virtual theme* GetDefaultTheme();
-
-
-            bool CheckWidgetApiRevision(int Major, int Minor, int Revision);
         protected: //variables
             theme* ThemeData;
             static Control* focussed;
@@ -180,9 +179,6 @@ namespace GLUI
             int             x, y;         //relative position from parent
             int  y_off_top, y_off_bot;    // top and bottom margin inside the control
             int  x_off_left, x_off_right; // right and left inner margin
-            int APIMajor, APIMinor, APIRevision; //< API of this component, check is performed
-                                                 //< by theme class to know if it can render the
-                                                 //< object
     };
 
 

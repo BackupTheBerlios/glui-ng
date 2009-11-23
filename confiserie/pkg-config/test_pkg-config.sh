@@ -18,9 +18,11 @@ mytest() {
 		printf pkg-config not found.
 		return 1
 	fi
+        PKG_CONFIG=${pkg_config}
 	PKG_CONFIG_INSTALL_DIR=${pkg_config%/bin/pkg-config} &&
 	PKG_CONFIG_INSTALL_DIR="${PKG_CONFIG_INSTALL_DIR}/lib/pkgconfig" &&
 	conf_cache PKG_CONFIG_INSTALL_DIR
+        conf_cache PKG_CONFIG
 }
 
 mytest

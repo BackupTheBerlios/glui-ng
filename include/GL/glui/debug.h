@@ -38,40 +38,55 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <X11/Xlib.h>
 using namespace std;
 
 const size_t ISIZE = 500;
 namespace GLUI
 {
-	class debug
-	{
-		public :
-			static debug* Instance();
+        class debug
+        {
+                public :
+                        static debug* Instance();
 
-			~debug();
-            void rawprint(const char* key, const char* format,...); //< raw print debug message
-			void print(
-                    const char* key,    //< the key in the env to enable this trace
-                    const char* file,   //< the file where the trace is located
-                    int line,           //< the line of the debug string
-                    const char* func,   //< the function that call debug::print
-                    int levelshift,     //< relative indent (-1 unindent, 1 indent, 0 keep same indent)
-                    const char* format, //< printf like format
-                    ...);               //< additional args
-			void FlushGL(void);
+                        ~debug();
+                        void Printxx(
+                                        const char* key,    //< the key in the env to enable this trace
+                                        const char* file,   //< the file where the trace is located
+                                        int line,           //< the line of the debug string
+                                        const char* func,   //< the function that call debug::print
+                                        int levelshift,     //< relative indent (-1 unindent, 1 indent, 0 keep same indent)
+                                        ostringstream& str);               //< additional args
 
-		private:
-			debug();
-			char* use_debug;
-            char* glui_enable_fileandline;
-            char* glui_enable_indent_traces;
-			char* buf;
-            int shift;
-	};
-#define IN(format, ...) debug::Instance()->print(MODULE_KEY, __FILE__, __LINE__, __func__,  1, format, ## __VA_ARGS__)
-#define OUT(format, ...) debug::Instance()->print(MODULE_KEY, __FILE__, __LINE__, __func__,  -1, format, ## __VA_ARGS__)
-#define MSG(format, ...) debug::Instance()->print(MODULE_KEY, __FILE__, __LINE__, __func__,  0, format, ## __VA_ARGS__)
-#define RAWMSG(format, ...) debug::Instance()->rawprint(MODULE_KEY, format, ## __VA_ARGS__)
+                        void FlushGL(void);
+                        void PrintEvent(const char* key,const ::XEvent& event, const char* func);
+                        static const char* EventTypeToString( int type );
+                        static const char* EventBoolToString( Bool b );
+                        static const char* EventNotifyHintToString( char is_hint );
+                        static const char* EventNotifyModeToString( int mode );
+                        static const char* EventNotifyDetailToString( int detail );
+                        static const char* EventVisibilityToString( int state );
+                        static const char* EventConfigureDetailToString( int detail );
+                        static const char* EventPlaceToString( int place );
+                        static const char* EventMappingRequestToString( int request );
+                        static const char* EventPropertyStateToString( int state );
+                        static const char* EventColormapStateToString( int state );
+                private:
+                        debug();
+                        char* use_debug;
+                        char* glui_enable_fileandline;
+                        char* glui_enable_indent_traces;
+                        int shift;
+
+                private : //methods
+
+        };
+#define IN(str)  { ostringstream string(""); string << str; debug::Instance()->Printxx(MODULE_KEY,__FILE__,__LINE__,__func__,1, string); }
+#define OUT(str)  { ostringstream string(""); string << str; debug::Instance()->Printxx(MODULE_KEY,__FILE__,__LINE__,__func__,-1, string); }
+#define MSG(str)  { ostringstream string(""); string << str; debug::Instance()->Printxx(MODULE_KEY,__FILE__,__LINE__,__func__,0, string); }
+#define RAWMSG(str) MSG(str)
+#define EVTMSG(evt) debug::Instance()->PrintEvent(MODULE_KEY, evt, __func__)
+#define ROUT(ret, str) { ostringstream string(""); string << "(" << ret << ")" << str; debug::Instance()->Printxx(MODULE_KEY,__FILE__,__LINE__,__func__,-1, string); return ret; }
 
 }
 

@@ -320,49 +320,53 @@ int Container::add_control(Node *control )
 #warning "TODO : implement the DoNotPropagateMask update mechanism?"
 int Container::AddEvent (::XEvent* event)
 {
-    #warning "update this using tree list creation"
-// purpose : when an event is created, use the opengl selection mechanism to know what object shall handle the event
-// then create a list containing all parent (parent can have multiple childrens but only one parent is allowed per child)
-// then use this list to propagate the event rather than the following algorithm
+        IN("::XEvent");
+        int err;
+#warning "update this using tree list creation"
+        // purpose : when an event is created, use the opengl selection mechanism to know what object shall handle the event
+        // then create a list containing all parent (parent can have multiple childrens but only one parent is allowed per child)
+        // then use this list to propagate the event rather than the following algorithm
+        EVTMSG((::XEvent) *event);
 
-    switch ( event->type )
-    {
-        case KeyPress : return  Container::AddEvent((::XKeyEvent*) event);
-        case KeyRelease: return  Container::AddEvent((::XKeyEvent*) event);
-        case ButtonPress: return  Container::AddEvent((::XButtonEvent*) event);
-        case ButtonRelease: return  Container::AddEvent((::XButtonEvent*) event);
-        case MotionNotify: return  Container::AddEvent((::XMotionEvent*) event);
-        case EnterNotify: return  Container::AddEvent((::XCrossingEvent*) event);
-        case LeaveNotify: return  Container::AddEvent((::XCrossingEvent*) event);
-        case FocusIn: return  Container::AddEvent((::XFocusChangeEvent*) event);
-        case FocusOut: return  Container::AddEvent((::XFocusChangeEvent*) event);
-        case KeymapNotify: return  Container::AddEvent((::XKeymapEvent*) event);
-        case Expose: return  Container::AddEvent((::XExposeEvent*) event);
-        case GraphicsExpose: return  Container::AddEvent((::XGraphicsExposeEvent*) event);
-        case NoExpose: return  Container::AddEvent((::XNoExposeEvent*) event);
-        case VisibilityNotify: return  Container::AddEvent((::XVisibilityEvent*) event);
-        case CreateNotify: return  Container::AddEvent((::XCreateWindowEvent*) event);
-        case DestroyNotify: return  Container::AddEvent((::XDestroyWindowEvent*) event);
-        case UnmapNotify: return  Container::AddEvent((::XUnmapEvent*) event);
-        case MapNotify: return  Container::AddEvent((::XMapEvent*) event);
-        case MapRequest: return  Container::AddEvent((::XMapRequestEvent*) event);
-        case ReparentNotify: return  Container::AddEvent((::XReparentEvent*) event);
-        case ConfigureNotify: return  Container::AddEvent((::XConfigureEvent*) event);
-        case ConfigureRequest: return  Container::AddEvent((::XConfigureRequestEvent*) event);
-        case GravityNotify: return  Container::AddEvent((::XGravityEvent*) event);
-        case ResizeRequest: return  Container::AddEvent((::XResizeRequestEvent*) event);
-        case CirculateNotify: return  Container::AddEvent((::XCirculateEvent*) event);
-        case CirculateRequest: return  Container::AddEvent((::XCirculateRequestEvent*) event);
-        case PropertyNotify: return  Container::AddEvent((::XPropertyEvent*) event);
-        case SelectionClear: return  Container::AddEvent((::XSelectionClearEvent*) event);
-        case SelectionRequest: return  Container::AddEvent((::XSelectionRequestEvent*) event);
-        case SelectionNotify: return  Container::AddEvent((::XSelectionEvent*) event);
-        case ColormapNotify: return  Container::AddEvent((::XColormapEvent*) event);
-        case ClientMessage: return  Container::AddEvent((::XClientMessageEvent*) event);
-        case MappingNotify: return  Container::AddEvent((::XMappingEvent*) event);
+        switch ( event->type )
+        {
+                case KeyPress : err = AddEvent((::XKeyEvent*) event); break;
+                case KeyRelease: err = AddEvent((::XKeyEvent*) event); break;
+                case ButtonPress: err = AddEvent((::XButtonEvent*) event); break;
+                case ButtonRelease: err = AddEvent((::XButtonEvent*) event); break;
+                case MotionNotify: err = AddEvent((::XMotionEvent*) event); break;
+                case EnterNotify: err = AddEvent((::XCrossingEvent*) event); break;
+                case LeaveNotify: err = AddEvent((::XCrossingEvent*) event); break;
+                case FocusIn: err = AddEvent((::XFocusChangeEvent*) event); break;
+                case FocusOut: err = AddEvent((::XFocusChangeEvent*) event); break;
+                case KeymapNotify: err = AddEvent((::XKeymapEvent*) event); break;
+                case Expose: err = AddEvent((::XExposeEvent*) event); break;
+                case GraphicsExpose: err = AddEvent((::XGraphicsExposeEvent*) event); break;
+                case NoExpose: err = AddEvent((::XNoExposeEvent*) event); break;
+                case VisibilityNotify: err = AddEvent((::XVisibilityEvent*) event); break;
+                case CreateNotify: err = AddEvent((::XCreateWindowEvent*) event); break;
+                case DestroyNotify: err = AddEvent((::XDestroyWindowEvent*) event); break;
+                case UnmapNotify: err = AddEvent((::XUnmapEvent*) event); break;
+                case MapNotify: err = AddEvent((::XMapEvent*) event); break;
+                case MapRequest: err = AddEvent((::XMapRequestEvent*) event); break;
+                case ReparentNotify: err = AddEvent((::XReparentEvent*) event); break;
+                case ConfigureNotify: err = AddEvent((::XConfigureEvent*) event); break;
+                case ConfigureRequest: err = AddEvent((::XConfigureRequestEvent*) event); break;
+                case GravityNotify: err = AddEvent((::XGravityEvent*) event); break;
+                case ResizeRequest: err = AddEvent((::XResizeRequestEvent*) event); break;
+                case CirculateNotify: err = AddEvent((::XCirculateEvent*) event); break;
+                case CirculateRequest: err = AddEvent((::XCirculateRequestEvent*) event); break;
+                case PropertyNotify: err = AddEvent((::XPropertyEvent*) event); break;
+                case SelectionClear: err = AddEvent((::XSelectionClearEvent*) event); break;
+                case SelectionRequest: err = AddEvent((::XSelectionRequestEvent*) event); break;
+                case SelectionNotify: err = AddEvent((::XSelectionEvent*) event); break;
+                case ColormapNotify: err = AddEvent((::XColormapEvent*) event); break;
+                case ClientMessage: err = AddEvent((::XClientMessageEvent*) event); break;
+                case MappingNotify: err = AddEvent((::XMappingEvent*) event); break;
 
-        default : return BroadcastEvent(event, LASTEvent, NoEventMask);
-    }
+                default : err = BroadcastEvent(event, LASTEvent, NoEventMask); break;
+        }
+        ROUT(err, "\n");
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -425,7 +429,7 @@ int Container::AddEvent (::XKeymapEvent* event)
 int Container::AddEvent (::XExposeEvent* event)
 {
     Control *node;
-    IN("");
+    IN("\n");
 
     pack (x, y);
     // we don't need this since it's allready done into the Control::AddEvent(XEposeEvent)
@@ -442,7 +446,7 @@ int Container::AddEvent (::XExposeEvent* event)
     }
     // glPopMatrix();
     debug::Instance()->FlushGL();
-    OUT("");
+    OUT("\n");
 }
 ///////////////////////////////////////////////////////////////////////////////////////////
 int Container::AddEvent (::XGraphicsExposeEvent* event)
@@ -562,35 +566,51 @@ int Container::AddEvent (::XErrorEvent* event)
 //////////////////////////////////////////////////////////////////////////////////////////
 int Container::BroadcastEvent(::XEvent* event, int type, long mask_check)
 {
-    if (LASTEvent != type && event->type != type) return EINVAL;   //check if event is correct
-    if (DoNotPropagateMask & mask_check) return 0; // check if event is masked
+        IN("\n");
+        if (LASTEvent != type && event->type != type)
+        {
+               ROUT(EINVAL,"\n");   //check if event is correct
+        }
+        if (DoNotPropagateMask & mask_check) 
+        {
+                ROUT(0,"DoNotPropagateMask\n"); // check if event is masked
+        }
 
-    //now broadcast to all childs
-    Control* child = dynamic_cast<Control*>(first_child());
-    int rc=0;
-    while (child != NULL && rc == 0)
-    {
-        rc = child->AddEvent(event);
-        Node* sibling = child->next();
-        child = dynamic_cast<Control*>(sibling);
-    }
-    //the event is for this widget and not a child
-    return rc;
+        //now broadcast to all childs
+        Control* child = dynamic_cast<Control*>(first_child());
+        int rc=0;
+        while (child != NULL && rc == 0)
+        {
+                rc = child->AddEvent(event);
+                Node* sibling = child->next();
+                child = dynamic_cast<Control*>(sibling);
+        }
+        //the event is for this widget and not a child
+        ROUT(rc,"\n");
 }
 //
 ////////////////////////////////////////////////////////////////////////////////////////////
 int Container::ForwardEvent(::XEvent* event, int* eventX, int* eventY, int EventType, long mask_check)
 {
-    if (event->type != EventType) return EINVAL;
-    if (DoNotPropagateMask & mask_check) return 0;
+        IN("\n");
+        if (event->type != EventType)
+        {
+                //int strerror_r(int errnum, char *buf, size_t buflen);
+                ROUT(EINVAL,"\n");
+        }
+        if (DoNotPropagateMask & mask_check)
+        {
+                ROUT(0,"DoNotPropagateMask\n");
+        }
 
-    Control* child = FindChildWidget(*eventX, *eventY);
-    if (child != NULL)
-    {
-        return child->AddEvent(event);
-    }
-    //the event is for this widget and not a child
-    return 0;
+        Control* child = FindChildWidget(*eventX, *eventY);
+        if (child != NULL)
+        {
+                int rc = child->AddEvent(event);
+                ROUT(rc, "\n");
+        }
+        //the event is for this widget and not a child
+        ROUT(0,"\n");
 
 }
 

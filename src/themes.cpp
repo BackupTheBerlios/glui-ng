@@ -411,21 +411,8 @@ void theme::ConvertglColorArray(
 
 }
 /////////////////////////////////////////////////////////////////////////////
-void theme::PostRedisplay(Control* ctrl)
-{
-        ::XEvent EventToForward;
-        //ask for redisplay of window
-        EventToForward.xexpose.type=Expose;
-        EventToForward.xexpose.send_event=true;
-        EventToForward.xexpose.x = ctrl->X();
-        EventToForward.xexpose.y = ctrl->Y();
-        EventToForward.xexpose.width = ctrl->Width();
-        EventToForward.xexpose.height = ctrl->Height();
-        Container* cont  = dynamic_cast<Container*>(ctrl->GetRootNode());
-        if ( cont != NULL)
-        {
-                cont->AddEvent(&EventToForward);
-        }
-}
+//
+
+
 
 

@@ -26,6 +26,20 @@ all :
 ifeq (${DebugBuild},yes)
 CXXFLAGS+= -g3 -gdwarf-2 -O0
 endif
+
+ifeq (${BackEnd},XGL)
+CXXFLAGS+= -D__USE_XLIB
+BACKENDLIB =
+endif
+ifeq (${BackEnd},GLUT)
+CXXFLAGS+= -D__USE_GLUT
+BACKENDLIB = -lglut
+endif
+ifeq (${BackEnd},WGL)
+CXXFLAGS+= -D__USE_WIN32
+endif
+
+
 ifneq (${SHAREDLIBEXT},)
 LIBGLUIDLL = -L../src/GENERATED/ -lglui-${libglui_VERSION}
 else
@@ -37,45 +51,51 @@ CXX_LDFLAGS  += -lpthread -lGLU -lGL
 CXXFLAGS   += -Wall -fPIC
 CPPFLAGS += -I../include
 
+noinst_CXXPROGRAMS=
+#tests that aren't expected to build... (compilation step safety)
+#noinst_CXXPROGRAMS+= NonCopyable
+NonCopyable_SOURCES = NonCopyable.cpp
+
 # programs to install in ${prefix}/bin directory
 # this variable is used in Makefile.autoapp to create the required Makefiles
 # it then has to be set before including of Makefiles.autoapp
-noinst_CXXPROGRAMS = SizeComputationTest PackingTest ContainerEventTest
+noinst_CXXPROGRAMS+= SizeComputationTest PackingTest ContainerEventTest
 noinst_CXXPROGRAMS+= WindowTest KeyboardTest KeyboardUserTest
 #noinst_CXXPROGRAMS+= Lightning_test
 
+
 #sources and additional variables for myapp1
 SizeComputationTest_SOURCES = SizeComputationTest.cpp
-SizeComputationTest_LDADD   = ${LIBGLUIDLL}  -lglut
+SizeComputationTest_LDADD   = ${LIBGLUIDLL}  ${BACKENDLIB}
 SizeComputationTest_ARADD   = ${LIBGLUIA}
 
 PackingTest_SOURCES = PackingTest.cpp
-PackingTest_LDADD   = ${LIBGLUIDLL}  -lglut
+PackingTest_LDADD   = ${LIBGLUIDLL}  ${BACKENDLIB}
 PackingTest_ARADD   = ${LIBGLUIA}
 
 
 ContainerEventTest_SOURCES = ContainerEventTest.cpp
-ContainerEventTest_LDADD   = ${LIBGLUIDLL}  -lglut
+ContainerEventTest_LDADD   = ${LIBGLUIDLL}   ${BACKENDLIB}
 ContainerEventTest_ARADD   = ${LIBGLUIA}
 
 
 WindowTest_SOURCES = WindowTest.cpp
-WindowTest_LDADD   = ${LIBGLUIDLL} -lglut
+WindowTest_LDADD   = ${LIBGLUIDLL}  ${BACKENDLIB}
 WindowTest_ARADD   = ${LIBGLUIA}
 
 
 KeyboardTest_SOURCES = KeyboardTest.cpp
-KeyboardTest_LDADD   = ${LIBGLUIDLL}  -lglut
+KeyboardTest_LDADD   = ${LIBGLUIDLL}  ${BACKENDLIB}
 KeyboardTest_ARADD   = ${LIBGLUIA}
 
 
 KeyboardUserTest_SOURCES = KeyboardUserTest.cpp
-KeyboardUserTest_LDADD   = ${LIBGLUIDLL}  -lglut
+KeyboardUserTest_LDADD   = ${LIBGLUIDLL}  ${BACKENDLIB}
 KeyboardUserTest_ARADD   = ${LIBGLUIA}
 
 
 Lightning_test_SOURCES = Lightning_test.cpp
-Lightning_test_LDADD   = ${LIBGLUIDLL}  -lglut
+Lightning_test_LDADD   = ${LIBGLUIDLL}   ${BACKENDLIB}
 Lightning_test_ARADD   = ${LIBGLUIA}
 
 

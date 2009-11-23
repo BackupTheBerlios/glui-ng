@@ -28,20 +28,37 @@
 
 #include <GL/glui/window.h>
 #include <GL/glui/Exception.h>
+#include <GL/glui/debug.h>
 #include <GL/gl.h>
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
+#include <signal.h>
 using namespace GLUI;
+#define MODULE_KEY "time"
+Time GLUI::get_time(void)
+{       
+     int  tint; 
+     struct timeval  tv;
+     struct timezone tz; /* is not used since ages */
+     gettimeofday(&tv, &tz);
+     tint = (int)tv.tv_sec * 1000;
+     tint = tint/1000 * 1000;
+     tint = tint + tv.tv_usec/1000;
+     return((Time)tint);
+}
+
+#undef MODULE_KEY
+#define MODULE_KEY "_Display"
 /////////////////////////////////////////////////////////////////////////////
 _Display::_Display()
 {
 }
+
 /////////////////////////////////////////////////////////////////////////////
-/*_Display::operator ::Display*()
-{
-    return disp;
-}*/
+#undef MODULE_KEY
+#define MODULE_KEY "_Window"
+
 /////////////////////////////////////////////////////////////////////////////
 _Window::_Window() :
     Container("window")
@@ -85,25 +102,38 @@ _Window::buffer_mode_t _Window::get_buffer_mode() {
     else return buffer_back;
 }
 /////////////////////////////////////////////////////////////////////////////
-void _Window::Start(void* arg)
+::Window _Window::GetWindowId()
 {
-        ThreadArgs* args = new ThreadArgs;
-        args->TheWindow=this;
-        args->args=arg;
-        int err = pthread_create(&main_thread,NULL,_Start, (void*)args);
-        if (err)
-        {
-                throw new  Exception(err, "window thread creation error");
-        }
+        return window;
+}
+/////////////////////////////////////////////////////////////////////////////
+void  _Window::Start()
+{
+    int err = pthread_create(&main_thread,NULL,_Start, (void*)this);
+    if (err)
+    {
+            throw new  Exception(err, "window thread creation error");
+    }
 }
 void* _Window::_Start(void* arg)
 {
         int res;
-        ThreadArgs* args = (ThreadArgs*) arg;
-        res = args->TheWindow->start_routine(args->args);
-        delete args;
+        _Window* win = (_Window*) arg;
+        win->thread_enabled = true;
+        res = win->start_routine();
         pthread_exit((void*)res);
 }
+
+int _Window::_Stop()
+{
+        int res = pthread_kill(main_thread, SIGTERM);
+        if (res) 
+        {
+                throw Exception(res,"pthread_kill\n");
+        }
+        return Wait();
+}
+
 
 /////////////////////////////////////////////////////////////////////////////
 _Window::DefaultTheme::DefaultTheme(_Window& owner) : Owner(owner) 
@@ -143,5 +173,93 @@ int _Window::DefaultTheme::draw()
 ///////////////////////////////////////////////////////////////////////
 int _Window::DefaultTheme::update()
 {
+        return 0;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+int _Window::AddEvent(::XResizeRequestEvent *event)
+{
+    IN("");
+
+    if ( event->width  != this->CurrentSize.size.w ||
+            event->height != this->CurrentSize.size.h ) {
+        this->CurrentSize.size.h = event->height;
+        this->CurrentSize.size.w = event->width;
+        this->pack(x, y);
+        PostRedisplay();
+    }
+    OUT("");
+    return 0;
+}
+
+
+
+int _Window::AddEvent(::XExposeEvent *event)
+{
+    IN("");
+    if (mapped)
+    {
+
+
+            // Set up OpenGL state for widget drawing
+            glEnable( GL_DEPTH_TEST );
+            glDepthFunc(GL_LEQUAL);
+            //glCullFace( GL_BACK );
+            //glDisable( GL_CULL_FACE );
+            glEnable ( GL_COLOR_MATERIAL );
+            glEnable ( GL_NORMALIZE );
+            glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+            glShadeModel(GL_SMOOTH);
+
+            glViewport( 0, 0, this->CurrentSize.size.w, this->CurrentSize.size.h);
+
+            ThemeData->draw();
+
+            this->SetCurrentDrawBuffer();
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear Screen And Depth Buffer
+
+            //update sizes and positions
+            this->update_size();
+
+
+
+            Container::AddEvent (event);
+
+            switch (get_buffer_mode()) {
+                    case buffer_front: // Make sure drawing gets to screen
+                            glFlush();
+                            break;
+                    case buffer_back: // Bring back buffer to front
+#warning "check how other *GL are doing swapbuffer"
+                            //                                        glutSwapBuffers();
+                            break;
+            }
+
+    }
+    OUT("");
+    return 0;
+}
+
+
+
+int _Window::AddEvent(::XDestroyWindowEvent *event)
+{
+    return 0;
+}
+
+
+
+int _Window::AddEvent(::XMapEvent* event)
+{
+
+    ::XExposeEvent expose;
+    expose.type = Expose;
+    this->AddEvent(&expose);
+
+
+
+}
+
+
+
 

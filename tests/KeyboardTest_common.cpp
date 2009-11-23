@@ -84,7 +84,7 @@ int myControl::AddEvent(::XKeyEvent* event)
 
 
 ////////////////////////////////////////////////////////////////////
-class myGluiWin : public GLUIWindow
+class myGluiWin : public GLUI::Window
 {
         public :
                 class theme : public _Window::DefaultTheme
@@ -94,8 +94,8 @@ class myGluiWin : public GLUIWindow
                                 int draw();
                 };
         public :
-                myGluiWin(Display* TheDisplay) : GLUIWindow(TheDisplay,
-                                TheDisplay->DefaultScreen()->RootWindow(),
+                myGluiWin(GLUI::Display& TheDisplay) : GLUI::Window(TheDisplay,
+                                TheDisplay.XDefaultScreenOfDisplay()->XRootWindowOfScreen(),
                                 0, 0,
                                 200, 200,
                                 1,
@@ -103,13 +103,16 @@ class myGluiWin : public GLUIWindow
                                 0)
                 {
                         Angle = 0;
+                        set_resize_policy(FixedSize);
                         ctrl = new myControl("top box");
                         add_control(ctrl);
                         SetTheme(new theme(*this));
+                        Start();
                 }
                 ~myGluiWin()
                 {
                         delete ctrl;
+                        ctrl = NULL;
                 }
                 virtual int AddEvent(::XKeyEvent* event);
                 void simulatekey();
@@ -122,12 +125,47 @@ class myGluiWin : public GLUIWindow
 
 int myGluiWin::AddEvent(::XKeyEvent* event)
 {
-    Angle += 5.0f;
-    Container::AddEvent((::XEvent*) event);
-    return ThemeData->update();
+        int err = 0;
+        Angle += 5.0f;
+        if (event->type == KeyPress)
+        {
+                err = Container::AddEvent(event);
+                if (err) return err;
+                err = ThemeData->update();
+                if (err) return err;
+                PostRedisplay();
+        }
+        return err;
 }
 #ifdef __USE_XLIB
 #include <GL/glui/x11_window.h>
+#include <sys/time.h>
+
+
+void myGluiWin::simulatekey(void)
+{
+        static int count = 0;
+        ::XKeyEvent evt;
+
+        evt.type = KeyPress;
+        evt.time = get_time();
+        evt.x = 100;
+        evt.y = 100;
+        evt.x_root = 1;
+        evt.y_root = 1;
+        evt.same_screen = True;
+        evt.keycode = XKeysymToKeycode(disp.Disp(),XK_Up);
+
+        count ++;
+        XSendEvent ((XEvent &) evt); 
+        if (count % 10 == 0)
+        {
+                evt.x = ctrl->X() + ctrl->Width()/2;
+                evt.y = this->Height() -  ctrl->Y() - ctrl->Height()/2 ;
+                evt.time = CurrentTime;
+                XSendEvent ((XEvent &) evt);
+        }
+}
 #elif  __USE_WIN32
 #include <GL/glui/win32_window.h>
 #else

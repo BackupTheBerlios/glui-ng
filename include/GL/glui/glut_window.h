@@ -71,14 +71,14 @@ namespace GLUI
     class GlutDisplay;
     class GlutWindow;
 
-#define GLUIWindow GlutWindow
-#define Display GlutDisplay
+    typedef GlutWindow Window;
+    typedef GlutDisplay Display;
 
     class GlutScreen: public _Screen
     {
         public :
             virtual int Depth();
-            virtual WindowId RootWindow();
+            virtual ::Window RootWindow();
     };
 
 
@@ -101,7 +101,7 @@ namespace GLUI
                 InputWin = InputOnly
             };
         public:
-            GlutWindow(Display* display, WindowId parent,
+            GlutWindow(Display* display,::Window parent,
                     int x, int y,
                     unsigned int width, unsigned int height,
                     unsigned int border_width,
@@ -110,7 +110,7 @@ namespace GLUI
                     Visual *visual,
                     unsigned long valuemask,
                     XSetWindowAttributes *attributes );
-            GlutWindow(Display *display, WindowId parent,
+            GlutWindow(Display *display, ::Window parent,
                     int x, int y,
                     unsigned int width, unsigned int height,
                     unsigned int border_width,
@@ -118,8 +118,7 @@ namespace GLUI
                     unsigned long background );
             static int init(int* argc, char** argv); //optional
             virtual ~GlutWindow();
-            virtual int AddEvent (::XEvent* event);
-             WindowId GetWindowId();
+            ::Window GetWindowId();
             virtual void idle(); //< shall not rely on that, it binds you to GLUT
 
         public: //XMethods
@@ -131,18 +130,9 @@ namespace GLUI
             virtual KeySym XLookupKeysym(::XKeyEvent *key_event, int index);
 
 
-        public: //event handlers
-            virtual int AddEvent(::XResizeRequestEvent* event);
-            virtual int AddEvent(::XExposeEvent* event);
-            virtual int AddEvent(::XDestroyWindowEvent* event);
-            virtual int AddEvent(::XKeyEvent* event);
-            virtual int AddEvent(::XButtonEvent* event);
-            virtual int AddEvent(::XMotionEvent* event);
-            virtual int AddEvent(::XCrossingEvent* event);
-            virtual int AddEvent(::XMapEvent* event);
-            virtual int AddEvent(::XUnmapEvent* event);
-            virtual int         set_size( Size sz, Size min=Size(0u,0u) ); //replace with a XResizeRequestEvent
-
+             virtual int AddEvent(::XExposeEvent* event);
+             virtual int AddEvent(::XResizeRequestEvent* event);
+             virtual int         set_size( Size sz, Size min=Size(0u,0u) ); //replace with a XResizeRequestEvent
 
         protected: //methods
 
@@ -172,7 +162,6 @@ namespace GLUI
         protected: //variables
             unsigned int KeyModifierState;
             long unsigned int GlutWindowId;
-            bool mapped;
             static bool glutinitialized;
             static pthread_mutex_t glut_mutex;
         protected: //defines
