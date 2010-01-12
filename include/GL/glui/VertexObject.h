@@ -38,8 +38,6 @@ namespace GLUI
                 };
 
         protected : //variables
-            uint8_t VerticeByFacesCount;   //< number of vertices per face of the object
-
             NCRC_AutoPtr<DataArray> Vertices;             //< array containing the vertices size*VerticeCount wide, for glVertexPointer
             NCRC_AutoPtr<DataArray> Indices;              //< array containing the indices of each faces, for glDrawElements
             NCRC_AutoPtr<DataArray> Colors;               //< array containing the Colors of each Vertice, for glColorPointer

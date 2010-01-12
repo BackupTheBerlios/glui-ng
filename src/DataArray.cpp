@@ -126,28 +126,28 @@ int DataArray::CpyArray(pointers data)
     switch (this->datatype_t)
     {
         case UINT8_T:
-            memcpy(this->array.puint8, data.all, this->count * sizeof(uint8_t) );
+            memcpy(this->array.puint8, data.all, this->count * this->ComponentsCount * sizeof(uint8_t) );
             break;
         case INT8_T:
-            memcpy(this->array.pint8, data.all, this->count * sizeof(int8_t) );
+            memcpy(this->array.pint8, data.all, this->count * this->ComponentsCount * sizeof(int8_t) );
             break;
         case UINT16_T:
-            memcpy(this->array.puint16, data.all, this->count * sizeof(uint16_t) );
+            memcpy(this->array.puint16, data.all, this->count * this->ComponentsCount * sizeof(uint16_t) );
             break;
         case INT16_T:
-            memcpy(this->array.pint16, data.all, this->count * sizeof(int16_t) );
+            memcpy(this->array.pint16, data.all, this->count * this->ComponentsCount * sizeof(int16_t) );
             break;
         case UINT32_T:
-            memcpy(this->array.puint32, data.all, this->count * sizeof(uint32_t) );
+            memcpy(this->array.puint32, data.all, this->count * this->ComponentsCount * sizeof(uint32_t) );
             break;
         case INT32_T:
-            memcpy(this->array.pint32, data.all, this->count * sizeof(uint32_t) );
+            memcpy(this->array.pint32, data.all, this->count * this->ComponentsCount * sizeof(uint32_t) );
             break;
         case FLOAT:
-            memcpy(this->array.pfloat, data.all, this->count * sizeof(float) );
+            memcpy(this->array.pfloat, data.all, this->count * this->ComponentsCount * sizeof(float) );
             break;
         case DOUBLE:
-            memcpy(this->array.pdouble, data.all, this->count * sizeof(double) );
+            memcpy(this->array.pdouble, data.all, this->count * this->ComponentsCount * sizeof(double) );
             break;
         default:
             GLUI_THROW(EINVAL, "unkown datatype");
