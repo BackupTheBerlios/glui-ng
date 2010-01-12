@@ -1,73 +1,32 @@
 #ifndef __GLUI_VERTEXOBJECT_H
 #define __GLUI_VERTEXOBJECT_H
-
 /*
+   GLUI, an openGL widget toolkit. Copyright (C) 2010 MALET Jean-Luc
 
-  GLUI User Interface Toolkit
-  Copyright (c) 2008 MALET Jean-Luc
+   This library is free software; you can redistribute it and/or modify it under
+   the terms of the GNU Lesser General Public License as published by the 
+   Free Software Foundation; either version 2.1 of the License, 
+   or (at your option) any later version.
 
-  This software is provided 'as-is', without any express or implied
-  warranty. In no event will the authors be held liable for any damages
-  arising from the use of this software.
+   This library is distributed in the hope that it will be useful, but 
+   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+   FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
 
-  Permission is granted to anyone to use this software for any purpose,
-  including commercial applications, and to alter it and redistribute it
-  freely, subject to the following restrictions:
-
-  1. The origin of this software must not be misrepresented; you must not
-  claim that you wrote the original software. If you use this software
-  in a product, an acknowledgment in the product documentation would be
-  appreciated but is not required.
-  2. Altered source versions must be plainly marked as such, and must not be
-  misrepresented as being the original software.
-  3. This notice may not be removed or altered from any source distribution.
-
+   You should have received a copy of the GNU Lesser General Public License along with this library;
+   if not, write to the 
+   Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
 */
-#include <stdint.h>
-#include <GL/gl.h>
+
 #include <GL/glui/algebra3.h>
+#include <GL/glui/SmartPointer.h>
+#include <GL/glui/Texture.h>
+#include <GL/glui/DataArray.h>
+
 namespace GLUI
 {
 
     class VertexObject
       {
-          public: //types
-              enum datatype { UNDEF   = 0,
-                              UINT8_T = GL_UNSIGNED_BYTE,
-                              INT8_T  = GL_BYTE,
-                              UINT16_T= GL_UNSIGNED_SHORT,
-                              INT16_T = GL_SHORT,
-                              UINT32_T= GL_UNSIGNED_INT,
-                              INT32_T = GL_INT,
-                              FLOAT   = GL_FLOAT,
-                              DOUBLE  = GL_DOUBLE};
-              union pointers {
-                  void*    all;
-                  uint8_t* puint8;
-                  int8_t* pint8;
-                  uint16_t* puint16;
-                  int16_t* pint16;
-                  uint32_t* puint32;
-                  int32_t* pint32;
-                  float* pfloat;
-                  double* pdouble;
-              };
-
-              struct DataArray
-              {
-                  public :
-                      uint32_t count;
-                      datatype datatype_t;
-                      pointers array;
-                      /// methods
-                      DataArray(uint32_t count, datatype datatype_t);
-                      DataArray(uint32_t count, datatype datatype_t,pointers data);
-                      ~DataArray();
-                  private:
-                      void _DataArray(uint32_t count, datatype datatype_t,pointers data);
-                      DataArray();
-                      int CpyArray(pointers data);
-              };
 
               struct V3List
                 {
@@ -79,15 +38,14 @@ namespace GLUI
                 };
 
         protected : //variables
-            uint8_t VerticesSize;          //< number of components per vertice
-            uint8_t ColorSize;             //< number of components per colors (3 = RGB, 4 = RGBA)
             uint8_t VerticeByFacesCount;   //< number of vertices per face of the object
 
-            DataArray* Vertices;             //< array containing the vertices size*VerticeCount wide, for glVertexPointer
-            DataArray* indices;              //< array containing the indices of each faces, for glDrawElements
-            DataArray* Colors;               //< array containing the Colors of each Vertice, for glColorPointer
-            DataArray* Normals;              //< array containing the computed normals of the vertice, for glNormalPointer
-            DataArray* Texture;              //< array containing the texture coordinates of the vertice, for glTexCoordPointer
+            NCRC_AutoPtr<DataArray> Vertices;             //< array containing the vertices size*VerticeCount wide, for glVertexPointer
+            NCRC_AutoPtr<DataArray> Indices;              //< array containing the indices of each faces, for glDrawElements
+            NCRC_AutoPtr<DataArray> Colors;               //< array containing the Colors of each Vertice, for glColorPointer
+            NCRC_AutoPtr<DataArray> Normals;              //< array containing the computed normals of the vertice, for glNormalPointer
+            NCRC_AutoPtr<Texture> TextureData;        //< array containing the texture coordinates of the vertice, for glTexCoordPointer
+            uint8_t   TextureCount;          //< number of textures to apply (multitexturing)
 
 
             float no_mat[4];
@@ -102,36 +60,36 @@ namespace GLUI
 
 
 
-        protected : //methods
-            VertexObject();
-
         public:
             ~VertexObject();
-            VertexObject(
-                    uint8_t verticessize,
-                    uint8_t colorsize,
-                    uint8_t verticebyfacescount
-                    );
+            VertexObject();
+            int SetVerticesArray (NCRC_AutoPtr<DataArray> vertices);
             int SetVerticesArray (
-                    datatype vertices_t, //< type of the data in the array
+                    DataArray::datatype vertices_t, //< type of the data in the array
+                    uint8_t ComponentsCount,        //<number of components per entry
                     void* vertices,      //< buffer to the array
                     uint32_t count);     //< number of vertices (the array is count* VerticesSize wide)
             int SetFaceIndicesArray (
-                    datatype indices_t,  //< type of the data in the array
+                    DataArray::datatype indices_t,  //< type of the data in the array
+                    uint8_t ComponentsCount,        //<number of components per entry
                     void* indices,       //< buffer to the array
                     uint32_t count);     //< number of faces (the array is count* VerticeByFacesCount wide)
             int SetColorArray (
-                    datatype colors_t,  //< type of the data in the array
+                    DataArray::datatype colors_t,  //< type of the data in the array
+                    uint8_t ComponentsCount,        //<number of components per entry
                     void* colors,       //< buffer to the array
                     uint32_t count);    //< number of colors (the array is count* ColorSizet wide)
             int SetNormalArray (
-                    datatype normals_t, //< type of the data in the array
+                    DataArray::datatype normals_t, //< type of the data in the array
+                    uint8_t ComponentsCount,        //<number of components per entry
                     void* normals,      //< buffer to the array
                     uint32_t count);    //< number of normals (the array is count*3 wide)
-            int SetTextureArray (
-                    datatype texture_t, //< type of the data in the array
-                    void* texture,      //< buffer to the array
-                    uint32_t count);    //< number of texture components (the array is count wide)
+            int AddTexture (
+                    NCRC_AutoPtr<Texture> texture   //< pointer to the class 
+                                                     //< containing the texture
+                    );
+
+            //int RemoveTexture (uint8_t index); //<remove the 'index'th texture
 
             int ComputeNormals();       //< this function computes normals according to faces
                                         //< and face indices, this is a rather expensive function so it

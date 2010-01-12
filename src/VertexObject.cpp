@@ -25,7 +25,6 @@
 #include <GL/glui/Exception.h>
 #include <GL/glui/debug.h>
 #include <GL/glui/algebra3.h>
-#include <string.h>
 #include <iostream>
 #include <fstream>
 #include <new>
@@ -34,21 +33,15 @@
 
 using namespace GLUI;
 /////////////////////////////////////////////////////////////////
-VertexObject::VertexObject (
-        uint8_t verticessize,
-        uint8_t colorsize,
-        uint8_t verticebyfacescount
-        )
+VertexObject::VertexObject ()
 {
     IN("\n");
-    this->VerticesSize = verticessize;
-    this->ColorSize = colorsize;
-    this->VerticeByFacesCount = verticebyfacescount;
     Vertices = NULL;
-    indices  = NULL;
+    Indices  = NULL;
     Colors   = NULL;
     Normals  = NULL;
-    Texture  = NULL;
+    TextureData  = NULL;
+    TextureCount = 0;
 
     float no_mat[] = {0.0f, 0.0f, 0.0f, 1.0f};
     float mat_ambient[] = {0.2f, 0.2f, 0.2f, 1.0f};
@@ -76,216 +69,114 @@ VertexObject::VertexObject (
 VertexObject::~VertexObject()
 {
     IN("\n");
-    delete this->Vertices;
-    this->Vertices = NULL;
-    delete this->indices;
-    this->indices = NULL;
-    delete this->Colors;
-    this->Colors = NULL;
-    delete this->Normals;
-    this->Normals = NULL;
-    delete this->Texture;
-    this->Texture = NULL;
     OUT("\n");
 
 };
 /////////////////////////////////////////////////////////////////
-VertexObject::DataArray::~DataArray()
-{
-    IN("array " << this << " data@" << this->array.all << endl);
-    switch (this->datatype_t)
-    {
-        case UINT8_T: delete[] this->array.puint8; break;
-        case INT8_T: delete[] this->array.pint8; break;
-        case UINT16_T: delete[] this->array.puint16; break;
-        case INT16_T: delete[] this->array.pint16; break;
-        case UINT32_T: delete[] this->array.puint32; break;
-        case INT32_T: delete[] this->array.pint32; break;
-        case FLOAT: delete[] this->array.pfloat; break;
-        case DOUBLE: delete[] this->array.pdouble; break;
-        case UNDEF : break;
-    }
-    this->count = 0;
-    this->array.all = NULL;
-    OUT("\n");
-};
-
-
-
-/////////////////////////////////////////////////////////////////
-VertexObject::DataArray::DataArray (uint32_t count, datatype data_t)
-{
-    pointers data;
-    data.all = NULL;
-    _DataArray (count, data_t, data);
-}
-
-
-VertexObject::DataArray::DataArray (uint32_t count, datatype data_t, pointers data)
-{
-    _DataArray (count, data_t, data);
-}
-
-void VertexObject::DataArray::_DataArray (uint32_t count, datatype data_t, pointers data)
-{
-    IN("array " << this << endl);
-    this->array.all=NULL;
-    this->count = count;
-    this->datatype_t = data_t;
-    try
-    {
-        if (this->count == 0) GLUI_THROW(EINVAL, "count is zero, cowardly refuse to allocate empty array");
-        switch (this->datatype_t)
-        {
-            case UINT8_T:
-                this->array.puint8 = new uint8_t[this->count];
-                break;
-            case INT8_T:
-                this->array.pint8 = new int8_t[this->count];
-                break;
-            case UINT16_T:
-                this->array.puint16 = new uint16_t[this->count];
-                break;
-            case INT16_T:
-                this->array.pint16 = new int16_t[this->count];
-                break;
-            case UINT32_T:
-                this->array.puint32 = new uint32_t[this->count];
-                break;
-            case INT32_T:
-                this->array.pint32 = new int32_t[this->count];
-                break;
-            case FLOAT:
-                this->array.pfloat = new float[this->count];
-                break;
-            case DOUBLE:
-                this->array.pdouble = new double[this->count];
-                break;
-            default:
-                GLUI_THROW(EINVAL, "unkown datatype");
-        }
-
-        if (data.all != NULL)
-        {
-            CpyArray(data);
-        }
-    }
-    catch(std::bad_alloc err)
-    {
-        std::cerr << err.what();
-        throw;
-    }
-    catch(Exception* err)
-    {
-        std::cerr << err->what();
-        throw;
-    }
-    OUT("data" << this->array.all << endl);
-
-}
-/////////////////////////////////////////////////////////////////
-int VertexObject::DataArray::CpyArray(pointers data)
+int VertexObject::SetVerticesArray (DataArray::datatype vertices_t,uint8_t ComponentsCount, void* vertices, uint32_t count)
 {
     IN("\n");
-    if (this->count == 0) GLUI_THROW(EINVAL, "count is zero, cowardly refuse to copy empty array");
-    switch (this->datatype_t)
-    {
-        case UINT8_T:
-            memcpy(this->array.puint8, data.all, this->count * sizeof(uint8_t) );
-            break;
-        case INT8_T:
-            memcpy(this->array.pint8, data.all, this->count * sizeof(int8_t) );
-            break;
-        case UINT16_T:
-            memcpy(this->array.puint16, data.all, this->count * sizeof(uint16_t) );
-            break;
-        case INT16_T:
-            memcpy(this->array.pint16, data.all, this->count * sizeof(int16_t) );
-            break;
-        case UINT32_T:
-            memcpy(this->array.puint32, data.all, this->count * sizeof(uint32_t) );
-            break;
-        case INT32_T:
-            memcpy(this->array.pint32, data.all, this->count * sizeof(uint32_t) );
-            break;
-        case FLOAT:
-            memcpy(this->array.pfloat, data.all, this->count * sizeof(float) );
-            break;
-        case DOUBLE:
-            memcpy(this->array.pdouble, data.all, this->count * sizeof(double) );
-            break;
-        default:
-            GLUI_THROW(EINVAL, "unkown datatype");
-    }
-    OUT("\n");
-    return 0;
-}
-
-/////////////////////////////////////////////////////////////////
-int VertexObject::SetVerticesArray (datatype vertices_t, void* vertices, uint32_t count)
-{
-    IN("\n");
-    pointers data;
+    DataArray::pointers data;
     data.all = vertices;
-    if (this->Vertices != NULL) delete this->Vertices;
-    this->Vertices = NULL;
-    this->Vertices = new DataArray(count*this->VerticesSize, vertices_t, data);
+    this->Vertices = NCRC_AutoPtr<DataArray>(
+                    new DataArray(count, ComponentsCount, vertices_t, data));
     OUT("\n");
 }
 /////////////////////////////////////////////////////////////////
-int VertexObject::SetFaceIndicesArray (datatype indices_t, void* indices, uint32_t count)
+int VertexObject::SetFaceIndicesArray (DataArray::datatype indices_t,uint8_t ComponentsCount, void* indices, uint32_t count)
 {
     IN("\n");
-    pointers data;
+    DataArray::pointers data;
     data.all = indices;
-    if (this->indices != NULL) delete this->indices;
-    this->indices = NULL;
-    this->indices = new DataArray(count*this->VerticeByFacesCount, indices_t, data);
+    this->Indices = NCRC_AutoPtr<DataArray>(
+                    new DataArray(count, ComponentsCount, indices_t, data));
     OUT("\n");
 }
 /////////////////////////////////////////////////////////////////
-int VertexObject::SetColorArray (datatype colors_t, void* colors, uint32_t count)
+int VertexObject::SetColorArray (DataArray::datatype colors_t,uint8_t ComponentsCount, void* colors, uint32_t count)
 {
     IN("\n");
-    pointers data;
+    DataArray::pointers data;
     data.all = colors;
-    if (this->Colors != NULL) delete this->Colors;
-    this->Colors = NULL;
-    this->Colors = new DataArray(count*this->ColorSize, colors_t, data);
+    this->Colors = NCRC_AutoPtr<DataArray>(
+                    new DataArray(count, ComponentsCount, colors_t, data));
     OUT("\n");
 }
 /////////////////////////////////////////////////////////////////
-int VertexObject::SetNormalArray (datatype normals_t, void* normals, uint32_t count)
+int VertexObject::SetNormalArray (DataArray::datatype normals_t,uint8_t ComponentsCount, void* normals, uint32_t count)
 {
     IN("\n");
-    pointers data;
+    DataArray::pointers data;
     data.all = normals;
-    this->Normals = NULL;
-    if ( this->Normals != NULL) delete this->Normals;
-    this->Normals = new DataArray(count * 3, normals_t, data);
+    this->Normals = NCRC_AutoPtr<DataArray>(
+                    new DataArray(count, ComponentsCount, normals_t, data));
     OUT("\n");
 }
 /////////////////////////////////////////////////////////////////
-int VertexObject::SetTextureArray (datatype texture_t, void* texture, uint32_t count)
+int VertexObject::AddTexture (NCRC_AutoPtr<Texture> texture)
 {
     IN("\n");
-    pointers data;
-    data.all = texture;
-    if ( this->Texture != NULL) delete this->Texture;
-    this->Texture = NULL;
-    this->Texture = new DataArray(count, texture_t, data);
+    this->TextureData = texture;
     OUT("\n");
 }
 /////////////////////////////////////////////////////////////////
 int VertexObject::draw()
 {
+        /*
+         * //g_texcoordArrayONE and g_texcoordArrayTWO are filled in a other function.
+
+         glDisable( GL_BLEND );
+        //Do multi texture coord setup
+        glClientActiveTextureARB(GL_TEXTURE0_ARB);
+        glTexCoordPointer(2, GL_FLOAT, 0, g_texcoordArrayONE);
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        //bind the primary texture to the first texture unit
+        glActiveTextureARB( GL_TEXTURE0_ARB );
+        glEnable( GL_TEXTURE_2D );
+        glBindTexture( GL_TEXTURE_2D, Texture_Ground.ID);
+        GlMultiTexCoord1f(GLenum texUnit, GLfloat s);
+glMultiTexCoord2f(GLenum texUnit, GLfloat s, GLfloat t);
+glMultiTexCoord3f(GLenum texUnit, GLfloat s, GLfloat t, Glfloat r);
+
+
+        glClientActiveTextureARB(GL_TEXTURE1_ARB);
+        glTexCoordPointer(2, GL_FLOAT, 0, g_texcoordArrayTWO);
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        //bind the detail texture to the second texture unit
+        glActiveTextureARB( GL_TEXTURE1_ARB );
+        glEnable( GL_TEXTURE_2D );
+        glBindTexture( GL_TEXTURE_2D, Texture_Detail.ID);
+        GlMultiTexCoord1f(GLenum texUnit, GLfloat s);
+glMultiTexCoord2f(GLenum texUnit, GLfloat s, GLfloat t);
+glMultiTexCoord3f(GLenum texUnit, GLfloat s, GLfloat t, Glfloat r);
+
+
+        glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_ARB );
+        glTexEnvi( GL_TEXTURE_ENV, GL_RGB_SCALE_ARB, 2 );
+
+        //DRAW
+        for (int z = 0; z < MAP_Z-1; z++)
+        {
+        glDrawElements(GL_TRIANGLE_STRIP, MAP_X * 2, GL_UNSIGNED_INT,&g_indexArray[z * MAP_X * 2]);
+        }
+
+        //unbind the texture occupying the second texture unit
+        glActiveTextureARB( GL_TEXTURE1_ARB );
+        glDisable( GL_TEXTURE_2D );
+        glBindTexture( GL_TEXTURE_2D, 0 );
+
+        //unbind the texture occupying the first texture unit
+        glActiveTextureARB( GL_TEXTURE0_ARB );
+        glDisable( GL_TEXTURE_2D );
+        glBindTexture( GL_TEXTURE_2D, 0 );
+        */
     IN("\n");
     glPushClientAttrib(0);
 
     if (this->Colors != NULL)
     {
         glEnableClientState(GL_COLOR_ARRAY);
-        glColorPointer(ColorSize, Colors->datatype_t, 0, Colors->array.all);
+        glColorPointer(Colors->ComponentsCount, Colors->datatype_t, 0, Colors->array.all);
     }
     if (this->Normals != NULL)
     {
@@ -295,10 +186,10 @@ int VertexObject::draw()
     if (this->Vertices != NULL)
     {
         glEnableClientState(GL_VERTEX_ARRAY);
-        glVertexPointer(VerticesSize, Vertices->datatype_t, 0, Vertices->array.all);
+        glVertexPointer(Vertices->ComponentsCount, Vertices->datatype_t, 0, Vertices->array.all);
         //go through our index array and draw our vertex array
         GLenum mode;
-        if ( VerticeByFacesCount == 3 ) mode = GL_TRIANGLES;
+        if ( Indices->ComponentsCount == 3 ) mode = GL_TRIANGLES;
         else mode = GL_QUADS;
 
         glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient_color);
@@ -308,8 +199,8 @@ int VertexObject::draw()
         glMaterialfv(GL_FRONT, GL_EMISSION, no_mat);
 
 
-        //indices->count has allready the right count of indices (VerticeByFacesCount*nbfaces)
-        glDrawElements(mode, indices->count, indices->datatype_t, indices->array.all);
+        //Indices->count has allready the right count of Indices (Indices->ComponentsCount*nbfaces)
+        glDrawElements(mode, Indices->count, Indices->datatype_t, Indices->array.all);
     }
 
     glPopClientAttrib();
@@ -351,9 +242,7 @@ int VertexObject::ComputeNormals()
     IN("\n");
     try
     {
-        if (this->Normals != NULL) delete this->Normals;
-        this->Normals = NULL;
-        this->Normals = new DataArray(Vertices->count/VerticesSize * 3, FLOAT);
+        this->Normals = new DataArray(Vertices->count, 3, DataArray::FLOAT);
     }
     catch(std::bad_alloc err)
     {
@@ -377,7 +266,7 @@ int VertexObject::ComputeNormals()
         throw;
     }
 
-    int nbOfFaces = this->indices->count / this->VerticeByFacesCount;
+    int nbOfFaces = this->Indices->count / this->Indices->ComponentsCount;
     for (int face = 0; face < nbOfFaces; face++)
     {
         uint32_t index1;
@@ -388,140 +277,140 @@ int VertexObject::ComputeNormals()
         double fVertice1[3];
         double fVertice2[3];
 
-        switch ( indices->datatype_t)
+        switch ( Indices->datatype_t)
         {
-            case UINT8_T :
-                index1 = indices->array.puint8[face * VerticeByFacesCount];
-                index2 = indices->array.puint8[face * VerticeByFacesCount + 1 ];
-                index3 = indices->array.puint8[face * VerticeByFacesCount + 2 ];
-                if (VerticeByFacesCount == 4) index4 = indices->array.puint8[face * VerticeByFacesCount + 3 ];
-                break;
-            case INT8_T:
-                index1 = indices->array.pint8[face * VerticeByFacesCount];
-                index2 = indices->array.pint8[face * VerticeByFacesCount + 1 ];
-                index3 = indices->array.pint8[face * VerticeByFacesCount + 2 ];
-                if (VerticeByFacesCount == 4) index4 = indices->array.pint8[face * VerticeByFacesCount + 3 ];
-                break;
-            case UINT16_T:
-                index1 = indices->array.puint16[face * VerticeByFacesCount];
-                index2 = indices->array.puint16[face * VerticeByFacesCount + 1 ];
-                index3 = indices->array.puint16[face * VerticeByFacesCount + 2 ];
-                if (VerticeByFacesCount == 4) index4 = indices->array.puint16[face * VerticeByFacesCount + 3 ];
-                break;
-            case INT16_T:
-                index1 = indices->array.pint16[face * VerticeByFacesCount];
-                index2 = indices->array.pint16[face * VerticeByFacesCount + 1 ];
-                index3 = indices->array.pint16[face * VerticeByFacesCount + 2 ];
-                if (VerticeByFacesCount == 4) index4 = indices->array.pint16[face * VerticeByFacesCount + 3 ];
-                break;
-            case UINT32_T:
-                index1 = indices->array.puint32[face * VerticeByFacesCount];
-                index2 = indices->array.puint32[face * VerticeByFacesCount + 1 ];
-                index3 = indices->array.puint32[face * VerticeByFacesCount + 2 ];
-                if (VerticeByFacesCount == 4) index4 = indices->array.puint32[face * VerticeByFacesCount + 3 ];
-                break;
-            case INT32_T:
-                index1 = indices->array.pint32[face * VerticeByFacesCount];
-                index2 = indices->array.pint32[face * VerticeByFacesCount + 1 ];
-                index3 = indices->array.pint32[face * VerticeByFacesCount + 2 ];
-                if (VerticeByFacesCount == 4) index4 = indices->array.pint32[face * VerticeByFacesCount + 3 ];
-                break;
-            default:
-                throw new Exception(EINVAL, "indices has not an int type");
+                case DataArray::UINT8_T :
+                        index1 = Indices->array.puint8[face * Indices->ComponentsCount];
+                        index2 = Indices->array.puint8[face * Indices->ComponentsCount + 1 ];
+                        index3 = Indices->array.puint8[face * Indices->ComponentsCount + 2 ];
+                        if (Indices->ComponentsCount == 4) index4 = Indices->array.puint8[face * Indices->ComponentsCount + 3 ];
+                        break;
+                case DataArray::INT8_T:
+                        index1 = Indices->array.pint8[face * Indices->ComponentsCount];
+                        index2 = Indices->array.pint8[face * Indices->ComponentsCount + 1 ];
+                        index3 = Indices->array.pint8[face * Indices->ComponentsCount + 2 ];
+                        if (Indices->ComponentsCount == 4) index4 = Indices->array.pint8[face * Indices->ComponentsCount + 3 ];
+                        break;
+                case DataArray::UINT16_T:
+                        index1 = Indices->array.puint16[face * Indices->ComponentsCount];
+                        index2 = Indices->array.puint16[face * Indices->ComponentsCount + 1 ];
+                        index3 = Indices->array.puint16[face * Indices->ComponentsCount + 2 ];
+                        if (Indices->ComponentsCount == 4) index4 = Indices->array.puint16[face * Indices->ComponentsCount + 3 ];
+                        break;
+                case DataArray::INT16_T:
+                        index1 = Indices->array.pint16[face * Indices->ComponentsCount];
+                        index2 = Indices->array.pint16[face * Indices->ComponentsCount + 1 ];
+                        index3 = Indices->array.pint16[face * Indices->ComponentsCount + 2 ];
+                        if (Indices->ComponentsCount == 4) index4 = Indices->array.pint16[face * Indices->ComponentsCount + 3 ];
+                        break;
+                case DataArray::UINT32_T:
+                        index1 = Indices->array.puint32[face * Indices->ComponentsCount];
+                        index2 = Indices->array.puint32[face * Indices->ComponentsCount + 1 ];
+                        index3 = Indices->array.puint32[face * Indices->ComponentsCount + 2 ];
+                        if (Indices->ComponentsCount == 4) index4 = Indices->array.puint32[face * Indices->ComponentsCount + 3 ];
+                        break;
+                case DataArray::INT32_T:
+                        index1 = Indices->array.pint32[face * Indices->ComponentsCount];
+                        index2 = Indices->array.pint32[face * Indices->ComponentsCount + 1 ];
+                        index3 = Indices->array.pint32[face * Indices->ComponentsCount + 2 ];
+                        if (Indices->ComponentsCount == 4) index4 = Indices->array.pint32[face * Indices->ComponentsCount + 3 ];
+                        break;
+                default:
+                        throw new Exception(EINVAL, "Indices has not an int type");
 
         }
         switch ( Vertices->datatype_t)
         {
-            case UINT8_T :
-                fVertice0[0] = Vertices->array.puint8[index1*VerticesSize +0];
-                fVertice0[1] = Vertices->array.puint8[index1*VerticesSize +1];
-                fVertice0[2] = Vertices->array.puint8[index1*VerticesSize +2];
-                fVertice1[0] = Vertices->array.puint8[index2*VerticesSize +0];
-                fVertice1[1] = Vertices->array.puint8[index2*VerticesSize +1];
-                fVertice1[2] = Vertices->array.puint8[index2*VerticesSize +2];
-                fVertice2[0] = Vertices->array.puint8[index3*VerticesSize +0];
-                fVertice2[1] = Vertices->array.puint8[index3*VerticesSize +1];
-                fVertice2[2] = Vertices->array.puint8[index3*VerticesSize +2];
-                break;
-            case INT8_T:
-                fVertice0[0] = Vertices->array.pint8[index1*VerticesSize +0];
-                fVertice0[1] = Vertices->array.pint8[index1*VerticesSize +1];
-                fVertice0[2] = Vertices->array.pint8[index1*VerticesSize +2];
-                fVertice1[0] = Vertices->array.pint8[index2*VerticesSize +0];
-                fVertice1[1] = Vertices->array.pint8[index2*VerticesSize +1];
-                fVertice1[2] = Vertices->array.pint8[index2*VerticesSize +2];
-                fVertice2[0] = Vertices->array.pint8[index3*VerticesSize +0];
-                fVertice2[1] = Vertices->array.pint8[index3*VerticesSize +1];
-                fVertice2[2] = Vertices->array.pint8[index3*VerticesSize +2];
-                break;
-            case UINT16_T:
-                fVertice0[0] = Vertices->array.puint16[index1*VerticesSize +0];
-                fVertice0[1] = Vertices->array.puint16[index1*VerticesSize +1];
-                fVertice0[2] = Vertices->array.puint16[index1*VerticesSize +2];
-                fVertice1[0] = Vertices->array.puint16[index2*VerticesSize +0];
-                fVertice1[1] = Vertices->array.puint16[index2*VerticesSize +1];
-                fVertice1[2] = Vertices->array.puint16[index2*VerticesSize +2];
-                fVertice2[0] = Vertices->array.puint16[index3*VerticesSize +0];
-                fVertice2[1] = Vertices->array.puint16[index3*VerticesSize +1];
-                fVertice2[2] = Vertices->array.puint16[index3*VerticesSize +2];
-                break;
-            case INT16_T:
-                fVertice0[0] = Vertices->array.pint16[index1*VerticesSize +0];
-                fVertice0[1] = Vertices->array.pint16[index1*VerticesSize +1];
-                fVertice0[2] = Vertices->array.pint16[index1*VerticesSize +2];
-                fVertice1[0] = Vertices->array.pint16[index2*VerticesSize +0];
-                fVertice1[1] = Vertices->array.pint16[index2*VerticesSize +1];
-                fVertice1[2] = Vertices->array.pint16[index2*VerticesSize +2];
-                fVertice2[0] = Vertices->array.pint16[index3*VerticesSize +0];
-                fVertice2[1] = Vertices->array.pint16[index3*VerticesSize +1];
-                fVertice2[2] = Vertices->array.pint16[index3*VerticesSize +2];
-                break;
-            case UINT32_T:
-                fVertice0[0] = Vertices->array.puint32[index1*VerticesSize +0];
-                fVertice0[1] = Vertices->array.puint32[index1*VerticesSize +1];
-                fVertice0[2] = Vertices->array.puint32[index1*VerticesSize +2];
-                fVertice1[0] = Vertices->array.puint32[index2*VerticesSize +0];
-                fVertice1[1] = Vertices->array.puint32[index2*VerticesSize +1];
-                fVertice1[2] = Vertices->array.puint32[index2*VerticesSize +2];
-                fVertice2[0] = Vertices->array.puint32[index3*VerticesSize +0];
-                fVertice2[1] = Vertices->array.puint32[index3*VerticesSize +1];
-                fVertice2[2] = Vertices->array.puint32[index3*VerticesSize +2];
-                break;
-            case INT32_T:
-                fVertice0[0] = Vertices->array.pint32[index1*VerticesSize +0];
-                fVertice0[1] = Vertices->array.pint32[index1*VerticesSize +1];
-                fVertice0[2] = Vertices->array.pint32[index1*VerticesSize +2];
-                fVertice1[0] = Vertices->array.pint32[index2*VerticesSize +0];
-                fVertice1[1] = Vertices->array.pint32[index2*VerticesSize +1];
-                fVertice1[2] = Vertices->array.pint32[index2*VerticesSize +2];
-                fVertice2[0] = Vertices->array.pint32[index3*VerticesSize +0];
-                fVertice2[1] = Vertices->array.pint32[index3*VerticesSize +1];
-                fVertice2[2] = Vertices->array.pint32[index3*VerticesSize +2];
-                break;
-            case FLOAT:
-                fVertice0[0] = Vertices->array.pfloat[index1*VerticesSize +0];
-                fVertice0[1] = Vertices->array.pfloat[index1*VerticesSize +1];
-                fVertice0[2] = Vertices->array.pfloat[index1*VerticesSize +2];
-                fVertice1[0] = Vertices->array.pfloat[index2*VerticesSize +0];
-                fVertice1[1] = Vertices->array.pfloat[index2*VerticesSize +1];
-                fVertice1[2] = Vertices->array.pfloat[index2*VerticesSize +2];
-                fVertice2[0] = Vertices->array.pfloat[index3*VerticesSize +0];
-                fVertice2[1] = Vertices->array.pfloat[index3*VerticesSize +1];
-                fVertice2[2] = Vertices->array.pfloat[index3*VerticesSize +2];
-                break;
-            case DOUBLE:
-                fVertice0[0] = Vertices->array.pdouble[index1*VerticesSize +0];
-                fVertice0[1] = Vertices->array.pdouble[index1*VerticesSize +1];
-                fVertice0[2] = Vertices->array.pdouble[index1*VerticesSize +2];
-                fVertice1[0] = Vertices->array.pdouble[index2*VerticesSize +0];
-                fVertice1[1] = Vertices->array.pdouble[index2*VerticesSize +1];
-                fVertice1[2] = Vertices->array.pdouble[index2*VerticesSize +2];
-                fVertice2[0] = Vertices->array.pdouble[index3*VerticesSize +0];
-                fVertice2[1] = Vertices->array.pdouble[index3*VerticesSize +1];
-                fVertice2[2] = Vertices->array.pdouble[index3*VerticesSize +2];
-                break;
-            default :
-                throw new Exception(EINVAL, "Vertices has an undefined type");
+                case DataArray::UINT8_T :
+                        fVertice0[0] = Vertices->array.puint8[index1*Vertices->ComponentsCount +0];
+                        fVertice0[1] = Vertices->array.puint8[index1*Vertices->ComponentsCount +1];
+                        fVertice0[2] = Vertices->array.puint8[index1*Vertices->ComponentsCount +2];
+                        fVertice1[0] = Vertices->array.puint8[index2*Vertices->ComponentsCount +0];
+                        fVertice1[1] = Vertices->array.puint8[index2*Vertices->ComponentsCount +1];
+                        fVertice1[2] = Vertices->array.puint8[index2*Vertices->ComponentsCount +2];
+                        fVertice2[0] = Vertices->array.puint8[index3*Vertices->ComponentsCount +0];
+                        fVertice2[1] = Vertices->array.puint8[index3*Vertices->ComponentsCount +1];
+                        fVertice2[2] = Vertices->array.puint8[index3*Vertices->ComponentsCount +2];
+                        break;
+                case DataArray::INT8_T:
+                        fVertice0[0] = Vertices->array.pint8[index1*Vertices->ComponentsCount +0];
+                        fVertice0[1] = Vertices->array.pint8[index1*Vertices->ComponentsCount +1];
+                        fVertice0[2] = Vertices->array.pint8[index1*Vertices->ComponentsCount +2];
+                        fVertice1[0] = Vertices->array.pint8[index2*Vertices->ComponentsCount +0];
+                        fVertice1[1] = Vertices->array.pint8[index2*Vertices->ComponentsCount +1];
+                        fVertice1[2] = Vertices->array.pint8[index2*Vertices->ComponentsCount +2];
+                        fVertice2[0] = Vertices->array.pint8[index3*Vertices->ComponentsCount +0];
+                        fVertice2[1] = Vertices->array.pint8[index3*Vertices->ComponentsCount +1];
+                        fVertice2[2] = Vertices->array.pint8[index3*Vertices->ComponentsCount +2];
+                        break;
+                case DataArray::UINT16_T:
+                        fVertice0[0] = Vertices->array.puint16[index1*Vertices->ComponentsCount +0];
+                        fVertice0[1] = Vertices->array.puint16[index1*Vertices->ComponentsCount +1];
+                        fVertice0[2] = Vertices->array.puint16[index1*Vertices->ComponentsCount +2];
+                        fVertice1[0] = Vertices->array.puint16[index2*Vertices->ComponentsCount +0];
+                        fVertice1[1] = Vertices->array.puint16[index2*Vertices->ComponentsCount +1];
+                        fVertice1[2] = Vertices->array.puint16[index2*Vertices->ComponentsCount +2];
+                        fVertice2[0] = Vertices->array.puint16[index3*Vertices->ComponentsCount +0];
+                        fVertice2[1] = Vertices->array.puint16[index3*Vertices->ComponentsCount +1];
+                        fVertice2[2] = Vertices->array.puint16[index3*Vertices->ComponentsCount +2];
+                        break;
+                case DataArray::INT16_T:
+                        fVertice0[0] = Vertices->array.pint16[index1*Vertices->ComponentsCount +0];
+                        fVertice0[1] = Vertices->array.pint16[index1*Vertices->ComponentsCount +1];
+                        fVertice0[2] = Vertices->array.pint16[index1*Vertices->ComponentsCount +2];
+                        fVertice1[0] = Vertices->array.pint16[index2*Vertices->ComponentsCount +0];
+                        fVertice1[1] = Vertices->array.pint16[index2*Vertices->ComponentsCount +1];
+                        fVertice1[2] = Vertices->array.pint16[index2*Vertices->ComponentsCount +2];
+                        fVertice2[0] = Vertices->array.pint16[index3*Vertices->ComponentsCount +0];
+                        fVertice2[1] = Vertices->array.pint16[index3*Vertices->ComponentsCount +1];
+                        fVertice2[2] = Vertices->array.pint16[index3*Vertices->ComponentsCount +2];
+                        break;
+                case DataArray::UINT32_T:
+                        fVertice0[0] = Vertices->array.puint32[index1*Vertices->ComponentsCount +0];
+                        fVertice0[1] = Vertices->array.puint32[index1*Vertices->ComponentsCount +1];
+                        fVertice0[2] = Vertices->array.puint32[index1*Vertices->ComponentsCount +2];
+                        fVertice1[0] = Vertices->array.puint32[index2*Vertices->ComponentsCount +0];
+                        fVertice1[1] = Vertices->array.puint32[index2*Vertices->ComponentsCount +1];
+                        fVertice1[2] = Vertices->array.puint32[index2*Vertices->ComponentsCount +2];
+                        fVertice2[0] = Vertices->array.puint32[index3*Vertices->ComponentsCount +0];
+                        fVertice2[1] = Vertices->array.puint32[index3*Vertices->ComponentsCount +1];
+                        fVertice2[2] = Vertices->array.puint32[index3*Vertices->ComponentsCount +2];
+                        break;
+                case DataArray::INT32_T:
+                        fVertice0[0] = Vertices->array.pint32[index1*Vertices->ComponentsCount +0];
+                        fVertice0[1] = Vertices->array.pint32[index1*Vertices->ComponentsCount +1];
+                        fVertice0[2] = Vertices->array.pint32[index1*Vertices->ComponentsCount +2];
+                        fVertice1[0] = Vertices->array.pint32[index2*Vertices->ComponentsCount +0];
+                        fVertice1[1] = Vertices->array.pint32[index2*Vertices->ComponentsCount +1];
+                        fVertice1[2] = Vertices->array.pint32[index2*Vertices->ComponentsCount +2];
+                        fVertice2[0] = Vertices->array.pint32[index3*Vertices->ComponentsCount +0];
+                        fVertice2[1] = Vertices->array.pint32[index3*Vertices->ComponentsCount +1];
+                        fVertice2[2] = Vertices->array.pint32[index3*Vertices->ComponentsCount +2];
+                        break;
+                case DataArray::FLOAT:
+                        fVertice0[0] = Vertices->array.pfloat[index1*Vertices->ComponentsCount +0];
+                        fVertice0[1] = Vertices->array.pfloat[index1*Vertices->ComponentsCount +1];
+                        fVertice0[2] = Vertices->array.pfloat[index1*Vertices->ComponentsCount +2];
+                        fVertice1[0] = Vertices->array.pfloat[index2*Vertices->ComponentsCount +0];
+                        fVertice1[1] = Vertices->array.pfloat[index2*Vertices->ComponentsCount +1];
+                        fVertice1[2] = Vertices->array.pfloat[index2*Vertices->ComponentsCount +2];
+                        fVertice2[0] = Vertices->array.pfloat[index3*Vertices->ComponentsCount +0];
+                        fVertice2[1] = Vertices->array.pfloat[index3*Vertices->ComponentsCount +1];
+                        fVertice2[2] = Vertices->array.pfloat[index3*Vertices->ComponentsCount +2];
+                        break;
+                case DataArray::DOUBLE:
+                        fVertice0[0] = Vertices->array.pdouble[index1*Vertices->ComponentsCount +0];
+                        fVertice0[1] = Vertices->array.pdouble[index1*Vertices->ComponentsCount +1];
+                        fVertice0[2] = Vertices->array.pdouble[index1*Vertices->ComponentsCount +2];
+                        fVertice1[0] = Vertices->array.pdouble[index2*Vertices->ComponentsCount +0];
+                        fVertice1[1] = Vertices->array.pdouble[index2*Vertices->ComponentsCount +1];
+                        fVertice1[2] = Vertices->array.pdouble[index2*Vertices->ComponentsCount +2];
+                        fVertice2[0] = Vertices->array.pdouble[index3*Vertices->ComponentsCount +0];
+                        fVertice2[1] = Vertices->array.pdouble[index3*Vertices->ComponentsCount +1];
+                        fVertice2[2] = Vertices->array.pdouble[index3*Vertices->ComponentsCount +2];
+                        break;
+                default :
+                        throw new Exception(EINVAL, "Vertices has an undefined type");
 
         }
         vec3 v0( fVertice0 );
@@ -534,76 +423,76 @@ int VertexObject::ComputeNormals()
         vec3 vnormal = vp1 ^ vp2;
         vnormal.normalize();
         MSG("index : " << index1 << endl);
-          {
-            V3List* backup = VerticeAndNormalsArray[index1];
-            VerticeAndNormalsArray[index1] = new V3List(vnormal);
-            VerticeAndNormalsArray[index1]->next = backup;
-            VerticeAndNormalsArray[index1]->print();
-          }
+        {
+                V3List* backup = VerticeAndNormalsArray[index1];
+                VerticeAndNormalsArray[index1] = new V3List(vnormal);
+                VerticeAndNormalsArray[index1]->next = backup;
+                VerticeAndNormalsArray[index1]->print();
+        }
         MSG("index : " << index2 << endl);
-          {
-            V3List* backup = VerticeAndNormalsArray[index2];
-            VerticeAndNormalsArray[index2] = new V3List(vnormal);
-            VerticeAndNormalsArray[index2]->next = backup;
-            VerticeAndNormalsArray[index2]->print();
-          }
+        {
+                V3List* backup = VerticeAndNormalsArray[index2];
+                VerticeAndNormalsArray[index2] = new V3List(vnormal);
+                VerticeAndNormalsArray[index2]->next = backup;
+                VerticeAndNormalsArray[index2]->print();
+        }
         MSG("index : " << index3 << endl);
-          {
-            V3List* backup = VerticeAndNormalsArray[index3];
-            VerticeAndNormalsArray[index3] = new V3List(vnormal);
-            VerticeAndNormalsArray[index3]->next = backup;
-            VerticeAndNormalsArray[index3]->print();
-          }
-        if (VerticeByFacesCount == 4) 
-          {
-            MSG("index : " << index4 << endl);
-              {
-                V3List* backup = VerticeAndNormalsArray[index4];
-                VerticeAndNormalsArray[index4] = new V3List(vnormal);
-                VerticeAndNormalsArray[index4]->next = backup;
-                VerticeAndNormalsArray[index4]->print();
-              }
-          }
+        {
+                V3List* backup = VerticeAndNormalsArray[index3];
+                VerticeAndNormalsArray[index3] = new V3List(vnormal);
+                VerticeAndNormalsArray[index3]->next = backup;
+                VerticeAndNormalsArray[index3]->print();
+        }
+        if (Indices->ComponentsCount == 4) 
+        {
+                MSG("index : " << index4 << endl);
+                {
+                        V3List* backup = VerticeAndNormalsArray[index4];
+                        VerticeAndNormalsArray[index4] = new V3List(vnormal);
+                        VerticeAndNormalsArray[index4]->next = backup;
+                        VerticeAndNormalsArray[index4]->print();
+                }
+        }
     }
     //we have processed all the faces and created the normals associated, now compute the average and fill the array
-    for (uint32_t i=0; i < Vertices->count/VerticesSize; i++)
-      {
-        MSG("vertice " << i << " :");
-        V3List* normals = VerticeAndNormalsArray[i];
-        vec3 normal = normals->vertex;
-        MSG(normal[VX] << "," << normal[VY] << "," << normal[VZ]);
-        while (normals->next != NULL)
-          {
-            normals= normals->next;
-            MSG(normals->vertex[VX] << "," << normals->vertex[VY] << "," << normals->vertex[VZ]);
-            normal = normal + normals->vertex;
-          }
-        normals = VerticeAndNormalsArray[i];
-        while (normals)
-          {
-            V3List* next = normals->next;
-            delete normals;
-            normals = next;
-          }
-        MSG("\n");
-        MSG(normal[VX] << "," << normal[VY] << "," << normal[VZ] << endl);
-        normal.normalize();
-        Normals->array.pfloat[i*3 + 0] = normal[VX];
-        Normals->array.pfloat[i*3 + 1] = normal[VY];
-        Normals->array.pfloat[i*3 + 2] = normal[VZ];
-      }
+    for (uint32_t i=0; i < Vertices->count/Vertices->ComponentsCount; i++)
+    {
+            MSG("vertice " << i << " :");
+            V3List* normals = VerticeAndNormalsArray[i];
+            vec3 normal = normals->vertex;
+            MSG(normal[VX] << "," << normal[VY] << "," << normal[VZ]);
+            while (normals->next != NULL)
+            {
+                    normals= normals->next;
+                    MSG(normals->vertex[VX] << "," << normals->vertex[VY] << "," << normals->vertex[VZ]);
+                    normal = normal + normals->vertex;
+            }
+            normals = VerticeAndNormalsArray[i];
+            while (normals)
+            {
+                    V3List* next = normals->next;
+                    delete normals;
+                    normals = next;
+            }
+            MSG("\n");
+            MSG(normal[VX] << "," << normal[VY] << "," << normal[VZ] << endl);
+            normal.normalize();
+            Normals->array.pfloat[i*3 + 0] = normal[VX];
+            Normals->array.pfloat[i*3 + 1] = normal[VY];
+            Normals->array.pfloat[i*3 + 2] = normal[VZ];
+    }
     if (NULL != getenv("GLUI_DEBUG_VERTEXOBJECT_DUMP_COMPUTED_NORMALS"))
     {
-        for (uint32_t i=0; i< Normals->count/3; i++)
-        {
-            MSG( Normals->array.pfloat[i*3 + 0] << ", " 
-                            << Normals->array.pfloat[i*3 + 1] << ", " 
-                            << Normals->array.pfloat[i*3 + 2] << endl);
-        }
+            for (uint32_t i=0; i< Normals->count/3; i++)
+            {
+                    MSG( Normals->array.pfloat[i*3 + 0] << ", " 
+                                    << Normals->array.pfloat[i*3 + 1] << ", " 
+                                    << Normals->array.pfloat[i*3 + 2] << endl);
+            }
     }
     else
     {
-        MSG("add GLUI_DEBUG_VERTEXOBJECT_DUMP_COMPUTED_NORMALS into env to dump computed normals on traces\n");
+            MSG("add GLUI_DEBUG_VERTEXOBJECT_DUMP_COMPUTED_NORMALS into env to dump computed normals on traces\n");
     }
     OUT("\n");
 
