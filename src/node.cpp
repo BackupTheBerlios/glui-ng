@@ -69,7 +69,7 @@ Node::~Node()
 /********************************************* Node::first() *******/
 /* Returns first sibling in 'this' node's sibling list                  */
 
-Node   *Node::first_sibling( void )
+NCRC_AutoPtr<Node> Node::first_sibling( void )
 {
   if ( parent_node == NULL )  
     return this;           /* root node has no siblings */
@@ -80,7 +80,7 @@ Node   *Node::first_sibling( void )
 /********************************************* Node::last() *******/
 /* Returns last sibling in 'this' node's sibling list                  */
 
-Node   *Node::last_sibling( void )
+NCRC_AutoPtr<Node> Node::last_sibling( void )
 {
   if ( parent_node == NULL )
     return this;            /* root node has no siblings */
@@ -91,7 +91,7 @@ Node   *Node::last_sibling( void )
 /******************************************** Node::prev() ********/
 /* Returns prev sibling in 'this' node's sibling list                  */
 
-Node    *Node::prev( void )
+NCRC_AutoPtr<Node> Node::prev( void )
 {
   return prev_sibling;
 }
@@ -100,16 +100,16 @@ Node    *Node::prev( void )
 /******************************************** Node::next() ********/
 /* Returns next sibling in 'this' node's sibling list                  */
 
-Node    *Node::next( void )
+NCRC_AutoPtr<Node> Node::next( void )
 {
   return next_sibling;
 }
 
 ///////////////////////////////////////////////////////////////////////
 // returns root node or NULL if already the root node
-Node* Node::GetRootNode()
+NCRC_AutoPtr<Node> Node::GetRootNode()
 {
-    Node* current = this->parent_node;
+    NCRC_AutoPtr<Node> current = this->parent_node;
     if(current == NULL || current == MasterObject::Instance() ) return this;
     while (current != NULL && current->parent() != NULL)
     {
@@ -122,7 +122,7 @@ Node* Node::GetRootNode()
 
 /************************************ Node::add_control() **************/
 #warning "redesign this... why doing up then down call....?"
-int Node::add_control( Node *child )
+int Node::add_control( NCRC_AutoPtr<Node> child )
 {
 	child->link_this_to_parent_last( this );
 	return 0;
@@ -133,7 +133,7 @@ int Node::add_control( Node *child )
 /*************************** Node::link_this_to_parent_last() *******/
 /* Links as last child of parent                                         */
 
-void   Node::link_this_to_parent_last( Node *new_parent )
+void   Node::link_this_to_parent_last( NCRC_AutoPtr<Node> new_parent )
 {
     if ( new_parent->child_tail == NULL ) {   /* parent has no children */
         new_parent->child_head = this;
@@ -151,7 +151,7 @@ void   Node::link_this_to_parent_last( Node *new_parent )
 /*************************** Node::link_this_to_parent_first() *******/
 /* Links as first child of parent                                         */
 
-void   Node::link_this_to_parent_first( Node *new_parent )
+void   Node::link_this_to_parent_first( NCRC_AutoPtr<Node> new_parent )
 {
     if ( new_parent->child_head == NULL ) {   /* parent has no children */
         new_parent->child_tail               = this;
@@ -167,7 +167,7 @@ void   Node::link_this_to_parent_first( Node *new_parent )
 
 /**************************** Node::link_this_to_sibling_next() *****/
 
-void   Node::link_this_to_sibling_next( Node *sibling )
+void   Node::link_this_to_sibling_next( NCRC_AutoPtr<Node> sibling )
 {
   if ( sibling->next_sibling == NULL ) {    /* node has no next sibling */
     sibling->next_sibling  = this;
@@ -192,7 +192,7 @@ void   Node::link_this_to_sibling_next( Node *sibling )
 
 /**************************** Node::link_this_to_sibling_prev() *****/
 
-void   Node::link_this_to_sibling_prev( Node *sibling )
+void   Node::link_this_to_sibling_prev( NCRC_AutoPtr<Node> sibling )
 {
   if ( sibling->prev_sibling == NULL ) {    /* node has no prev sibling */
     sibling->prev_sibling  = this;
