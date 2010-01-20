@@ -15,6 +15,7 @@
    Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
 */
 #include <GL/glui/NonCopyableClass.h>
+#include <GL/glui/Exception.h>
 #ifndef __SMARTPOINTER_H
 #define __SMARTPOINTER_H
 namespace GLUI
@@ -54,9 +55,10 @@ namespace GLUI
                 {
                         if (counter->isShareable() == false) 
                         {
-                                T *oldValue = counter->pointee;
-                                counter = new CountHolder;
-                                counter->pointee = oldValue ? new T(*oldValue) : 0;
+                                throw Exception(EINVAL,"trying to duplicate a non copyable object");
+                                //T *oldValue = counter->pointee;
+                                //counter = new CountHolder;
+                                //counter->pointee = oldValue ? new T(*oldValue) : 0;
                         } 
 
                         counter->addReference();

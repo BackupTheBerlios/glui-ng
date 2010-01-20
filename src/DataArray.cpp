@@ -53,12 +53,15 @@ DataArray::DataArray (uint32_t count, uint8_t ComponentsCount, datatype data_t)
     _DataArray (count, ComponentsCount, data_t, data);
 }
 
-
-DataArray::DataArray (uint32_t count, uint8_t ComponentsCount, datatype data_t, pointers data)
+//////////////////////////////////////////////////////////////////
+DataArray::DataArray (uint32_t count, uint8_t ComponentsCount, datatype data_t, void* data)
 {
-    _DataArray (count, ComponentsCount, data_t, data);
+        pointers _data;
+        _data.all = data;
+        _DataArray (count, ComponentsCount, data_t, _data);
 }
 
+//////////////////////////////////////////////////////////////////
 void DataArray::_DataArray (uint32_t count, uint8_t ComponentsCount, datatype data_t, pointers data)
 {
     IN("array " << this << endl);
@@ -156,4 +159,9 @@ int DataArray::CpyArray(pointers data)
     return 0;
 }
 
+/////////////////////////////////////////////////////////////////
+DataArray::operator GLenum()
+{
+        return datatype_t;
+}
 

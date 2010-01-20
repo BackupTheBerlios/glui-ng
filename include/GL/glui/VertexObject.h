@@ -25,88 +25,92 @@
 namespace GLUI
 {
 
-    class VertexObject
-      {
+        class VertexObject
+        {
+                public:
+                        ~VertexObject();
+                        VertexObject();
+                        int SetVerticesArray (NCRC_AutoPtr<DataArray> vertices);
+                        int SetVerticesArray (
+                                        DataArray::datatype vertices_t, //< type of the data in the array
+                                        uint8_t ComponentsCount,        //<number of components per entry
+                                        void* vertices,      //< buffer to the array
+                                        uint32_t count);     //< number of vertices (the array is count* VerticesSize wide)
+                        int SetFaceIndicesArray (NCRC_AutoPtr<DataArray> FaceIndices);
+                        int SetFaceIndicesArray (
+                                        DataArray::datatype indices_t,  //< type of the data in the array
+                                        uint8_t ComponentsCount,        //<number of components per entry
+                                        void* indices,       //< buffer to the array
+                                        uint32_t count);     //< number of faces (the array is count* VerticeByFacesCount wide)
+                        int SetColorArray (NCRC_AutoPtr<DataArray> ColorArray);
+                        int SetColorArray (
+                                        DataArray::datatype colors_t,  //< type of the data in the array
+                                        uint8_t ComponentsCount,        //<number of components per entry
+                                        void* colors,       //< buffer to the array
+                                        uint32_t count);    //< number of colors (the array is count* ColorSizet wide)
+                        int SetNormalArray (NCRC_AutoPtr<DataArray> NormalArray);
+                        int SetNormalArray (
+                                        DataArray::datatype normals_t, //< type of the data in the array
+                                        uint8_t ComponentsCount,        //<number of components per entry
+                                        void* normals,      //< buffer to the array
+                                        uint32_t count);    //< number of normals (the array is count*3 wide)
+                        int AddTexture (
+                                        NCRC_AutoPtr<Texture> texture   //< pointer to the class 
+                                        //< containing the texture
+                                       );
 
-              struct V3List
-                {
-                  vec3 vertex;
-                  V3List* next;
-                  V3List();                //< constructor
-                  V3List(vec3 vert);       //< constructor
-                  void print();            //< print the list
-                };
+                        //int RemoveTexture (uint8_t index); //<remove the 'index'th texture
 
-        protected : //variables
-            NCRC_AutoPtr<DataArray> Vertices;             //< array containing the vertices size*VerticeCount wide, for glVertexPointer
-            NCRC_AutoPtr<DataArray> Indices;              //< array containing the indices of each faces, for glDrawElements
-            NCRC_AutoPtr<DataArray> Colors;               //< array containing the Colors of each Vertice, for glColorPointer
-            NCRC_AutoPtr<DataArray> Normals;              //< array containing the computed normals of the vertice, for glNormalPointer
-            NCRC_AutoPtr<Texture> TextureData;        //< array containing the texture coordinates of the vertice, for glTexCoordPointer
-            uint8_t   TextureCount;          //< number of textures to apply (multitexturing)
-
-
-            float no_mat[4];
-            float mat_ambient[4];
-            float mat_ambient_color[4];
-            float mat_diffuse[4];
-            float mat_specular[4];
-            float no_shininess;
-            float low_shininess;
-            float high_shininess;
-            float mat_emission[4];
-
-
-
-        public:
-            ~VertexObject();
-            VertexObject();
-            int SetVerticesArray (NCRC_AutoPtr<DataArray> vertices);
-            int SetVerticesArray (
-                    DataArray::datatype vertices_t, //< type of the data in the array
-                    uint8_t ComponentsCount,        //<number of components per entry
-                    void* vertices,      //< buffer to the array
-                    uint32_t count);     //< number of vertices (the array is count* VerticesSize wide)
-            int SetFaceIndicesArray (
-                    DataArray::datatype indices_t,  //< type of the data in the array
-                    uint8_t ComponentsCount,        //<number of components per entry
-                    void* indices,       //< buffer to the array
-                    uint32_t count);     //< number of faces (the array is count* VerticeByFacesCount wide)
-            int SetColorArray (
-                    DataArray::datatype colors_t,  //< type of the data in the array
-                    uint8_t ComponentsCount,        //<number of components per entry
-                    void* colors,       //< buffer to the array
-                    uint32_t count);    //< number of colors (the array is count* ColorSizet wide)
-            int SetNormalArray (
-                    DataArray::datatype normals_t, //< type of the data in the array
-                    uint8_t ComponentsCount,        //<number of components per entry
-                    void* normals,      //< buffer to the array
-                    uint32_t count);    //< number of normals (the array is count*3 wide)
-            int AddTexture (
-                    NCRC_AutoPtr<Texture> texture   //< pointer to the class 
-                                                     //< containing the texture
-                    );
-
-            //int RemoveTexture (uint8_t index); //<remove the 'index'th texture
-
-            int ComputeNormals();       //< this function computes normals according to faces
-                                        //< and face indices, this is a rather expensive function so it
-                                        //< shall not be used on object with static geometry
-                                        //< (normals can be computed once for all
-                                        //<  with this function and then stored into an array and SetNormalArray)
+                        int ComputeNormals();       //< this function computes normals according to faces
+                        //< and face indices, this is a rather expensive function so it
+                        //< shall not be used on object with static geometry
+                        //< (normals can be computed once for all
+                        //<  with this function and then stored into an array and SetNormalArray)
 
 
 
-            int draw();                        //< draw the object at current place current opengl state
+                        int draw();                        //< draw the object at current place current opengl state
+                protected :
+                        struct V3List
+                        {
+                                vec3 vertex;
+                                V3List* next;
+                                V3List();                //< constructor
+                                V3List(vec3 vert);       //< constructor
+                                void print();            //< print the list
+                        };
 
-      };
+                protected : //variables
+                        NCRC_AutoPtr<DataArray> Vertices; //< array containing the vertices size*VerticeCount wide, for glVertexPointer
+                        NCRC_AutoPtr<DataArray> Indices;  //< array containing the indices of each faces, for glDrawElements
+                        NCRC_AutoPtr<DataArray> Colors;   //< array containing the Colors of each Vertice, for glColorPointer
+                        NCRC_AutoPtr<DataArray> Normals;  //< array containing the computed normals of the vertice, for glNormalPointer
+                        NCRC_AutoPtr<Texture> TextureData;//< array containing the texture coordinates of the vertice, for glTexCoordPointer
+                        uint8_t   TextureCount;           //< number of textures to apply (multitexturing)
 
-    //bezier spline class
-    class Bezier : public VertexObject
+
+                        float no_mat[4];
+                        float mat_ambient[4];
+                        float mat_ambient_color[4];
+                        float mat_diffuse[4];
+                        float mat_specular[4];
+                        float no_shininess;
+                        float low_shininess;
+                        float high_shininess;
+                        float mat_emission[4];
+
+
+
+
+
+        };
+
+        //bezier spline class
+        class Bezier : public VertexObject
         {
         };
 
-    class Nurbs : public VertexObject
+        class Nurbs : public VertexObject
         {
         };
 

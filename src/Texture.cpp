@@ -27,8 +27,12 @@ using namespace std;
 
 Texture::Texture(const std::string& filename)
 {
-        NonCopyableReferenceCountedClass::addReference();
         this->filename = filename;
+        TextureType = GL_TEXTURE_2D;
+        texturePipeID = 0;
+        ID = 0;
+        data = 0;
+        pdata = 0;
 }
 
 Texture::~Texture()
@@ -38,6 +42,44 @@ Texture::~Texture()
         data = NULL;
 }
 
+int  Texture::SetTexCoord(DataArray::datatype vertices_t,
+                 uint8_t ComponentsCount,
+                 void* vertices,
+                 uint32_t count)
+{
+        NCRC_AutoPtr<DataArray> array(new DataArray(count, ComponentsCount, vertices_t, vertices));
+        TexCoord = array;
+}
+
+
+int Texture::Finalise()
+{
+        glBindTexture(TextureType,ID);
+        glTexImage2D (
+                        TextureType,
+                        0,
+                        this->ComponentsCount,
+                        this->width,
+                        this->height,
+                        0,
+                        this->format,
+                        this->type,
+                        pdata
+                     );
+        glTexParameteri(TextureType, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(TextureType, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+}
+
+int Texture::SetTexCoord(NCRC_AutoPtr<DataArray> array)
+{
+        this->TexCoord = array;
+        return 0;
+}
+
+NCRC_AutoPtr<DataArray> Texture::GetTexCoord()
+{
+        return this->TexCoord;
+}
 
 int32_t Texture::Width()
 {
@@ -67,21 +109,42 @@ void Texture::Flip()
         delete lineBuffer;
 }
 
-
-int Texture::SetTexCoord(NCRC_AutoPtr<DataArray> array)
+/////////////////////////////////////////////////////////////////////////////
+void Texture::ClientActiveTexture( GLenum texture )
 {
-        this->Array = array;
-        return 0;
+        if (ID == 0)
+        {
+                glGenTextures(1,&(this->ID));
+                Finalise();
+        }
+        texturePipeID = texture;
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        glDisable( GL_BLEND );
+        glClientActiveTexture(texturePipeID);
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        glTexCoordPointer(TexCoord->ComponentsCount,
+                        (GLenum)*(TexCoord),
+                        0,
+                        TexCoord->array.all);
+
+        //bind the primary texture to the first texture unit
+        glActiveTextureARB( texturePipeID );
+        glEnable( TextureType );
+        glBindTexture( TextureType, ID);
+
 }
 
- int  Texture::SetTexCoord(DataArray::datatype vertices_t,
-                 uint8_t ComponentsCount,
-                 DataArray::pointers vertices,
-                 uint32_t count)
+////////////////////////////////////////////////////////////////////////////
+void Texture::ReleaseTecture()
 {
-        NCRC_AutoPtr<DataArray> array(new DataArray(count, ComponentsCount, vertices_t, vertices));
-        Array = array;
+        //unbind the texture occupying the second texture unit
+        glActiveTextureARB( texturePipeID );
+        glDisable( TextureType );
+        glBindTexture( TextureType, 0 );
+        texturePipeID = 0;
 }
+
+
 /////////////////////////////////////////////////////////////////////////////
 ///////////////////////        PPM  Loader         //////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -98,35 +161,46 @@ PPMTexture::PPMTexture(const std::string& filename) : Texture(filename)
                 throw 0;
         }
 
-        fp.read(buff, this->BitsPerPixel);
-        if (fp.bad()){
-                cerr <<"Unable to open file " << filename << endl;
+        fp.read(buff,3);
+        if (fp.bad())
+        {
+                cerr << "Error loading image " << filename << endl ;
                 throw 0;
         }
 
-        if (buff[0] != 'P' || buff[1] != '6'){
+
+        if (buff[0] != 'P' || buff[1] != '6')
+        {
                 cerr << "Invalid image format (must be `P6')\n" ;
                 throw 0;
         }
 
-        if (buff[2] != 0x0a)
-                fp.seekg(-1,ios::cur);
+        if (buff[2] != '\n' && buff[2] != '\t' && buff[2] != ' ')
+        {
+                 cerr << "Invalid image format (delimiter must be a newline or a tab or a space)\n" ;
+                throw 0;
+       }
 
         while (fp.read(buff, 1), buff[0] == '#'){
                 lig_comm++;
                 while (fp.read(buff, 1), buff[0] != '\n');
         }
-
         fp.seekg(-1,ios::cur);
 
-        fp >> width;
-        fp >> height;
-        if (fp.bad()){
-                cerr << "Error loading image " << filename << endl ;
-                throw 0;
+        fp >> this->width;
+        fp >> this->height;
+        fp >> this->BitsPerPixel;
+        switch (this->BitsPerPixel)
+        {
+                case 255 : 
+                        this->BitsPerPixel = 32;
+                        this->format = GL_RGB;
+                        this->type = GL_UNSIGNED_BYTE;
+                        break;
+                default   :
+                             cerr << "Invalid image format (max value uknown)\n" ;
+                             throw 0;
         }
-
-        fp >> maxval;
         if (fp.bad()){
                 cerr << "Error loading image " << filename << endl ;
                 throw 0;
@@ -136,13 +210,13 @@ PPMTexture::PPMTexture(const std::string& filename) : Texture(filename)
                 ;
 
         pdata = new  uint8_t[this->BitsPerPixel * width * height];
-        if (!data)
+        if (!pdata)
         {
                 cerr <<  "Unable to allocate memory\n";
                 throw 0;
         }
 
-        fp.read((char*)data, this->BitsPerPixel*width*height );
+        fp.read((char*)pdata, this->BitsPerPixel*width*height );
         if (fp.bad())
         {
                 cerr <<  "Error loading image " << filename << endl;

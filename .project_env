@@ -48,3 +48,6 @@ export GLUI_DEBUG_XGL=yes
 export PATH=${PATH}:${PWD}/src/GENERATED/:${PWD}/tests/GENERATED/
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${PWD}/src/GENERATED/
 
+export GLUI_THEME_DATA_DIR=$PWD/themes_data
+
+

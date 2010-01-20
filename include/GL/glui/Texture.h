@@ -27,30 +27,44 @@
 
 namespace GLUI
 {
-        class Texture : public NonCopyableReferenceCountedClass
+        class Texture : public NonCopyableClass
         {
                 public :
                         Texture(const std::string& filename);
+                        virtual ~Texture();
                         int SetTexCoord(DataArray::datatype vertices_t,
                                         uint8_t ComponentsCount,
-                                        DataArray::pointers vertices,      //< buffer to the array
+                                        void* vertices,      //< buffer to the array
                                         uint32_t count);
+
                         int SetTexCoord(NCRC_AutoPtr<DataArray> array);
-                        virtual ~Texture();
+                        NCRC_AutoPtr<DataArray> GetTexCoord();
+                        virtual int Finalise();
                         int32_t Width();
                         int32_t Height();
+                        void ClientActiveTexture( GLenum texture );
+                        void ReleaseTecture();
                         const uint8_t* data;
                 public: //operator
                         Texture& operator=(const Texture&);
+                        operator GLenum();
                 protected:
                         void Flip();
                 protected :
-                        NCRC_AutoPtr<DataArray> Array;
+                        GLuint ID; //<value returned by glGenTextures
+                        GLenum texturePipeID; //<GL_TEXTURE0..
+                        GLenum TextureType; //< GL_TEXTURE_1D,GL_TEXTURE_2D,GL_TEXTURE_3D
+                        GLenum format; //< one of the GL_RGBA, GL_RGB... 
+                                       //< see man glTexImage2D
+                        GLenum type;   //< one of the GL_UNSIGNED_BYTE, GL_BYTE...
+                                       //< see man glTexImage2D
+                        NCRC_AutoPtr<DataArray> TexCoord;
                         uint8_t* pdata;
                         std::string filename;
                         int32_t width;
                         int32_t height;
-                        uint8_t BitsPerPixel;
+                        int32_t BitsPerPixel;
+                        int8_t ComponentsCount;
         };
 
         class PPMTexture : public Texture

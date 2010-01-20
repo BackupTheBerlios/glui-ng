@@ -47,7 +47,7 @@
 #include <GL/glui/container.h>
 #include <GL/glui/Exception.h>
 #include <GL/glui/DefaultTheme.h>
-#include <GL/glui/NonCopyableClass.h>
+#include <GL/glui/SmartPointer.h>
 #include <X11/Xlib.h>
 #include <GL/gl.h>
 
