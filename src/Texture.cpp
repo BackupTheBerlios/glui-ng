@@ -98,7 +98,7 @@ void Texture::Flip()
 int Texture::Finalise()
 {
         glBindTexture(TextureType,ID);
-glPixelStorei(GL_UNPACK_ALIGNMENT,1);
+        //glPixelStorei(GL_UNPACK_ALIGNMENT,1);
         glTexImage2D (
                         TextureType,
                         0,
