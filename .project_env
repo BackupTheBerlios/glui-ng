@@ -39,6 +39,8 @@ function restoresession() {
 export GLUI_ENABLE_DEBUG=yes
 export GLUI_ENABLE_INDENT_TRACES=yes
 export GLUI_ENABLE_FILEANDLINE=yes
+export GLUI_BUFFER_MODE=buffer_front
+export GLUI_SYNC=yes
 
 #debug vertexobject class
 export GLUI_DEBUG_CONTAINER=yes

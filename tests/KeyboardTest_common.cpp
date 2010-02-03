@@ -65,18 +65,18 @@ myControl::myControl(const char* name) :
     Control(name)
 {
     this->SetTheme(new myControl::myControltheme(*this));
-    ((myControltheme*)this->ThemeData)->bkgd_color[0] = 255;
-    ((myControltheme*)this->ThemeData)->bkgd_color[1] = 0;
-    ((myControltheme*)this->ThemeData)->bkgd_color[2] = 0;
+    ((myControltheme*)&*this->ThemeData)->bkgd_color[0] = 255;
+    ((myControltheme*)&*this->ThemeData)->bkgd_color[1] = 0;
+    ((myControltheme*)&*this->ThemeData)->bkgd_color[2] = 0;
     set_size(Size(200u,10u));
 }
 
 ///////////////////////////////////////////////////////////////////////
 int myControl::AddEvent(::XKeyEvent* event)
 {
-    uint8_t previous_red = ((myControltheme*)this->ThemeData)->bkgd_color[0];
-    ((myControltheme*)this->ThemeData)->bkgd_color[0] = ((myControltheme*)this->ThemeData)->bkgd_color[2];
-    ((myControltheme*)this->ThemeData)->bkgd_color[2] = previous_red;
+    uint8_t previous_red = ((myControltheme*)&*this->ThemeData)->bkgd_color[0];
+    ((myControltheme*)&*this->ThemeData)->bkgd_color[0] = ((myControltheme*)&*this->ThemeData)->bkgd_color[2];
+    ((myControltheme*)&*this->ThemeData)->bkgd_color[2] = previous_red;
     return ThemeData->update();
 }
 
@@ -87,10 +87,10 @@ int myControl::AddEvent(::XKeyEvent* event)
 class myGluiWin : public GLUI::Window
 {
         public :
-                class theme : public _Window::DefaultTheme
+                class myDefaulttheme : public _Window::DefaultTheme
                 { 
                         public :
-                                theme(myGluiWin& owner): _Window::DefaultTheme(owner) {};
+                                myDefaulttheme(myGluiWin& owner): _Window::DefaultTheme(owner) {};
                                 int draw();
                 };
         public :
@@ -106,7 +106,8 @@ class myGluiWin : public GLUI::Window
                         set_resize_policy(FixedSize);
                         ctrl = new myControl("top box");
                         add_control(ctrl);
-                        SetTheme(new theme(*this));
+                        TheDefaultTheme = new myDefaulttheme(*this);
+                        SetTheme(TheDefaultTheme);
                         Start();
                 }
                 ~myGluiWin()
@@ -183,7 +184,7 @@ void myGluiWin::simulatekey(void)
 }
 #endif
 
-int myGluiWin::theme::draw(void)
+int myGluiWin::myDefaulttheme::draw(void)
 {
         _Window::DefaultTheme::draw();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear Screen And Depth Buffer

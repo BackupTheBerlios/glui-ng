@@ -20,10 +20,10 @@ int main(int argc, char** argv)
             struct timespec sleeptime = { 0, 100000000 };
             struct timespec rem = { 0, 0};
             Window->simulatekey();
-            err = nanosleep(&sleeptime, &sleeptime);
+            err = nanosleep(&sleeptime, &rem);
             while (EINTR == err )
             {
-                err =  nanosleep(&sleeptime, &sleeptime);
+                err =  nanosleep(&rem, &rem);
             }
             count++;
     }

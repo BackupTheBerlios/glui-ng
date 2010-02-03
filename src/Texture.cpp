@@ -52,23 +52,7 @@ int  Texture::SetTexCoord(DataArray::datatype vertices_t,
 }
 
 
-int Texture::Finalise()
-{
-        glBindTexture(TextureType,ID);
-        glTexImage2D (
-                        TextureType,
-                        0,
-                        this->ComponentsCount,
-                        this->width,
-                        this->height,
-                        0,
-                        this->format,
-                        this->type,
-                        pdata
-                     );
-        glTexParameteri(TextureType, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(TextureType, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-}
+
 
 int Texture::SetTexCoord(NCRC_AutoPtr<DataArray> array)
 {
@@ -93,54 +77,73 @@ int32_t Texture::Height()
 
 void Texture::Flip()
 {
-        uint8_t* lineBuffer = new uint8_t[this->BitsPerPixel * width * height];
-        for (int j=0; j <= (height/2); j++)
+        uint8_t* lineBuffer = NULL;
+        lineBuffer = new uint8_t[this->OctetsPerPixel * this->width ];
+        for (int j=0; j <= (this->height/2); j++)
         {
                 memcpy(lineBuffer, 
-                                pdata + j*width*BitsPerPixel, 
-                                sizeof(uint8_t)*width*BitsPerPixel);
-                memcpy(pdata + j*width*BitsPerPixel, 
-                                pdata + (height - j)*width*BitsPerPixel,
-                                sizeof(uint8_t)*width*BitsPerPixel);
-                memcpy(pdata + (height - j)*width*BitsPerPixel,
+                                pdata + j*this->width*OctetsPerPixel, 
+                                sizeof(uint8_t)*this->width*OctetsPerPixel);
+                memcpy(pdata + j*this->width*OctetsPerPixel, 
+                                pdata + (this->height - j - 1 )*this->width*OctetsPerPixel,
+                                sizeof(uint8_t)*this->width*OctetsPerPixel);
+                memcpy(pdata + (this->height - j)*this->width*OctetsPerPixel,
                                 lineBuffer, 
-                                sizeof(uint8_t)*width*BitsPerPixel);
+                                sizeof(uint8_t)*this->width*OctetsPerPixel);
         }
-        delete lineBuffer;
+        delete[] lineBuffer;
 }
 
 /////////////////////////////////////////////////////////////////////////////
+int Texture::Finalise()
+{
+        glBindTexture(TextureType,ID);
+glPixelStorei(GL_UNPACK_ALIGNMENT,1);
+        glTexImage2D (
+                        TextureType,
+                        0,
+                        this->ComponentsCount,
+                        this->width,
+                        this->height,
+                        0,
+                        this->format,
+                        this->type,
+                        pdata
+                     );
+        glTexParameteri(TextureType, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(TextureType, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+}
+
 void Texture::ClientActiveTexture( GLenum texture )
 {
+        texturePipeID = texture;
+        glEnable( TextureType );
+        glActiveTextureARB( texturePipeID );
+        glClientActiveTexture(texturePipeID);
+
         if (ID == 0)
         {
-                glGenTextures(1,&(this->ID));
+                GLuint textureID;
+                glGenTextures(1,&textureID);
+                this->ID = textureID;
                 Finalise();
         }
-        texturePipeID = texture;
-        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-        glDisable( GL_BLEND );
-        glClientActiveTexture(texturePipeID);
+glDisable( GL_BLEND );
+        glBindTexture(TextureType,ID);
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
         glTexCoordPointer(TexCoord->ComponentsCount,
                         (GLenum)*(TexCoord),
                         0,
                         TexCoord->array.all);
 
-        //bind the primary texture to the first texture unit
-        glActiveTextureARB( texturePipeID );
-        glEnable( TextureType );
-        glBindTexture( TextureType, ID);
-
 }
 
 ////////////////////////////////////////////////////////////////////////////
-void Texture::ReleaseTecture()
+void Texture::ReleaseTexture()
 {
         //unbind the texture occupying the second texture unit
         glActiveTextureARB( texturePipeID );
         glDisable( TextureType );
-        glBindTexture( TextureType, 0 );
         texturePipeID = 0;
 }
 
@@ -189,11 +192,13 @@ PPMTexture::PPMTexture(const std::string& filename) : Texture(filename)
 
         fp >> this->width;
         fp >> this->height;
-        fp >> this->BitsPerPixel;
-        switch (this->BitsPerPixel)
+        int32_t BitsPerPixel;
+        fp >> BitsPerPixel;
+        switch (BitsPerPixel)
         {
                 case 255 : 
-                        this->BitsPerPixel = 32;
+                        this->OctetsPerPixel = 3;
+                        this->ComponentsCount = 3;
                         this->format = GL_RGB;
                         this->type = GL_UNSIGNED_BYTE;
                         break;
@@ -209,14 +214,14 @@ PPMTexture::PPMTexture(const std::string& filename) : Texture(filename)
         while (fp.read(buff, 1), buff[0] != '\n')
                 ;
 
-        pdata = new  uint8_t[this->BitsPerPixel * width * height];
+        pdata = new  uint8_t[this->OctetsPerPixel * this->width * this->height];
         if (!pdata)
         {
                 cerr <<  "Unable to allocate memory\n";
                 throw 0;
         }
 
-        fp.read((char*)pdata, this->BitsPerPixel*width*height );
+        fp.read((char*)pdata, this->OctetsPerPixel * this->width * this->height );
         if (fp.bad())
         {
                 cerr <<  "Error loading image " << filename << endl;
@@ -224,7 +229,7 @@ PPMTexture::PPMTexture(const std::string& filename) : Texture(filename)
         }
 
         fp.close();
-        Flip();
+        //Flip();
         data = const_cast<const uint8_t*>(pdata);
 }
 

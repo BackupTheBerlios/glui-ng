@@ -7,6 +7,7 @@
 /*                                                          */
 /************************************************************/
 #include <GL/glui/commondefs.h>
+#include <GL/glui/SmartPointer.h>
 #include <cstdio>
 /**
  Node is a node in a sort of tree of GLUI controls.

@@ -45,6 +45,7 @@ StaticText::StaticText( Node *parent, const char *name )
   Control* ctrl;
   parent->add_control( this );
   ctrl = (Control*)this;
+  this->TheDefaultTheme = new StaticText::DefaultTheme(*this);
 #warning "TODO"
   //set_font(theme::Instance()->font);
 }
@@ -63,15 +64,10 @@ void    StaticText::set_text(const char *text )
 
 void   StaticText::update_size( void )
 {
-	CurrentSize.size.w = dynamic_cast<Text*>(ThemeData)->Width();
-	CurrentSize.size.h = dynamic_cast<Text*>(ThemeData)->Height();
+	CurrentSize.size.w = dynamic_cast<Text*>(&*ThemeData)->Width();
+	CurrentSize.size.h = dynamic_cast<Text*>(&*ThemeData)->Height();
 }
 
-//////////////////////////////////////////////////////////////////////////////
-theme* StaticText::GetDefaultTheme()
-{
-        return new StaticText::DefaultTheme(*this);
-}
 ///////////////////////////////////////////////////////////////////////////////
 
 int StaticText::DefaultTheme::draw( )

@@ -45,6 +45,7 @@ Button::Button( Node *parent, const char *name,
     common_init();
     this->resizeable = AdaptThisToFitChilds;
     parent->add_control( this );
+    TheDefaultTheme = new Button::DefaultTheme(*this);
 #warning "register on KeyPress, KeyRelease, ButtonPress, ButtonRelease, EnterNotify, LeaveNotify, MotionNotify"
 }
 
@@ -73,11 +74,6 @@ void Button::common_init(void) {
 bool Button::GetValue()
 {
         return value;
-}
-
-theme* Button::GetDefaultTheme()
-{
-        return new Button::DefaultTheme(*this);
 }
 
 ////////////////////////////////////////////////////////////
@@ -130,6 +126,7 @@ TextButton::TextButton (Node *parent, const char *name,
     Button(parent, name, id, cb),
     text(this, "text")
 {
+    this->TheDefaultTheme = new TextButton::DefaultTheme(*this);
     this->resizeable == AdaptThisToFitChilds;
 }
 
@@ -138,8 +135,4 @@ void TextButton::SetText(char* newtext)
     text.set_text(newtext);
 }
 
-theme* TextButton::GetDefaultTheme()
-{
-        return new TextButton::DefaultTheme(*this);
-}
 

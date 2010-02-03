@@ -129,9 +129,11 @@ namespace GLUI
                         bool operator== (::Window target);
                 protected: //variables
                         X11Display& disp;
+                        XVisualInfo *vi;
                         GLXFBConfig *fbc;
                         int fbc_id;
                         GLXContext ctx;
+                        bool hasContext;
                         bool dirty;
                 protected: //methods
                         void _X11Window( ::Window parent_window,

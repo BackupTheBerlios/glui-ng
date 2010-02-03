@@ -140,6 +140,7 @@ int VertexObject::draw()
     if (this->Colors != NULL)
     {
         glEnableClientState(GL_COLOR_ARRAY);
+        printf("%d %d %d\n" ,Colors->ComponentsCount, Colors->datatype_t,  Colors->array.all);
         glColorPointer(Colors->ComponentsCount, Colors->datatype_t, 0, Colors->array.all);
     }
     if (this->Normals != NULL)
@@ -172,9 +173,10 @@ int VertexObject::draw()
             */
 
     }
-    if (this->Vertices != NULL)
+    if (this->Vertices != NULL && this->Indices != NULL)
     {
         glEnableClientState(GL_VERTEX_ARRAY);
+        printf("%d %d %d\n" ,Vertices->ComponentsCount, Vertices->datatype_t,  Vertices->array.all);
         glVertexPointer(Vertices->ComponentsCount, Vertices->datatype_t, 0, Vertices->array.all);
         //go through our index array and draw our vertex array
         GLenum mode;
@@ -189,11 +191,19 @@ int VertexObject::draw()
 
 
         //Indices->count has allready the right count of Indices (Indices->ComponentsCount*nbfaces)
-        glDrawElements(mode, Indices->count, Indices->datatype_t, Indices->array.all);
+        glDrawElements(mode,
+                        this->Indices->count * this->Indices->ComponentsCount,
+                        this->Indices->datatype_t,
+                        this->Indices->array.all);
+        glDisableClientState(GL_VERTEX_ARRAY);        
+    }
+    if (this->Normals != NULL)
+    {
+        glDisableClientState(GL_NORMAL_ARRAY);
     }
     if (this->TextureData != NULL)
     {
-            this->TextureData->ReleaseTecture();
+            this->TextureData->ReleaseTexture();
 
             /* for multitexturing
             //unbind the texture occupying the first texture unit
@@ -202,6 +212,11 @@ int VertexObject::draw()
             glBindTexture( GL_TEXTURE_2D, 0 );
             */
     }
+    if (this->Colors != NULL)
+    {
+        glDisableClientState(GL_COLOR_ARRAY);
+    }
+
 
     glPopClientAttrib();
 

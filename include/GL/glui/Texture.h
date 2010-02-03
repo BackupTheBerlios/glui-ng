@@ -43,7 +43,7 @@ namespace GLUI
                         int32_t Width();
                         int32_t Height();
                         void ClientActiveTexture( GLenum texture );
-                        void ReleaseTecture();
+                        void ReleaseTexture();
                         const uint8_t* data;
                 public: //operator
                         Texture& operator=(const Texture&);
@@ -63,7 +63,7 @@ namespace GLUI
                         std::string filename;
                         int32_t width;
                         int32_t height;
-                        int32_t BitsPerPixel;
+                        int32_t OctetsPerPixel;
                         int8_t ComponentsCount;
         };
 
