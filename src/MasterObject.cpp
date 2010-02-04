@@ -32,7 +32,6 @@
 #include <GL/glui/MasterObject.h>
 using namespace GLUI;
 
-#warning "GLUI class is a duplicate of GLUI_Main, remove!"
 
 
 
@@ -45,7 +44,7 @@ MasterObject::MasterObject()
 
 
 ///////////////////////////////////////////////////////////////////////////
-MasterObject* MasterObject::Instance()
+NCRC_AutoPtr<MasterObject> MasterObject::Instance()
 {
     static MasterObject object("MasterObject");
     return &object;
@@ -57,12 +56,11 @@ MasterObject::MasterObject(const char *name) : Node (name)
 
 
 //////////////////////////////////////////////////////////////////////////
-GLUI::Window*      MasterObject::FindWindow( ::Window window_id )
+NCRC_AutoPtr<GLUI::Window>      MasterObject::FindWindow( ::Window window_id )
 {
+        NCRC_AutoPtr<GLUI::Window> win = this->first_child();
 
-        GLUI::Window* win = dynamic_cast<GLUI::Window*>( this->first_child());
-
-        while( win ) 
+        while( NULL !=  dynamic_cast<GLUI::Window*>( win->getPointee() )) 
         {
                 if ( win->GetWindowId() == window_id )
                         return win;

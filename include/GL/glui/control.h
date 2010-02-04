@@ -23,7 +23,7 @@
 #include <GL/glui/commondefs.h>
 #include <GL/glui/to_clean.h>
 
-#include <GL/glui/node.h>
+#include <GL/glui/Node.h>
 #include <GL/glui/callback.h>
 #include <GL/glui/xwrapper.h>
 #include <GL/glui/event_handler.h>

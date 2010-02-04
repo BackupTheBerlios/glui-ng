@@ -80,7 +80,7 @@ namespace GLUI
 
         Time get_time(void);
 
-        class _Screen : public NonCopyableClass
+        class _Screen : public NonCopyableReferenceCountedClass
         {
                 public :
                         virtual int XDefaultDepthOfScreen()  =0;
@@ -88,7 +88,7 @@ namespace GLUI
                         virtual ::Screen* Screen()=0;
         };
 
-        class _Display  : public NonCopyableClass
+        class _Display  : public NonCopyableReferenceCountedClass
         {
                 public :
                         virtual _Screen* XDefaultScreenOfDisplay()  =0;
@@ -101,7 +101,7 @@ namespace GLUI
         };
 
 
-        class _Window : public Container, public NonCopyableClass
+        class _Window : public Container, public NonCopyableReferenceCountedClass
         {
                 public : //types
                         enum buffer_mode_t

@@ -31,7 +31,7 @@
 
 *****************************************************************************/
 
-#include <GL/glui/node.h>
+#include <GL/glui/Node.h>
 #include <GL/glui/debug.h>
 #include <GL/glui/MasterObject.h>
 using namespace GLUI;
@@ -41,11 +41,6 @@ using namespace GLUI;
 
 Node::Node()
 : 
-    parent_node(NULL),
-    child_head(NULL),
-    child_tail(NULL),
-    next_sibling(NULL),
-    prev_sibling(NULL)
 {
     _level = 0;
 }
@@ -53,11 +48,6 @@ Node::Node()
 Node::Node(const char* name)
 {
     NodeName = name;
-    parent_node = NULL;
-    child_head = NULL;
-    child_tail = NULL;
-    next_sibling = NULL;
-    prev_sibling = NULL;
     _level = 0;
 }
 

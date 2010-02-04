@@ -15,6 +15,7 @@
    Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
 */
 #include <GL/glui/NonCopyableClass.h>
+#include <GL/glui/Exception.h>
 #ifndef __SMARTPOINTER_H
 #define __SMARTPOINTER_H
 namespace GLUI
@@ -35,8 +36,103 @@ namespace GLUI
                                 T* operator->() const;
                                 T& operator*() const;
 
+                                T* getPointee() // give access to pointee
+                                { return this->pointee; }
+
+                        private:
+                                T *pointee;
+
+                                void init();
+                };
+
+        template<class T>
+                void NCRC_AutoPtr<T>::init()
+                {
+                        if (pointee->isShareable() == false) 
+                        {
+                                throw Exception(EINVAL,"trying to duplicate a non copyable object");
+                                //T *oldValue = this->pointee;
+                                //counter = new CountHolder;
+                                //counter->pointee = oldValue ? new T(*oldValue) : 0;
+                        } 
+
+                        pointee->addReference();
+                }
+
+        template<class T>
+                NCRC_AutoPtr<T>::NCRC_AutoPtr(T* realPtr)
+                { 
+                        this->pointee = realPtr;
+                        init();
+                }
+
+        template<class T>
+                NCRC_AutoPtr<T>::NCRC_AutoPtr(const NCRC_AutoPtr& rhs)
+                {
+                        pointee = rhs.pointee;
+                        init();
+                }
+
+        template<class T>
+                NCRC_AutoPtr<T>::~NCRC_AutoPtr()
+                {
+                        pointee->removeReference();
+                }
+
+        template<class T>
+                NCRC_AutoPtr<T>& NCRC_AutoPtr<T>::operator=(const NCRC_AutoPtr& rhs)
+                {
+                        if (pointee != rhs.pointee) 
+                        {
+                                pointee->removeReference();
+                                pointee = rhs.pointee;
+                                init();
+                        }
+                        return *this;
+                }
+
+        template<class T>
+                bool NCRC_AutoPtr<T>::operator==(const T* rhs)
+                {
+                        return (this->pointee == rhs);
+                }
+
+        template<class T>
+                bool NCRC_AutoPtr<T>::operator!=(const T* rhs)
+                {
+                        return (this->pointee != rhs);
+                }
+
+
+        template<class T>
+                T* NCRC_AutoPtr<T>::operator->() const
+                { return this->pointee; }
+
+        template<class T>
+                T& NCRC_AutoPtr<T>::operator*() const
+                { return *(this->pointee); }
+
+        ///////////////////////////////////////////////////////////////////////////
+        // NCIRC :  Non Copyable Indirect Reference Counted class  for reference //
+        /*
+           template<class T>
+                class NCRC_AutoPtr 
+                {
+                        public:
+                                NCRC_AutoPtr(T* realPtr = 0);
+                                NCRC_AutoPtr(const NCRC_AutoPtr& rhs);
+                                ~NCRC_AutoPtr();
+                                NCRC_AutoPtr& operator=(const NCRC_AutoPtr& rhs);
+                                bool operator==(const T* rhs);
+                                bool operator!=(const T* rhs);
+
+                                T* operator->() const;
+                                T& operator*() const;
+
                                 NonCopyableReferenceCountedClass& getReferenceCounter()  // give clients access to
                                 { return *counter; }     // isShared, etc.
+                                T* getPointee() // give access to a reference for type checking
+                                { return counter->pointee; }
 
                         private:
                                 struct CountHolder: public NonCopyableReferenceCountedClass
@@ -111,6 +207,8 @@ namespace GLUI
         template<class T>
                 T& NCRC_AutoPtr<T>::operator*() const
                 { return *(counter->pointee); }
+
+        */
 
 }
 #endif //__SMARTPOINTER_H
