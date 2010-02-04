@@ -10,14 +10,18 @@ using namespace GLUI;
 /////////////////////////////////////////////////////////////////////////
 VertexObject* _DefaultTheme::raised_box( uint32_t w, uint32_t h, uint32_t thickness)
 {
+        if (thickness >= w || thickness >= h)
+        {
+                return NULL;
+        }
         GLfloat Vertices[8][3] = { {  0.0,   0.0, 0.0}, //0
                 {    w,   0.0, 0.0}, //1
                 {    w,     h, 0.0}, //2
                 {  0.0,     h, 0.0}, //3
-                {  (float) thickness,   (float) thickness, (float) thickness}, //4
-                {w-(float) thickness,   (float) thickness, (float) thickness}, //5
-                {w-(float) thickness, h-(float) thickness, (float) thickness}, //6
-                {  (float) thickness, h-(float) thickness, (float) thickness}}; //7
+                {  0.0,   0.0, (float) thickness}, //4
+                {    w,   0.0, (float) thickness}, //5
+                {    w,     h, (float) thickness}, //6
+                {  0.0,     h, (float) thickness}}; //7
         GLfloat Normals[8][3]   = { {  0.0, 0.0, 1.0}, //0
                 {  0.0, 0.0, 1.0}, //1
                 {  0.0, 0.0, 1.0}, //2
@@ -34,7 +38,9 @@ VertexObject* _DefaultTheme::raised_box( uint32_t w, uint32_t h, uint32_t thickn
                 7, 6, 2, 3,		//top slope
                 5, 1, 2, 6,		//right slope
                 0, 1, 5, 4,		//bottom slope
-                0, 4, 7, 3};	//left slope
+                0, 4, 7, 3,
+                0, 1, 2, 3              //bottom
+        };	//left slope
 
         float Colors[8][3];
         memset(Colors, 0, 8*3*sizeof(float));
@@ -56,7 +62,7 @@ VertexObject* _DefaultTheme::raised_box( uint32_t w, uint32_t h, uint32_t thickn
 
         VertexObject* vo = new VertexObject();
         vo->SetVerticesArray(DataArray::FLOAT, 3, Vertices, 8);
-        vo->SetFaceIndicesArray (DataArray::UINT8_T, 4, indices, 5);
+        vo->SetFaceIndicesArray (DataArray::UINT8_T, 4, indices, 6);
         vo->SetColorArray (DataArray::FLOAT, 3, Colors, 8);
         //vo->ComputeNormals();
         vo->SetNormalArray (DataArray::FLOAT, 3, Normals, 8);

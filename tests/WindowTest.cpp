@@ -28,8 +28,6 @@ class myGluiWin : public GLUI::Window
                         Start();
                 }
 
-                theme* GetDefaultTheme() { return new myGluiWinTheme(*this); }
-
 };
 
 int myGluiWin::myGluiWinTheme::draw(void)

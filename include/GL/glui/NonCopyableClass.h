@@ -20,17 +20,19 @@ namespace GLUI
 {
         class NonCopyableClass
         {
-                public :
-                        NonCopyableClass() {}
+                public : 
+                        NonCopyableClass() {};
+                        virtual ~NonCopyableClass() {};
                 private :
-                        NonCopyableClass(NonCopyableClass const& copy) {};
+                        NonCopyableClass(const NonCopyableClass & copy) {};
                         virtual NonCopyableClass& operator= 
                                 (const NonCopyableClass& n) throw() 
                                 {return *this;};
+
         };
 
 
-        class NonCopyableReferenceCountedClass
+        class NonCopyableReferenceCountedClass :public NonCopyableClass
         {
                 public:
                         void addReference();
@@ -40,14 +42,9 @@ namespace GLUI
                         bool isShared() const;
                         int  GetCount() const;
 
-                protected:
+                public:
                         NonCopyableReferenceCountedClass();
-                        NonCopyableReferenceCountedClass(const 
-                                        NonCopyableReferenceCountedClass& rhs);
-                        NonCopyableReferenceCountedClass& operator=(const 
-                                        NonCopyableReferenceCountedClass& rhs);
                         virtual ~NonCopyableReferenceCountedClass() = 0;
-
                 private:
                         int refCount;
                         bool shareable;

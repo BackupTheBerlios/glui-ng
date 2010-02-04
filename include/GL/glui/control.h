@@ -157,7 +157,7 @@ namespace GLUI
             void         set_alignment( Alignement align );
             void         set_resize_policy( SizePolicy policy) { resizeable = policy; }
             SizePolicy   get_resize_policy( void ) { return resizeable;}
-            int SetTheme(theme* data);
+            int SetTheme(NCRC_AutoPtr<theme> data);
 
             int  add_control( Node *control ); //<prevent adding subsequent controls
 
@@ -166,9 +166,10 @@ namespace GLUI
         protected: //methods
             Control(const char* name);
             Control();
-            virtual theme* GetDefaultTheme();
+            virtual NCRC_AutoPtr<theme> GetDefaultTheme();
         protected: //variables
-            theme* ThemeData;
+            NCRC_AutoPtr<theme> TheDefaultTheme;
+            NCRC_AutoPtr<theme> ThemeData;
             static Control* focussed;
             SizePolicy resizeable;
             Size CurrentSize;

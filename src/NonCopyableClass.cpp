@@ -21,14 +21,6 @@ using namespace GLUI;
 NonCopyableReferenceCountedClass::NonCopyableReferenceCountedClass()
         : refCount(0), shareable(true) {}
 
-NonCopyableReferenceCountedClass::NonCopyableReferenceCountedClass(const NonCopyableReferenceCountedClass&)
-        : refCount(0), shareable(true) {}
-
-NonCopyableReferenceCountedClass& NonCopyableReferenceCountedClass::operator=(const NonCopyableReferenceCountedClass&)
-{
-        return *this;
-}  
-
 NonCopyableReferenceCountedClass::~NonCopyableReferenceCountedClass() {}
 
 void NonCopyableReferenceCountedClass::addReference() 

@@ -27,8 +27,12 @@ using namespace std;
 
 Texture::Texture(const std::string& filename)
 {
-        NonCopyableReferenceCountedClass::addReference();
         this->filename = filename;
+        TextureType = GL_TEXTURE_2D;
+        texturePipeID = 0;
+        ID = 0;
+        data = 0;
+        pdata = 0;
 }
 
 Texture::~Texture()
@@ -38,6 +42,28 @@ Texture::~Texture()
         data = NULL;
 }
 
+int  Texture::SetTexCoord(DataArray::datatype vertices_t,
+                 uint8_t ComponentsCount,
+                 void* vertices,
+                 uint32_t count)
+{
+        NCRC_AutoPtr<DataArray> array(new DataArray(count, ComponentsCount, vertices_t, vertices));
+        TexCoord = array;
+}
+
+
+
+
+int Texture::SetTexCoord(NCRC_AutoPtr<DataArray> array)
+{
+        this->TexCoord = array;
+        return 0;
+}
+
+NCRC_AutoPtr<DataArray> Texture::GetTexCoord()
+{
+        return this->TexCoord;
+}
 
 int32_t Texture::Width()
 {
@@ -51,37 +77,77 @@ int32_t Texture::Height()
 
 void Texture::Flip()
 {
-        uint8_t* lineBuffer = new uint8_t[this->BitsPerPixel * width * height];
-        for (int j=0; j <= (height/2); j++)
+        uint8_t* lineBuffer = NULL;
+        lineBuffer = new uint8_t[this->OctetsPerPixel * this->width ];
+        for (int j=0; j <= (this->height/2); j++)
         {
                 memcpy(lineBuffer, 
-                                pdata + j*width*BitsPerPixel, 
-                                sizeof(uint8_t)*width*BitsPerPixel);
-                memcpy(pdata + j*width*BitsPerPixel, 
-                                pdata + (height - j)*width*BitsPerPixel,
-                                sizeof(uint8_t)*width*BitsPerPixel);
-                memcpy(pdata + (height - j)*width*BitsPerPixel,
+                                pdata + j*this->width*OctetsPerPixel, 
+                                sizeof(uint8_t)*this->width*OctetsPerPixel);
+                memcpy(pdata + j*this->width*OctetsPerPixel, 
+                                pdata + (this->height - j - 1 )*this->width*OctetsPerPixel,
+                                sizeof(uint8_t)*this->width*OctetsPerPixel);
+                memcpy(pdata + (this->height - j)*this->width*OctetsPerPixel,
                                 lineBuffer, 
-                                sizeof(uint8_t)*width*BitsPerPixel);
+                                sizeof(uint8_t)*this->width*OctetsPerPixel);
         }
-        delete lineBuffer;
+        delete[] lineBuffer;
 }
 
-
-int Texture::SetTexCoord(NCRC_AutoPtr<DataArray> array)
+/////////////////////////////////////////////////////////////////////////////
+int Texture::Finalise()
 {
-        this->Array = array;
-        return 0;
+        glBindTexture(TextureType,ID);
+        //glPixelStorei(GL_UNPACK_ALIGNMENT,1);
+        glTexImage2D (
+                        TextureType,
+                        0,
+                        this->ComponentsCount,
+                        this->width,
+                        this->height,
+                        0,
+                        this->format,
+                        this->type,
+                        pdata
+                     );
+        glTexParameteri(TextureType, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(TextureType, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 }
 
- int  Texture::SetTexCoord(DataArray::datatype vertices_t,
-                 uint8_t ComponentsCount,
-                 DataArray::pointers vertices,
-                 uint32_t count)
+void Texture::ClientActiveTexture( GLenum texture )
 {
-        NCRC_AutoPtr<DataArray> array(new DataArray(count, ComponentsCount, vertices_t, vertices));
-        Array = array;
+        texturePipeID = texture;
+        glEnable( TextureType );
+        glActiveTextureARB( texturePipeID );
+        glClientActiveTexture(texturePipeID);
+
+        if (ID == 0)
+        {
+                GLuint textureID;
+                glGenTextures(1,&textureID);
+                this->ID = textureID;
+                Finalise();
+        }
+glDisable( GL_BLEND );
+        glBindTexture(TextureType,ID);
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        glTexCoordPointer(TexCoord->ComponentsCount,
+                        (GLenum)*(TexCoord),
+                        0,
+                        TexCoord->array.all);
+
 }
+
+////////////////////////////////////////////////////////////////////////////
+void Texture::ReleaseTexture()
+{
+        //unbind the texture occupying the second texture unit
+        glActiveTextureARB( texturePipeID );
+        glDisable( TextureType );
+        texturePipeID = 0;
+}
+
+
 /////////////////////////////////////////////////////////////////////////////
 ///////////////////////        PPM  Loader         //////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -98,35 +164,48 @@ PPMTexture::PPMTexture(const std::string& filename) : Texture(filename)
                 throw 0;
         }
 
-        fp.read(buff, this->BitsPerPixel);
-        if (fp.bad()){
-                cerr <<"Unable to open file " << filename << endl;
+        fp.read(buff,3);
+        if (fp.bad())
+        {
+                cerr << "Error loading image " << filename << endl ;
                 throw 0;
         }
 
-        if (buff[0] != 'P' || buff[1] != '6'){
+
+        if (buff[0] != 'P' || buff[1] != '6')
+        {
                 cerr << "Invalid image format (must be `P6')\n" ;
                 throw 0;
         }
 
-        if (buff[2] != 0x0a)
-                fp.seekg(-1,ios::cur);
+        if (buff[2] != '\n' && buff[2] != '\t' && buff[2] != ' ')
+        {
+                 cerr << "Invalid image format (delimiter must be a newline or a tab or a space)\n" ;
+                throw 0;
+       }
 
         while (fp.read(buff, 1), buff[0] == '#'){
                 lig_comm++;
                 while (fp.read(buff, 1), buff[0] != '\n');
         }
-
         fp.seekg(-1,ios::cur);
 
-        fp >> width;
-        fp >> height;
-        if (fp.bad()){
-                cerr << "Error loading image " << filename << endl ;
-                throw 0;
+        fp >> this->width;
+        fp >> this->height;
+        int32_t BitsPerPixel;
+        fp >> BitsPerPixel;
+        switch (BitsPerPixel)
+        {
+                case 255 : 
+                        this->OctetsPerPixel = 3;
+                        this->ComponentsCount = 3;
+                        this->format = GL_RGB;
+                        this->type = GL_UNSIGNED_BYTE;
+                        break;
+                default   :
+                             cerr << "Invalid image format (max value uknown)\n" ;
+                             throw 0;
         }
-
-        fp >> maxval;
         if (fp.bad()){
                 cerr << "Error loading image " << filename << endl ;
                 throw 0;
@@ -135,14 +214,14 @@ PPMTexture::PPMTexture(const std::string& filename) : Texture(filename)
         while (fp.read(buff, 1), buff[0] != '\n')
                 ;
 
-        pdata = new  uint8_t[this->BitsPerPixel * width * height];
-        if (!data)
+        pdata = new  uint8_t[this->OctetsPerPixel * this->width * this->height];
+        if (!pdata)
         {
                 cerr <<  "Unable to allocate memory\n";
                 throw 0;
         }
 
-        fp.read((char*)data, this->BitsPerPixel*width*height );
+        fp.read((char*)pdata, this->OctetsPerPixel * this->width * this->height );
         if (fp.bad())
         {
                 cerr <<  "Error loading image " << filename << endl;
@@ -150,7 +229,7 @@ PPMTexture::PPMTexture(const std::string& filename) : Texture(filename)
         }
 
         fp.close();
-        Flip();
+        //Flip();
         data = const_cast<const uint8_t*>(pdata);
 }
 

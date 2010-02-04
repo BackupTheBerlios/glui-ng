@@ -20,6 +20,18 @@
 #define __SMARTPOINTER_H
 namespace GLUI
 {
+
+        template<class __Array>
+                class Array
+                {
+                        public :
+                                Array(int count);
+                                virtual ~Array();
+                                __Array& operator[] (int index);
+                        protected:
+                                __Array* data;
+                };
+
         /* NCRC : Non Copyable Reference Counted class  */
 
         template<class T>
@@ -30,6 +42,7 @@ namespace GLUI
                                 NCRC_AutoPtr(const NCRC_AutoPtr& rhs);
                                 ~NCRC_AutoPtr();
                                 NCRC_AutoPtr& operator=(const NCRC_AutoPtr& rhs);
+                                void SetPointee(T* NewPointee); //< broadcast the pointee
                                 bool operator==(const T* rhs);
                                 bool operator!=(const T* rhs);
 
@@ -150,9 +163,10 @@ namespace GLUI
                 {
                         if (counter->isShareable() == false) 
                         {
-                                T *oldValue = counter->pointee;
-                                counter = new CountHolder;
-                                counter->pointee = oldValue ? new T(*oldValue) : 0;
+                                throw Exception(EINVAL,"trying to duplicate a non copyable object");
+                                //T *oldValue = counter->pointee;
+                                //counter = new CountHolder;
+                                //counter->pointee = oldValue ? new T(*oldValue) : 0;
                         } 
 
                         counter->addReference();
@@ -165,6 +179,17 @@ namespace GLUI
                         counter->pointee = realPtr;
                         init();
                 }
+
+        template<class T>
+                void NCRC_AutoPtr<T>::SetPointee(T* NewPointee)
+                {
+                        if (counter->pointee != NULL)
+                        {
+                                delete counter->pointee;
+                        }
+                        counter->pointee = NewPointee;
+                }
+
 
         template<class T>
                 NCRC_AutoPtr<T>::NCRC_AutoPtr(const NCRC_AutoPtr& rhs)

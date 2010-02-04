@@ -257,11 +257,10 @@ void Control::set_alignment(Alignement new_align)
     ThemeData->update();
 }
 ///////////////////////////////////////////////////////////////////////////
-int Control::SetTheme(theme* data)
+int Control::SetTheme(NCRC_AutoPtr<theme> data)
 {
         if (data != NULL)
         {
-                if (this->ThemeData != NULL) delete this->ThemeData;
                 this->ThemeData = data;
         }
         return EINVAL;
@@ -273,7 +272,6 @@ int Control::SetTheme(theme* data)
 Control::~Control()
 {
     if (focussed == this) focussed = NULL;
-    delete this->ThemeData;
 }
 
 Control::Control(const char* name) : Node(name)
@@ -297,9 +295,9 @@ Control::Control(const char* name) : Node(name)
 }
 
 ////////////////////////////////////////////////////////////////////////
-theme* Control::GetDefaultTheme()
+NCRC_AutoPtr<theme> Control::GetDefaultTheme()
 {
-        return new _DefaultTheme;
+        return TheDefaultTheme;
 }
 
 ////////////////////////////////////////////////////////////////////////

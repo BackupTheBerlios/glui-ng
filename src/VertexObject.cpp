@@ -73,43 +73,55 @@ VertexObject::~VertexObject()
 
 };
 /////////////////////////////////////////////////////////////////
+int VertexObject::SetVerticesArray (NCRC_AutoPtr<DataArray> vertices)
+{
+        Vertices = vertices;
+}
+
 int VertexObject::SetVerticesArray (DataArray::datatype vertices_t,uint8_t ComponentsCount, void* vertices, uint32_t count)
 {
     IN("\n");
-    DataArray::pointers data;
-    data.all = vertices;
     this->Vertices = NCRC_AutoPtr<DataArray>(
-                    new DataArray(count, ComponentsCount, vertices_t, data));
+                    new DataArray(count, ComponentsCount, vertices_t, vertices));
     OUT("\n");
 }
 /////////////////////////////////////////////////////////////////
+int VertexObject::SetFaceIndicesArray (NCRC_AutoPtr<DataArray> FaceIndices)
+{
+        Indices = FaceIndices;
+}
+
 int VertexObject::SetFaceIndicesArray (DataArray::datatype indices_t,uint8_t ComponentsCount, void* indices, uint32_t count)
 {
     IN("\n");
-    DataArray::pointers data;
-    data.all = indices;
     this->Indices = NCRC_AutoPtr<DataArray>(
-                    new DataArray(count, ComponentsCount, indices_t, data));
+                    new DataArray(count, ComponentsCount, indices_t, indices));
     OUT("\n");
 }
 /////////////////////////////////////////////////////////////////
+int VertexObject::SetColorArray (NCRC_AutoPtr<DataArray> ColorArray)
+{
+        Colors = ColorArray;
+}
+
 int VertexObject::SetColorArray (DataArray::datatype colors_t,uint8_t ComponentsCount, void* colors, uint32_t count)
 {
     IN("\n");
-    DataArray::pointers data;
-    data.all = colors;
     this->Colors = NCRC_AutoPtr<DataArray>(
-                    new DataArray(count, ComponentsCount, colors_t, data));
+                    new DataArray(count, ComponentsCount, colors_t, colors));
     OUT("\n");
 }
 /////////////////////////////////////////////////////////////////
+int VertexObject::SetNormalArray (NCRC_AutoPtr<DataArray> NormalArray)
+{
+        Normals = NormalArray;
+}
+
 int VertexObject::SetNormalArray (DataArray::datatype normals_t,uint8_t ComponentsCount, void* normals, uint32_t count)
 {
     IN("\n");
-    DataArray::pointers data;
-    data.all = normals;
     this->Normals = NCRC_AutoPtr<DataArray>(
-                    new DataArray(count, ComponentsCount, normals_t, data));
+                    new DataArray(count, ComponentsCount, normals_t, normals));
     OUT("\n");
 }
 /////////////////////////////////////////////////////////////////
@@ -122,60 +134,13 @@ int VertexObject::AddTexture (NCRC_AutoPtr<Texture> texture)
 /////////////////////////////////////////////////////////////////
 int VertexObject::draw()
 {
-        /*
-         * //g_texcoordArrayONE and g_texcoordArrayTWO are filled in a other function.
-
-         glDisable( GL_BLEND );
-        //Do multi texture coord setup
-        glClientActiveTextureARB(GL_TEXTURE0_ARB);
-        glTexCoordPointer(2, GL_FLOAT, 0, g_texcoordArrayONE);
-        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-        //bind the primary texture to the first texture unit
-        glActiveTextureARB( GL_TEXTURE0_ARB );
-        glEnable( GL_TEXTURE_2D );
-        glBindTexture( GL_TEXTURE_2D, Texture_Ground.ID);
-        GlMultiTexCoord1f(GLenum texUnit, GLfloat s);
-glMultiTexCoord2f(GLenum texUnit, GLfloat s, GLfloat t);
-glMultiTexCoord3f(GLenum texUnit, GLfloat s, GLfloat t, Glfloat r);
-
-
-        glClientActiveTextureARB(GL_TEXTURE1_ARB);
-        glTexCoordPointer(2, GL_FLOAT, 0, g_texcoordArrayTWO);
-        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-        //bind the detail texture to the second texture unit
-        glActiveTextureARB( GL_TEXTURE1_ARB );
-        glEnable( GL_TEXTURE_2D );
-        glBindTexture( GL_TEXTURE_2D, Texture_Detail.ID);
-        GlMultiTexCoord1f(GLenum texUnit, GLfloat s);
-glMultiTexCoord2f(GLenum texUnit, GLfloat s, GLfloat t);
-glMultiTexCoord3f(GLenum texUnit, GLfloat s, GLfloat t, Glfloat r);
-
-
-        glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_ARB );
-        glTexEnvi( GL_TEXTURE_ENV, GL_RGB_SCALE_ARB, 2 );
-
-        //DRAW
-        for (int z = 0; z < MAP_Z-1; z++)
-        {
-        glDrawElements(GL_TRIANGLE_STRIP, MAP_X * 2, GL_UNSIGNED_INT,&g_indexArray[z * MAP_X * 2]);
-        }
-
-        //unbind the texture occupying the second texture unit
-        glActiveTextureARB( GL_TEXTURE1_ARB );
-        glDisable( GL_TEXTURE_2D );
-        glBindTexture( GL_TEXTURE_2D, 0 );
-
-        //unbind the texture occupying the first texture unit
-        glActiveTextureARB( GL_TEXTURE0_ARB );
-        glDisable( GL_TEXTURE_2D );
-        glBindTexture( GL_TEXTURE_2D, 0 );
-        */
     IN("\n");
     glPushClientAttrib(0);
 
     if (this->Colors != NULL)
     {
         glEnableClientState(GL_COLOR_ARRAY);
+        printf("%d %d %d\n" ,Colors->ComponentsCount, Colors->datatype_t,  Colors->array.all);
         glColorPointer(Colors->ComponentsCount, Colors->datatype_t, 0, Colors->array.all);
     }
     if (this->Normals != NULL)
@@ -183,9 +148,35 @@ glMultiTexCoord3f(GLenum texUnit, GLfloat s, GLfloat t, Glfloat r);
         glEnableClientState(GL_NORMAL_ARRAY);
         glNormalPointer(Normals->datatype_t, 0, Normals->array.all);
     }
-    if (this->Vertices != NULL)
+    if (this->TextureData != NULL)
+    {
+            this->TextureData->ClientActiveTexture(GL_TEXTURE0);
+            /* for multitexturing
+            GlMultiTexCoord1f(GLenum texUnit, GLfloat s);
+            glMultiTexCoord2f(GLenum texUnit, GLfloat s, GLfloat t);
+            glMultiTexCoord3f(GLenum texUnit, GLfloat s, GLfloat t, Glfloat r);
+
+               glClientActiveTextureARB(GL_TEXTURE1_ARB);
+               glTexCoordPointer(2, GL_FLOAT, 0, g_texcoordArrayTWO);
+               glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+            //bind the detail texture to the second texture unit
+            glActiveTextureARB( GL_TEXTURE1_ARB );
+            glEnable( GL_TEXTURE_2D );
+            glBindTexture( GL_TEXTURE_2D, Texture_Detail.ID);
+            GlMultiTexCoord1f(GLenum texUnit, GLfloat s);
+            glMultiTexCoord2f(GLenum texUnit, GLfloat s, GLfloat t);
+            glMultiTexCoord3f(GLenum texUnit, GLfloat s, GLfloat t, Glfloat r);
+
+
+            glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_ARB );
+            glTexEnvi( GL_TEXTURE_ENV, GL_RGB_SCALE_ARB, 2 );
+            */
+
+    }
+    if (this->Vertices != NULL && this->Indices != NULL)
     {
         glEnableClientState(GL_VERTEX_ARRAY);
+        printf("%d %d %d\n" ,Vertices->ComponentsCount, Vertices->datatype_t,  Vertices->array.all);
         glVertexPointer(Vertices->ComponentsCount, Vertices->datatype_t, 0, Vertices->array.all);
         //go through our index array and draw our vertex array
         GLenum mode;
@@ -200,8 +191,32 @@ glMultiTexCoord3f(GLenum texUnit, GLfloat s, GLfloat t, Glfloat r);
 
 
         //Indices->count has allready the right count of Indices (Indices->ComponentsCount*nbfaces)
-        glDrawElements(mode, Indices->count, Indices->datatype_t, Indices->array.all);
+        glDrawElements(mode,
+                        this->Indices->count * this->Indices->ComponentsCount,
+                        this->Indices->datatype_t,
+                        this->Indices->array.all);
+        glDisableClientState(GL_VERTEX_ARRAY);        
     }
+    if (this->Normals != NULL)
+    {
+        glDisableClientState(GL_NORMAL_ARRAY);
+    }
+    if (this->TextureData != NULL)
+    {
+            this->TextureData->ReleaseTexture();
+
+            /* for multitexturing
+            //unbind the texture occupying the first texture unit
+            glActiveTextureARB( GL_TEXTURE0_ARB );
+            glDisable( GL_TEXTURE_2D );
+            glBindTexture( GL_TEXTURE_2D, 0 );
+            */
+    }
+    if (this->Colors != NULL)
+    {
+        glDisableClientState(GL_COLOR_ARRAY);
+    }
+
 
     glPopClientAttrib();
 
