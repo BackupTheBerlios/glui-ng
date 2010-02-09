@@ -92,7 +92,7 @@ _Window* X11Display::XRootWindow(int screen_number)
 }
 
 /////////////////////////////////////////////////////////////////////
-X11Window::X11Window(X11Display& display, ::Window parent_window,
+X11Window::X11Window(NCRC_AutoPtr<X11Display> display, ::Window parent_window,
                 int x, int y,
                 unsigned int width, unsigned int height,
                 unsigned int border_width,
@@ -149,7 +149,7 @@ void X11Window::_X11Window(::Window parent_window,
                     | PropertyChangeMask
                     | ColormapChangeMask
                     | OwnerGrabButtonMask ;*/
-        window = XCreateWindow (disp.Disp(), parent_window,
+        window = XCreateWindow (disp->Disp(), parent_window,
                 x, y,
                 width, height,
                 border_width,
@@ -161,14 +161,14 @@ void X11Window::_X11Window(::Window parent_window,
         if ( !window )
                 throw Exception(EINVAL,"Failed to create window.\n" );
 
-        XSelectInput(disp.Disp(), window, EventMask);
-        Atom wmDeleteMessage = ::XInternAtom(disp.Disp(), "WM_DELETE_WINDOW", False);
-        ::XSetWMProtocols(disp.Disp(), window, &wmDeleteMessage, 1);
+        XSelectInput(disp->Disp(), window, EventMask);
+        Atom wmDeleteMessage = ::XInternAtom(disp->Disp(), "WM_DELETE_WINDOW", False);
+        ::XSetWMProtocols(disp->Disp(), window, &wmDeleteMessage, 1);
 
         hasContext=false;
         dirty=false;
 }
-X11Window::X11Window(X11Display &display, ::Window parent,
+X11Window::X11Window(NCRC_AutoPtr<X11Display> display, ::Window parent,
                 int x, int y,
                 unsigned int width, unsigned int height,
                 unsigned int border_width,
@@ -222,8 +222,8 @@ X11Window::X11Window(X11Display &display, ::Window parent,
 
         printf( "Getting matching framebuffer configs\n" );
         int fbcount;
-        fbc = ::glXChooseFBConfig( disp.Disp(),
-                        XScreenNumberOfScreen(disp.XDefaultScreenOfDisplay()->Screen()),
+        fbc = ::glXChooseFBConfig( disp->Disp(),
+                        XScreenNumberOfScreen(disp->XDefaultScreenOfDisplay()->Screen()),
                         visual_attribs,
                         &fbcount );
         if ( !fbc )
@@ -240,16 +240,16 @@ X11Window::X11Window(X11Display &display, ::Window parent,
         int i;
         for ( i = 0; i < fbcount; i++ )
         {
-                XVisualInfo *vi = glXGetVisualFromFBConfig( disp.Disp(), fbc[i] );
+                XVisualInfo *vi = glXGetVisualFromFBConfig( disp->Disp(), fbc[i] );
                 if ( vi )
                 {
                         int samp_buf, samples;
-                        glXGetFBConfigAttrib( disp.Disp(), fbc[i], GLX_SAMPLE_BUFFERS, &samp_buf );
-                        glXGetFBConfigAttrib( disp.Disp(), fbc[i], GLX_SAMPLES       , &samples  );
+                        glXGetFBConfigAttrib( disp->Disp(), fbc[i], GLX_SAMPLE_BUFFERS, &samp_buf );
+                        glXGetFBConfigAttrib( disp->Disp(), fbc[i], GLX_SAMPLES       , &samples  );
 
                         printf( "  Matching fbconfig %d, visual ID 0x%2x: SAMPLE_BUFFERS = %d,"
                                         " SAMPLES = %d\n", 
-                                        i, vi -> visualid, samp_buf, samples );
+                                        i, (int)(vi -> visualid), samp_buf, samples );
 
                         if ( best_fbc < 0 || samp_buf && samples > best_num_samp )
                                 best_fbc = i, best_num_samp = samples;
@@ -263,13 +263,13 @@ X11Window::X11Window(X11Display &display, ::Window parent,
         fbc_id = best_fbc;
         //int fbc_id = worst_fbc;
 
-        this->vi = glXGetVisualFromFBConfig( disp.Disp(), fbc[ fbc_id ]  );
-        printf( "Chosen visual ID = 0x%x\n", this->vi->visualid );
+        this->vi = glXGetVisualFromFBConfig( disp->Disp(), fbc[ fbc_id ]  );
+        printf( "Chosen visual ID = 0x%x\n", (int)(this->vi->visualid) );
 
         printf( "Creating colormap\n" );
         XSetWindowAttributes swa;
-        swa.colormap = XCreateColormap( disp.Disp(),
-                        disp.XRootWindow( this->vi->screen )->GetWindowId(), 
+        swa.colormap = XCreateColormap( disp->Disp(),
+                        disp->XRootWindow( this->vi->screen )->GetWindowId(), 
                         this->vi->visual, AllocNone );
         swa.background_pixmap = None ;
         swa.border_pixel      = 0;
@@ -294,7 +294,7 @@ X11Window::~X11Window()
         ::XClientMessageEvent wakeup;
         wakeup.type = ClientMessage;
         wakeup.format = 32;
-        wakeup.data.l[ 0 ] = XInternAtom(disp.Disp(), "WM_DELETE_WINDOW", False);
+        wakeup.data.l[ 0 ] = XInternAtom(disp->Disp(), "WM_DELETE_WINDOW", False);
 
         this->XSendEvent ((XEvent&)wakeup); 
         OUT("\n");
@@ -323,7 +323,7 @@ int X11Window::start_routine()
                         AddEvent(&EventToForward);
                         dirty=False;
                 }
-                XWindowEvent(disp.Disp(), window, EventMask, &event);
+                XWindowEvent(disp->Disp(), window, EventMask, &event);
                 EventCoordToGLCoord(event);
                 err = Container::AddEvent(&event);
         }
@@ -345,9 +345,9 @@ int X11Window::XMapWindow()
         IN("\n");
         cerr << "XMapWindow" <<endl;
         int err;
-        err = ::XMapWindow(disp.Disp(),window);
+        err = ::XMapWindow(disp->Disp(),window);
         if (err) ROUT(err,"\n");
-        err = XFlush( disp.Disp() );
+        err = XFlush( disp->Disp() );
         ROUT(err,"\n");
               
 }
@@ -356,9 +356,9 @@ int X11Window::XMapRaised()
 {
         IN("\n");
         int err;
-        err = ::XMapRaised(disp.Disp(),window);
+        err = ::XMapRaised(disp->Disp(),window);
         if (err) ROUT(err,"\n");
-        err = XFlush( disp.Disp() );
+        err = XFlush( disp->Disp() );
         ROUT(err,"\n");
 }
 
@@ -366,9 +366,9 @@ int X11Window::XMapSubwindows()
 {
         IN("\n");
         int err;
-        err = ::XMapSubwindows(disp.Disp(),window);
+        err = ::XMapSubwindows(disp->Disp(),window);
         if (err) ROUT(err,"\n");
-        err = XFlush( disp.Disp() );
+        err = XFlush( disp->Disp() );
         ROUT(err,"\n");
 }
 
@@ -377,9 +377,9 @@ int X11Window::XUnmapWindow()
         IN("\n");
         cerr << "XUnmapWindow" <<endl;
         int err;
-        err = ::XUnmapWindow(disp.Disp(),window);
+        err = ::XUnmapWindow(disp->Disp(),window);
         if (err) ROUT(err,"\n");
-        err = XFlush( disp.Disp() );
+        err = XFlush( disp->Disp() );
         ROUT(err,"\n");
 }
 
@@ -387,9 +387,9 @@ int X11Window::XUnmapSubwindows()
 {
         IN("\n");
         int err;
-        err = ::XUnmapSubwindows(disp.Disp(),window);
+        err = ::XUnmapSubwindows(disp->Disp(),window);
         if (err) ROUT(err,"\n");
-        err = XFlush( disp.Disp() );
+        err = XFlush( disp->Disp() );
         ROUT(err,"\n");
 }
 
@@ -406,7 +406,7 @@ int X11Window::XSendEvent(::XEvent &evt)
         IN(" ");
         ::XAnyEvent *evtp = (::XAnyEvent*) &evt;
         
-        evtp->display = disp.Disp(); ;
+        evtp->display = disp->Disp(); ;
         evtp->window = window;
         EVTMSG(evt);
 
@@ -453,9 +453,9 @@ int X11Window::AddEvent(::XClientMessageEvent *event)
 {
         IN(debug::Instance()->EventTypeToString(event->type)<<endl);
         /* Destroy the window when the WM_DELETE_WINDOW message arrives */
-        if( (Atom) event->data.l[ 0 ] == XInternAtom(disp.Disp(), "WM_DELETE_WINDOW", False))
+        if( (Atom) event->data.l[ 0 ] == XInternAtom(disp->Disp(), "WM_DELETE_WINDOW", False))
         {
-                int res = XDestroyWindow(disp.Disp(), window);
+                int res = XDestroyWindow(disp->Disp(), window);
                 this->thread_enabled = false;
                 if ( res ) ROUT(res,"\n");
                 window = 0;
@@ -487,7 +487,7 @@ int X11Window::AddEvent(::XMapEvent *event)
                 CreateGLContext();
                 this->hasContext = true;
         }
-        err = glXMakeCurrent( disp.Disp(), window, ctx );
+        err = glXMakeCurrent( disp->Disp(), window, ctx );
         err = Container::AddEvent(event);
         mapped = True;
         ROUT(err,"\n");
@@ -498,7 +498,7 @@ int X11Window::AddEvent(::XUnmapEvent *event)
         int err;
         IN(debug::Instance()->EventTypeToString(event->type)<<endl);
         printf( "unsetting context\n" );
-        err = glXMakeCurrent( disp.Disp(), None, NULL );
+        err = glXMakeCurrent( disp->Disp(), None, NULL );
         err = Container::AddEvent(event);
         ROUT(err,"\n");
 }
@@ -526,14 +526,14 @@ int X11Window::AddEvent(::XExposeEvent* event)
 {
         int err;
         IN(debug::Instance()->EventTypeToString(event->type)<<endl);
-        //err = glXMakeCurrent( disp.Disp(), window, ctx );        
+        //err = glXMakeCurrent( disp->Disp(), window, ctx );        
         err = _Window::AddEvent(event);
         switch (get_buffer_mode()) {
                 case buffer_front: // Make sure drawing gets to screen
                         glFlush();
                         break;
                 case buffer_back: // Bring back buffer to front
-                        glXSwapBuffers ( disp.Disp(), this->window );
+                        glXSwapBuffers ( disp->Disp(), this->window );
                         break;
         }
 
@@ -572,7 +572,7 @@ int X11Window::CreateGLContext()
         // If it "does", try to get a GL 3.0 context!
         else
         {
-                glXMakeCurrent( disp.Disp(), 0, 0 );
+                glXMakeCurrent( disp->Disp(), 0, 0 );
 
                 static int context_attribs[] =
                 {
@@ -583,7 +583,7 @@ int X11Window::CreateGLContext()
                 };
 
                 printf( "Creating context\n" );
-                ctx = glXCreateContextAttribsARB( disp.Disp(), fbc[ fbc_id ], 0, 
+                ctx = glXCreateContextAttribsARB( disp->Disp(), fbc[ fbc_id ], 0, 
                                 True, context_attribs );
                 if ( ctx )
                         printf( "Created GL 3.0 context\n" );
@@ -596,7 +596,7 @@ int X11Window::CreateGLContext()
         if (!ctx)
         {
                 printf( " ... using old-style GLX context\n" );
-                ctx = glXCreateContext( disp.Disp(), this->vi, 0, True );
+                ctx = glXCreateContext( disp->Disp(), this->vi, 0, True );
         }
 
 
@@ -605,7 +605,7 @@ int X11Window::CreateGLContext()
 
         // Verifying that context is a direct context
         printf( "Verifying that context is direct\n" );
-        if ( ! glXIsDirect ( disp.Disp(), ctx ) )
+        if ( ! glXIsDirect ( disp->Disp(), ctx ) )
         {
                 printf( "Indirect GLX rendering context obtained" );
         }

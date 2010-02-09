@@ -87,7 +87,8 @@ namespace GLUI
         class X11Window : public _Window
         {
                 public:
-                        X11Window(X11Display& display, ::Window parent_window,
+                        X11Window(NCRC_AutoPtr<X11Display> display,
+                                        ::Window parent_window,
                                         int x, int y,
                                         unsigned int width, unsigned int height,
                                         unsigned int border_width,
@@ -96,7 +97,7 @@ namespace GLUI
                                         Visual *visual,
                                         unsigned long valuemask,
                                         XSetWindowAttributes *attributes );
-                        X11Window(X11Display &display, ::Window parent,
+                        X11Window(NCRC_AutoPtr<X11Display> display, ::Window parent,
                                         int x, int y,
                                         unsigned int width, unsigned int height,
                                         unsigned int border_width,
@@ -128,7 +129,7 @@ namespace GLUI
                 public : //operators
                         bool operator== (::Window target);
                 protected: //variables
-                        X11Display& disp;
+                        NCRC_AutoPtr<X11Display> disp;
                         XVisualInfo *vi;
                         GLXFBConfig *fbc;
                         int fbc_id;

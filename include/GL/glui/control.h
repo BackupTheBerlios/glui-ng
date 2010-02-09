@@ -147,7 +147,7 @@ namespace GLUI
             virtual int AddEvent (::XMappingEvent* event) { return 0; };
             virtual int AddEvent (::XErrorEvent* event) { return 0; };
 
-
+            //this function can't be called into a constructor!
             virtual int         set_size( Size sz, Size min=Size(0u,0u) ); //replace with a XResizeRequestEvent
 
             void         set_alignment( Alignement align );

@@ -174,8 +174,8 @@ class myGluiWin : public GLUI::Window
 
                 };
         public :
-                myGluiWin(GLUI::Display& TheDisplay) : GLUI::Window(TheDisplay,
-                                TheDisplay.XDefaultScreenOfDisplay()->XRootWindowOfScreen(),
+                myGluiWin(NCRC_AutoPtr<GLUI::Display> TheDisplay) : GLUI::Window(TheDisplay,
+                                TheDisplay->XDefaultScreenOfDisplay()->XRootWindowOfScreen(),
                                 -1, -1,
                                 200, 200,
                                 1,
@@ -198,14 +198,12 @@ int main(int argc, char** argv)
 
         struct timespec sleeptime = { 500, 0 };
         GLUI::Window::init(&argc, argv);  //optional
-        GLUI::Display*    TheDisplay = new GLUI::Display();
-        GLUI::Window* Window = new myGluiWin(*TheDisplay);
+        NCRC_AutoPtr<GLUI::Display>    TheDisplay = new GLUI::Display();
+        NCRC_AutoPtr<GLUI::Window> Window = new myGluiWin(TheDisplay);
         Window->XMapWindow();
         nanosleep(&sleeptime, NULL);
         Window->XUnmapWindow();
         nanosleep(&sleeptime, NULL);
-        delete(Window); 
-        delete(TheDisplay);
         exit(0);
 
 }
