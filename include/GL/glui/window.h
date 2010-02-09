@@ -101,7 +101,7 @@ namespace GLUI
         };
 
 
-        class _Window : public Container, public NonCopyableReferenceCountedClass
+        class _Window : public Container
         {
                 public : //types
                         enum buffer_mode_t
@@ -156,8 +156,6 @@ namespace GLUI
                         static void* _Start(void* args);
                         int _Stop();
                         virtual int start_routine()=0; //< the thead main routine;
-
-                        long flags;
                         int  SetCurrentDrawBuffer( void );
                 protected: //variables
                         ::Window window;
@@ -165,6 +163,7 @@ namespace GLUI
                         pthread_t main_thread;
                         bool mapped;
                         bool thread_enabled;
+                        long flags;
 
         };
 

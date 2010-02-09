@@ -22,7 +22,7 @@
 
 namespace GLUI
 {
-        class DataArray  : public NonCopyableClass
+        class DataArray  : public NonCopyableReferenceCountedClass
         {
                 public : //types
                         enum datatype { UNDEF   = 0,

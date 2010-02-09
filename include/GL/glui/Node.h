@@ -37,30 +37,35 @@ namespace GLUI
                         NCRC_AutoPtr<Node> parent()        { return parent_node; }
                         NCRC_AutoPtr<Node> GetRootNode();
 
-                        /** Link in a new child control */
-                        virtual int  add_control( NCRC_AutoPtr<Node> control );
+                        virtual int add_control( NCRC_AutoPtr<Node> control ); //< Link in a new child control
+                        virtual int RemoveChild(  NCRC_AutoPtr<Node> child  ); //< remove child from child list
+                        virtual int RemoveParent( NCRC_AutoPtr<Node> parent ); //< remove parent from parents list
 
-                        void link_this_to_parent_last (NCRC_AutoPtr<Node> parent  );
-                        void link_this_to_parent_first(NCRC_AutoPtr<Node> parent  );
-                        void link_this_to_sibling_next(NCRC_AutoPtr<Node> sibling );
-                        void link_this_to_sibling_prev(NCRC_AutoPtr<Node> sibling );
-                        void unlink();
+                        virtual void removeReference();
+
 
                         void dump( FILE *out, const char *name );
                         const char* whole_tree(int start=1);
-                        const char* NodeName;
 
                         int level() { return _level;}
 
+                protected:// methodes
+                        void LinkLast( NCRC_AutoPtr<Node> new_child );
+                        void link_this_to_parent_first(NCRC_AutoPtr<Node> parent  );
+                        void link_this_to_sibling_next(NCRC_AutoPtr<Node> sibling );
+                        void link_this_to_sibling_prev(NCRC_AutoPtr<Node> sibling );
 
                 protected:
                         int _level;   //node level, used for debug purpose
-                        Node();
+                        int ChildCount;
                         NCRC_AutoPtr<Node> parent_node;
                         NCRC_AutoPtr<Node> child_head;
                         NCRC_AutoPtr<Node> child_tail;
                         NCRC_AutoPtr<Node> next_sibling;
                         NCRC_AutoPtr<Node> prev_sibling;
+                        const char* NodeName;
+                private:
+                        Node();
         };
 }
 #endif

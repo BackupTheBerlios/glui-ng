@@ -21,7 +21,7 @@ namespace GLUI
     {
 
         public:
-            static NCRC_AutoPtr<MasterObject> Instance();
+            static NCRC_AutoPtr<Node> Instance();
             NCRC_AutoPtr<GLUI::Window>      FindWindow( ::Window window_id );
             virtual int  add_control( Node *window );
             virtual void pack( int x, int y);

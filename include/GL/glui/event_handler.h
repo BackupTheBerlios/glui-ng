@@ -31,9 +31,11 @@
 *****************************************************************************/
 #include <X11/Xlib.h>
 #include <errno.h>
+#include <GL/glui/NonCopyableClass.h>
+
 namespace GLUI
 {
-	class EventHandler
+	class EventHandler : public NonCopyableReferenceCountedClass
 	{
 		public : //methods
 			virtual int AddEvent(::XEvent *event) = 0;

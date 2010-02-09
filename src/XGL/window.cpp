@@ -28,6 +28,7 @@
  *****************************************************************************/
 #include <GL/glui/debug.h>
 #include <GL/glui/x11_window.h>
+#include <string.h>
 #undef Display
 #define MODULE_KEY "GLUI_DEBUG_XGL"
 using namespace GLUI;
@@ -305,6 +306,7 @@ int X11Window::start_routine()
         IN("\n");
         int err = 0;
         ::XEvent event;
+        ::memset(&event,0,sizeof(event));
 
         while(this->thread_enabled && err == 0) 
         {

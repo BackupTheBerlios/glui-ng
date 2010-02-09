@@ -48,8 +48,8 @@ class GLUIAPI Collapsible : public Container
 
     protected :
         bool            is_open;
-        Control*   Toggle; //the toggle ie widget that is always displayed
-        Control*   Content; //the content that can or not be displayed
+        NCRC_AutoPtr<Control>   Toggle; //the toggle ie widget that is always displayed
+        NCRC_AutoPtr<Control>   Content; //the content that can or not be displayed
 };
 
 }

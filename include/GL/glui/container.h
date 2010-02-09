@@ -58,9 +58,9 @@ namespace GLUI
             virtual void update_size( void ); //<recursively update all control sizes
             virtual int  UpdateTheme( void );
             virtual void pack ( int x, int y); //<recursively update positions
-             void set_orientation( orientation new_orientation);
+            void set_orientation( orientation new_orientation);
             virtual void align( void );
-            virtual int  add_control( Node *control );
+            virtual int  add_control( NCRC_AutoPtr<Node> control );
 
             virtual int AddEvent (::XEvent* event);
             virtual int AddEvent (::XKeyEvent* event);
@@ -101,21 +101,13 @@ namespace GLUI
             orientation GetParentOrientation();
 
         protected : //internal API
-             Control* FindChildWidget(int x, int y);
+            NCRC_AutoPtr<Control> FindChildWidget(int x, int y);
             int BroadcastEvent(::XEvent* event, int EventType, long mask_check);
             int ForwardEvent(::XEvent* event, int* eventX, int* eventY, int EventType, long mask_check);
 
          protected : //variables
             orientation CurrOrientation;
-            int         total_child_w;
-
-
-            int         contain_x, contain_y;
-            int         contain_w, contain_h;
             long        DoNotPropagateMask;
-            /* if this is a container control (e.g.,
-               radiogroup or panel) this indicated dimensions
-               of inner area in which controls reside */
 
     };
 

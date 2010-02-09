@@ -45,8 +45,8 @@ Collapsible::Collapsible(const char *name,
 
 void    Collapsible::open( bool recurse )
 {
-	Collapsible*    ctrl;
-	Node*           node;
+	NCRC_AutoPtr<Collapsible>    ctrl;
+	NCRC_AutoPtr<Node>           node;
 
 
 	if ( is_open )
@@ -57,10 +57,10 @@ void    Collapsible::open( bool recurse )
 
 	if (recurse)
 	{
-		node = Content;
+		node = dynamic_cast<Node*>(Content.getPointee());
 		while (node != NULL)
 		{
-			ctrl=static_cast<Collapsible*>(node);
+			ctrl=dynamic_cast<Collapsible*>(node.getPointee());
 			if (ctrl != NULL)
 			{
 				ctrl->open(recurse);
@@ -83,16 +83,16 @@ void    Collapsible::close( bool recurse )
 
 	this->CurrentSize.size.h = Toggle->Height();
 
-	Collapsible*    ctrl;
-	Node*           node;
+	NCRC_AutoPtr<Collapsible>    ctrl;
+	NCRC_AutoPtr<Node>           node;
 	is_open = false;
 
 	if (recurse)
 	{
-		node = Content;
+		node = dynamic_cast<Node*>(Content.getPointee());
 		while (node != NULL)
 		{
-			ctrl=static_cast<Collapsible*>(node);
+			ctrl=dynamic_cast<Collapsible*>(node.getPointee());
 			if (ctrl != NULL)
 			{
 				ctrl->open(recurse);

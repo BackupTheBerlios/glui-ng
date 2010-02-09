@@ -25,7 +25,7 @@
 namespace GLUI
 {
 
-        class VertexObject
+        class VertexObject : public NonCopyableReferenceCountedClass
         {
                 public:
                         ~VertexObject();

@@ -27,7 +27,7 @@
 
 namespace GLUI
 {
-        class Texture : public NonCopyableClass
+        class Texture : public NonCopyableReferenceCountedClass
         {
                 public :
                         Texture(const std::string& filename);

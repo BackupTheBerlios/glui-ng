@@ -63,6 +63,10 @@ _Display::_Display()
 _Window::_Window() :
     Container("window")
 {
+        args = NULL;
+        mapped = false;
+        thread_enabled = false;
+        flags = 0;
         SetTheme(new _Window::DefaultTheme(*this));
 }
 _Window::~_Window()

@@ -42,9 +42,10 @@ namespace GLUI
                                 NCRC_AutoPtr(const NCRC_AutoPtr& rhs);
                                 ~NCRC_AutoPtr();
                                 NCRC_AutoPtr& operator=(const NCRC_AutoPtr& rhs);
-                                void SetPointee(T* NewPointee); //< broadcast the pointee
                                 bool operator==(const T* rhs);
+                                bool operator==(const NCRC_AutoPtr& rhs);
                                 bool operator!=(const T* rhs);
+                                bool operator!=(const NCRC_AutoPtr& rhs);
 
                                 T* operator->() const;
                                 T& operator*() const;
@@ -61,15 +62,18 @@ namespace GLUI
         template<class T>
                 void NCRC_AutoPtr<T>::init()
                 {
-                        if (pointee->isShareable() == false) 
+                        if (pointee != NULL)
                         {
-                                throw Exception(EINVAL,"trying to duplicate a non copyable object");
-                                //T *oldValue = this->pointee;
-                                //counter = new CountHolder;
-                                //counter->pointee = oldValue ? new T(*oldValue) : 0;
-                        } 
+                                if (pointee->isShareable() == false) 
+                                {
+                                        throw Exception(EINVAL,"trying to duplicate a non copyable object");
+                                        //T *oldValue = this->pointee;
+                                        //counter = new CountHolder;
+                                        //counter->pointee = oldValue ? new T(*oldValue) : 0;
+                                } 
 
-                        pointee->addReference();
+                                pointee->addReference();
+                        }
                 }
 
         template<class T>
@@ -89,7 +93,10 @@ namespace GLUI
         template<class T>
                 NCRC_AutoPtr<T>::~NCRC_AutoPtr()
                 {
-                        pointee->removeReference();
+                        if (pointee != NULL)
+                        {
+                                pointee->removeReference();
+                        }
                 }
 
         template<class T>
@@ -97,12 +104,16 @@ namespace GLUI
                 {
                         if (pointee != rhs.pointee) 
                         {
-                                pointee->removeReference();
+                                if (pointee != NULL)
+                                {
+                                        pointee->removeReference();
+                                }
                                 pointee = rhs.pointee;
                                 init();
                         }
                         return *this;
                 }
+
 
         template<class T>
                 bool NCRC_AutoPtr<T>::operator==(const T* rhs)
@@ -111,9 +122,21 @@ namespace GLUI
                 }
 
         template<class T>
+                bool NCRC_AutoPtr<T>::operator==(const NCRC_AutoPtr& rhs)
+                {
+                        return (this->pointee == rhs.pointee);
+                }
+
+
+        template<class T>
                 bool NCRC_AutoPtr<T>::operator!=(const T* rhs)
                 {
                         return (this->pointee != rhs);
+                }
+        template<class T>
+                bool NCRC_AutoPtr<T>::operator!=(const NCRC_AutoPtr& rhs)
+                {
+                        return (this->pointee != rhs.pointee);
                 }
 
 
