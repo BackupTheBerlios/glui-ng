@@ -35,8 +35,8 @@ namespace GLUI
         class NonCopyableReferenceCountedClass :public NonCopyableClass
         {
                 public:
-                        void addReference();
-                        void removeReference();
+                        virtual void addReference();
+                        virtual void removeReference();
                         void markUnshareable();
                         bool isShareable() const;
                         bool isShared() const;

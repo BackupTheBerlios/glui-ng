@@ -22,7 +22,7 @@
 
 namespace GLUI
 {
-        class DataArray  : public NonCopyableClass
+        class DataArray  : public NonCopyableReferenceCountedClass
         {
                 public : //types
                         enum datatype { UNDEF   = 0,
@@ -46,7 +46,7 @@ namespace GLUI
                                 float* pfloat;
                                 double* pdouble;
                         };
-                public :
+                public : //variables
                         uint8_t ComponentsCount;    //< number of components per entry
                                                     //< for vertices it is the number of
                                                     //< vertices per entry (3d=3, 2d=2)
@@ -55,7 +55,7 @@ namespace GLUI
                         uint32_t count;
                         datatype datatype_t;
                         pointers array;
-                        /// methods
+                public: // methods
                         DataArray(uint32_t count,
                                         uint8_t ComponentsCount,
                                         datatype datatype_t);
@@ -66,7 +66,7 @@ namespace GLUI
                         virtual ~DataArray();
                 public : //operators
                         operator GLenum();
-                private:
+                private: //methods
                         void _DataArray(uint32_t count, uint8_t ComponentsCount, datatype datatype_t,pointers data);
                         int CpyArray(pointers data);
         };

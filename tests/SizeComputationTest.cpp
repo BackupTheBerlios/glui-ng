@@ -52,7 +52,7 @@ class DoForward : public Container
 //////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
-    DoForward* root = new DoForward("root");
+    NCRC_AutoPtr<DoForward> root = new DoForward("root");
     DoNotForward* branch1 = new DoNotForward("branch1");
     DoForward* branch2 = new DoForward("branch2");
     LeefKo* leefb1 = new LeefKo("leefb1");
@@ -103,7 +103,7 @@ int main(int argc, char* argv[])
     assert(root->Width() == branch1->Width() + branch2->Width() + root->XOffLeft() + root->XOffRight());
     assert(root->Height() ==  max<int>(branch1->Height(), branch2->Height()) + root->YOffTop() + root->YOffBot());
 
-    delete root; //will delete everything recursively bellow it
+    root = NULL; //will delete everything recursively bellow it
 
     return 0;
 }
