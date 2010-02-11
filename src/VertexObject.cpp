@@ -36,11 +36,6 @@ using namespace GLUI;
 VertexObject::VertexObject ()
 {
     IN("\n");
-    Vertices = NULL;
-    Indices  = NULL;
-    Colors   = NULL;
-    Normals  = NULL;
-    TextureData  = NULL;
     TextureCount = 0;
 
     float no_mat[] = {0.0f, 0.0f, 0.0f, 1.0f};
@@ -49,6 +44,14 @@ VertexObject::VertexObject ()
     float mat_diffuse[] = {0.1f, 0.5f, 0.8f, 1.0f};
     float mat_specular[] = {1.0f, 1.0f, 1.0f, 1.0f};
     float mat_emission[] = {0.3f, 0.2f, 0.2f, 0.0f};
+
+
+    memset(this->no_mat, 0, 4*sizeof(float));
+    memset(this->mat_ambient, 0, 4*sizeof(float));
+    memset(this->mat_ambient_color, 0, 4*sizeof(float));
+    memset(this->mat_diffuse, 0, 4*sizeof(float));
+    memset(this->mat_specular, 0, 4*sizeof(float));
+    memset(this->mat_emission, 0, 4*sizeof(float));
 
     memcpy(this->no_mat, no_mat, sizeof(no_mat)/sizeof(no_mat[0]));
     memcpy(this->mat_ambient, mat_ambient, sizeof(mat_ambient)/sizeof(mat_ambient[0]));
@@ -264,9 +267,9 @@ int VertexObject::ComputeNormals()
         std::cerr << err.what();
         throw;
     }
-    catch(Exception* err)
+    catch(Exception& err)
     {
-        std::cerr << err->what();
+        std::cerr << err.what();
         throw;
     }
     V3List** VerticeAndNormalsArray;
@@ -331,7 +334,7 @@ int VertexObject::ComputeNormals()
                         if (Indices->ComponentsCount == 4) index4 = Indices->array.pint32[face * Indices->ComponentsCount + 3 ];
                         break;
                 default:
-                        throw new Exception(EINVAL, "Indices has not an int type");
+                        throw Exception(EINVAL, "Indices has not an int type");
 
         }
         switch ( Vertices->datatype_t)
@@ -425,7 +428,7 @@ int VertexObject::ComputeNormals()
                         fVertice2[2] = Vertices->array.pdouble[index3*Vertices->ComponentsCount +2];
                         break;
                 default :
-                        throw new Exception(EINVAL, "Vertices has an undefined type");
+                        throw Exception(EINVAL, "Vertices has an undefined type");
 
         }
         vec3 v0( fVertice0 );

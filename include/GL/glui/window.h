@@ -84,17 +84,17 @@ namespace GLUI
         {
                 public :
                         virtual int XDefaultDepthOfScreen()  =0;
-                        virtual ::Window XRootWindowOfScreen() =0;
+                        virtual NCRC_AutoPtr<_Window> XRootWindowOfScreen() =0;
                         virtual ::Screen* Screen()=0;
         };
 
         class _Display  : public NonCopyableReferenceCountedClass
         {
                 public :
-                        virtual _Screen* XDefaultScreenOfDisplay()  =0;
+                        virtual NCRC_AutoPtr<_Screen> XDefaultScreenOfDisplay()  =0;
                         //virtual _Screen* XScreenOfDisplay(int screen_number) =0;
-                        virtual _Window* XDefaultRootWindow() =0;
-                        virtual _Window* XRootWindow(int screen_number) =0;
+                        virtual NCRC_AutoPtr<_Window> XDefaultRootWindow() =0;
+                        virtual NCRC_AutoPtr<_Window> XRootWindow(int screen_number) =0;
                         int DefaultVisual();
                 protected :
                         _Display();
@@ -152,7 +152,7 @@ namespace GLUI
                         };
                 protected : //methods
                         _Window();
-                        void Start(); //start event handler, shall be started in child constructor;
+                        virtual void Start(); //start event handler, shall be started in child constructor;
                         static void* _Start(void* args);
                         int _Stop();
                         virtual int start_routine()=0; //< the thead main routine;
@@ -180,6 +180,7 @@ namespace GLUI
                         virtual KeySym XLookupKeysym(::XKeyEvent *key_event, int index) {return 0;}
                         virtual int XSendEvent(::XEvent &evt) {return 0;};
                 protected:
+                        virtual void Start() {thread_enabled = false;}
                         virtual int start_routine() { return 0; }
                 private:
                         ROWindow();

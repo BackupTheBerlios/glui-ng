@@ -40,9 +40,9 @@ int X11Screen::XDefaultDepthOfScreen()
 {
         return ::XDefaultDepthOfScreen(TheScreen);
 }
-::Window X11Screen::XRootWindowOfScreen()
+NCRC_AutoPtr<_Window> X11Screen::XRootWindowOfScreen()
 {
-        return ::XRootWindowOfScreen(TheScreen);
+        return NCRC_AutoPtr<_Window>(new ROWindow(::XRootWindowOfScreen(TheScreen)));
 }
 
 ::Screen* X11Screen::Screen()
@@ -73,16 +73,20 @@ void X11Display::_X11Display(char* name)
         }
 }
 
+X11Display::~X11Display()
+{
+        XCloseDisplay(disp);
+}
 
-_Screen* X11Display::XDefaultScreenOfDisplay()
+NCRC_AutoPtr<_Screen> X11Display::XDefaultScreenOfDisplay()
 {
         return new X11Screen(::XDefaultScreenOfDisplay(disp));
 }
-_Window* X11Display::XDefaultRootWindow()
+NCRC_AutoPtr<_Window> X11Display::XDefaultRootWindow()
 {
         return new ROWindow(::XDefaultRootWindow(disp));
 }
-_Window* X11Display::XRootWindow(int screen_number)
+NCRC_AutoPtr<_Window> X11Display::XRootWindow(int screen_number)
 {
         return new ROWindow(::XRootWindow(disp,screen_number));
 }
@@ -92,7 +96,8 @@ _Window* X11Display::XRootWindow(int screen_number)
 }
 
 /////////////////////////////////////////////////////////////////////
-X11Window::X11Window(NCRC_AutoPtr<X11Display> display, ::Window parent_window,
+X11Window::X11Window(NCRC_AutoPtr<X11Display> display,
+                NCRC_AutoPtr<_Window> parent_window,
                 int x, int y,
                 unsigned int width, unsigned int height,
                 unsigned int border_width,
@@ -114,61 +119,10 @@ X11Window::X11Window(NCRC_AutoPtr<X11Display> display, ::Window parent_window,
                 attributes );
 }
 
-void X11Window::_X11Window(::Window parent_window,
-                int x, int y,
-                unsigned int width, unsigned int height,
-                unsigned int border_width,
-                int depth,
-                unsigned int _class,
-                Visual *visual,
-                unsigned long valuemask,
-                XSetWindowAttributes *attributes )
-{
-/*        EventMask = KeyPressMask 
-                    | KeyReleaseMask 
-                    | ButtonPressMask 
-                    | ButtonReleaseMask 
-                    | EnterWindowMask 
-                    | LeaveWindowMask 
-                    | PointerMotionMask
-                    | PointerMotionHintMask
-                    | Button1MotionMask
-                    | Button2MotionMask
-                    | Button3MotionMask
-                    | Button4MotionMask
-                    | Button5MotionMask
-                    | ButtonMotionMask
-                    | KeymapStateMask
-                    | ExposureMask
-                    | VisibilityChangeMask
-                    | StructureNotifyMask
-                    | ResizeRedirectMask
-                    | SubstructureNotifyMask
-                    | SubstructureRedirectMask
-                    | FocusChangeMask
-                    | PropertyChangeMask
-                    | ColormapChangeMask
-                    | OwnerGrabButtonMask ;*/
-        window = XCreateWindow (disp->Disp(), parent_window,
-                x, y,
-                width, height,
-                border_width,
-                depth,
-                _class,
-                visual,
-                valuemask,
-                attributes );
-        if ( !window )
-                throw Exception(EINVAL,"Failed to create window.\n" );
 
-        XSelectInput(disp->Disp(), window, EventMask);
-        Atom wmDeleteMessage = ::XInternAtom(disp->Disp(), "WM_DELETE_WINDOW", False);
-        ::XSetWMProtocols(disp->Disp(), window, &wmDeleteMessage, 1);
 
-        hasContext=false;
-        dirty=false;
-}
-X11Window::X11Window(NCRC_AutoPtr<X11Display> display, ::Window parent,
+X11Window::X11Window(NCRC_AutoPtr<X11Display> display,
+                NCRC_AutoPtr<_Window> parent_window,
                 int x, int y,
                 unsigned int width, unsigned int height,
                 unsigned int border_width,
@@ -276,13 +230,69 @@ X11Window::X11Window(NCRC_AutoPtr<X11Display> display, ::Window parent,
         swa.event_mask        = EventMask;
 
         printf( "Creating window\n" );
-        _X11Window( parent, 
+        _X11Window( parent_window, 
                         x, y, width, height, border_width, this->vi->depth, InputOutput, 
                         this->vi->visual, 
                         CWBorderPixel|CWColormap|CWEventMask, &swa );
 
 
 }
+
+void X11Window::_X11Window(NCRC_AutoPtr<_Window> parent_window,
+                int x, int y,
+                unsigned int width, unsigned int height,
+                unsigned int border_width,
+                int depth,
+                unsigned int _class,
+                Visual *visual,
+                unsigned long valuemask,
+                XSetWindowAttributes *attributes )
+{
+/*        EventMask = KeyPressMask 
+                    | KeyReleaseMask 
+                    | ButtonPressMask 
+                    | ButtonReleaseMask 
+                    | EnterWindowMask 
+                    | LeaveWindowMask 
+                    | PointerMotionMask
+                    | PointerMotionHintMask
+                    | Button1MotionMask
+                    | Button2MotionMask
+                    | Button3MotionMask
+                    | Button4MotionMask
+                    | Button5MotionMask
+                    | ButtonMotionMask
+                    | KeymapStateMask
+                    | ExposureMask
+                    | VisibilityChangeMask
+                    | StructureNotifyMask
+                    | ResizeRedirectMask
+                    | SubstructureNotifyMask
+                    | SubstructureRedirectMask
+                    | FocusChangeMask
+                    | PropertyChangeMask
+                    | ColormapChangeMask
+                    | OwnerGrabButtonMask ;*/
+        window = XCreateWindow (disp->Disp(), parent_window->GetWindowId(),
+                x, y,
+                width, height,
+                border_width,
+                depth,
+                _class,
+                visual,
+                valuemask,
+                attributes );
+        if ( !window )
+                throw Exception(EINVAL,"Failed to create window.\n" );
+
+        XSelectInput(disp->Disp(), window, EventMask);
+        Atom wmDeleteMessage = ::XInternAtom(disp->Disp(), "WM_DELETE_WINDOW", False);
+        ::XSetWMProtocols(disp->Disp(), window, &wmDeleteMessage, 1);
+
+        hasContext=false;
+        dirty=false;
+}
+
 
 X11Window::~X11Window()
 {

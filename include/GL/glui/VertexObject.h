@@ -70,7 +70,7 @@ namespace GLUI
 
 
                         int draw();                        //< draw the object at current place current opengl state
-                protected :
+                protected : //types
                         struct V3List
                         {
                                 vec3 vertex;
@@ -94,10 +94,10 @@ namespace GLUI
                         float mat_ambient_color[4];
                         float mat_diffuse[4];
                         float mat_specular[4];
+                        float mat_emission[4];
                         float no_shininess;
                         float low_shininess;
                         float high_shininess;
-                        float mat_emission[4];
 
 
 

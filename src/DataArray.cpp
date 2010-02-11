@@ -65,10 +65,10 @@ DataArray::DataArray (uint32_t count, uint8_t ComponentsCount, datatype data_t, 
 void DataArray::_DataArray (uint32_t count, uint8_t ComponentsCount, datatype data_t, pointers data)
 {
     IN("array " << this << endl);
-    this->array.all=NULL;
+    this->ComponentsCount = ComponentsCount;
     this->count = count;
     this->datatype_t = data_t;
-    this->ComponentsCount = ComponentsCount;
+    this->array.all=NULL;
     try
     {
         if (this->count == 0) GLUI_THROW(EINVAL, "count is zero, cowardly refuse to allocate empty array");
@@ -77,27 +77,35 @@ void DataArray::_DataArray (uint32_t count, uint8_t ComponentsCount, datatype da
         {
             case UINT8_T:
                 this->array.puint8 = new uint8_t[this->count * this->ComponentsCount];
+                memset(this->array.all,0,sizeof(uint8_t)*this->count*this->ComponentsCount);
                 break;
             case INT8_T:
                 this->array.pint8 = new int8_t[this->count * this->ComponentsCount];
+                memset(this->array.all,0,sizeof(int8_t)*this->count*this->ComponentsCount);
                 break;
             case UINT16_T:
                 this->array.puint16 = new uint16_t[this->count * this->ComponentsCount];
+                memset(this->array.all,0,sizeof(uint16_t)*this->count*this->ComponentsCount);
                 break;
             case INT16_T:
                 this->array.pint16 = new int16_t[this->count * this->ComponentsCount];
+                memset(this->array.all,0,sizeof(int16_t)*this->count*this->ComponentsCount);
                 break;
             case UINT32_T:
                 this->array.puint32 = new uint32_t[this->count * this->ComponentsCount];
+                memset(this->array.all,0,sizeof(uint32_t)*this->count*this->ComponentsCount);
                 break;
             case INT32_T:
                 this->array.pint32 = new int32_t[this->count * this->ComponentsCount];
+                memset(this->array.all,0,sizeof(int32_t)*this->count*this->ComponentsCount);
                 break;
             case FLOAT:
                 this->array.pfloat = new float[this->count * this->ComponentsCount];
+                memset(this->array.all,0,sizeof(float)*this->count*this->ComponentsCount);
                 break;
             case DOUBLE:
                 this->array.pdouble = new double[this->count * this->ComponentsCount];
+                memset(this->array.all,0,sizeof(double)*this->count*this->ComponentsCount);
                 break;
             default:
                 GLUI_THROW(EINVAL, "unkown datatype");
@@ -113,9 +121,9 @@ void DataArray::_DataArray (uint32_t count, uint8_t ComponentsCount, datatype da
         std::cerr << err.what();
         throw;
     }
-    catch(Exception* err)
+    catch(Exception& err)
     {
-        std::cerr << err->what();
+        std::cerr << err.what();
         throw;
     }
     OUT("data" << this->array.all << endl);
