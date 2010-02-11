@@ -29,9 +29,6 @@ namespace GLUI
 
 			StaticText(Node *parent, const char *name);
 
-		protected:
-                        virtual theme* GetDefaultTheme();
-
 	};
 }
 #endif

@@ -159,13 +159,12 @@ void X11Window::_X11Window(::Window parent_window,
                 attributes );
         if ( !window )
                 throw Exception(EINVAL,"Failed to create window.\n" );
-        CreateGLContext();
-        if (ctx == 0)
-                throw Exception(ENOTSUP,"Failed to create GLX context.\n");
+
         XSelectInput(disp.Disp(), window, EventMask);
         Atom wmDeleteMessage = ::XInternAtom(disp.Disp(), "WM_DELETE_WINDOW", False);
         ::XSetWMProtocols(disp.Disp(), window, &wmDeleteMessage, 1);
 
+        hasContext=false;
         dirty=false;
 }
 X11Window::X11Window(X11Display &display, ::Window parent,
@@ -263,24 +262,23 @@ X11Window::X11Window(X11Display &display, ::Window parent,
         fbc_id = best_fbc;
         //int fbc_id = worst_fbc;
 
-        XVisualInfo *vi = glXGetVisualFromFBConfig( disp.Disp(), fbc[ fbc_id ]  );
-        printf( "Chosen visual ID = 0x%x\n", vi->visualid );
+        this->vi = glXGetVisualFromFBConfig( disp.Disp(), fbc[ fbc_id ]  );
+        printf( "Chosen visual ID = 0x%x\n", this->vi->visualid );
 
         printf( "Creating colormap\n" );
         XSetWindowAttributes swa;
         swa.colormap = XCreateColormap( disp.Disp(),
-                        disp.XRootWindow( vi->screen )->GetWindowId(), 
-                        vi->visual, AllocNone );
+                        disp.XRootWindow( this->vi->screen )->GetWindowId(), 
+                        this->vi->visual, AllocNone );
         swa.background_pixmap = None ;
         swa.border_pixel      = 0;
         swa.event_mask        = EventMask;
 
         printf( "Creating window\n" );
         _X11Window( parent, 
-                        x, y, width, height, border_width, vi->depth, InputOutput, 
-                        vi->visual, 
+                        x, y, width, height, border_width, this->vi->depth, InputOutput, 
+                        this->vi->visual, 
                         CWBorderPixel|CWColormap|CWEventMask, &swa );
-        XFree(vi);
 
 
 }
@@ -288,6 +286,10 @@ X11Window::X11Window(X11Display &display, ::Window parent,
 X11Window::~X11Window()
 {
         IN("\n");
+
+        XFree(vi);
+        XFree( fbc );
+
         ::XClientMessageEvent wakeup;
         wakeup.type = ClientMessage;
         wakeup.format = 32;
@@ -478,6 +480,11 @@ int X11Window::AddEvent(::XMapEvent *event)
         int err;
         IN(debug::Instance()->EventTypeToString(event->type)<<endl);
         printf( "Making context current\n" );
+        if(this->hasContext == false) 
+        {
+                CreateGLContext();
+                this->hasContext = true;
+        }
         err = glXMakeCurrent( disp.Disp(), window, ctx );
         err = Container::AddEvent(event);
         mapped = True;
@@ -517,6 +524,7 @@ int X11Window::AddEvent(::XExposeEvent* event)
 {
         int err;
         IN(debug::Instance()->EventTypeToString(event->type)<<endl);
+        //err = glXMakeCurrent( disp.Disp(), window, ctx );        
         err = _Window::AddEvent(event);
         switch (get_buffer_mode()) {
                 case buffer_front: // Make sure drawing gets to screen
@@ -586,20 +594,18 @@ int X11Window::CreateGLContext()
         if (!ctx)
         {
                 printf( " ... using old-style GLX context\n" );
-                XVisualInfo *vi = glXGetVisualFromFBConfig( disp.Disp(), fbc[ fbc_id ]  );
-                ctx = glXCreateContext( disp.Disp(), vi, 0, True );
-                XFree(vi);
+                ctx = glXCreateContext( disp.Disp(), this->vi, 0, True );
         }
 
-        XFree( fbc );
-        fbc = NULL;
+
+        if (!ctx )
+                throw Exception(ENOTSUP,"Failed to create GLX context.\n");
 
         // Verifying that context is a direct context
         printf( "Verifying that context is direct\n" );
         if ( ! glXIsDirect ( disp.Disp(), ctx ) )
         {
                 printf( "Indirect GLX rendering context obtained" );
-                exit(1);
         }
 
 }

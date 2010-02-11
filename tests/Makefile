@@ -60,7 +60,8 @@ NonCopyable_SOURCES = NonCopyable.cpp
 # this variable is used in Makefile.autoapp to create the required Makefiles
 # it then has to be set before including of Makefiles.autoapp
 noinst_CXXPROGRAMS+= SizeComputationTest PackingTest ContainerEventTest
-noinst_CXXPROGRAMS+= WindowTest KeyboardTest KeyboardUserTest
+noinst_CXXPROGRAMS+= WindowTest KeyboardTest KeyboardUserTest VertexObject_test
+noinst_CXXPROGRAMS+= SmartPointer_test
 #noinst_CXXPROGRAMS+= Lightning_test
 
 
@@ -98,7 +99,13 @@ Lightning_test_SOURCES = Lightning_test.cpp
 Lightning_test_LDADD   = ${LIBGLUIDLL}   ${BACKENDLIB}
 Lightning_test_ARADD   = ${LIBGLUIA}
 
+VertexObject_test_SOURCES = VertexObjectTest.cpp
+VertexObject_test_LDADD   = ${LIBGLUIDLL}   ${BACKENDLIB}
+VertexObject_test_ARADD   = ${LIBGLUIA}
 
+SmartPointer_test_SOURCES = SmartPointer_test.cpp
+SmartPointer_test_LDADD   = ${LIBGLUIDLL}   ${BACKENDLIB}
+SmartPointer_test_ARADD   = ${LIBGLUIA}
 
 clean : 
 	${CLEANINGMSG} ${MSGSUBDIR}

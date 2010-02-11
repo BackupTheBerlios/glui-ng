@@ -11,7 +11,6 @@ class LeefOk : public Control
         public :
                 LeefOk(char* name) : Control(name) {}
                 virtual int AddEvent (::XEvent* event);
-                virtual theme* GetDefaultTheme();
 };
 
 class LeefKo : public Control
@@ -19,12 +18,9 @@ class LeefKo : public Control
         public :
                 LeefKo(char* name) : Control(name) {}
                 virtual int AddEvent (::XEvent* event);
-                virtual theme* GetDefaultTheme();
 };
 
 
-theme* LeefOk::GetDefaultTheme() {return NULL;}
-theme* LeefKo::GetDefaultTheme() {return NULL;}
 
 int LeefOk::AddEvent(::XEvent* event)
 {
@@ -43,18 +39,14 @@ class DoNotForward : public Container
         public :
                 DoNotForward(char* name) : Container(name)
         { DoNotPropagateMask = KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask; }
-                virtual theme* GetDefaultTheme();
 };
-theme* DoNotForward::GetDefaultTheme() {return NULL;}
 
 class DoForward : public Container
 {
         public :
                 DoForward(char* name) : Container(name)
         { DoNotPropagateMask = 0; }
-                virtual theme* GetDefaultTheme();
 };
-theme* DoForward::GetDefaultTheme() {return NULL;}
 
 
 //////////////////////////////////////////////////////////////

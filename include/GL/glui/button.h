@@ -53,7 +53,6 @@ namespace GLUI
 		protected:
                         bool value;
 			void common_init(void) ;
-                        virtual theme* GetDefaultTheme();
 
 	};
 
@@ -98,7 +97,6 @@ namespace GLUI
 		protected:
 			//		void draw_text( int sunken );
 			StaticText text;
-                        virtual theme* GetDefaultTheme();
 	};
 
 

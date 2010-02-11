@@ -219,18 +219,22 @@ void   Node::link_this_to_sibling_prev( Node *sibling )
 void   Node::unlink( void )
 {
   /* Unlink from prev sibling */
-  if ( this->prev_sibling != NULL ) {
+  if ( this->prev_sibling != NULL ) 
+  {
     this->prev_sibling->next_sibling = this->next_sibling;
   }
-  else {                 /* No prev sibling: this was parent's first child */
+  else if (this->parent_node != NULL )
+  {                 /* No prev sibling: this was parent's first child */
     this->parent_node->child_head = this->next_sibling;
   }
 
   /* Unlink from next sibling */
-  if ( this->next_sibling != NULL ) {
+  if ( this->next_sibling != NULL )
+  {
     this->next_sibling->prev_sibling = this->prev_sibling;
   }
-  else {                /* No next sibling: this was parent's last child */
+  else if (this->parent_node != NULL) 
+  {                /* No next sibling: this was parent's last child */
     this->parent_node->child_tail = this->prev_sibling;
   }
 

@@ -76,12 +76,12 @@ VertexObject* LigthningTheme::raised_box( uint32_t w, uint32_t h, uint32_t thick
                 8 );
 
       }
-    VertexObject* vo = new VertexObject(3, 3, 4);
-    vo->SetVerticesArray(VertexObject::FLOAT, Vertices, 8);
-    vo->SetFaceIndicesArray (VertexObject::UINT8_T, indices, 5);
-    vo->SetColorArray (VertexObject::FLOAT, Colors, 8);
+    VertexObject* vo = new VertexObject();
+    vo->SetVerticesArray(DataArray::FLOAT, 3, Vertices, 8);
+    vo->SetFaceIndicesArray (DataArray::UINT8_T, 4, indices, 5);
+    vo->SetColorArray (DataArray::FLOAT, 3, Colors, 8);
     //vo->ComputeNormals();
-    vo->SetNormalArray (VertexObject::FLOAT, Normals, 8);
+    vo->SetNormalArray (DataArray::FLOAT, 3, Normals, 8);
     return vo;
 
 }
@@ -130,10 +130,10 @@ VertexObject* LigthningTheme::lowered_box( uint32_t w, uint32_t h, uint32_t thic
                 8 );
 
       }
-    VertexObject* vo = new VertexObject(3, 3, 4);
-    vo->SetVerticesArray(VertexObject::FLOAT, Vertices, 8);
-    vo->SetFaceIndicesArray (VertexObject::UINT8_T, indices, 5);
-    vo->SetColorArray (VertexObject::FLOAT, Colors, 8);
+    VertexObject* vo = new VertexObject();
+    vo->SetVerticesArray(DataArray::FLOAT, 3, Vertices, 8);
+    vo->SetFaceIndicesArray (DataArray::UINT8_T, 4, indices, 5);
+    vo->SetColorArray (DataArray::FLOAT, 3, Colors, 8);
     vo->ComputeNormals();
     return vo;
 

@@ -29,6 +29,7 @@
 
 */
 #include <GL/gl.h>
+#include <GL/glui/NonCopyableClass.h>
 
 namespace GLUI
 {
@@ -36,7 +37,7 @@ namespace GLUI
         class Container;
 
 
-        class theme
+        class theme : public NonCopyableReferenceCountedClass
         {
                 public:
                         virtual int draw()=0;
