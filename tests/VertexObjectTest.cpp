@@ -69,7 +69,7 @@ class myGluiWin : public GLUI::Window
                                                 };
 
 
-                                        NCRC_AutoPtr<Texture> texture(new PPMTexture(texturename));
+                                        NCRC_AutoPtr<TextureData> OpenGlLogo(new PPMTexture(texturename));
 #warning "to investigate this don't work (segfault)"
                                         /*
                                         uint32_t TexCoord[8][2] = 
@@ -94,7 +94,7 @@ class myGluiWin : public GLUI::Window
                                                 { 1.0/3  , 1.0 }, //6
                                                 { 0      , 1.0 }}; //7
                                         NCRC_AutoPtr<DataArray> texcoord(new DataArray(8, 2, DataArray::FLOAT, TexCoord));
-                                        texture->SetTexCoord(texcoord);
+                                        NCRC_AutoPtr<Texture> texture(new Texture(texcoord, OpenGlLogo));
 
 
 
@@ -109,9 +109,6 @@ class myGluiWin : public GLUI::Window
                                         themeVO = raised_box(30, 50, 10);
 
                                         //////////////////// Third VO creation
-                                        std::string texturename2(getenv("GLUI_THEME_DATA_DIR"));
-                                        texturename2 += "/200px-OpenGL_logo.bin.pnm";
-
                                         rectangleTextureVO =  new VertexObject();
                                         GLfloat Vertices3[4][3] = { {  0.0,   0.0, 0.0}, //0
                                                 {    w,   0.0, 0.0}, //1
@@ -123,7 +120,6 @@ class myGluiWin : public GLUI::Window
                                                 };
                                         rectangleTextureVO->SetFaceIndicesArray (DataArray::UINT8_T, 4, indices3, 1);
 
-                                        NCRC_AutoPtr<Texture> texture3(new PPMTexture(texturename2));
                                         float TexCoord3[4][2] = 
                                         {       { 0.0, 0.0 }, // 0
                                                 { 1.0, 0.0 }, //1
@@ -131,7 +127,7 @@ class myGluiWin : public GLUI::Window
                                                 { 0.0, 1.0 } //3
                                         };
                                         NCRC_AutoPtr<DataArray> texcoord3(new DataArray(4, 2, DataArray::FLOAT, TexCoord3));
-                                        texture3->SetTexCoord(texcoord3);
+                                        NCRC_AutoPtr<Texture> texture3(new Texture(texcoord3, OpenGlLogo));
 
                                         rectangleTextureVO->AddTexture(texture3);
                                         //rectangleTextureVO->SetColorArray(colors);
