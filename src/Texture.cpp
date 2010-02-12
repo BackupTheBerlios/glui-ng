@@ -24,24 +24,28 @@ using namespace GLUI;
 using namespace std;
 #warning "clean the use of cerr and use glui loging facility"
 
+////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////            TEXTURE CLASS         //////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
 
-Texture::Texture(const std::string& filename)
+Texture::Texture()
 {
-        this->filename = filename;
-        TextureType = GL_TEXTURE_2D;
-        texturePipeID = 0;
         ID = 0;
-        data = 0;
-        pdata = 0;
+        texturepipeid = 0;
 }
 
-Texture::~Texture()
+//////////////////////////////////////////////////////////////////////////////
+Texture::Texture(NCRC_AutoPtr<DataArray> TexCoord,
+                NCRC_AutoPtr<TextureData> TexData)
 {
-        delete[] pdata;
-        pdata = NULL;
-        data = NULL;
+        ID = 0;
+        texturepipeid = 0;
+        this->TexCoord = TexCoord;
+        this->TexData = TexData;
 }
 
+
+//////////////////////////////////////////////////////////////////////////////
 int  Texture::SetTexCoord(DataArray::datatype vertices_t,
                  uint8_t ComponentsCount,
                  void* vertices,
@@ -51,75 +55,63 @@ int  Texture::SetTexCoord(DataArray::datatype vertices_t,
         TexCoord = array;
 }
 
-
-
-
+///////////////////////////////////////////////////////////////////////////
 int Texture::SetTexCoord(NCRC_AutoPtr<DataArray> array)
 {
         this->TexCoord = array;
         return 0;
 }
 
+/////////////////////////////////////////////////////////////////////////////
 NCRC_AutoPtr<DataArray> Texture::GetTexCoord()
 {
         return this->TexCoord;
 }
 
-int32_t Texture::Width()
+#warning "todo : make an autotype detection and loading"
+////////////////////////////////////////////////////////////////////////////
+//int Texture::SetTexData(const std::string& filename)
+//{
+//}
+////////////////////////////////////////////////////////////////////////////
+int Texture::SetTexData(NCRC_AutoPtr<TextureData> data)
 {
-        return this->width;
+        this->TexData = data;
+        return 0;
 }
-
-int32_t Texture::Height()
+////////////////////////////////////////////////////////////////////////////
+NCRC_AutoPtr<TextureData> Texture::GetTexData()
 {
-        return this->height;
-}
-
-void Texture::Flip()
-{
-        uint8_t* lineBuffer = NULL;
-        lineBuffer = new uint8_t[this->OctetsPerPixel * this->width ];
-        for (int j=0; j <= (this->height/2); j++)
-        {
-                memcpy(lineBuffer, 
-                                pdata + j*this->width*OctetsPerPixel, 
-                                sizeof(uint8_t)*this->width*OctetsPerPixel);
-                memcpy(pdata + j*this->width*OctetsPerPixel, 
-                                pdata + (this->height - j - 1 )*this->width*OctetsPerPixel,
-                                sizeof(uint8_t)*this->width*OctetsPerPixel);
-                memcpy(pdata + (this->height - j)*this->width*OctetsPerPixel,
-                                lineBuffer, 
-                                sizeof(uint8_t)*this->width*OctetsPerPixel);
-        }
-        delete[] lineBuffer;
+        return this->TexData;
 }
 
 /////////////////////////////////////////////////////////////////////////////
 int Texture::Finalise()
 {
-        glBindTexture(TextureType,ID);
+        glBindTexture(TexData->TextureType(),ID);
         //glPixelStorei(GL_UNPACK_ALIGNMENT,1);
         glTexImage2D (
-                        TextureType,
+                        TexData->TextureType(),
                         0,
-                        this->ComponentsCount,
-                        this->width,
-                        this->height,
+                        TexData->ComponentsCount(),
+                        TexData->Width(),
+                        TexData->Height(),
                         0,
-                        this->format,
-                        this->type,
-                        pdata
+                        TexData->Format(),
+                        TexData->Type(),
+                        TexData->data
                      );
-        glTexParameteri(TextureType, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(TextureType, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(TexData->TextureType(), GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(TexData->TextureType(), GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 }
 
+//////////////////////////////////////////////////////////////////////////////
 void Texture::ClientActiveTexture( GLenum texture )
 {
-        texturePipeID = texture;
-        glEnable( TextureType );
-        glActiveTextureARB( texturePipeID );
-        glClientActiveTexture(texturePipeID);
+        texturepipeid = texture;
+        glEnable( TexData->TextureType() );
+        glActiveTextureARB( texturepipeid );
+        glClientActiveTexture(texturepipeid);
 
         if (ID == 0)
         {
@@ -128,8 +120,8 @@ void Texture::ClientActiveTexture( GLenum texture )
                 this->ID = textureID;
                 Finalise();
         }
-glDisable( GL_BLEND );
-        glBindTexture(TextureType,ID);
+        glDisable( GL_BLEND );
+        glBindTexture(TexData->TextureType(),ID);
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
         glTexCoordPointer(TexCoord->ComponentsCount,
                         (GLenum)*(TexCoord),
@@ -137,22 +129,111 @@ glDisable( GL_BLEND );
                         TexCoord->array.all);
 
 }
-
 ////////////////////////////////////////////////////////////////////////////
 void Texture::ReleaseTexture()
 {
         //unbind the texture occupying the second texture unit
-        glActiveTextureARB( texturePipeID );
-        glDisable( TextureType );
-        texturePipeID = 0;
+        glActiveTextureARB( texturepipeid );
+        glDisable( TexData->TextureType() );
+        texturepipeid = 0;
 }
+
+
+////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////        TEXTUREDATA CLASS         //////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
+
+TextureData::TextureData(const std::string& filename)
+{
+        this->filename = filename;
+        texturetype = GL_TEXTURE_2D;
+        data = 0;
+        pdata = 0;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+TextureData::~TextureData()
+{
+        delete[] pdata;
+        pdata = NULL;
+        data = NULL;
+}
+
+
+
+//////////////////////////////////////////////////////////////////////////////
+int32_t TextureData::Width()
+{
+        return this->width;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+int32_t TextureData::Height()
+{
+        return this->height;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+GLenum TextureData::TextureType()
+{
+        return this->texturetype;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+GLenum TextureData::Format()
+{
+        return this->format;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+GLenum TextureData::Type()
+{
+        return this->type;
+}
+
+
+
+//////////////////////////////////////////////////////////////////////////////
+int32_t TextureData::OctetsPerPixel()
+{
+        return this->octetsperpixel;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+int8_t TextureData::ComponentsCount()
+{
+        return this->componentscount;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+void TextureData::Flip()
+{
+        uint8_t* lineBuffer = NULL;
+        lineBuffer = new uint8_t[this->octetsperpixel * this->width ];
+        for (int j=0; j <= (this->height/2); j++)
+        {
+                memcpy(lineBuffer, 
+                                pdata + j*this->width*octetsperpixel, 
+                                sizeof(uint8_t)*this->width*octetsperpixel);
+                memcpy(pdata + j*this->width*octetsperpixel, 
+                                pdata + (this->height - j - 1 )*this->width*octetsperpixel,
+                                sizeof(uint8_t)*this->width*octetsperpixel);
+                memcpy(pdata + (this->height - j)*this->width*octetsperpixel,
+                                lineBuffer, 
+                                sizeof(uint8_t)*this->width*octetsperpixel);
+        }
+        delete[] lineBuffer;
+}
+
+
+
 
 
 /////////////////////////////////////////////////////////////////////////////
 ///////////////////////        PPM  Loader         //////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
-PPMTexture::PPMTexture(const std::string& filename) : Texture(filename)
+PPMTexture::PPMTexture(const std::string& filename) : TextureData(filename)
 {
         char buff[16];
 
@@ -197,8 +278,8 @@ PPMTexture::PPMTexture(const std::string& filename) : Texture(filename)
         switch (BitsPerPixel)
         {
                 case 255 : 
-                        this->OctetsPerPixel = 3;
-                        this->ComponentsCount = 3;
+                        this->octetsperpixel = 3;
+                        this->componentscount = 3;
                         this->format = GL_RGB;
                         this->type = GL_UNSIGNED_BYTE;
                         break;
@@ -214,14 +295,14 @@ PPMTexture::PPMTexture(const std::string& filename) : Texture(filename)
         while (fp.read(buff, 1), buff[0] != '\n')
                 ;
 
-        pdata = new  uint8_t[this->OctetsPerPixel * this->width * this->height];
+        pdata = new  uint8_t[this->octetsperpixel * this->width * this->height];
         if (!pdata)
         {
                 cerr <<  "Unable to allocate memory\n";
                 throw 0;
         }
 
-        fp.read((char*)pdata, this->OctetsPerPixel * this->width * this->height );
+        fp.read((char*)pdata, this->octetsperpixel * this->width * this->height );
         if (fp.bad())
         {
                 cerr <<  "Error loading image " << filename << endl;

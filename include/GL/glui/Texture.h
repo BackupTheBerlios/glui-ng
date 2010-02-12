@@ -27,11 +27,13 @@
 
 namespace GLUI
 {
+        class TextureData;
         class Texture : public NonCopyableReferenceCountedClass
         {
-                public :
-                        Texture(const std::string& filename);
-                        virtual ~Texture();
+                public : //methods
+                        Texture();
+                        Texture(NCRC_AutoPtr<DataArray> TexCoord,
+                                        NCRC_AutoPtr<TextureData> TexData);
                         int SetTexCoord(DataArray::datatype vertices_t,
                                         uint8_t ComponentsCount,
                                         void* vertices,      //< buffer to the array
@@ -39,11 +41,36 @@ namespace GLUI
 
                         int SetTexCoord(NCRC_AutoPtr<DataArray> array);
                         NCRC_AutoPtr<DataArray> GetTexCoord();
-                        virtual int Finalise();
-                        int32_t Width();
-                        int32_t Height();
+
+                        //int SetTexData(const std::string& filename);
+                        int SetTexData(NCRC_AutoPtr<TextureData> data);
+                        NCRC_AutoPtr<TextureData> GetTexData();
+
                         void ClientActiveTexture( GLenum texture );
                         void ReleaseTexture();
+                protected: //methods
+                        virtual int Finalise();
+                protected: //data
+                        NCRC_AutoPtr<DataArray> TexCoord;
+                        NCRC_AutoPtr<TextureData> TexData;
+                        GLuint ID; //<value returned by glGenTextures
+                        GLenum texturepipeid; //<GL_TEXTURE0..
+
+        };
+
+        class TextureData : public NonCopyableReferenceCountedClass
+        {
+                public :
+                        TextureData(const std::string& filename);
+                        virtual ~TextureData();
+
+                        int32_t Width();
+                        int32_t Height();
+                        GLenum TextureType();
+                        GLenum Format();
+                        GLenum Type();
+                        int32_t OctetsPerPixel();
+                        int8_t ComponentsCount();
                         const uint8_t* data;
                 public: //operator
                         Texture& operator=(const Texture&);
@@ -51,23 +78,20 @@ namespace GLUI
                 protected:
                         void Flip();
                 protected :
-                        GLuint ID; //<value returned by glGenTextures
-                        GLenum texturePipeID; //<GL_TEXTURE0..
-                        GLenum TextureType; //< GL_TEXTURE_1D,GL_TEXTURE_2D,GL_TEXTURE_3D
+                        GLenum texturetype; //< GL_TEXTURE_1D,GL_TEXTURE_2D,GL_TEXTURE_3D
                         GLenum format; //< one of the GL_RGBA, GL_RGB... 
                                        //< see man glTexImage2D
                         GLenum type;   //< one of the GL_UNSIGNED_BYTE, GL_BYTE...
                                        //< see man glTexImage2D
-                        NCRC_AutoPtr<DataArray> TexCoord;
                         uint8_t* pdata;
                         std::string filename;
                         int32_t width;
                         int32_t height;
-                        int32_t OctetsPerPixel;
-                        int8_t ComponentsCount;
+                        int32_t octetsperpixel;
+                        int8_t componentscount;
         };
 
-        class PPMTexture : public Texture
+        class PPMTexture : public TextureData
         {
                 public :
                         PPMTexture(const std::string& filename);
