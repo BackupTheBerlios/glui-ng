@@ -23,7 +23,7 @@
 #include <GL/glui/commondefs.h>
 #include <GL/glui/to_clean.h>
 
-#include <GL/glui/node.h>
+#include <GL/glui/Node.h>
 #include <GL/glui/callback.h>
 #include <GL/glui/xwrapper.h>
 #include <GL/glui/event_handler.h>
@@ -36,7 +36,7 @@ namespace GLUI
     class Container;
     class theme;
 
-    class GLUIAPI Control : public Node, public EventHandler
+    class GLUIAPI Control : public Node
     {
         public : //types
             enum SizePolicy {
@@ -96,11 +96,7 @@ namespace GLUI
              int SetMargins(int top, int bottom, int left, int right);
 
 
-            virtual int Activate(); //< activate the current control return 0 if activated, !=0 on error (can't activate)
-
-            int             alignment;
-            bool            enabled;    //< Is this control grayed out?
-            unsigned long   EventMask;  //<mask used to inform containers about what type of event is wanted
+             virtual int Activate(); //< activate the current control return 0 if activated, !=0 on error (can't activate)
 
 
         public:
@@ -151,7 +147,7 @@ namespace GLUI
             virtual int AddEvent (::XMappingEvent* event) { return 0; };
             virtual int AddEvent (::XErrorEvent* event) { return 0; };
 
-
+            //this function can't be called into a constructor!
             virtual int         set_size( Size sz, Size min=Size(0u,0u) ); //replace with a XResizeRequestEvent
 
             void         set_alignment( Alignement align );
@@ -159,7 +155,7 @@ namespace GLUI
             SizePolicy   get_resize_policy( void ) { return resizeable;}
             int SetTheme(NCRC_AutoPtr<theme> data);
 
-            int  add_control( Node *control ); //<prevent adding subsequent controls
+            int  add_control( NCRC_AutoPtr<Node> control ); //<prevent adding subsequent controls
 
             virtual ~Control();
 
@@ -167,14 +163,19 @@ namespace GLUI
             Control(const char* name);
             Control();
             virtual NCRC_AutoPtr<theme> GetDefaultTheme();
+        public: //variables
+            int             alignment;
+            bool            enabled;    //< Is this control grayed out?
+            unsigned long   EventMask;  //<mask used to inform containers about what type of event is wanted
+
         protected: //variables
             NCRC_AutoPtr<theme> TheDefaultTheme;
             NCRC_AutoPtr<theme> ThemeData;
-            static Control* focussed;
+            static NCRC_AutoPtr<Control> focussed;
             SizePolicy resizeable;
-            Size CurrentSize;
             Size Min;
-            EventHandler* handler;
+            Size CurrentSize;
+            NCRC_AutoPtr<EventHandler> handler;
             bool active;       ///< If true, we've got the focus
                         /** relative coordinates Y axis up as in OGL */
             int             x, y;         //relative position from parent

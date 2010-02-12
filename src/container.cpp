@@ -48,19 +48,12 @@ Container::Container(const char *name ,
 {
     CurrOrientation = orient;
     resizeable = AdaptThisToFitChilds;
+    DoNotPropagateMask = 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
 Container::~Container()
 {
-    Control *item = (Control*) this->first_child();
-
-    while (item)
-    {
-        Control *tmp = item;
-        item = (Control*) item->next();
-        delete tmp;
-    }
 }
 
 
@@ -69,8 +62,8 @@ Container::~Container()
 #warning "split this in inline functions"
 void Container::update_size( void )
 {
-    Node* node;
-    Control* child;
+    NCRC_AutoPtr<Node> node;
+    NCRC_AutoPtr<Control> child;
 
     orientation theOrient = CurrOrientation;
     if( theOrient == useparent ) theOrient = GetParentOrientation();
@@ -86,10 +79,10 @@ void Container::update_size( void )
 
         Control::update_size();
         node = this->first_child();
-        while (NULL != node)
+        while (node != NULL)
         {
-            child = dynamic_cast<Control*>(node);
-            if ( (NULL != child) &&
+            child = dynamic_cast<Control*>(node.getPointee());
+            if ( (child != NULL) &&
                  (child->get_resize_policy() != FillSpace)
                )
             {
@@ -128,10 +121,10 @@ void Container::update_size( void )
             }
 
 
-            while (NULL != node)
+            while (node != NULL )
             {
-                child = dynamic_cast<Control*>(node);
-                if ( (NULL != child) &&
+                child = dynamic_cast<Control*>(node.getPointee());
+                if ( (child != NULL) &&
                      (child->get_resize_policy() != FillSpace)
                    )
                 {
@@ -153,10 +146,10 @@ void Container::update_size( void )
         int height = 0;
 
         //parse all childs updating their size firt
-        while (NULL != node)
+        while (node != NULL)
         {
-            child = dynamic_cast<Control*>(node);
-            if ( NULL != child)
+            child = dynamic_cast<Control*>(node.getPointee());
+            if (child != NULL)
             {
                 child->update_size();
 
@@ -181,14 +174,14 @@ void Container::update_size( void )
 int Container::UpdateTheme( void )
 {
         Control::UpdateTheme();
-        Control* child = dynamic_cast<Control*>(first_child());
+        NCRC_AutoPtr<Control> child = dynamic_cast<Control*>(first_child().getPointee());
         while (child != NULL)
         {
                 int  rc;
                 rc = child->UpdateTheme();
                 if(rc) return rc;
-                Node* sibling = child->next();
-                child = dynamic_cast<Control*>(sibling);
+                NCRC_AutoPtr<Node> sibling = child->next();
+                child = dynamic_cast<Control*>(sibling.getPointee());
         }
         return 0;
 
@@ -196,9 +189,8 @@ int Container::UpdateTheme( void )
 ////////////////////////////////////////////////////////////////////////////////////////
 void Container::pack (int x, int y)
 {
-    Node* node;
-    Control* child;
-    node = this->first_child();
+    NCRC_AutoPtr<Control> child;
+    NCRC_AutoPtr<Node> node = this->first_child();
     orientation theOrient = CurrOrientation;
     if( theOrient == useparent ) theOrient = GetParentOrientation();
 
@@ -208,10 +200,10 @@ void Container::pack (int x, int y)
     int ChildTotalHeight = 0;
 
 
-    while (NULL != node)
+    while (node != NULL)
     {
-        child = dynamic_cast<Control*>(node);
-        if ( NULL != child)
+        child = dynamic_cast<Control*>(node.getPointee());
+        if ( child != NULL)
         {
             if (theOrient == TopDown || theOrient == BottomUp )
             {
@@ -249,12 +241,12 @@ void Container::pack (int x, int y)
 ///////////////////////////////////////////////////////////////////////////////////////
 Container::orientation Container::GetParentOrientation()
 {
-    Container* parent = dynamic_cast<Container*>(this->parent());
-    if (CurrOrientation == useparent && NULL != parent)
+    NCRC_AutoPtr<Container> parent = dynamic_cast<Container*>(this->parent().getPointee());
+    if (CurrOrientation == useparent && parent != NULL)
     {
         return parent->GetParentOrientation();
     }
-    else if (CurrOrientation == useparent && NULL == parent)
+    else if (CurrOrientation == useparent && parent == NULL)
     {
         // even the top most parent has useparent, so arbitraly choose TopDown
         return TopDown;
@@ -266,14 +258,14 @@ Container::orientation Container::GetParentOrientation()
 #warning "remove alignement code and create spacer control instead"
 void Container::align()
 {
-    Container* par;
+    NCRC_AutoPtr<Container> par;
 
 
-    if ( NULL == parent() )
+    if ( parent() == NULL)
         return;  /* Clearly this shouldn't happen, though */
 
-    par = dynamic_cast<Container*>(parent());
-    if ( NULL == par )
+    par = dynamic_cast<Container*>(parent().getPointee());
+    if ( par == NULL )
         return;
 
     if ( alignment == Control::LEFT ) {
@@ -287,13 +279,13 @@ void Container::align()
     }
 
     // now align childs
-    Node *child;
-    Container *childc;
+    NCRC_AutoPtr<Node> child;
+    NCRC_AutoPtr<Container> childc;
     child = this->first_child();
 
     while( child != NULL )
     {
-        childc=dynamic_cast<Container*>(child);
+        childc=dynamic_cast<Container*>(child.getPointee());
         if (childc != NULL) childc->align();
 
         child = child->next();
@@ -301,18 +293,18 @@ void Container::align()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
-int Container::add_control(Node *control )
+int Container::add_control( NCRC_AutoPtr<Node> control )
 {
-	Control *child;
+        NCRC_AutoPtr<Control> child;
 
-	child = dynamic_cast<Control*>(control);
-	if ( NULL != child)
-	{
-        Node::add_control(control);
-		child->enabled = this->enabled;
-        return 0;
-	}
-    return -1;
+        child = dynamic_cast<Control*>(control.getPointee());
+        if ( child != NULL )
+        {
+                Node::add_control(control);
+                child->enabled = this->enabled;
+                return 0;
+        }
+        return EINVAL;
 }
 
 
@@ -397,8 +389,8 @@ int Container::AddEvent (::XMotionEvent* event)
          )
        )
         return 0;
-    Control* child = FindChildWidget(event->x, event->y);
-    if (child)
+    NCRC_AutoPtr<Control> child = FindChildWidget(event->x, event->y);
+    if (child != NULL)
     {
         event->x = event->x - child->X();
         event->y = event->y - child->Y();
@@ -428,7 +420,7 @@ int Container::AddEvent (::XKeymapEvent* event)
 ///////////////////////////////////////////////////////////////////////////////////////////
 int Container::AddEvent (::XExposeEvent* event)
 {
-    Control *node;
+    NCRC_AutoPtr<Control> node;
     IN("\n");
 
     pack (x, y);
@@ -438,11 +430,11 @@ int Container::AddEvent (::XExposeEvent* event)
     // glLoadIdentity ( );    // Reset The Model View Matrix
 
     Control::AddEvent (event);
-    node = dynamic_cast<Control*>(first_child());
-    while( node )
+    node = dynamic_cast<Control*>(first_child().getPointee());
+    while( node != NULL )
     {
         node->AddEvent(event);
-        node = dynamic_cast<Control*>(node->next());
+        node = dynamic_cast<Control*>(node->next().getPointee());
     }
     // glPopMatrix();
     debug::Instance()->FlushGL();
@@ -577,13 +569,13 @@ int Container::BroadcastEvent(::XEvent* event, int type, long mask_check)
         }
 
         //now broadcast to all childs
-        Control* child = dynamic_cast<Control*>(first_child());
+        NCRC_AutoPtr<Control> child = dynamic_cast<Control*>(first_child().getPointee());
         int rc=0;
         while (child != NULL && rc == 0)
         {
                 rc = child->AddEvent(event);
-                Node* sibling = child->next();
-                child = dynamic_cast<Control*>(sibling);
+                NCRC_AutoPtr<Node> sibling = child->next();
+                child = dynamic_cast<Control*>(sibling.getPointee());
         }
         //the event is for this widget and not a child
         ROUT(rc,"\n");
@@ -603,7 +595,7 @@ int Container::ForwardEvent(::XEvent* event, int* eventX, int* eventY, int Event
                 ROUT(0,"DoNotPropagateMask\n");
         }
 
-        Control* child = FindChildWidget(*eventX, *eventY);
+        NCRC_AutoPtr<Control> child = FindChildWidget(*eventX, *eventY);
         if (child != NULL)
         {
                 int rc = child->AddEvent(event);
@@ -636,7 +628,7 @@ int Container::AddEvent (::XKeyEvent* event)
 void Container::set_orientation( orientation new_orientation)
 {
     CurrOrientation = new_orientation;
-    Container* cont  = dynamic_cast<Container*>(GetRootNode());
+    NCRC_AutoPtr<Container> cont  = dynamic_cast<Container*>(GetRootNode().getPointee());
     if ( cont != NULL)
       {
         cont->update_size();
@@ -646,13 +638,13 @@ void Container::set_orientation( orientation new_orientation)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
-Control* Container::FindChildWidget(int x, int y)
+NCRC_AutoPtr<Control> Container::FindChildWidget(int x, int y)
 {
-    Node* current_node = first_child();
-    while (current_node)
+    NCRC_AutoPtr<Node> current_node = first_child();
+    while (current_node != NULL)
       {
-        Control* current_control = dynamic_cast<Control*>(current_node);
-        if (current_control)
+        NCRC_AutoPtr<Control> current_control = dynamic_cast<Control*>(current_node.getPointee());
+        if (current_control != NULL)
           {
             if (x > current_control->X() &&
                     x < (current_control->X() + current_control->Width()) &&

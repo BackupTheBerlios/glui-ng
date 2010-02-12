@@ -40,9 +40,7 @@ misrepresented as being the original software.
 #include <GL/glui/themes.h>
 using namespace GLUI;
 
-
-Control*  Control::focussed = NULL;
-
+NCRC_AutoPtr<Control> Control::focussed;
 int _glui_draw_border_only = 0;
 
 
@@ -63,8 +61,8 @@ void Control::pack (int x, int y)
 ////////////////////////////////////////////////////////////////////////
  void Control::PostRedisplay()
 {
-        Control* par = dynamic_cast<Control*>(parent());
-        if (par) par->PostRedisplay();
+        NCRC_AutoPtr<Control> par = dynamic_cast<Control*>(parent().getPointee());
+        if (par != NULL) par->PostRedisplay();
 }
 
 
@@ -75,8 +73,8 @@ void Control::update_size( void )
 
     if (this->resizeable == PercentOfParent)
     {
-        Control* par= dynamic_cast<Control*>(this->parent());
-        if (par)
+        NCRC_AutoPtr<Control> par= dynamic_cast<Control*>(this->parent().getPointee());
+        if (par != NULL)
         {
             this->CurrentSize.size.w = par->Width() * this->CurrentSize.percent.w / 100;
             this->CurrentSize.size.h = par->Height() * this->CurrentSize.percent.h / 100;
@@ -109,7 +107,7 @@ int Control::set_size( Size sz, Size min)
         return EINVAL;
     }
 #warning "use a bottom to top approach : child shall ask parent to update size only if size did change"
-    Control* cont  = dynamic_cast<Control*>(GetRootNode());
+    NCRC_AutoPtr<Control> cont  = dynamic_cast<Control*>(GetRootNode().getPointee());
     if ( cont != NULL)
     {
         cont->update_size();
@@ -130,7 +128,7 @@ int Control::UpdateTheme( void )
 
 
 
-int  Control::add_control( Node *control )
+int  Control::add_control( NCRC_AutoPtr<Node> control )
 {
     //prevent adding subsequent controls
     return -1;
@@ -142,18 +140,18 @@ int  Control::add_control( Node *control )
 
 void Control::enable()
 {
-    Control *node;
+    NCRC_AutoPtr<Control> node;
 
     enabled = true;
     ThemeData->update();
 
 #warning "this has nothing todo here, move to container class"
     /*** Now recursively enable all buttons below it ***/
-    node = (Control*) first_child();
-    while(node)
+    node = dynamic_cast<Control*>(first_child().getPointee());
+    while(node != NULL)
     {
         node->enable();
-        node = (Control*) node->next();
+        node = dynamic_cast<Control*>(node->next().getPointee());
     }
 }
 
@@ -162,17 +160,17 @@ void Control::enable()
 
 void Control::disable()
 {
-    Control *node;
+    NCRC_AutoPtr<Control> node;
 
     enabled = false;
 
     ThemeData->update();
 #warning "this has nothing todo here, move to container class"
     /*** Now recursively disable all buttons below it ***/
-    node = (Control*) first_child();
-    while(node) {
+    node = dynamic_cast<Control*> (first_child().getPointee());
+    while(node != NULL) {
         node->disable();
-        node = (Control*) node->next();
+        node = dynamic_cast<Control*> (node->next().getPointee());
     }
 }
 
@@ -262,6 +260,7 @@ int Control::SetTheme(NCRC_AutoPtr<theme> data)
         if (data != NULL)
         {
                 this->ThemeData = data;
+                return 0;
         }
         return EINVAL;
 }
@@ -276,21 +275,20 @@ Control::~Control()
 
 Control::Control(const char* name) : Node(name)
 {
-
-    active         = false;
+    alignment      = LEFT;
     enabled        = true;
+    EventMask      = 0;
+    resizeable     = FixedSize;
     Min            = Size(0u, 0u);
     CurrentSize    = Min;
-    alignment      = LEFT;
-    resizeable     = FixedSize;
-    handler        = NULL;
+    active         = false;
+    x              = 0;
+    y              = 0;
     y_off_top      = GLUI_YOFF;
     y_off_bot      = GLUI_YOFF;
     x_off_left     = GLUI_XOFF;
     x_off_right    = GLUI_XOFF;
-    x              = 0;
-    y              = 0;
-    this->ThemeData = GLUI::GetTheme(*this);
+    this->TheDefaultTheme = GLUI::GetTheme(*this);
     SetTheme(new _DefaultTheme);
 }
 
@@ -329,7 +327,7 @@ int Control::SetMargins(int top, int bottom, int left, int right)
     y_off_bot = bottom;
     x_off_left = left;
     x_off_right = right;
-    Control* cont  = dynamic_cast<Control*>(GetRootNode());
+    NCRC_AutoPtr<Control> cont  = dynamic_cast<Control*>(GetRootNode().getPointee());
     if ( cont != NULL)
       {
         cont->update_size();

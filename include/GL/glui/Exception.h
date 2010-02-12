@@ -44,7 +44,7 @@ namespace GLUI
 
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
-#define GLUI_THROW(errnb, str) throw new Exception(errnb, __FILE__ ":" TOSTRING(__LINE__) str TOSTRING(errnb))
+#define GLUI_THROW(errnb, str) throw Exception(errnb, __FILE__ ":" TOSTRING(__LINE__) str TOSTRING(errnb))
 }
 
 

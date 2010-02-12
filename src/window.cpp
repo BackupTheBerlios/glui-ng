@@ -63,6 +63,10 @@ _Display::_Display()
 _Window::_Window() :
     Container("window")
 {
+        args = NULL;
+        mapped = false;
+        thread_enabled = false;
+        flags = 0;
         SetTheme(new _Window::DefaultTheme(*this));
 }
 _Window::~_Window()
@@ -74,12 +78,19 @@ int _Window::Wait()
 {
         int res;
         int err;
-        err = pthread_join(main_thread, (void**)&res);
-        if (err)
+        if (this->thread_enabled)
         {
-                return err;
+                err = pthread_join(main_thread, (void**)&res);
+                if (err)
+                {
+                        return err;
+                }
+                return res;
         }
-        return res;
+        else
+        {
+                return 0;
+        }
 }
 /////////////////////////////////////////////////////////////////////////////
 int _Window::SetCurrentDrawBuffer( void )
@@ -112,7 +123,7 @@ void  _Window::Start()
     int err = pthread_create(&main_thread,NULL,_Start, (void*)this);
     if (err)
     {
-            throw new  Exception(err, "window thread creation error");
+            throw Exception(err, "window thread creation error");
     }
 }
 void* _Window::_Start(void* arg)

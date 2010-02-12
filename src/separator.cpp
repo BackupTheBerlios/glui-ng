@@ -50,11 +50,11 @@ Separator::Separator( Node *parent, const char* name )
 void    Separator::draw( )
 {
 
-        Control* par;
+    NCRC_AutoPtr<Control> par;
 
     int width, indent;
 
-    par = dynamic_cast<Control*>(parent());
+    par = dynamic_cast<Control*>(parent().getPointee());
     if ( par != NULL ) {
         width = par->Width();
     }

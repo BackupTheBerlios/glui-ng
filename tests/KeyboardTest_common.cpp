@@ -68,7 +68,7 @@ myControl::myControl(const char* name) :
     ((myControltheme*)&*this->ThemeData)->bkgd_color[0] = 255;
     ((myControltheme*)&*this->ThemeData)->bkgd_color[1] = 0;
     ((myControltheme*)&*this->ThemeData)->bkgd_color[2] = 0;
-    set_size(Size(200u,10u));
+    this->CurrentSize = Size(200u,10u);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -94,8 +94,8 @@ class myGluiWin : public GLUI::Window
                                 int draw();
                 };
         public :
-                myGluiWin(GLUI::Display& TheDisplay) : GLUI::Window(TheDisplay,
-                                TheDisplay.XDefaultScreenOfDisplay()->XRootWindowOfScreen(),
+                myGluiWin(NCRC_AutoPtr<GLUI::Display> TheDisplay) : GLUI::Window(TheDisplay,
+                                TheDisplay->XDefaultScreenOfDisplay()->XRootWindowOfScreen(),
                                 0, 0,
                                 200, 200,
                                 1,
@@ -105,15 +105,13 @@ class myGluiWin : public GLUI::Window
                         Angle = 0;
                         set_resize_policy(FixedSize);
                         ctrl = new myControl("top box");
-                        add_control(ctrl);
+                        add_control(ctrl.getPointee());
                         TheDefaultTheme = new myDefaulttheme(*this);
                         SetTheme(TheDefaultTheme);
                         Start();
                 }
                 ~myGluiWin()
                 {
-                        delete ctrl;
-                        ctrl = NULL;
                 }
                 virtual int AddEvent(::XKeyEvent* event);
                 void simulatekey();
@@ -121,7 +119,7 @@ class myGluiWin : public GLUI::Window
 
         public : //variables
                 float Angle;
-                myControl* ctrl;
+                NCRC_AutoPtr<myControl> ctrl;
 };
 
 int myGluiWin::AddEvent(::XKeyEvent* event)
@@ -155,7 +153,7 @@ void myGluiWin::simulatekey(void)
         evt.x_root = 1;
         evt.y_root = 1;
         evt.same_screen = True;
-        evt.keycode = XKeysymToKeycode(disp.Disp(),XK_Up);
+        evt.keycode = XKeysymToKeycode(disp->Disp(),XK_Up);
 
         count ++;
         XSendEvent ((XEvent &) evt); 

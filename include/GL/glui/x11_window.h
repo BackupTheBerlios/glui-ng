@@ -60,7 +60,7 @@ namespace GLUI
                 public :
                         X11Screen(::Screen* ScreenNumber);
                         virtual int XDefaultDepthOfScreen();
-                        virtual ::Window XRootWindowOfScreen();
+                        virtual NCRC_AutoPtr<_Window> XRootWindowOfScreen();
                         ::Screen* Screen();
                 protected:
                         ::Screen* TheScreen;
@@ -72,10 +72,11 @@ namespace GLUI
         {
                 public :
                         X11Display();
+                        ~X11Display();
                         X11Display(char* name);
-                        virtual _Screen* XDefaultScreenOfDisplay();
-                        virtual _Window* XDefaultRootWindow();
-                        virtual _Window* XRootWindow(int screen_number);
+                        virtual NCRC_AutoPtr<_Screen> XDefaultScreenOfDisplay();
+                        virtual NCRC_AutoPtr<_Window> XDefaultRootWindow();
+                        virtual NCRC_AutoPtr<_Window> XRootWindow(int screen_number);
                         ::Display* Disp();
 
                 private:
@@ -87,7 +88,8 @@ namespace GLUI
         class X11Window : public _Window
         {
                 public:
-                        X11Window(X11Display& display, ::Window parent_window,
+                        X11Window(      NCRC_AutoPtr<X11Display> display,
+                                        NCRC_AutoPtr<_Window> parent_window,
                                         int x, int y,
                                         unsigned int width, unsigned int height,
                                         unsigned int border_width,
@@ -96,7 +98,9 @@ namespace GLUI
                                         Visual *visual,
                                         unsigned long valuemask,
                                         XSetWindowAttributes *attributes );
-                        X11Window(X11Display &display, ::Window parent,
+
+                        X11Window(      NCRC_AutoPtr<X11Display> display,
+                                        NCRC_AutoPtr<_Window> parent_window,
                                         int x, int y,
                                         unsigned int width, unsigned int height,
                                         unsigned int border_width,
@@ -127,16 +131,8 @@ namespace GLUI
 
                 public : //operators
                         bool operator== (::Window target);
-                protected: //variables
-                        X11Display& disp;
-                        XVisualInfo *vi;
-                        GLXFBConfig *fbc;
-                        int fbc_id;
-                        GLXContext ctx;
-                        bool hasContext;
-                        bool dirty;
                 protected: //methods
-                        void _X11Window( ::Window parent_window,
+                        void _X11Window(NCRC_AutoPtr<_Window> parent_window,
                                         int x, int y,
                                         unsigned int width, unsigned int height,
                                         unsigned int border_width,
@@ -148,6 +144,15 @@ namespace GLUI
                         X11Window();
                         int CreateGLContext();
                         void EventCoordToGLCoord(::XEvent& evt);
+                protected: //variables
+                        NCRC_AutoPtr<X11Display> disp;
+                        XVisualInfo *vi;
+                        GLXFBConfig *fbc;
+                        int fbc_id;
+                        GLXContext ctx;
+                        bool hasContext;
+                        bool dirty;
+
         };
         typedef X11Window Window ;
         typedef X11Display Display;

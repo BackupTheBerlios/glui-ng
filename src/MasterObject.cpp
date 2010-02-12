@@ -32,7 +32,6 @@
 #include <GL/glui/MasterObject.h>
 using namespace GLUI;
 
-#warning "GLUI class is a duplicate of GLUI_Main, remove!"
 
 
 
@@ -40,15 +39,20 @@ using namespace GLUI;
 
 ///////////////////////////////////////////////////////////////////////////
 MasterObject::MasterObject()
+        : Node ("MasterObject")
 {
 }
 
 
 ///////////////////////////////////////////////////////////////////////////
-MasterObject* MasterObject::Instance()
+NCRC_AutoPtr<Node> MasterObject::Instance()
 {
-    static MasterObject object("MasterObject");
-    return &object;
+    static NCRC_AutoPtr<Node> object;
+    if ( object == NULL)
+    {
+            object = new  MasterObject ("MasterObject");
+    }
+    return object;
 }
 
 MasterObject::MasterObject(const char *name) : Node (name)
@@ -57,17 +61,16 @@ MasterObject::MasterObject(const char *name) : Node (name)
 
 
 //////////////////////////////////////////////////////////////////////////
-GLUI::Window*      MasterObject::FindWindow( ::Window window_id )
+NCRC_AutoPtr<GLUI::Window>      MasterObject::FindWindow( ::Window window_id )
 {
+        NCRC_AutoPtr<GLUI::Window> win = dynamic_cast<GLUI::Window*>(this->first_child().getPointee());
 
-        GLUI::Window* win = dynamic_cast<GLUI::Window*>( this->first_child());
-
-        while( win ) 
+        while( win != NULL )
         {
                 if ( win->GetWindowId() == window_id )
                         return win;
 
-                win = dynamic_cast<GLUI::Window*>(win->next());
+                win = dynamic_cast<GLUI::Window*>(win->next().getPointee());
         }
         return NULL;
 }
@@ -83,12 +86,12 @@ int  MasterObject::add_control( Node *window )
 
 void MasterObject::pack( int x, int y)
 {
-        GLUI::Window* win = dynamic_cast<GLUI::Window*>( this->first_child());
+        NCRC_AutoPtr<GLUI::Window> win = dynamic_cast<GLUI::Window*>(this->first_child().getPointee());
 
-        while( win )
+        while( win != NULL )
         {
                 win->pack(0, 0);
-                win = dynamic_cast<GLUI::Window*>(win->next());
+                win = dynamic_cast<GLUI::Window*>(win->next().getPointee());
         }
 
 }

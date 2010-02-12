@@ -31,45 +31,56 @@
 
 *****************************************************************************/
 
-#include <GL/glui/node.h>
+#include <GL/glui/Node.h>
 #include <GL/glui/debug.h>
 #include <GL/glui/MasterObject.h>
+#include <GL/glui/Exception.h>
 using namespace GLUI;
 
 #define MODULE_KEY  "GLUI_DEBUG_NODE"
 /********************************************* Node::Node() *******/
 
 Node::Node()
-: 
-    parent_node(NULL),
-    child_head(NULL),
-    child_tail(NULL),
-    next_sibling(NULL),
-    prev_sibling(NULL)
 {
     _level = 0;
+    ChildCount = 0;
 }
 
 Node::Node(const char* name)
 {
     NodeName = name;
-    parent_node = NULL;
-    child_head = NULL;
-    child_tail = NULL;
-    next_sibling = NULL;
-    prev_sibling = NULL;
     _level = 0;
+    ChildCount = 0;
 }
 
 Node::~Node()
 {
-        unlink();
+        if (this->ChildCount != GetCount())
+        {
+                throw Exception(ENOTSUP,
+                                "trying to delete a node that have still owners...");
+        }
+        if (this->next_sibling != NULL)
+        {
+                this->next_sibling->prev_sibling = this->prev_sibling;
+        }
+
+        if (this->prev_sibling != NULL)
+        {
+                this->prev_sibling->next_sibling = this->next_sibling;
+        }
+
+        while (this->child_head != NULL)
+        {
+                RemoveChild(this->child_head);
+        }
 }
+
 
 /********************************************* Node::first() *******/
 /* Returns first sibling in 'this' node's sibling list                  */
 
-Node   *Node::first_sibling( void )
+NCRC_AutoPtr<Node> Node::first_sibling( void )
 {
   if ( parent_node == NULL )  
     return this;           /* root node has no siblings */
@@ -80,7 +91,7 @@ Node   *Node::first_sibling( void )
 /********************************************* Node::last() *******/
 /* Returns last sibling in 'this' node's sibling list                  */
 
-Node   *Node::last_sibling( void )
+NCRC_AutoPtr<Node> Node::last_sibling( void )
 {
   if ( parent_node == NULL )
     return this;            /* root node has no siblings */
@@ -91,7 +102,7 @@ Node   *Node::last_sibling( void )
 /******************************************** Node::prev() ********/
 /* Returns prev sibling in 'this' node's sibling list                  */
 
-Node    *Node::prev( void )
+NCRC_AutoPtr<Node> Node::prev( void )
 {
   return prev_sibling;
 }
@@ -100,16 +111,16 @@ Node    *Node::prev( void )
 /******************************************** Node::next() ********/
 /* Returns next sibling in 'this' node's sibling list                  */
 
-Node    *Node::next( void )
+NCRC_AutoPtr<Node> Node::next( void )
 {
   return next_sibling;
 }
 
 ///////////////////////////////////////////////////////////////////////
 // returns root node or NULL if already the root node
-Node* Node::GetRootNode()
+NCRC_AutoPtr<Node> Node::GetRootNode()
 {
-    Node* current = this->parent_node;
+    NCRC_AutoPtr<Node> current = this->parent_node;
     if(current == NULL || current == MasterObject::Instance() ) return this;
     while (current != NULL && current->parent() != NULL)
     {
@@ -118,40 +129,114 @@ Node* Node::GetRootNode()
     return current;
 }
 
-
-
-/************************************ Node::add_control() **************/
-#warning "redesign this... why doing up then down call....?"
-int Node::add_control( Node *child )
+////////////////////////////////////////////////////////////////////////
+int Node:: RemoveParent( NCRC_AutoPtr<Node> parent )
 {
-	child->link_this_to_parent_last( this );
+        if (parent_node == parent)
+        {
+                parent_node = NULL;
+                delete this;
+        }
+        else
+        {
+                throw Exception(EINVAL,
+                                "trying to remove a parent that isn't in parent list");
+        }
 	return 0;
 }
 
 
+/////////////////////////////////////////////////////////////////////////
+void Node::removeReference()
+{
+        if (ChildCount == (GetCount()-1))
+        {
+                while (child_head != NULL)
+                {
+                        RemoveChild(child_head);
+                }
+        }
+        NonCopyableReferenceCountedClass::removeReference();
+}
+
+/************************************ Node::add_control() **************/
+int Node::add_control( NCRC_AutoPtr<Node> child )
+{
+	LinkLast( child );
+        ChildCount ++;
+	return 0;
+}
+
+int Node::RemoveChild(  NCRC_AutoPtr<Node> child  )
+{
+        NCRC_AutoPtr<Node> curr = this->child_head;
+        this->ChildCount--;
+        while ( curr != NULL && curr != child)
+        {
+                curr = curr->next();
+        }
+        if (curr != NULL)
+        {
+                // if the node is in middle of the chain
+                if ( curr->prev_sibling != NULL && curr->next_sibling != NULL) 
+                {
+                        curr->prev_sibling->next_sibling = curr->next_sibling;
+                        curr->next_sibling->prev_sibling = curr->prev_sibling;
+                }
+                else
+                {
+                        if (curr == this->child_head )
+                        {    //first child
+                                this->child_head = curr->next_sibling;
+                                if (this->child_head != NULL)
+                                {
+                                        this->child_head->prev_sibling = NULL;
+                                }
+                        }
+                        if (curr == this->child_tail)
+                        {  // last child
+                                this->child_tail = curr->prev_sibling;
+                                if (this->child_tail != NULL)
+                                {
+                                        this->child_tail->next_sibling = NULL;
+                                }
+                        }
+                }
+
+                curr->_level = 0;
+                curr->parent_node  = NULL;
+                curr->next_sibling = NULL;
+                curr->prev_sibling = NULL;
+        }
+        else
+        {
+                throw Exception(EINVAL,
+                                "trying to unlink a node that isn't in the childs list");
+        }
+}
 
 /*************************** Node::link_this_to_parent_last() *******/
 /* Links as last child of parent                                         */
 
-void   Node::link_this_to_parent_last( Node *new_parent )
+void   Node::LinkLast( NCRC_AutoPtr<Node> new_child )
 {
-    if ( new_parent->child_tail == NULL ) {   /* parent has no children */
-        new_parent->child_head = this;
+    if ( this->child_tail == NULL ) {   /* parent has no children */
+        this->child_head = new_child;
     }
     else {                                 /* parent has children */
-        new_parent->child_tail->next_sibling = this;
-        this->prev_sibling                   = new_parent->child_tail;
+        this->child_tail->next_sibling = new_child;
+        new_child->prev_sibling        = this->child_tail;
     }
-    new_parent->child_tail = this;
-    this->parent_node                    = new_parent;
-    this->_level = parent_node->level()+1;
+    this->child_tail = new_child;
+    new_child->parent_node             = this;
+    new_child->_level = this->_level+1;
 }
 
 
 /*************************** Node::link_this_to_parent_first() *******/
 /* Links as first child of parent                                         */
 
-void   Node::link_this_to_parent_first( Node *new_parent )
+void   Node::link_this_to_parent_first( NCRC_AutoPtr<Node> new_parent )
 {
     if ( new_parent->child_head == NULL ) {   /* parent has no children */
         new_parent->child_tail               = this;
@@ -167,7 +252,7 @@ void   Node::link_this_to_parent_first( Node *new_parent )
 
 /**************************** Node::link_this_to_sibling_next() *****/
 
-void   Node::link_this_to_sibling_next( Node *sibling )
+void   Node::link_this_to_sibling_next( NCRC_AutoPtr<Node> sibling )
 {
   if ( sibling->next_sibling == NULL ) {    /* node has no next sibling */
     sibling->next_sibling  = this;
@@ -192,7 +277,7 @@ void   Node::link_this_to_sibling_next( Node *sibling )
 
 /**************************** Node::link_this_to_sibling_prev() *****/
 
-void   Node::link_this_to_sibling_prev( Node *sibling )
+void   Node::link_this_to_sibling_prev( NCRC_AutoPtr<Node> sibling )
 {
   if ( sibling->prev_sibling == NULL ) {    /* node has no prev sibling */
     sibling->prev_sibling  = this;
@@ -214,48 +299,20 @@ void   Node::link_this_to_sibling_prev( Node *sibling )
   this->_level = parent_node->level()+1;
 }
 
-/**************************************** Node::unlink() **************/
 
-void   Node::unlink( void )
-{
-  /* Unlink from prev sibling */
-  if ( this->prev_sibling != NULL ) 
-  {
-    this->prev_sibling->next_sibling = this->next_sibling;
-  }
-  else if (this->parent_node != NULL )
-  {                 /* No prev sibling: this was parent's first child */
-    this->parent_node->child_head = this->next_sibling;
-  }
 
-  /* Unlink from next sibling */
-  if ( this->next_sibling != NULL )
-  {
-    this->next_sibling->prev_sibling = this->prev_sibling;
-  }
-  else if (this->parent_node != NULL) 
-  {                /* No next sibling: this was parent's last child */
-    this->parent_node->child_tail = this->prev_sibling;
-  }
-
-  this->_level = 0;
-  this->parent_node  = NULL;
-  this->next_sibling = NULL;
-  this->prev_sibling = NULL;
-  this->child_head   = NULL;
-  this->child_tail   = NULL;
-}
 
 /**************************************** Node::dump() **************/
 
 void Node::dump( FILE *out, const char *name )
 {
 	MSG( "node: " << name << endl );
-	MSG("   parent: " << (void *) parent_node
-                   <<"    child_head: " << (void *) child_head
-                   <<"    child_tail: " << (void *) child_tail
+	MSG("   parent: " << (void *) parent_node.getPointee()
+                   <<"    child_head: " << (void *) child_head.getPointee()
+                   <<"    child_tail: " << (void *) child_tail.getPointee()
                    << endl);
-	MSG("   next: " << (void *) next_sibling << "       prev: " << (void *) prev_sibling << endl);
+	MSG("   next: " << (void *) next_sibling.getPointee() 
+                        << "       prev: " << (void *) prev_sibling.getPointee() << endl);
 }
 
 const char* Node::whole_tree(int start)

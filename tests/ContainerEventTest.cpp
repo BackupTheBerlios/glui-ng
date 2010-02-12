@@ -1,5 +1,7 @@
 #include <GL/glui/container.h>
 #include <assert.h>
+#include <string.h>
+
 using namespace GLUI;
 
 /////////////////////////////////////////////////////////////////
@@ -62,7 +64,9 @@ void fillEventStruct(Control* theCtrl, ::XKeyEvent* theEvent)
 //////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
-    DoForward* root = new DoForward("root");
+
+
+    NCRC_AutoPtr<DoForward> root = new DoForward("root");
     DoNotForward* branch1 = new DoNotForward("branch1");
     DoForward* branch2 = new DoForward("branch2");
     EventCounter* leefb1 = new EventCounter("leefb1");
@@ -85,6 +89,7 @@ int main(int argc, char* argv[])
     leef2b2->WaitedEvent = KeyPress;
 
     ::XKeyEvent keyevent;
+    ::memset(&keyevent,0, sizeof(keyevent));
     keyevent.type= KeyPress;
 
     // try to send a event to some widget that is masked if we get something then error
@@ -99,6 +104,6 @@ int main(int argc, char* argv[])
     fillEventStruct(leef2b2, &keyevent);
     root->AddEvent((::XEvent*) & keyevent);
     assert( leef2b2->count == 1 && leef2b2->bad_count == 0 );
-    delete root; //will delete everything recursively bellow it
+    root = NULL; //will delete everything recursively bellow it
 
 }
