@@ -1,5 +1,7 @@
+#ifndef __NONCOPYABLECLASS_H
+#define __NONCOPYABLECLASS_H
 /*
-   GLUI, an openGL widget toolkit. Copyright (C) 2010 MALET Jean-Luc
+   GLUI-ng, an openGL widget toolkit. Copyright (C) 2010 MALET Jean-Luc
 
    This library is free software; you can redistribute it and/or modify it under
    the terms of the GNU Lesser General Public License as published by the 
@@ -13,9 +15,10 @@
    You should have received a copy of the GNU Lesser General Public License along with this library;
    if not, write to the 
    Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
+
+   based on the work of Paul Rademacher (orignal software http://glui.sourceforge.net/)
 */
-#ifndef __NONCOPYABLECLASS_H
-#define __NONCOPYABLECLASS_H
+
 namespace GLUI
 {
         class NonCopyableClass

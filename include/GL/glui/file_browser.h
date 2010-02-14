@@ -1,11 +1,24 @@
 #ifndef __GLUI_FILE_BROWSER_H
 #define __GLUI_FILE_BROWSER_H
+/*
+   GLUI-ng, an openGL widget toolkit. Copyright (C) 2010 MALET Jean-Luc
 
-/************************************************************/
-/*                                                          */
-/*               File Browser class (container)             */
-/*                         JVK                              */
-/************************************************************/
+   This library is free software; you can redistribute it and/or modify it under
+   the terms of the GNU Lesser General Public License as published by the 
+   Free Software Foundation; either version 2.1 of the License, 
+   or (at your option) any later version.
+
+   This library is distributed in the hope that it will be useful, but 
+   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+   FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public License along with this library;
+   if not, write to the 
+   Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
+
+   based on the work of Paul Rademacher (orignal software http://glui.sourceforge.net/)
+*/
+
 
 /**
  A list of files the user can select from.
