@@ -24,7 +24,7 @@
 
 using namespace GLUI;
 /****************************** Button::Button() **********/
-Button::Button( Node *parent, const char *name,
+Button::Button( const char *name,
         int id, CB cb ):
     Container(name)
     //,value(NULL, id, cb)
@@ -32,7 +32,6 @@ Button::Button( Node *parent, const char *name,
 {
     common_init();
     this->resizeable = AdaptThisToFitChilds;
-    parent->add_control( this );
     TheDefaultTheme = new Button::DefaultTheme(*this);
 #warning "register on KeyPress, KeyRelease, ButtonPress, ButtonRelease, EnterNotify, LeaveNotify, MotionNotify"
 }
@@ -48,8 +47,6 @@ int Button::AddEvent(::XEvent *event)
         value = true;
         ThemeData->update();
     }
-
-
 }
 
 
@@ -109,9 +106,9 @@ int TextButton::DefaultTheme::update()
 
 
 
-TextButton::TextButton (Node *parent, const char *name,
+TextButton::TextButton (const char *name,
         int id, CB cb ) :
-    Button(parent, name, id, cb),
+    Button(name, id, cb),
     text(this, "text")
 {
     this->TheDefaultTheme = new TextButton::DefaultTheme(*this);

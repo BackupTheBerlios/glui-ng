@@ -64,7 +64,7 @@ namespace GLUI
 			  @param id Optional ID number, to pass to the optional callback function.
 			  @param callback Optional callback function, taking either the int ID or control.
 			  */
-			Button( Node *parent, const char *name,
+			Button( const char *name,
 					int id=-1, CB cb=CB() );
 			virtual int AddEvent(::XEvent *event);
                         bool GetValue();
@@ -110,7 +110,7 @@ namespace GLUI
 
 		public :
 			 void SetText(char* newtext);
-			 TextButton (Node *parent, const char *name,
+			 TextButton (const char *name,
 					int id=-1, CB cb=CB() ) ;
 
 		protected:

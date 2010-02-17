@@ -26,11 +26,15 @@
 
 int main(int argc, char* argv[])
 {
+    struct timespec sleeptime = { 1, 100000000 };
+    int count = 0;
+    int err = 0;
+
 
     glutInit(&argc, argv);
     glutInitDisplayMode( GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH );
-    GLUI::Display *disp  = new GLUI::Display( NULL );
-    GLUI::Window *window = new GLUI::Window( disp, disp->DefaultScreen()->RootWindow(),
+    NCRC_AutoPtr<GLUI::Display> disp  = new GLUI::Display( NULL );
+    NCRC_AutoPtr<GLUI::Window> window = new GLUI::Window( disp, disp->DefaultScreen()->RootWindow(),
             0, //winX,
             0, //winY,
             0, //winW,
@@ -42,11 +46,27 @@ int main(int argc, char* argv[])
             0, //CWEventMask|CWBackPixel|CWBorderPixel,
             &xswa);
     window->set_resize_policy(GLUI_Control::AdaptThisToFitChilds);
-
-    GLUI_Button( glui, "Button");
-    GLUI_Master.set_glutIdleFunc( NULL );
-    glutMainLoop();
-
+    window->add_control(new Button("Button"));
+    Window->XMapWindow();
+    nanosleep(&sleeptime, &sleeptime);
+    while (EINTR == err )
+    {
+            err =  nanosleep(&sleeptime, &sleeptime);
+    }
+    while (count < 50)
+    {
+            struct timespec sleeptime = { 0, 100000000 };
+            struct timespec rem = { 0, 0};
+            Window->simulatekey();
+            err = nanosleep(&sleeptime, &rem);
+            while (EINTR == err )
+            {
+                err =  nanosleep(&rem, &rem);
+            }
+            count++;
+    }
+    Window->XUnmapWindow();
+    exit(0);
     return EXIT_SUCCESS;
 }
 

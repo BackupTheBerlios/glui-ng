@@ -139,30 +139,30 @@ X11Window::X11Window(NCRC_AutoPtr<X11Display> display,
                 None
         };
         EventMask = KeyPressMask 
-                    | KeyReleaseMask 
-                    | ButtonPressMask 
-                    | ButtonReleaseMask 
-                    | EnterWindowMask 
-                    | LeaveWindowMask 
-                    | PointerMotionMask
-                    | PointerMotionHintMask
-                    | Button1MotionMask
-                    | Button2MotionMask
-                    | Button3MotionMask
-                    | Button4MotionMask
-                    | Button5MotionMask
-                    | ButtonMotionMask
-                    | KeymapStateMask
-                    | ExposureMask
-                    | VisibilityChangeMask
-                    | StructureNotifyMask
-                    | ResizeRedirectMask
-                    | SubstructureNotifyMask
-                    | SubstructureRedirectMask
-                    | FocusChangeMask
-                    | PropertyChangeMask
-                    | ColormapChangeMask
-                    | OwnerGrabButtonMask ;
+                  | KeyReleaseMask 
+                  | ButtonPressMask 
+                  | ButtonReleaseMask 
+                  | EnterWindowMask
+                  | LeaveWindowMask
+                  | PointerMotionMask
+                  | Button1MotionMask 
+                  | Button2MotionMask 
+                  | Button3MotionMask
+                  | Button4MotionMask
+                  | Button5MotionMask
+                  | ButtonMotionMask
+                  | KeymapStateMask
+                  | ExposureMask
+                  | VisibilityChangeMask
+                  | StructureNotifyMask
+                  /*| ResizeRedirectMask */
+                  | SubstructureNotifyMask
+                  | SubstructureRedirectMask
+                  | FocusChangeMask
+                  | PropertyChangeMask
+                  | ColormapChangeMask
+                  | OwnerGrabButtonMask;
+
 
         printf( "Getting matching framebuffer configs\n" );
         int fbcount;
@@ -238,31 +238,6 @@ void X11Window::_X11Window(NCRC_AutoPtr<_Window> parent_window,
                 unsigned long valuemask,
                 XSetWindowAttributes *attributes )
 {
-/*        EventMask = KeyPressMask 
-                    | KeyReleaseMask 
-                    | ButtonPressMask 
-                    | ButtonReleaseMask 
-                    | EnterWindowMask 
-                    | LeaveWindowMask 
-                    | PointerMotionMask
-                    | PointerMotionHintMask
-                    | Button1MotionMask
-                    | Button2MotionMask
-                    | Button3MotionMask
-                    | Button4MotionMask
-                    | Button5MotionMask
-                    | ButtonMotionMask
-                    | KeymapStateMask
-                    | ExposureMask
-                    | VisibilityChangeMask
-                    | StructureNotifyMask
-                    | ResizeRedirectMask
-                    | SubstructureNotifyMask
-                    | SubstructureRedirectMask
-                    | FocusChangeMask
-                    | PropertyChangeMask
-                    | ColormapChangeMask
-                    | OwnerGrabButtonMask ;*/
         window = XCreateWindow (disp->Disp(), parent_window->GetWindowId(),
                 x, y,
                 width, height,
@@ -276,8 +251,9 @@ void X11Window::_X11Window(NCRC_AutoPtr<_Window> parent_window,
                 throw Exception(EINVAL,"Failed to create window.\n" );
 
         XSelectInput(disp->Disp(), window, EventMask);
-        Atom wmDeleteMessage = ::XInternAtom(disp->Disp(), "WM_DELETE_WINDOW", False);
-        ::XSetWMProtocols(disp->Disp(), window, &wmDeleteMessage, 1);
+        wm_protocols = ::XInternAtom(disp->Disp(), "WM_PROTOCOLS", False);
+        wm_delete_window = ::XInternAtom(disp->Disp(), "WM_DELETE_WINDOW", False);
+        XSetWMProtocols(disp->Disp(), window, &wm_delete_window, 1);
 
         hasContext=false;
         dirty=false;
@@ -323,7 +299,7 @@ int X11Window::start_routine()
                         AddEvent(&EventToForward);
                         dirty=False;
                 }
-                XWindowEvent(disp->Disp(), window, EventMask, &event);
+                XNextEvent (disp->Disp(), &event);
                 EventCoordToGLCoord(event);
                 err = Container::AddEvent(&event);
         }
