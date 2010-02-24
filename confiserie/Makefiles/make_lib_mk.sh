@@ -118,9 +118,12 @@ install_${complete_name} :
 	printf \${INSTALLMSG} ${complete_name} : $1 not defined... skipping install
 endif
 
+ifeq (${ENABLE_AUTODEPS}, yes)
 ifneq (\${MAKECMDGOALS},clean)
 -include \${${name}_SOURCES:%=GENERATED/%.d}
 endif
+endif
+
 
 else 
 

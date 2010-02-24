@@ -18,6 +18,7 @@
 */
 #include <GL/glui/debug.h>
 #include <GL/glui/x11_window.h>
+#include <GL/glui/RecorderPlayer.h>
 #include <string.h>
 #undef Display
 #define MODULE_KEY "GLUI_DEBUG_XGL"
@@ -238,31 +239,6 @@ void X11Window::_X11Window(NCRC_AutoPtr<_Window> parent_window,
                 unsigned long valuemask,
                 XSetWindowAttributes *attributes )
 {
-/*        EventMask = KeyPressMask 
-                    | KeyReleaseMask 
-                    | ButtonPressMask 
-                    | ButtonReleaseMask 
-                    | EnterWindowMask 
-                    | LeaveWindowMask 
-                    | PointerMotionMask
-                    | PointerMotionHintMask
-                    | Button1MotionMask
-                    | Button2MotionMask
-                    | Button3MotionMask
-                    | Button4MotionMask
-                    | Button5MotionMask
-                    | ButtonMotionMask
-                    | KeymapStateMask
-                    | ExposureMask
-                    | VisibilityChangeMask
-                    | StructureNotifyMask
-                    | ResizeRedirectMask
-                    | SubstructureNotifyMask
-                    | SubstructureRedirectMask
-                    | FocusChangeMask
-                    | PropertyChangeMask
-                    | ColormapChangeMask
-                    | OwnerGrabButtonMask ;*/
         window = XCreateWindow (disp->Disp(), parent_window->GetWindowId(),
                 x, y,
                 width, height,
@@ -307,6 +283,10 @@ int X11Window::start_routine()
         int err = 0;
         ::XEvent event;
         ::memset(&event,0,sizeof(event));
+        char* replay_file_name = getenv("GLUI_REPLAY_FILE");
+        char* event_file_name = getenv("GLUI_EVENT_FILE");
+        EventPlayer player(replay_file_name);
+        EventRecorder rec(event_file_name);
 
         while(this->thread_enabled && err == 0) 
         {
@@ -323,8 +303,19 @@ int X11Window::start_routine()
                         AddEvent(&EventToForward);
                         dirty=False;
                 }
-                XWindowEvent(disp->Disp(), window, EventMask, &event);
+                if (NULL == replay_file_name)
+                {
+                        XNextEvent (disp->Disp(), &event);
+                }
+                else
+                {
+                        player.next(event);
+                }
                 EventCoordToGLCoord(event);
+                if (NULL != event_file_name)
+                {
+                        rec.add(event);
+                }
                 err = Container::AddEvent(&event);
         }
         this->thread_enabled = False;
