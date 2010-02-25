@@ -57,7 +57,7 @@ X11Display::X11Display(char* name)
 void X11Display::_X11Display(char* name)
 {
         disp = XOpenDisplay(name);
-        if (! disp) throw Exception(EINVAL,"can't open display");
+        if (! disp) GLUI_THROW(EINVAL,"can't open display");
         if ( NULL != getenv("GLUI_ENABLE_DEBUG") ) 
         {
                 XSynchronize(disp, True);
@@ -249,7 +249,7 @@ void X11Window::_X11Window(NCRC_AutoPtr<_Window> parent_window,
                 valuemask,
                 attributes );
         if ( !window )
-                throw Exception(EINVAL,"Failed to create window.\n" );
+                GLUI_THROW(EINVAL,"Failed to create window.\n" );
 
         XSelectInput(disp->Disp(), window, EventMask);
         Atom wmDeleteMessage = ::XInternAtom(disp->Disp(), "WM_DELETE_WINDOW", False);
@@ -592,7 +592,7 @@ int X11Window::CreateGLContext()
 
 
         if (!ctx )
-                throw Exception(ENOTSUP,"Failed to create GLX context.\n");
+                GLUI_THROW(ENOTSUP,"Failed to create GLX context.\n");
 
         // Verifying that context is a direct context
         printf( "Verifying that context is direct\n" );

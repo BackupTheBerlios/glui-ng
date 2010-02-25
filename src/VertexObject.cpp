@@ -330,7 +330,7 @@ int VertexObject::ComputeNormals()
                         if (Indices->ComponentsCount == 4) index4 = Indices->array.pint32[face * Indices->ComponentsCount + 3 ];
                         break;
                 default:
-                        throw Exception(EINVAL, "Indices has not an int type");
+                        GLUI_THROW(EINVAL, "Indices has not an int type");
 
         }
         switch ( Vertices->datatype_t)
@@ -424,7 +424,7 @@ int VertexObject::ComputeNormals()
                         fVertice2[2] = Vertices->array.pdouble[index3*Vertices->ComponentsCount +2];
                         break;
                 default :
-                        throw Exception(EINVAL, "Vertices has an undefined type");
+                        GLUI_THROW(EINVAL, "Vertices has an undefined type");
 
         }
         vec3 v0( fVertice0 );

@@ -16,29 +16,36 @@
 
    based on the work of Paul Rademacher (orignal software http://glui.sourceforge.net/)
 */
-
+#include <iostream>
+#include <sstream>
 #include <GL/glui/Exception.h>
+#include <string.h>
 using namespace GLUI;
 ///////////////////////////////////////////////////////////////////
-Exception::Exception(int errnb, const std::string* str)
-{
-    this->err = errnb;
-    this->str   = str;
-    this->c_str = NULL;
-}
 
-///////////////////////////////////////////////////////////////////
-Exception::Exception(int errnb, const char* str)
+Exception::Exception(int errnb, const std::string& file, int line, const std::string& str)
 {
-    this->err = errnb;
-    this->str   = NULL;
-    this->c_str = str;
+        std::stringstream format;
+        char* buff = new char[30];
+        format << file << ":" << line << " error "<< errnb << "(";
+        if (strerror_r(errnb, buff, 30))
+        {
+                format << "UNKNOWN";
+        }
+        else
+        {
+                format << buff;
+        }
+        format << ")  " << str;
+
+        this->err = errnb;
+        this->str = format.str();
+        delete[] buff;
 }
 
 ///////////////////////////////////////////////////////////////////
 const char * Exception::what () const throw ()
 {
-    if (this->str != NULL) return this->str->c_str();
-    else if (this->c_str != NULL) return this->c_str;
+    return this->str.c_str();
 }
 

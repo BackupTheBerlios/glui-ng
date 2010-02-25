@@ -327,7 +327,7 @@ void debug::DumpEvent(const ::XEvent& event, ostream& out)
                         {
                                 ::XKeymapEvent &e = (::XKeymapEvent&)event;
                                 out << EventTypeToString( e.type )
-                                       << ": window=0x" << hex << e.window << " ";
+                                       << ": window=0x" << hex << e.window << " " << dec;
                                 for (int i = 0; i < 32; i++)
                                 {
                                         int vect = e.key_vector[i];

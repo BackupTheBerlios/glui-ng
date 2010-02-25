@@ -68,7 +68,7 @@ namespace GLUI
                         {
                                 if (pointee->isShareable() == false) 
                                 {
-                                        throw Exception(EINVAL,"trying to duplicate a non copyable object");
+                                        GLUI_THROW(EINVAL,"trying to duplicate a non copyable object");
                                         //T *oldValue = this->pointee;
                                         //counter = new CountHolder;
                                         //counter->pointee = oldValue ? new T(*oldValue) : 0;
@@ -188,7 +188,7 @@ namespace GLUI
                 {
                         if (counter->isShareable() == false) 
                         {
-                                throw Exception(EINVAL,"trying to duplicate a non copyable object");
+                                GLUI_THROW(EINVAL,"trying to duplicate a non copyable object");
                                 //T *oldValue = counter->pointee;
                                 //counter = new CountHolder;
                                 //counter->pointee = oldValue ? new T(*oldValue) : 0;
