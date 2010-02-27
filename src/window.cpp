@@ -114,7 +114,7 @@ void  _Window::Start()
     int err = pthread_create(&main_thread,NULL,_Start, (void*)this);
     if (err)
     {
-            throw Exception(err, "window thread creation error");
+            GLUI_THROW(err, "window thread creation error");
     }
 }
 void* _Window::_Start(void* arg)
@@ -131,7 +131,7 @@ int _Window::_Stop()
         int res = pthread_kill(main_thread, SIGTERM);
         if (res) 
         {
-                throw Exception(res,"pthread_kill\n");
+                GLUI_THROW(res,"pthread_kill\n");
         }
         return Wait();
 }

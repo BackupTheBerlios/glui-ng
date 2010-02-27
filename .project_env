@@ -1,4 +1,4 @@
-export TAGS=${PWD}/tags,${PWD}/_usr_include_GL_tags,${PWD}/_usr_include_X11_tags
+export TAGS=${PWD}/tags,${PWD}/_usr_include_GL_tags,${PWD}/_usr_include_X11_tags,${PWD}/_usr_include_c++_tags
 export VIM_SERVER=glui
 export VIM_SESSION=" "
 unalias vi

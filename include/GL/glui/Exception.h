@@ -27,18 +27,18 @@ namespace GLUI
     {
         private :
             Exception();
-            const char* c_str;
-            const std::string* str;
+        private : //variables
+            std::string str;
             int err;
         public:
-             Exception(int errnb, const std::string* str);
-             Exception(int errnb, const char* str);
+             Exception(int errnb, const std::string& file, int line, const std::string& str);
+             ~Exception() throw() { }
              virtual const char * 	what () const throw ();
     };
 
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
-#define GLUI_THROW(errnb, str) throw Exception(errnb, __FILE__ ":" TOSTRING(__LINE__) str TOSTRING(errnb))
+#define GLUI_THROW(errnb, str) throw Exception(errnb, __FILE__ , __LINE__,str )
 }
 
 

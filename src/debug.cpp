@@ -243,6 +243,11 @@ const char* debug::EventColormapStateToString( int state )
 void debug::PrintEvent(const char* key,const ::XEvent& event, const char* func)
 {
         if (use_debug == NULL || NULL == getenv(key)) return;
+        DumpEvent(event, cerr);
+}
+
+void debug::DumpEvent(const ::XEvent& event, ostream& out)
+{
         switch( event.type )
         {
 
@@ -250,15 +255,15 @@ void debug::PrintEvent(const char* key,const ::XEvent& event, const char* func)
                 case KeyRelease:
                         {
                                 ::XKeyEvent &e = (::XKeyEvent&)event;
-                                cerr << EventTypeToString( e.type )
-                                     << "window=0x" << hex << e.window << dec << ", root=0x" << hex
-                                     << e.root << dec << ", subwindow=0x" << hex
-                                     <<  e.subwindow << dec << ", time=" 
-                                     <<  (unsigned long)e.time << ", (x,y)=("
-                                     << e.x << "," << e.y << "), (x_root,y_root)=("
-                                     << e.x_root <<","<< e.y_root << "), state=0x" << hex 
-                                     << e.state << dec << "keycode=" << e.keycode
-                                     << "same_screen=" << EventBoolToString( e.same_screen ) <<endl;
+                                out << EventTypeToString( e.type )
+                                     << ": window=0x" << hex << e.window << dec << " root=0x" << hex
+                                     << e.root << dec << " subwindow=0x" << hex
+                                     <<  e.subwindow << dec << " time=" 
+                                     <<  e.time << " (x,y)=("
+                                     << e.x << "," << e.y << ") (x_root,y_root)=("
+                                     << e.x_root <<","<< e.y_root << ") state=0x" << hex 
+                                     << e.state << dec << " keycode=" << e.keycode
+                                     << " same_screen=" << EventBoolToString( e.same_screen ) <<endl;
                                 return;
                         }
 
@@ -266,28 +271,28 @@ void debug::PrintEvent(const char* key,const ::XEvent& event, const char* func)
                 case ButtonRelease: 
                         {
                                 ::XButtonEvent &e = (::XButtonEvent&)event;
-                                cerr << EventTypeToString( e.type ) << ": window=0x" << hex << e.window << dec << ", root=0x" << hex
-                                        << e.root << dec << ", subwindow=0x" << hex << e.subwindow << dec << ", time="
-                                        << (unsigned long)e.time << ", (x,y)=(" << e.x 
-                                        << "," << e.y << "), (x_root,y_root)=(" 
-                                        << e.x_root << "," << e.y_root << "), state=0x" << hex << e.state
-                                        << dec << ", button=" << e.button << ", same_screen=" << EventBoolToString( e.same_screen )<< endl;
+                                out << EventTypeToString( e.type ) << ": window=0x" << hex << e.window << dec << " root=0x" << hex
+                                        << e.root << dec << " subwindow=0x" << hex << e.subwindow << dec << " time="
+                                        << e.time << " (x,y)=(" << e.x 
+                                        << "," << e.y << ") (x_root,y_root)=(" 
+                                        << e.x_root << "," << e.y_root << ") state=0x" << hex << e.state
+                                        << dec << " button=" << e.button << " same_screen=" << EventBoolToString( e.same_screen )<< endl;
                                 return;
                         }
 
                 case MotionNotify:
                         {
                                 ::XMotionEvent &e = (::XMotionEvent&)event;
-                                cerr << EventTypeToString( e.type ) 
+                                out << EventTypeToString( e.type ) 
                                         << ": window=0x" << hex << e.window 
-                                        << dec << ", root=0x" << hex << e.root 
-                                        << dec << ", subwindow=0x" << hex << e.subwindow 
-                                        << dec << ", time=" << (unsigned long)e.time 
-                                        << "u, (x,y)=(" << e.x << "," << e.y 
-                                        << "), (x_root,y_root)=(" << e.x_root << "," << e.y_root 
-                                        << "), state=0x" << hex << e.state 
-                                        << dec << ", is_hint=" << EventNotifyHintToString( e.is_hint ) 
-                                        << ", same_screen=" << EventBoolToString( e.same_screen ) 
+                                        << dec << " root=0x" << hex << e.root 
+                                        << dec << " subwindow=0x" << hex << e.subwindow 
+                                        << dec << " time=" << e.time 
+                                        << " (x,y)=(" << e.x << "," << e.y 
+                                        << ") (x_root,y_root)=(" << e.x_root << "," << e.y_root 
+                                        << ") state=0x" << hex << e.state 
+                                        << dec << " is_hint=" << EventNotifyHintToString( e.is_hint ) 
+                                        << " same_screen=" << EventBoolToString( e.same_screen ) 
                                         << "\n";
                                 return;
                         }
@@ -296,14 +301,14 @@ void debug::PrintEvent(const char* key,const ::XEvent& event, const char* func)
                 case LeaveNotify: 
                         {
                                 ::XCrossingEvent &e = (::XCrossingEvent&)event;
-                                cerr << EventTypeToString( e.type ) << ": window=0x" << hex << e.window 
-                                        << dec << ", root=0x" << hex << e.root << dec << ", subwindow=0x" << hex 
-                                        << e.subwindow << dec << ", time=" << (unsigned long)e.time 
-                                        << "u, (x,y)=(" << e.x << "," << e.y 
-                                        << "), mode=" << EventNotifyModeToString( e.mode ) 
-                                        << ", detail=" << EventNotifyDetailToString( e.detail ) 
-                                        << ", same_screen=" << (int)e.same_screen << ", focus=" 
-                                        << (int)e.focus << ", state=0x" << hex << e.state << dec << "\n";
+                                out << EventTypeToString( e.type ) << ": window=0x" << hex << e.window 
+                                        << dec << " root=0x" << hex << e.root << dec << " subwindow=0x" << hex 
+                                        << e.subwindow << dec << " time=" << e.time 
+                                        << " (x,y)=(" << e.x << "," << e.y 
+                                        << ") mode=" << EventNotifyModeToString( e.mode ) 
+                                        << " detail=" << EventNotifyDetailToString( e.detail ) 
+                                        << " same_screen=" << EventBoolToString(e.same_screen) << " focus=" 
+                                        << (int)e.focus << " state=0x" << hex << e.state << dec << "\n";
                                 return;
                         }
 
@@ -311,9 +316,9 @@ void debug::PrintEvent(const char* key,const ::XEvent& event, const char* func)
                 case FocusOut:
                         {
                                 ::XFocusChangeEvent &e = (::XFocusChangeEvent&)event;
-                                cerr << EventTypeToString( e.type ) << ": window=0x" << hex
-                                        << e.window << dec << ", mode="
-                                        << EventNotifyModeToString( e.mode ) << ", detail="
+                                out << EventTypeToString( e.type ) << ": window=0x" << hex
+                                        << e.window << dec << " mode="
+                                        << EventNotifyModeToString( e.mode ) << " detail="
                                         << EventNotifyDetailToString( e.detail ) << endl;
                                 return;
                         }
@@ -321,23 +326,24 @@ void debug::PrintEvent(const char* key,const ::XEvent& event, const char* func)
                 case KeymapNotify:
                         {
                                 ::XKeymapEvent &e = (::XKeymapEvent&)event;
-                                cerr << EventTypeToString( e.type )
-                                       << ": window=0x" << hex << e.window << dec << ", ";
+                                out << EventTypeToString( e.type )
+                                       << ": window=0x" << hex << e.window << " " << dec;
                                 for (int i = 0; i < 32; i++)
                                 {
-                                        cerr << e.key_vector[i];
+                                        int vect = e.key_vector[i];
+                                        out << vect << " ";
                                 }
-                                cerr << endl;
+                                out << endl;
                                 return;
                         }
 
                 case Expose:
                         {
                                 ::XExposeEvent &e = (::XExposeEvent&)event;
-                                cerr << EventTypeToString( e.type ) << ": window=0x" << hex 
-                                        <<  e.window << dec << ", (x,y)=(" <<  e.x << "," << e.y 
-                                        << "), (width,height)=("
-                                        << e.width << "," << e.height << "), count=" 
+                                out << EventTypeToString( e.type ) << ": window=0x" << hex 
+                                        <<  e.window << dec << " (x,y)=(" <<  e.x << "," << e.y 
+                                        << ") (width,height)=("
+                                        << e.width << "," << e.height << ") count=" 
                                         << e.count << endl;
                                 return;
                         }
@@ -345,10 +351,10 @@ void debug::PrintEvent(const char* key,const ::XEvent& event, const char* func)
                 case GraphicsExpose:
                         {
                                 ::XGraphicsExposeEvent &e = (::XGraphicsExposeEvent&)event;
-                                cerr << EventTypeToString( e.type ) << ": drawable=0x" << hex << e.drawable 
-                                        << dec << ", (x,y)=(" << e.x << "," << e.y << "), (width,height)=("
-                                        << e.width << ", " << e.height << "), count=" << e.count 
-                                        << ", (major_code,minor_code)=(" << e.major_code 
+                                out << EventTypeToString( e.type ) << ": drawable=0x" << hex << e.drawable 
+                                        << dec << " (x,y)=(" << e.x << "," << e.y << ") (width,height)=("
+                                        << e.width << "," << e.height << ") count=" << e.count 
+                                        << " (major_code,minor_code)=(" << e.major_code 
                                         << "," << e.minor_code << ")\n";
                                 return;
                         }
@@ -356,8 +362,8 @@ void debug::PrintEvent(const char* key,const ::XEvent& event, const char* func)
                 case NoExpose:
                         {
                                 ::XNoExposeEvent &e = (::XNoExposeEvent&)event;
-                                cerr << EventTypeToString( e.type ) << ": drawable=0x" << hex << e.drawable 
-                                        << dec << ", (major_code,minor_code)=(" << e.major_code 
+                                out << EventTypeToString( e.type ) << ": drawable=0x" << hex << e.drawable 
+                                        << dec << " (major_code,minor_code)=(" << e.major_code 
                                         << "," << e.minor_code << ")\n";
                                 return;
                         }
@@ -365,35 +371,35 @@ void debug::PrintEvent(const char* key,const ::XEvent& event, const char* func)
                 case VisibilityNotify:
                         {
                                 ::XVisibilityEvent &e = (::XVisibilityEvent&)event;
-                                cerr << EventTypeToString( e.type ) << ": window=0x" << hex << e.window 
-                                        << dec << ", state=" << EventVisibilityToString( e.state) << "\n";
+                                out << EventTypeToString( e.type ) << ": window=0x" << hex << e.window 
+                                        << dec << " state=" << EventVisibilityToString( e.state) << "\n";
                                 return;
                         }
 
                 case CreateNotify:
                         {
                                 ::XCreateWindowEvent &e = (::XCreateWindowEvent&)event;
-                                cerr << EventTypeToString( e.type ) << ": (x,y)=(" << e.x << "," << e.y 
-                                        << "), (width,height)=(" << e.width << "," << e.height 
-                                        << "), border_width=" << e.border_width << ", window=0x" << hex 
-                                        << e.window << dec << "," 
-                                        <<  "override_redirect=" <<EventBoolToString( e.override_redirect ) << "\n";
+                                out << EventTypeToString( e.type ) << ": (x,y)=(" << e.x << "," << e.y 
+                                        << ") (width,height)=(" << e.width << "," << e.height 
+                                        << ") border_width=" << e.border_width << " window=0x" << hex 
+                                        << e.window << dec 
+                                        <<  " override_redirect=" <<EventBoolToString( e.override_redirect ) << "\n";
                                 return;
                         }
 
                 case DestroyNotify:
                         {
                                 ::XDestroyWindowEvent &e = (::XDestroyWindowEvent&)event;
-                                cerr << EventTypeToString( e.type ) << ": event=0x" << hex 
-                                        << e.event << dec << ", window=0x" << hex << e.window << dec << "\n";
+                                out << EventTypeToString( e.type ) << ": event=0x" << hex 
+                                        << e.event << dec << " window=0x" << hex << e.window << dec << "\n";
                                 return;
                         }
 
                 case UnmapNotify:
                         {
                                 ::XUnmapEvent &e = (::XUnmapEvent&)event;
-                                cerr << EventTypeToString( e.type ) << ": event=0x" << hex << e.event 
-                                        << dec << ", window=0x" << hex << e.window << dec << ", from_configure=" 
+                                out << EventTypeToString( e.type ) << ": event=0x" << hex << e.event 
+                                        << dec << " window=0x" << hex << e.window << dec << " from_configure=" 
                                         << EventBoolToString( e.from_configure )  << "\n";
                                 return;
                         }
@@ -401,8 +407,8 @@ void debug::PrintEvent(const char* key,const ::XEvent& event, const char* func)
                 case MapNotify:
                         {
                                 ::XMapEvent &e = (::XMapEvent&)event;
-                                cerr << EventTypeToString( e.type ) << ": event=0x" << hex 
-                                        << e.event << dec << ", window=0x" << hex << e.window << dec << ", override_redirect=" 
+                                out << EventTypeToString( e.type ) << ": event=0x" << hex 
+                                        << e.event << dec << " window=0x" << hex << e.window << dec << " override_redirect=" 
                                         << EventBoolToString( e.override_redirect ) << "\n";
                                 return;
                         }
@@ -410,17 +416,17 @@ void debug::PrintEvent(const char* key,const ::XEvent& event, const char* func)
                 case MapRequest:
                         {
                                 ::XMapRequestEvent &e = (::XMapRequestEvent&)event;
-                                cerr << EventTypeToString( e.type ) << ": parent=0x" << hex << e.parent 
-                                        << dec << ", window=0x" << hex << e.window << dec << "\n";
+                                out << EventTypeToString( e.type ) << ": parent=0x" << hex << e.parent 
+                                        << dec << " window=0x" << hex << e.window << dec << "\n";
                                 return;
                         }
 
                 case ReparentNotify:
                         {
                                 ::XReparentEvent &e = (::XReparentEvent&)event;
-                                cerr << EventTypeToString( e.type ) << ": event=0x" << hex << e.event 
-                                        << dec << ", window=0x" << hex << e.window << dec << ", parent=0x" << hex << e.parent 
-                                        << dec << ", (x,y)=(" << e.x << "," << e.y << "), "
+                                out << EventTypeToString( e.type ) << ": event=0x" << hex << e.event 
+                                        << dec << " window=0x" << hex << e.window << dec << " parent=0x" << hex << e.parent 
+                                        << dec << " (x,y)=(" << e.x << "," << e.y << ") "
                                         "override_redirect=" << EventBoolToString( e.override_redirect ) << "\n";
                                 return;
                         }
@@ -428,11 +434,11 @@ void debug::PrintEvent(const char* key,const ::XEvent& event, const char* func)
                 case ConfigureNotify:
                         {
                                 ::XConfigureEvent &e = (::XConfigureEvent&)event;
-                                cerr << EventTypeToString( e.type ) << ": event=0x" << hex << e.event 
-                                        << dec << ", window=0x" << hex << e.window << dec << ", (x,y)=(" << e.x 
-                                        << "," << e.y << "), (width,height)=(" << e.width << "," 
-                                        << e.height << "), border_width=" << e.border_width 
-                                        << ", above=0x" << hex << e.above << dec << ", override_redirect=" 
+                                out << EventTypeToString( e.type ) << ": event=0x" << hex << e.event 
+                                        << dec << " window=0x" << hex << e.window << dec << " (x,y)=(" << e.x 
+                                        << "," << e.y << ") (width,height)=(" << e.width << "," 
+                                        << e.height << ") border_width=" << e.border_width 
+                                        << " above=0x" << hex << e.above << dec << " override_redirect=" 
                                         << EventBoolToString( e.override_redirect ) << "\n";
                                 return;
                         }
@@ -440,32 +446,32 @@ void debug::PrintEvent(const char* key,const ::XEvent& event, const char* func)
                 case ConfigureRequest:
                         {
                                 ::XConfigureRequestEvent &e = (::XConfigureRequestEvent&)event;
-                                cerr << EventTypeToString( e.type ) << ": parent=0x" << hex << e.parent 
-                                        << dec << ", window=0x" << hex << e.window 
-                                        << dec << ", (x,y)=(" << e.x << "," << e.y << "), "
+                                out << EventTypeToString( e.type ) << ": parent=0x" << hex << e.parent 
+                                        << dec << " window=0x" << hex << e.window 
+                                        << dec << " (x,y)=(" << e.x << "," << e.y << ") "
                                         "(width,height)=(" << e.width << "," << e.height 
-                                        << "), border_width=" << e.border_width << ", above=0x" << hex 
-                                        << e.above << dec << ", "
+                                        << ") border_width=" << e.border_width << " above=0x" << hex 
+                                        << e.above << dec << " "
                                         "detail=" << EventConfigureDetailToString( e.detail ) 
-                                        << ", value_mask=" << e.value_mask << "\n";
+                                        << " value_mask=" << e.value_mask << "\n";
                                 return;
                         }
 
                 case GravityNotify:
                         {
                                 ::XGravityEvent &e = (::XGravityEvent&)event;
-                                cerr << EventTypeToString( e.type ) << ": event=0x" << hex << e.event 
-                                        << dec << ", window=0x" << hex << e.window 
-                                        << dec << ", (x,y)=(" << e.x << "," << e.y << ")\n";
+                                out << EventTypeToString( e.type ) << ": event=0x" << hex << e.event 
+                                        << dec << " window=0x" << hex << e.window 
+                                        << dec << " (x,y)=(" << e.x << "," << e.y << ")\n";
                                 return;
                         }
 
                 case ResizeRequest:
                         {
                                 ::XResizeRequestEvent &e = (::XResizeRequestEvent&)event;
-                                cerr << EventTypeToString( e.type ) 
+                                out << EventTypeToString( e.type ) 
                                         << ": window=0x" << hex << e.window 
-                                        << dec << ", (width,height)=(" << e.width << "," << e.height 
+                                        << dec << " (width,height)=(" << e.width << "," << e.height 
                                         << ")\n";
                                 return;
                         }
@@ -473,9 +479,9 @@ void debug::PrintEvent(const char* key,const ::XEvent& event, const char* func)
                 case CirculateNotify:
                         {
                                 ::XCirculateEvent &e = (::XCirculateEvent&)event;
-                                cerr << EventTypeToString( e.type ) 
-                                        << ": event=0x" << hex << e.event << dec << ", window=0x" << hex 
-                                        << e.window << dec << ", place=" 
+                                out << EventTypeToString( e.type ) 
+                                        << ": event=0x" << hex << e.event << dec << " window=0x" << hex 
+                                        << e.window << dec << " place=" 
                                         << EventPlaceToString( e.place ) << "\n";
                                 return;
                         }
@@ -483,8 +489,8 @@ void debug::PrintEvent(const char* key,const ::XEvent& event, const char* func)
                 case CirculateRequest:
                         {
                                 ::XCirculateRequestEvent &e = (::XCirculateRequestEvent&)event;
-                                cerr << EventTypeToString( e.type ) << ": parent=0x" << hex << e.parent 
-                                        << dec << ", window=0x" << hex << e.window << dec << ", place=" 
+                                out << EventTypeToString( e.type ) << ": parent=0x" << hex << e.parent 
+                                        << dec << " window=0x" << hex << e.window << dec << " place=" 
                                         << EventPlaceToString( e.place ) << "\n";
                                 return;
                         }
@@ -492,54 +498,54 @@ void debug::PrintEvent(const char* key,const ::XEvent& event, const char* func)
                 case PropertyNotify:
                         {
                                 ::XPropertyEvent &e = (::XPropertyEvent&)event;
-                                cerr << EventTypeToString( e.type ) << ": window=0x" << hex 
-                                        << e.window << dec << ", atom=" << (unsigned long) e.atom 
-                                        << "u, time=" << (unsigned long)e.time 
-                                        << "u, state=" << EventPropertyStateToString( e.state ) << "\n";
+                                out << EventTypeToString( e.type ) << ": window=0x" << hex 
+                                        << e.window << dec << " atom=" << e.atom 
+                                        << " time=" << e.time 
+                                        << " state=" << EventPropertyStateToString( e.state ) << "\n";
                                 return;
                         }
 
                 case SelectionClear:
                         {
                                 ::XSelectionClearEvent &e = (::XSelectionClearEvent&)event;
-                                cerr << EventTypeToString( e.type ) 
+                                out << EventTypeToString( e.type ) 
                                         << ": window=0x" << hex << e.window 
-                                        << dec << ", selection=" << (unsigned long)e.selection 
-                                        << "u, time=" << (unsigned long)e.time << "u\n";
+                                        << dec << " selection=" << e.selection 
+                                        << " time=" << e.time << "\n";
                                 return;
                         }
 
                 case SelectionRequest:
                         {
                                 ::XSelectionRequestEvent &e = (::XSelectionRequestEvent&)event;
-                                cerr << EventTypeToString( e.type ) << ": owner=0x" << hex 
-                                        << e.owner << dec << ", requestor=0x" << hex << e.requestor 
-                                        << dec << ", selection=0x" << hex << (unsigned long)e.selection << dec << ", "
-                                        "target=0x" << hex << (unsigned long)e.target 
-                                        << dec << ", property=" << (unsigned long)e.property << "u, time=" 
-                                        << (unsigned long)e.time << "u\n";
+                                out << EventTypeToString( e.type ) << ": owner=0x" << hex 
+                                        << e.owner << dec << " requestor=0x" << hex << e.requestor 
+                                        << dec << " selection=0x" << hex << e.selection << dec << " "
+                                        "target=0x" << hex << e.target 
+                                        << dec << " property=" << e.property << " time=" 
+                                        << e.time << "\n";
                                 return;
                         }
 
                 case SelectionNotify:
                         {
                                 ::XSelectionEvent &e = (::XSelectionEvent&)event;
-                                cerr << EventTypeToString( e.type ) << ": requestor=0x" << hex 
-                                        << e.requestor << dec << ", selection=0x" << hex 
-                                        << (unsigned long)e.selection << dec << ", target=0x" << hex 
-                                        << (unsigned long)e.target << dec << ", "
-                                        "property=" << (unsigned long)e.property 
-                                        << "u, time=" << (unsigned long)e.time << "u\n";
+                                out << EventTypeToString( e.type ) << ": requestor=0x" << hex 
+                                        << e.requestor << dec << " selection=0x" << hex 
+                                        << e.selection << dec << " target=0x" << hex 
+                                        << e.target << dec << " "
+                                        "property=" << e.property 
+                                        << " time=" << e.time << "\n";
                                 return;
                         }
 
                 case ColormapNotify:
                         {
                                 ::XColormapEvent &e = (::XColormapEvent&)event;
-                                cerr << EventTypeToString( e.type ) << ": window=0x" << hex 
-                                        << e.window << dec << ", colormap=" << (unsigned long)e.colormap 
-                                        << "u, new=" << EventBoolToString( e.c_new ) 
-                                        << ", state=" << EventColormapStateToString( e.state )
+                                out << EventTypeToString( e.type ) << ": window=0x" << hex 
+                                        << e.window << dec << " colormap=" << e.colormap 
+                                        << " new=" << EventBoolToString( e.c_new ) 
+                                        << " state=" << EventColormapStateToString( e.state )
                                         << "\n";
                                 return;
                         }
@@ -547,47 +553,49 @@ void debug::PrintEvent(const char* key,const ::XEvent& event, const char* func)
                 case ClientMessage:
                         {
                                 ::XClientMessageEvent &e = (::XClientMessageEvent&)event;
-                                cerr << EventTypeToString( e.type ) << ": window=0x" << hex 
-                                        << e.window << dec << ", message_type=" 
-                                        << (unsigned long)e.message_type 
-                                        << "u, format=" << e.format << ", data=(";
+                                out << EventTypeToString( e.type ) << ": window=0x" << hex 
+                                        << e.window << dec << " message_type=" 
+                                        << e.message_type 
+                                        << " format=" << e.format << " data=( ";
                                 int i;
-#warning "todo"
-                                /*switch( e.format ) {
+                                switch( e.format ) {
                                         case 8:
-                                                for (int  i = 0; i < 20; i++, p += 3 ) {
-                                                        cerr << " %02x" <<  e.data.b[ i ];
+                                                for (int  i = 0; i < 20; i++)
+                                                {
+                                                        out <<  e.data.b[ i ] << " ";
                                                 }
                                                 break;
                                         case 16:
-                                                for (int  i = 0; i < 10; i++, p += 5 ) {
-                                                        cerr << " %04x" << e.data.s[ i ];
+                                                for (int  i = 0; i < 10; i++)
+                                                {
+                                                        out << e.data.s[ i ] << " ";
                                                 }
                                                 break;
                                         case 32:
-                                                for (int  i = 0; i < 5; i++, p += 9 ) {
-                                                        cerr << " %08lx" << e.data.l[ i ] ;
+                                                for (int  i = 0; i < 5; i++)
+                                                {
+                                                        out << e.data.l[ i ] << " " ;
                                                 }
                                                 break;
-                                }*/
-                                cerr << ")\n";
+                                }
+                                out << ")\n";
                                 return;
                         }
 
                 case MappingNotify:
                         {
                                 ::XMappingEvent &e = (::XMappingEvent&)event;
-                                cerr << EventTypeToString( e.type ) << ": window=0x" << hex 
-                                        << e.window << dec << ", request=" 
+                                out << EventTypeToString( e.type ) << ": window=0x" << hex 
+                                        << e.window << dec << " request=" 
                                         << EventMappingRequestToString( e.request ) 
-                                        << ", first_keycode=" << e.first_keycode 
-                                        << ", count=" << e.count << "\n";
+                                        << " first_keycode=" << e.first_keycode 
+                                        << " count=" << e.count << "\n";
                                 return;
                         }
 
                 default:
                         {
-                                cerr << EventTypeToString( event.type ) << "\n";
+                                out << EventTypeToString( event.type ) << "\n";
                                 return;
                         }
         }

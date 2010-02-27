@@ -18,6 +18,7 @@
 */
 #include <GL/glui/debug.h>
 #include <GL/glui/x11_window.h>
+#include <GL/glui/RecorderPlayer.h>
 #include <string.h>
 #undef Display
 #define MODULE_KEY "GLUI_DEBUG_XGL"
@@ -56,7 +57,7 @@ X11Display::X11Display(char* name)
 void X11Display::_X11Display(char* name)
 {
         disp = XOpenDisplay(name);
-        if (! disp) throw Exception(EINVAL,"can't open display");
+        if (! disp) GLUI_THROW(EINVAL,"can't open display");
         if ( NULL != getenv("GLUI_ENABLE_DEBUG") ) 
         {
                 XSynchronize(disp, True);
@@ -238,31 +239,6 @@ void X11Window::_X11Window(NCRC_AutoPtr<_Window> parent_window,
                 unsigned long valuemask,
                 XSetWindowAttributes *attributes )
 {
-/*        EventMask = KeyPressMask 
-                    | KeyReleaseMask 
-                    | ButtonPressMask 
-                    | ButtonReleaseMask 
-                    | EnterWindowMask 
-                    | LeaveWindowMask 
-                    | PointerMotionMask
-                    | PointerMotionHintMask
-                    | Button1MotionMask
-                    | Button2MotionMask
-                    | Button3MotionMask
-                    | Button4MotionMask
-                    | Button5MotionMask
-                    | ButtonMotionMask
-                    | KeymapStateMask
-                    | ExposureMask
-                    | VisibilityChangeMask
-                    | StructureNotifyMask
-                    | ResizeRedirectMask
-                    | SubstructureNotifyMask
-                    | SubstructureRedirectMask
-                    | FocusChangeMask
-                    | PropertyChangeMask
-                    | ColormapChangeMask
-                    | OwnerGrabButtonMask ;*/
         window = XCreateWindow (disp->Disp(), parent_window->GetWindowId(),
                 x, y,
                 width, height,
@@ -273,7 +249,7 @@ void X11Window::_X11Window(NCRC_AutoPtr<_Window> parent_window,
                 valuemask,
                 attributes );
         if ( !window )
-                throw Exception(EINVAL,"Failed to create window.\n" );
+                GLUI_THROW(EINVAL,"Failed to create window.\n" );
 
         XSelectInput(disp->Disp(), window, EventMask);
         Atom wmDeleteMessage = ::XInternAtom(disp->Disp(), "WM_DELETE_WINDOW", False);
@@ -307,6 +283,10 @@ int X11Window::start_routine()
         int err = 0;
         ::XEvent event;
         ::memset(&event,0,sizeof(event));
+        char* replay_file_name = getenv("GLUI_REPLAY_FILE");
+        char* event_file_name = getenv("GLUI_EVENT_FILE");
+        EventPlayer player(replay_file_name);
+        EventRecorder rec(event_file_name);
 
         while(this->thread_enabled && err == 0) 
         {
@@ -323,8 +303,19 @@ int X11Window::start_routine()
                         AddEvent(&EventToForward);
                         dirty=False;
                 }
-                XWindowEvent(disp->Disp(), window, EventMask, &event);
+                if (NULL == replay_file_name)
+                {
+                        XNextEvent (disp->Disp(), &event);
+                }
+                else
+                {
+                        player.next(event);
+                }
                 EventCoordToGLCoord(event);
+                if (NULL != event_file_name)
+                {
+                        rec.add(event);
+                }
                 err = Container::AddEvent(&event);
         }
         this->thread_enabled = False;
@@ -601,7 +592,7 @@ int X11Window::CreateGLContext()
 
 
         if (!ctx )
-                throw Exception(ENOTSUP,"Failed to create GLX context.\n");
+                GLUI_THROW(ENOTSUP,"Failed to create GLX context.\n");
 
         // Verifying that context is a direct context
         printf( "Verifying that context is direct\n" );

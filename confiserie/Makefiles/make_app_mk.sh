@@ -81,8 +81,10 @@ clean_${name} :
 	\${CLEANINGMSG} GENERATED
 	rm -rf GENERATED
 
+ifeq (${ENABLE_AUTODEPS}, yes)
 ifneq (\${MAKECMDGOALS},clean)
 -include \${${name}_SOURCES:%=GENERATED/%.d}
+endif
 endif
 
 else
