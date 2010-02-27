@@ -46,6 +46,7 @@ namespace GLUI
 
                         void FlushGL(void);
                         void PrintEvent(const char* key,const ::XEvent& event, const char* func);
+                        void DumpEvent(const ::XEvent& event, ostream& out);
                         static const char* EventTypeToString( int type );
                         static const char* EventBoolToString( Bool b );
                         static const char* EventNotifyHintToString( char is_hint );

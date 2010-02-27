@@ -1,0 +1,80 @@
+ColormapNotify: window=0x6000002 colormap=100663297 new=True state=ColormapUninstalled
+PropertyNotify: window=0x6000002 atom=308 time=287144013 state=PropertyNewValue
+ConfigureNotify: event=0x6000002 window=0x6000002 (x,y)=(0,12) (width,height)=(200,200) border_width=0 above=0x5000412 override_redirect=False
+PropertyNotify: window=0x6000002 atom=396 time=287144016 state=PropertyNewValue
+ReparentNotify: event=0x6000002 window=0x6000002 parent=0x16cfe1b (x,y)=(0,212) override_redirect=False
+PropertyNotify: window=0x6000002 atom=316 time=287144017 state=PropertyNewValue
+PropertyNotify: window=0x6000002 atom=316 time=287144017 state=PropertyNewValue
+PropertyNotify: window=0x6000002 atom=313 time=287144018 state=PropertyNewValue
+ConfigureNotify: event=0x6000002 window=0x6000002 (x,y)=(6,186) (width,height)=(200,200) border_width=0 above=0x0 override_redirect=False
+PropertyNotify: window=0x6000002 atom=357 time=287144018 state=PropertyNewValue
+PropertyNotify: window=0x6000002 atom=322 time=287144018 state=PropertyNewValue
+ConfigureNotify: event=0x6000002 window=0x6000002 (x,y)=(43,109) (width,height)=(200,200) border_width=1 above=0x0 override_redirect=False
+MapNotify: event=0x6000002 window=0x6000002 override_redirect=False
+VisibilityNotify: window=0x6000002 state=VisibilityUnobscured
+Expose: window=0x6000002 (x,y)=(0,0) (width,height)=(200,200) count=0
+PropertyNotify: window=0x6000002 atom=322 time=287144067 state=PropertyNewValue
+FocusIn: window=0x6000002 mode=NotifyNormal detail=NotifyNonlinear
+KeymapNotify: window=0x0 0 0 0 0 16 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+PropertyNotify: window=0x6000002 atom=322 time=287144068 state=PropertyNewValue
+PropertyNotify: window=0x6000002 atom=420 time=287144071 state=PropertyNewValue
+ColormapNotify: window=0x6000002 colormap=100663297 new=False state=ColormapInstalled
+KeyRelease: window=0x6000002 root=0x10f subwindow=0x0 time=287144104 (x,y)=(194,-60) (x_root,y_root)=(238,376) state=0x0 keycode=36 same_screen=True
+PropertyNotify: window=0x6000002 atom=387 time=287144142 state=PropertyNewValue
+EnterNotify: window=0x6000002 root=0x10f subwindow=0x0 time=287145330 (x,y)=(82,13) mode=NotifyNormal detail=NotifyAncestor same_screen=True focus=1 state=0x0
+KeymapNotify: window=0x0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+MotionNotify: window=0x6000002 root=0x10f subwindow=0x0 time=287145330 (x,y)=(82,199) (x_root,y_root)=(126,303) state=0x0 is_hint=NotifyHint same_screen=True
+KeyPress: window=0x6000002 root=0x10f subwindow=0x0 time=287146073 (x,y)=(100,93) (x_root,y_root)=(144,223) state=0x0 keycode=65 same_screen=True
+KeyRelease: window=0x6000002 root=0x10f subwindow=0x0 time=287146200 (x,y)=(118,73) (x_root,y_root)=(162,243) state=0x0 keycode=65 same_screen=True
+KeyPress: window=0x6000002 root=0x10f subwindow=0x0 time=287146329 (x,y)=(119,76) (x_root,y_root)=(163,240) state=0x0 keycode=65 same_screen=True
+KeyRelease: window=0x6000002 root=0x10f subwindow=0x0 time=287146390 (x,y)=(122,93) (x_root,y_root)=(166,223) state=0x0 keycode=65 same_screen=True
+KeyPress: window=0x6000002 root=0x10f subwindow=0x0 time=287146686 (x,y)=(56,180) (x_root,y_root)=(100,136) state=0x0 keycode=65 same_screen=True
+KeyRelease: window=0x6000002 root=0x10f subwindow=0x0 time=287146787 (x,y)=(53,187) (x_root,y_root)=(97,129) state=0x0 keycode=65 same_screen=True
+KeyPress: window=0x6000002 root=0x10f subwindow=0x0 time=287146989 (x,y)=(28,191) (x_root,y_root)=(72,125) state=0x0 keycode=65 same_screen=True
+KeyRelease: window=0x6000002 root=0x10f subwindow=0x0 time=287147095 (x,y)=(25,191) (x_root,y_root)=(69,125) state=0x0 keycode=65 same_screen=True
+KeyPress: window=0x6000002 root=0x10f subwindow=0x0 time=287147472 (x,y)=(61,190) (x_root,y_root)=(105,126) state=0x0 keycode=65 same_screen=True
+KeyRelease: window=0x6000002 root=0x10f subwindow=0x0 time=287147523 (x,y)=(64,190) (x_root,y_root)=(108,126) state=0x0 keycode=65 same_screen=True
+KeyPress: window=0x6000002 root=0x10f subwindow=0x0 time=287147658 (x,y)=(67,191) (x_root,y_root)=(111,125) state=0x0 keycode=65 same_screen=True
+KeyRelease: window=0x6000002 root=0x10f subwindow=0x0 time=287147742 (x,y)=(65,158) (x_root,y_root)=(109,158) state=0x0 keycode=65 same_screen=True
+KeyPress: window=0x6000002 root=0x10f subwindow=0x0 time=287148033 (x,y)=(72,71) (x_root,y_root)=(116,245) state=0x0 keycode=65 same_screen=True
+KeyRelease: window=0x6000002 root=0x10f subwindow=0x0 time=287148130 (x,y)=(91,66) (x_root,y_root)=(135,250) state=0x0 keycode=65 same_screen=True
+KeyPress: window=0x6000002 root=0x10f subwindow=0x0 time=287148315 (x,y)=(129,70) (x_root,y_root)=(173,246) state=0x0 keycode=65 same_screen=True
+KeyRelease: window=0x6000002 root=0x10f subwindow=0x0 time=287148378 (x,y)=(164,31) (x_root,y_root)=(208,285) state=0x0 keycode=65 same_screen=True
+LeaveNotify: window=0x6000002 root=0x10f subwindow=0x0 time=287148401 (x,y)=(190,4) mode=NotifyNormal detail=NotifyNonlinear same_screen=True focus=1 state=0x0
+FocusOut: window=0x6000002 mode=NotifyNormal detail=NotifyNonlinear
+ColormapNotify: window=0x6000002 colormap=100663297 new=False state=ColormapUninstalled
+FocusIn: window=0x6000002 mode=NotifyNormal detail=NotifyNonlinear
+KeymapNotify: window=0x0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+ColormapNotify: window=0x6000002 colormap=100663297 new=False state=ColormapInstalled
+EnterNotify: window=0x6000002 root=0x10f subwindow=0x0 time=287149001 (x,y)=(199,55) mode=NotifyNormal detail=NotifyAncestor same_screen=True focus=1 state=0x0
+KeymapNotify: window=0x0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+MotionNotify: window=0x6000002 root=0x10f subwindow=0x0 time=287149001 (x,y)=(199,157) (x_root,y_root)=(243,261) state=0x0 is_hint=NotifyHint same_screen=True
+LeaveNotify: window=0x6000002 root=0x10f subwindow=0x0 time=287150617 (x,y)=(200,173) mode=NotifyNormal detail=NotifyAncestor same_screen=True focus=1 state=0x0
+FocusOut: window=0x6000002 mode=NotifyNormal detail=NotifyNonlinear
+ColormapNotify: window=0x6000002 colormap=100663297 new=False state=ColormapUninstalled
+FocusIn: window=0x6000002 mode=NotifyNormal detail=NotifyNonlinear
+KeymapNotify: window=0x0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+ColormapNotify: window=0x6000002 colormap=100663297 new=False state=ColormapInstalled
+VisibilityNotify: window=0x6000002 state=VisibilityPartiallyObscured
+VisibilityNotify: window=0x6000002 state=VisibilityUnobscured
+Expose: window=0x6000002 (x,y)=(183,2) (width,height)=(17,21) count=0
+EnterNotify: window=0x6000002 root=0x10f subwindow=0x0 time=287152361 (x,y)=(194,212) mode=NotifyNormal detail=NotifyAncestor same_screen=True focus=1 state=0x0
+KeymapNotify: window=0x0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+MotionNotify: window=0x6000002 root=0x10f subwindow=0x0 time=287152361 (x,y)=(194,0) (x_root,y_root)=(238,104) state=0x0 is_hint=NotifyHint same_screen=True
+KeyPress: window=0x6000002 root=0x10f subwindow=0x0 time=287152637 (x,y)=(186,204) (x_root,y_root)=(230,112) state=0x0 keycode=65 same_screen=True
+KeyRelease: window=0x6000002 root=0x10f subwindow=0x0 time=287152754 (x,y)=(186,204) (x_root,y_root)=(230,112) state=0x0 keycode=65 same_screen=True
+LeaveNotify: window=0x6000002 root=0x10f subwindow=0x0 time=287153209 (x,y)=(193,213) mode=NotifyNormal detail=NotifyAncestor same_screen=True focus=1 state=0x0
+EnterNotify: window=0x6000002 root=0x10f subwindow=0x0 time=287153561 (x,y)=(190,212) mode=NotifyNormal detail=NotifyAncestor same_screen=True focus=1 state=0x0
+KeymapNotify: window=0x0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+MotionNotify: window=0x6000002 root=0x10f subwindow=0x0 time=287153561 (x,y)=(190,0) (x_root,y_root)=(234,104) state=0x0 is_hint=NotifyHint same_screen=True
+LeaveNotify: window=0x6000002 root=0x10f subwindow=0x0 time=287154649 (x,y)=(192,213) mode=NotifyNormal detail=NotifyAncestor same_screen=True focus=1 state=0x0
+FocusOut: window=0x6000002 mode=NotifyNormal detail=NotifyNonlinear
+ColormapNotify: window=0x6000002 colormap=100663297 new=False state=ColormapUninstalled
+FocusIn: window=0x6000002 mode=NotifyNormal detail=NotifyNonlinear
+KeymapNotify: window=0x0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+ColormapNotify: window=0x6000002 colormap=100663297 new=False state=ColormapInstalled
+EnterNotify: window=0x6000002 root=0x10f subwindow=0x0 time=287155449 (x,y)=(199,212) mode=NotifyNormal detail=NotifyAncestor same_screen=True focus=1 state=0x0
+KeymapNotify: window=0x0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+MotionNotify: window=0x6000002 root=0x10f subwindow=0x0 time=287155449 (x,y)=(199,0) (x_root,y_root)=(243,104) state=0x0 is_hint=NotifyHint same_screen=True
+LeaveNotify: window=0x6000002 root=0x10f subwindow=0x0 time=287155986 (x,y)=(199,213) mode=NotifyNormal detail=NotifyAncestor same_screen=True focus=1 state=0x0
+ClientMessage: window=0x6000002 message_type=308 format=32 data=( 306 287156498 143447840 -1078390476 0 )

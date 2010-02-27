@@ -43,7 +43,7 @@ Node::~Node()
 {
         if (this->ChildCount != GetCount())
         {
-                throw Exception(ENOTSUP,
+                GLUI_THROW(ENOTSUP,
                                 "trying to delete a node that have still owners...");
         }
         if (this->next_sibling != NULL)
@@ -125,7 +125,7 @@ int Node:: RemoveParent( NCRC_AutoPtr<Node> parent )
         }
         else
         {
-                throw Exception(EINVAL,
+                GLUI_THROW(EINVAL,
                                 "trying to remove a parent that isn't in parent list");
         }
 	return 0;
@@ -196,7 +196,7 @@ int Node::RemoveChild(  NCRC_AutoPtr<Node> child  )
         }
         else
         {
-                throw Exception(EINVAL,
+                GLUI_THROW(EINVAL,
                                 "trying to unlink a node that isn't in the childs list");
         }
 }
