@@ -18,56 +18,32 @@
 */
 
 #include <string.h>
-#include <GL/glui.h>
-
+#include <GL/glui/button.h>
+#include <GL/glui/window.h>
+using namespace GLUI;
 
 
 /**************************************** main() ********************/
 
 int main(int argc, char* argv[])
 {
-    struct timespec sleeptime = { 1, 100000000 };
-    int count = 0;
-    int err = 0;
-
-
-    glutInit(&argc, argv);
-    glutInitDisplayMode( GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH );
-    NCRC_AutoPtr<GLUI::Display> disp  = new GLUI::Display( NULL );
-    NCRC_AutoPtr<GLUI::Window> window = new GLUI::Window( disp, disp->DefaultScreen()->RootWindow(),
-            0, //winX,
-            0, //winY,
-            0, //winW,
-            0, //winH,
-            1, //border_width,
-            disp->DefaultScreen()->Depth(),
-            GLUI::Window::InputOutput,
-            disp->DefaultVisual(disp->DefaultScreen()),
-            0, //CWEventMask|CWBackPixel|CWBorderPixel,
-            &xswa);
-    window->set_resize_policy(GLUI_Control::AdaptThisToFitChilds);
-    window->add_control(new Button("Button"));
-    Window->XMapWindow();
-    nanosleep(&sleeptime, &sleeptime);
-    while (EINTR == err )
-    {
-            err =  nanosleep(&sleeptime, &sleeptime);
-    }
-    while (count < 50)
-    {
-            struct timespec sleeptime = { 0, 100000000 };
-            struct timespec rem = { 0, 0};
-            Window->simulatekey();
-            err = nanosleep(&sleeptime, &rem);
-            while (EINTR == err )
-            {
-                err =  nanosleep(&rem, &rem);
-            }
-            count++;
-    }
-    Window->XUnmapWindow();
-    exit(0);
-    return EXIT_SUCCESS;
+        //Window->init(&argc, argv);  //optional
+        NCRC_AutoPtr<GLUI::Display>    TheDisplay = new GLUI::Display();
+        NCRC_AutoPtr<GLUI::Window> window = new GLUI::Window(TheDisplay,
+                                TheDisplay->XDefaultScreenOfDisplay()->XRootWindowOfScreen(),
+                                0, 0,
+                                200, 200,
+                                1,
+                                1,
+                                0);
+        NCRC_AutoPtr<Button> button1 = new Button("Button");
+        button1->set_size(Control::Size(100u,200u));
+        window->set_resize_policy(Control::AdaptThisToFitChilds);
+        window->add_control(button1);
+        window->Start();
+        window->XMapWindow();
+        int res = window->Wait();
+        exit(res);
 }
 
 

@@ -96,6 +96,7 @@ namespace GLUI
                         int Wait();
                         static buffer_mode_t get_buffer_mode();
                         ::Window GetWindowId();
+                        virtual void Start(); //start event handler, shall be started in child constructor;
                 public :  //operators
                 public : //XMethods
                         virtual int XMapWindow()=0;
@@ -129,7 +130,6 @@ namespace GLUI
                         };
                 protected : //methods
                         _Window();
-                        virtual void Start(); //start event handler, shall be started in child constructor;
                         static void* _Start(void* args);
                         int _Stop();
                         virtual int start_routine()=0; //< the thead main routine;

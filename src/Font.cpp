@@ -1,6 +1,3 @@
-#ifndef __GLUI_EVENT_HANDLER_H
-#define __GLUI_EVENT_HANDLER_H
-
 /*
    GLUI-ng, an openGL widget toolkit. Copyright (C) 2010 MALET Jean-Luc
 
@@ -19,19 +16,31 @@
 
    based on the work of Paul Rademacher (orignal software http://glui.sourceforge.net/)
 */
-#include <X11/Xlib.h>
-#include <errno.h>
-#include <GL/glui/SmartPointer.h>
+#include <GL/glui/Font.h>
 
-namespace GLUI
+using namespace GLUI;
+
+Font::Font(const std::string& name)
 {
-        class Control;
-	class EventHandler : public NonCopyableReferenceCountedClass
-	{
-		public : //methods
-			virtual int AddEvent(::XEvent *event, NCRC_AutoPtr<Control> focussed) = 0;
-	};
-
+        this->name = name;
+        ascent = 0;
+        descent = 0;
+        linegap = 0;
 }
-#endif //__GLUI_EVENT_HANDLER_H
 
+Font::~Font()
+{
+}
+
+
+NCRC_AutoPtr<Glyph> Font::GetGlyph(char c)
+{
+#warning "create a sorted linked list of glyphs and fill it when a glyph is requested"
+        NCRC_AutoPtr<Glyph> found;
+        return found;
+}
+
+std::string& Font::Name()
+{
+        return this->name;
+}

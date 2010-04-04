@@ -63,6 +63,12 @@ Node::~Node()
 }
 
 
+////////////////////////////////////////////////////////////////////////
+const char* Node::Name()
+{
+        return this->NodeName;
+}
+
 /********************************************* Node::first() *******/
 /* Returns first sibling in 'this' node's sibling list                  */
 

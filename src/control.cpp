@@ -25,8 +25,10 @@
 #include <GL/glui/window.h>
 #include <GL/glui/themes.h>
 using namespace GLUI;
+#define MODULE_KEY  "GLUI_DEBUG_CONTROL"
 
-NCRC_AutoPtr<Control> Control::focussed;
+
+NCRC_AutoPtr<EventInterpreter> Control::handler(new EventInterpreter);
 int _glui_draw_border_only = 0;
 
 
@@ -126,19 +128,8 @@ int  Control::add_control( NCRC_AutoPtr<Node> control )
 
 void Control::enable()
 {
-    NCRC_AutoPtr<Control> node;
-
     enabled = true;
     ThemeData->update();
-
-#warning "this has nothing todo here, move to container class"
-    /*** Now recursively enable all buttons below it ***/
-    node = dynamic_cast<Control*>(first_child().getPointee());
-    while(node != NULL)
-    {
-        node->enable();
-        node = dynamic_cast<Control*>(node->next().getPointee());
-    }
 }
 
 
@@ -146,20 +137,19 @@ void Control::enable()
 
 void Control::disable()
 {
-    NCRC_AutoPtr<Control> node;
-
     enabled = false;
-
     ThemeData->update();
-#warning "this has nothing todo here, move to container class"
-    /*** Now recursively disable all buttons below it ***/
-    node = dynamic_cast<Control*> (first_child().getPointee());
-    while(node != NULL) {
-        node->disable();
-        node = dynamic_cast<Control*> (node->next().getPointee());
-    }
 }
 
+void Control::Focus(::XEvent* event)
+{
+         handler->AddEvent(event, this);
+}
+
+void Control::UnFocus( void )
+{
+        handler->AddEvent(NULL, NULL);
+}
 ////////////////////////////////////////////////////////////////////////////
 int Control::AddEvent(::XExposeEvent *event)
 {
@@ -176,47 +166,56 @@ int Control::AddEvent(::XExposeEvent *event)
     debug::Instance()->FlushGL();
 }
 
-///////////////////////////////////////////////////////////////////////////
-int Control::AddEvent(::XEvent *event)
+////////////////////////////////////////////////////////////////////////////////////////
+int Control::AddEvent (::XEvent* event)
 {
-    switch ( event->type )
-    {
-        case KeyPress : return  AddEvent((::XKeyEvent*) event);
-        case KeyRelease: return  AddEvent((::XKeyEvent*) event);
-        case ButtonPress: return  AddEvent((::XButtonEvent*) event);
-        case ButtonRelease: return  AddEvent((::XButtonEvent*) event);
-        case MotionNotify: return  AddEvent((::XMotionEvent*) event);
-        case EnterNotify: return  AddEvent((::XCrossingEvent*) event);
-        case LeaveNotify: return  AddEvent((::XCrossingEvent*) event);
-        case FocusIn: return  AddEvent((::XFocusChangeEvent*) event);
-        case FocusOut: return  AddEvent((::XFocusChangeEvent*) event);
-        case KeymapNotify: return  AddEvent((::XKeymapEvent*) event);
-        case Expose: return  AddEvent((::XExposeEvent*) event);
-        case GraphicsExpose: return  AddEvent((::XGraphicsExposeEvent*) event);
-        case NoExpose: return  AddEvent((::XNoExposeEvent*) event);
-        case VisibilityNotify: return  AddEvent((::XVisibilityEvent*) event);
-        case CreateNotify: return  AddEvent((::XCreateWindowEvent*) event);
-        case DestroyNotify: return  AddEvent((::XDestroyWindowEvent*) event);
-        case UnmapNotify: return  AddEvent((::XUnmapEvent*) event);
-        case MapNotify: return  AddEvent((::XMapEvent*) event);
-        case MapRequest: return  AddEvent((::XMapRequestEvent*) event);
-        case ReparentNotify: return  AddEvent((::XReparentEvent*) event);
-        case ConfigureNotify: return  AddEvent((::XConfigureEvent*) event);
-        case ConfigureRequest: return  AddEvent((::XConfigureRequestEvent*) event);
-        case GravityNotify: return  AddEvent((::XGravityEvent*) event);
-        case ResizeRequest: return  AddEvent((::XResizeRequestEvent*) event);
-        case CirculateNotify: return  AddEvent((::XCirculateEvent*) event);
-        case CirculateRequest: return  AddEvent((::XCirculateRequestEvent*) event);
-        case PropertyNotify: return  AddEvent((::XPropertyEvent*) event);
-        case SelectionClear: return  AddEvent((::XSelectionClearEvent*) event);
-        case SelectionRequest: return  AddEvent((::XSelectionRequestEvent*) event);
-        case SelectionNotify: return  AddEvent((::XSelectionEvent*) event);
-        case ColormapNotify: return  AddEvent((::XColormapEvent*) event);
-        case ClientMessage: return  AddEvent((::XClientMessageEvent*) event);
-        case MappingNotify: return  AddEvent((::XMappingEvent*) event);
+        IN("::XEvent");
+        int err;
+#warning "update this using tree list creation"
+        // purpose : when an event is created, use the opengl selection mechanism to know what object shall handle the event
+        // then create a list containing all parent (parent can have multiple childrens but only one parent is allowed per child)
+        // then use this list to propagate the event rather than the following algorithm
+        EVTMSG((::XEvent) *event);
 
-    }
+        switch ( event->type )
+        {
+                case KeyPress : err = AddEvent((::XKeyEvent*) event); break;
+                case KeyRelease: err = AddEvent((::XKeyEvent*) event); break;
+                case ButtonPress: err = AddEvent((::XButtonEvent*) event); break;
+                case ButtonRelease: err = AddEvent((::XButtonEvent*) event); break;
+                case MotionNotify: err = AddEvent((::XMotionEvent*) event); break;
+                case EnterNotify: err = AddEvent((::XCrossingEvent*) event); break;
+                case LeaveNotify: err = AddEvent((::XCrossingEvent*) event); break;
+                case FocusIn: err = AddEvent((::XFocusChangeEvent*) event); break;
+                case FocusOut: err = AddEvent((::XFocusChangeEvent*) event); break;
+                case KeymapNotify: err = AddEvent((::XKeymapEvent*) event); break;
+                case Expose: err = AddEvent((::XExposeEvent*) event); break;
+                case GraphicsExpose: err = AddEvent((::XGraphicsExposeEvent*) event); break;
+                case NoExpose: err = AddEvent((::XNoExposeEvent*) event); break;
+                case VisibilityNotify: err = AddEvent((::XVisibilityEvent*) event); break;
+                case CreateNotify: err = AddEvent((::XCreateWindowEvent*) event); break;
+                case DestroyNotify: err = AddEvent((::XDestroyWindowEvent*) event); break;
+                case UnmapNotify: err = AddEvent((::XUnmapEvent*) event); break;
+                case MapNotify: err = AddEvent((::XMapEvent*) event); break;
+                case MapRequest: err = AddEvent((::XMapRequestEvent*) event); break;
+                case ReparentNotify: err = AddEvent((::XReparentEvent*) event); break;
+                case ConfigureNotify: err = AddEvent((::XConfigureEvent*) event); break;
+                case ConfigureRequest: err = AddEvent((::XConfigureRequestEvent*) event); break;
+                case GravityNotify: err = AddEvent((::XGravityEvent*) event); break;
+                case ResizeRequest: err = AddEvent((::XResizeRequestEvent*) event); break;
+                case CirculateNotify: err = AddEvent((::XCirculateEvent*) event); break;
+                case CirculateRequest: err = AddEvent((::XCirculateRequestEvent*) event); break;
+                case PropertyNotify: err = AddEvent((::XPropertyEvent*) event); break;
+                case SelectionClear: err = AddEvent((::XSelectionClearEvent*) event); break;
+                case SelectionRequest: err = AddEvent((::XSelectionRequestEvent*) event); break;
+                case SelectionNotify: err = AddEvent((::XSelectionEvent*) event); break;
+                case ColormapNotify: err = AddEvent((::XColormapEvent*) event); break;
+                case ClientMessage: err = AddEvent((::XClientMessageEvent*) event); break;
+                case MappingNotify: err = AddEvent((::XMappingEvent*) event); break;
 
+                default : err = EINVAL; break;
+        }
+        ROUT(err, "\n");
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -226,14 +225,123 @@ int Control::AddEvent (::XKeyEvent* event)
     //... FocusIn through tab then send the event to the next sibling
     //    if there is no sibling return an error, if control is desactivated,
     //    do the same
+        Focus((::XEvent*) event);
+}
+////////////////////////////////////////////////////////////////////////////////////////
+int Control::AddEvent (::XButtonEvent* event)
+{
+        Focus((::XEvent*) event);
+}
+/////////////////////////////////////////////////////////////////////////////////////////
+int Control::AddEvent (::XMotionEvent* event)
+{
+        Focus((::XEvent*) event);
+}
+////////////////////////////////////////////////////////////////////////////////////////////
+int Control::AddEvent (::XCrossingEvent* event)
+{
+        Focus((::XEvent*) event);
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////
+int Control::AddEvent (::XFocusChangeEvent* event)
+{ return 0; }
+
+///////////////////////////////////////////////////////////////////////////////////////////
+int Control::AddEvent (::XKeymapEvent* event)
+{ return 0; }
+
+///////////////////////////////////////////////////////////////////////////////////////////
+int Control::AddEvent (::XExposeEvent* event);
+
 ///////////////////////////////////////////////////////////////////////////
+int Control::AddEvent (::XGraphicsExposeEvent* event)
+{
+        Focus((::XEvent*) event);
+}
 
+///////////////////////////////////////////////////////////////////////////////////////////
+int Control::AddEvent (::XNoExposeEvent* event)
+{ return 0; }
 
+///////////////////////////////////////////////////////////////////////////////////////////
+int Control::AddEvent (::XVisibilityEvent* event)
+{ return 0; }
 
-/***** Control::set_alignment() ******/
+///////////////////////////////////////////////////////////////////////////////////////////
+int Control::AddEvent (::XCreateWindowEvent* event)
+{ return 0; }
 
+///////////////////////////////////////////////////////////////////////////////////////////
+int Control::AddEvent (::XDestroyWindowEvent* event)
+{ return 0; }
+
+///////////////////////////////////////////////////////////////////////////////////////////
+int Control::AddEvent (::XUnmapEvent* event)
+{ return 0; }
+
+///////////////////////////////////////////////////////////////////////////////////////////
+int Control::AddEvent (::XMapEvent* event)
+{ return 0; }
+
+///////////////////////////////////////////////////////////////////////////////////////////
+int Control::AddEvent (::XMapRequestEvent* event)
+{ return 0; }
+
+//////////////////////////////////////////////////////////////////////////////////////////
+int Control::AddEvent (::XReparentEvent* event)
+{
+        Focus((::XEvent*) event);
+}
+//////////////////////////////////////////////////////////////////////////////////////////
+int Control::AddEvent (::XConfigureEvent* event)
+{
+        Focus((::XEvent*) event);
+}
+///////////////////////////////////////////////////////////////////////////////////////////
+int Control::AddEvent (::XGravityEvent* event)
+{
+        Focus((::XEvent*) event);
+}
+///////////////////////////////////////////////////////////////////////////////////////////
+int Control::AddEvent (::XResizeRequestEvent* event)
+{ return 0; }
+///////////////////////////////////////////////////////////////////////////////////////////
+int Control::AddEvent (::XConfigureRequestEvent* event)
+{
+        Focus((::XEvent*) event);
+}
+///////////////////////////////////////////////////////////////////////////////////////////
+int Control::AddEvent (::XCirculateEvent* event)
+{ return 0; }
+///////////////////////////////////////////////////////////////////////////////////////////
+int Control::AddEvent (::XCirculateRequestEvent* event)
+{ return 0; }
+///////////////////////////////////////////////////////////////////////////////////////////
+int Control::AddEvent (::XPropertyEvent* event)
+{ return 0; }
+///////////////////////////////////////////////////////////////////////////////////////////
+int Control::AddEvent (::XSelectionClearEvent* event)
+{ return 0; }
+///////////////////////////////////////////////////////////////////////////////////////////
+int Control::AddEvent (::XSelectionRequestEvent* event)
+{ return 0; }
+///////////////////////////////////////////////////////////////////////////////////////////
+int Control::AddEvent (::XSelectionEvent* event)
+{ return 0; }
+///////////////////////////////////////////////////////////////////////////////////////////
+int Control::AddEvent (::XColormapEvent* event)
+{ return 0; }
+///////////////////////////////////////////////////////////////////////////////////////////
+int Control::AddEvent (::XClientMessageEvent* event)
+{ return 0; }
+///////////////////////////////////////////////////////////////////////////////////////////
+int Control::AddEvent (::XMappingEvent* event)
+{ return 0; }
+///////////////////////////////////////////////////////////////////////////////////////////
+int Control::AddEvent (::XErrorEvent* event)
+{ return 0; }
+///////////////////////////////////////////////////////////////////////////
 void Control::set_alignment(Alignement new_align)
 {
     alignment = new_align;
@@ -252,13 +360,15 @@ int Control::SetTheme(NCRC_AutoPtr<theme> data)
 }
 
 
-/********* Control::~Control() **********/
 
+////////////////////////////////////////////////////////////////////////
 Control::~Control()
 {
-    if (focussed == this) focussed = NULL;
+#warning "to fix"
+//    if (focussed == this) focussed = NULL;
 }
 
+////////////////////////////////////////////////////////////////////////
 Control::Control(const char* name) : Node(name)
 {
     alignment      = LEFT;
@@ -267,7 +377,6 @@ Control::Control(const char* name) : Node(name)
     resizeable     = FixedSize;
     Min            = Size(0u, 0u);
     CurrentSize    = Min;
-    active         = false;
     x              = 0;
     y              = 0;
     y_off_top      = GLUI_YOFF;

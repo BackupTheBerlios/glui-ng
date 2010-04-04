@@ -20,22 +20,34 @@
 */
 
 #include <GL/glui/themes.h>
+#include <GL/glui/VertexObject.h>
 namespace GLUI
 {
-        class  VertexObject;
 
         class _DefaultTheme : public theme
         {
+                public :
+                        enum VOflags
+                        {
+                                none = 0,
+                                enablecolor = 1<<0,
+                                enablenormals = 1<<1,
+                                enablenormalcomputation = 1<<2
+                        };
                 public : 
                         _DefaultTheme();
                         virtual int draw();
                         virtual int update();
-                        virtual VertexObject* raised_box( uint32_t w,
-                                        uint32_t h,
-                                                          uint32_t thickness = 1);
-                        virtual VertexObject* lowered_box( uint32_t w,
+                        virtual NCRC_AutoPtr<VertexObject> raised_box( uint32_t w,
+                                                          uint32_t h,
+                                                          uint32_t thickness = 1,
+                                                          uint32_t BorderWidth = 1,
+                                                          uint32_t flags = enablecolor);
+                        virtual NCRC_AutoPtr<VertexObject> lowered_box( uint32_t w,
                                                            uint32_t h,
-                                                           uint32_t thickness = 1);
+                                                           uint32_t thickness = 1,
+                                                           uint32_t BorderWidth = 1,
+                                                           uint32_t flags = enablecolor);
                         void SetBorderColor(uint8_t border_color[4]);
                         void SetBkgdColor(uint8_t bkgd_color[4]);
                         void SetActivatedColor(uint8_t activated_color[4]);
@@ -51,6 +63,11 @@ namespace GLUI
                         uint8_t    bkgd_color[4];
                         uint8_t    activated_color[4];
                         uint8_t    hover_color[4];
+                protected :
+                        NCRC_AutoPtr<VertexObject> box( NCRC_AutoPtr<DataArray> vertices,
+                                        NCRC_AutoPtr<DataArray> normals,
+                                        uint32_t flags);
+
         };
 
 }

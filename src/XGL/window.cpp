@@ -317,7 +317,7 @@ int X11Window::start_routine()
                 {
                         rec.add(event);
                 }
-                err = Container::AddEvent(&event);
+                err = Control::AddEvent(&event);
         }
         this->thread_enabled = False;
         ROUT(err,"\n");

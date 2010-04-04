@@ -38,20 +38,22 @@ namespace GLUI
 {
 	class Node;
 
-	class GLUIAPI Button : public Container, public EventInterpreter
+	class GLUIAPI Button : public Container
 	{
                 public: //types
                         class DefaultTheme : public _DefaultTheme
                         {
                                 public : //methods
-                                        DefaultTheme(Button& owner) : Owner(owner) {};
+                                        DefaultTheme(Button& owner);
                                         ~DefaultTheme();
                                         virtual int draw();
                                         virtual int update();
                                 protected: //variable
                                         Button& Owner;
-                                        VertexObject* un_pressed;
-                                        VertexObject* pressed;
+                                        NCRC_AutoPtr<VertexObject> UnPressed;
+                                        NCRC_AutoPtr<Texture> TextureUnpressed;
+                                        NCRC_AutoPtr<VertexObject> Pressed;
+                                        NCRC_AutoPtr<Texture> TexturePressed;
                         };
 		public:
 			//LiveInt value;
@@ -66,8 +68,8 @@ namespace GLUI
 			  */
 			Button( const char *name,
 					int id=-1, CB cb=CB() );
-			virtual int AddEvent(::XEvent *event);
-                        bool GetValue();
+			virtual int AddEvent(::XButtonEvent *event);
+                        int GetValue();
 
 		protected:
                         bool value;

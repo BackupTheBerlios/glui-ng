@@ -127,6 +127,11 @@ int Text::draw()
   glPopMatrix();
 }
 
+int Text::update()
+{
+#warning "todo : create a linked list of Glyph"
+}
+
 
 /*************** Text::GetFont() **********/
 

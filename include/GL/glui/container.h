@@ -48,6 +48,9 @@ namespace GLUI
             virtual void align( void );
             virtual int  add_control( NCRC_AutoPtr<Node> control );
 
+            virtual void enable( void );
+            virtual void disable( void );
+
             virtual int AddEvent (::XEvent* event);
             virtual int AddEvent (::XKeyEvent* event);
             virtual int AddEvent (::XButtonEvent* event);

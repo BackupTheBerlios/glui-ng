@@ -16,14 +16,11 @@
 
    based on the work of Paul Rademacher (orignal software http://glui.sourceforge.net/)
 */
-#include <iostream>
-#include <sstream>
 #include <GL/glui/Exception.h>
-#include <string.h>
 using namespace GLUI;
 ///////////////////////////////////////////////////////////////////
 
-Exception::Exception(int errnb, const std::string& file, int line, const std::string& str)
+Exception::Exception(int errnb, const std::string& file, int line, const std::stringstream& str)
 {
         std::stringstream format;
         char* buff = new char[30];
@@ -36,7 +33,7 @@ Exception::Exception(int errnb, const std::string& file, int line, const std::st
         {
                 format << buff;
         }
-        format << ")  " << str;
+        format << ")  " << str.str();
 
         this->err = errnb;
         this->str = format.str();

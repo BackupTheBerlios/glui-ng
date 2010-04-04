@@ -139,7 +139,6 @@ int VertexObject::draw()
     if (this->Colors != NULL)
     {
         glEnableClientState(GL_COLOR_ARRAY);
-        printf("%d %d %d\n" ,Colors->ComponentsCount, Colors->datatype_t,  Colors->array.all);
         glColorPointer(Colors->ComponentsCount, Colors->datatype_t, 0, Colors->array.all);
     }
     if (this->Normals != NULL)
@@ -175,7 +174,6 @@ int VertexObject::draw()
     if (this->Vertices != NULL && this->Indices != NULL)
     {
         glEnableClientState(GL_VERTEX_ARRAY);
-        printf("%d %d %d\n" ,Vertices->ComponentsCount, Vertices->datatype_t,  Vertices->array.all);
         glVertexPointer(Vertices->ComponentsCount, Vertices->datatype_t, 0, Vertices->array.all);
         //go through our index array and draw our vertex array
         GLenum mode;

@@ -35,7 +35,7 @@ namespace GLUI
                         class DefaultTheme : public Text
                         {
                                 public : //methods
-                                        DefaultTheme(StaticText& owner) : Owner(owner) {};
+                                        DefaultTheme(StaticText& owner);
                                         ~DefaultTheme();
                                         virtual int draw();
                                         virtual int update();

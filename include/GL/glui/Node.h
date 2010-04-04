@@ -66,6 +66,7 @@ namespace GLUI
                         const char* whole_tree(int start=1);
 
                         int level() { return _level;}
+                        const char* Name();
 
                 protected:// methodes
                         void LinkLast( NCRC_AutoPtr<Node> new_child );
