@@ -128,6 +128,8 @@ namespace GLUI
                         GLXContext ctx;
                         bool hasContext;
                         bool dirty;
+                        Atom wm_delete_window;
+                        Atom wm_protocols;
 
         };
         typedef X11Window Window ;

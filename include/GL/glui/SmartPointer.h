@@ -55,6 +55,8 @@ namespace GLUI
                                 T* getPointee() // give access to pointee
                                 { return this->pointee; }
 
+                                template <class cast> operator NCRC_AutoPtr<cast>();
+
                         private:
                                 T *pointee;
 
@@ -149,6 +151,12 @@ namespace GLUI
         template<class T>
                 T& NCRC_AutoPtr<T>::operator*() const
                 { return *(this->pointee); }
+
+         template <class T> template <class cast>  NCRC_AutoPtr<T>::operator  NCRC_AutoPtr<cast>()
+         {
+                 NCRC_AutoPtr<cast> To = dynamic_cast<cast*>(this->pointee);
+                 return To;
+         }
 
         ///////////////////////////////////////////////////////////////////////////
         // NCIRC :  Non Copyable Indirect Reference Counted class  for reference //

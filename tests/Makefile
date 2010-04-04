@@ -60,8 +60,8 @@ NonCopyable_SOURCES = NonCopyable.cpp
 # this variable is used in Makefile.autoapp to create the required Makefiles
 # it then has to be set before including of Makefiles.autoapp
 noinst_CXXPROGRAMS+= SizeComputationTest PackingTest ContainerEventTest
-noinst_CXXPROGRAMS+= WindowTest KeyboardTest VertexObject_test
-noinst_CXXPROGRAMS+= SmartPointer_test
+noinst_CXXPROGRAMS+= WindowTest KeyboardTest VertexObjectTest
+noinst_CXXPROGRAMS+= SmartPointerTest ButtonTest EventInterpreterTest
 #noinst_CXXPROGRAMS+= Lightning_test
 
 
@@ -90,13 +90,22 @@ Lightning_test_SOURCES = Lightning_test.cpp
 Lightning_test_LDADD   = ${LIBGLUIDLL}   ${BACKENDLIB}
 Lightning_test_ARADD   = ${LIBGLUIA}
 
-VertexObject_test_SOURCES = VertexObjectTest.cpp
-VertexObject_test_LDADD   = ${LIBGLUIDLL}   ${BACKENDLIB}
-VertexObject_test_ARADD   = ${LIBGLUIA}
+VertexObjectTest_SOURCES = VertexObjectTest.cpp
+VertexObjectTest_LDADD   = ${LIBGLUIDLL}   ${BACKENDLIB}
+VertexObjectTest_ARADD   = ${LIBGLUIA}
 
-SmartPointer_test_SOURCES = SmartPointer_test.cpp
-SmartPointer_test_LDADD   = ${LIBGLUIDLL}   ${BACKENDLIB}
-SmartPointer_test_ARADD   = ${LIBGLUIA}
+SmartPointerTest_SOURCES = SmartPointer_test.cpp
+SmartPointerTest_LDADD   = ${LIBGLUIDLL}   ${BACKENDLIB}
+SmartPointerTest_ARADD   = ${LIBGLUIA}
+
+ButtonTest_SOURCES = button.cpp
+ButtonTest_LDADD   = ${LIBGLUIDLL}   ${BACKENDLIB}
+ButtonTest_ARADD   = ${LIBGLUIA}
+
+EventInterpreterTest_SOURCES = EventInterpreter.cpp
+EventInterpreterTest_LDADD   = ${LIBGLUIDLL}   ${BACKENDLIB}
+EventInterpreterTest_ARADD   = ${LIBGLUIA}
+
 
 clean : 
 	${CLEANINGMSG} ${MSGSUBDIR}

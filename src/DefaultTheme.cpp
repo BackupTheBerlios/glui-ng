@@ -27,30 +27,83 @@ using namespace GLUI;
 
 
 /////////////////////////////////////////////////////////////////////////
-VertexObject* _DefaultTheme::raised_box( uint32_t w, uint32_t h, uint32_t thickness)
+NCRC_AutoPtr<VertexObject> _DefaultTheme::raised_box( uint32_t w, uint32_t h, uint32_t thickness, uint32_t BorderWidth,
+                                                          uint32_t flags)
 {
-        if (thickness >= w || thickness >= h)
+        if (BorderWidth >= w || BorderWidth >= h)
         {
                 return NULL;
         }
+        uint32_t b = BorderWidth;
         GLfloat Vertices[8][3] = { {  0.0,   0.0, 0.0}, //0
                 {    w,   0.0, 0.0}, //1
                 {    w,     h, 0.0}, //2
                 {  0.0,     h, 0.0}, //3
-                {  0.0,   0.0, (float) thickness}, //4
-                {    w,   0.0, (float) thickness}, //5
-                {    w,     h, (float) thickness}, //6
-                {  0.0,     h, (float) thickness}}; //7
-        GLfloat Normals[8][3]   = { {  0.0, 0.0, 1.0}, //0
-                {  0.0, 0.0, 1.0}, //1
-                {  0.0, 0.0, 1.0}, //2
-                {  0.0, 0.0, 1.0}, //3
-                {  0.0, 0.0, 1.0}, //4
-                {  0.0, 0.0, 1.0}, //5
-                {  0.0, 0.0, 1.0}, //6
-                {  0.0, 0.0, 1.0}}; //7
+                 {   b,     b, (float) thickness}, //4
+                {  w-b,     b, (float) thickness}, //5
+                {  w-b,   h-b, (float) thickness}, //6
+                {    b,   h-b, (float) thickness}}; //7
+        NCRC_AutoPtr<DataArray> vert(new DataArray(8, 3, DataArray::FLOAT, Vertices));
+        NCRC_AutoPtr<DataArray> norm;
+        if (flags & enablenormals)
+        {
+                GLfloat Normals[8][3]   = { {  0.0, 0.0, 1.0}, //0
+                        {  0.0, 0.0, 1.0}, //1
+                        {  0.0, 0.0, 1.0}, //2
+                        {  0.0, 0.0, 1.0}, //3
+                        {  0.0, 0.0, 1.0}, //4
+                        {  0.0, 0.0, 1.0}, //5
+                        {  0.0, 0.0, 1.0}, //6
+                        {  0.0, 0.0, 1.0}}; //7
+                norm = new DataArray(8, 3, DataArray::FLOAT, Normals);
 
+        }
+        return box(vert, norm, flags);
+ 
+}
 
+/////////////////////////////////////////////////////////////////////////////
+NCRC_AutoPtr<VertexObject> _DefaultTheme::lowered_box( uint32_t w, uint32_t h, uint32_t thickness, uint32_t BorderWidth,
+                                                          uint32_t flags)
+{
+        if (BorderWidth >= w || BorderWidth >= h)
+        {
+                return NULL;
+        }
+        uint32_t b = BorderWidth;
+
+        GLfloat Vertices[8][3] = { {  0.0,   0.0, 0.0}, //0
+                {    w,   0.0, 0.0}, //1
+                {    w,     h, 0.0}, //2
+                {  0.0,     h, 0.0}, //3
+                {   b,     b, (float) -thickness}, //4
+                {  w-b,     b, (float) -thickness}, //5
+                {  w-b,   h-b, (float) -thickness}, //6
+                {    b,   h-b, (float) -thickness}}; //7
+        NCRC_AutoPtr<DataArray> vert(new DataArray(8, 3, DataArray::FLOAT, Vertices));
+        NCRC_AutoPtr<DataArray> norm;
+        if (flags & enablenormals)
+        {
+                GLfloat Normals[8][3]   = { {  0.0, 0.0, 1.0}, //0
+                        {  0.0, 0.0, 1.0}, //1
+                        {  0.0, 0.0, 1.0}, //2
+                        {  0.0, 0.0, 1.0}, //3
+                        {  0.0, 0.0, 1.0}, //4
+                        {  0.0, 0.0, 1.0}, //5
+                        {  0.0, 0.0, 1.0}, //6
+                        {  0.0, 0.0, 1.0}}; //7
+                norm = new DataArray(8, 3, DataArray::FLOAT, Normals);
+
+        }
+        return box(vert, norm, flags);
+
+}
+
+/////////////////////////////////////////////////////////////////////////////
+NCRC_AutoPtr<VertexObject> _DefaultTheme::box( NCRC_AutoPtr<DataArray> vertices,
+                                        NCRC_AutoPtr<DataArray> normals,
+                                        uint32_t flags)
+{
 
         GLubyte indices[] = {
                 4, 5, 6, 7,		//front
@@ -61,89 +114,43 @@ VertexObject* _DefaultTheme::raised_box( uint32_t w, uint32_t h, uint32_t thickn
                 0, 1, 2, 3              //bottom
         };	//left slope
 
-        float Colors[8][3];
-        memset(Colors, 0, 8*3*sizeof(float));
-        this->FillglColorPointer(
-                        border_color,
-                        3,
-                        GL_FLOAT,
-                        0,
-                        Colors,
-                        4 );
-        this->FillglColorPointer(
-                        bkgd_color,
-                        3,
-                        GL_FLOAT,
-                        0,
-                        &(Colors[4][0]),
-                        4 );
-
-
-        VertexObject* vo = new VertexObject();
-        vo->SetVerticesArray(DataArray::FLOAT, 3, Vertices, 8);
+        
+        NCRC_AutoPtr<VertexObject> vo(new VertexObject());
+        vo->SetVerticesArray(vertices);
         vo->SetFaceIndicesArray (DataArray::UINT8_T, 4, indices, 6);
-        vo->SetColorArray (DataArray::FLOAT, 3, Colors, 8);
-        //vo->ComputeNormals();
-        vo->SetNormalArray (DataArray::FLOAT, 3, Normals, 8);
+        if (flags & enablecolor)
+        {
+                float Colors[8][3];
+                memset(Colors, 0, 8*3*sizeof(float));
+                this->FillglColorPointer(
+                                border_color,
+                                3,
+                                GL_FLOAT,
+                                0,
+                                Colors,
+                                4 );
+                this->FillglColorPointer(
+                                bkgd_color,
+                                3,
+                                GL_FLOAT,
+                                0,
+                                &(Colors[4][0]),
+                                4 );
+
+
+                vo->SetColorArray (DataArray::FLOAT, 3, Colors, 8);
+        }
+        vo->SetNormalArray (normals);
+        if (flags & enablenormalcomputation)
+        {
+                vo->ComputeNormals();
+        }
+     
         return vo;
 
 }
 
 
-/////////////////////////////////////////////////////////////////////////////
-VertexObject* _DefaultTheme::lowered_box( uint32_t w, uint32_t h, uint32_t thickness)
-{
-        GLfloat Vertices[8][3] = { {  0.0,   0.0, 0.0}, //0
-                {    w,   0.0, 0.0}, //1
-                {    w,     h, 0.0}, //2
-                {  0.0,     h, 0.0}, //3
-                {  (float) thickness,   (float) thickness, (float) thickness}, //4
-                {w-(float) thickness,   (float) thickness, (float) thickness}, //5
-                {w-(float) thickness, h-(float) thickness, (float) thickness}, //6
-                {  (float) thickness, h-(float) thickness, (float) thickness}}; //7
-        GLfloat Normals[8][3]   = { {  0.0, 0.0, 1.0}, //0
-                {  0.0, 0.0, 1.0}, //1
-                {  0.0, 0.0, 1.0}, //2
-                {  0.0, 0.0, 1.0}, //3
-                {  0.0, 0.0, 1.0}, //4
-                {  0.0, 0.0, 1.0}, //5
-                {  0.0, 0.0, 1.0}, //6
-                {  0.0, 0.0, 1.0}}; //7
-
-
-        GLubyte indices[] = {
-                4, 7, 6, 5,		//front
-                0, 4, 7, 3,		//top slope
-                7, 3, 2, 6,		//right slope
-                6, 2, 1, 5,		//bottom slope
-                5, 4, 0, 1};	//left slope
-
-        float Colors[8][3];
-        memset(Colors, 0, 8*3*sizeof(float));
-        this->FillglColorPointer(
-                        border_color,
-                        3,
-                        GL_FLOAT,
-                        0,
-                        Colors,
-                        4 );
-        this->FillglColorPointer(
-                        bkgd_color,
-                        3,
-                        GL_FLOAT,
-                        0,
-                        &(Colors[4][0]),
-                        4 );
-
-        VertexObject* vo = new VertexObject();
-        vo->SetVerticesArray(DataArray::FLOAT, 3, Vertices, 8);
-        vo->SetFaceIndicesArray (DataArray::UINT8_T, 4, indices, 5);
-        vo->SetColorArray (DataArray::FLOAT, 3, Colors, 8);
-        vo->ComputeNormals();
-        return vo;
-
-
-}
 
 ////////////////////////////////////////////////////////////////////
 // constructor

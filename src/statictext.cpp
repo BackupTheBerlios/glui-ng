@@ -56,6 +56,14 @@ void   StaticText::update_size( void )
 
 ///////////////////////////////////////////////////////////////////////////////
 
+StaticText::DefaultTheme::DefaultTheme(StaticText& owner) : Owner(owner)
+{
+}
+
+StaticText::DefaultTheme::~DefaultTheme()
+{
+}
+
 int StaticText::DefaultTheme::draw( )
 {
 

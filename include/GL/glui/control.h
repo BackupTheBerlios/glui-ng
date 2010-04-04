@@ -45,7 +45,7 @@
 #include <GL/glui/Node.h>
 #include <GL/glui/callback.h>
 #include <GL/glui/xwrapper.h>
-#include <GL/glui/event_handler.h>
+#include <GL/glui/EventInterpreter.h>
 
 #define GLUI_CONTROL_MAX_THICKNESS 4
 
@@ -130,41 +130,41 @@ namespace GLUI
 
             virtual void enable( void );
             virtual void disable( void );
-            virtual void activate( int how )     { active = true; }
-            virtual void deactivate( void )     { active = false; }
+            virtual void Focus(::XEvent* event);
+            virtual void UnFocus( void );
 
             //event interfaces
             virtual int AddEvent (::XEvent* event);
             virtual int AddEvent (::XKeyEvent* event);
-            virtual int AddEvent (::XButtonEvent* event) { return 0; };
-            virtual int AddEvent (::XMotionEvent* event) { return 0; };
-            virtual int AddEvent (::XCrossingEvent* event) { return 0; };
-            virtual int AddEvent (::XFocusChangeEvent* event) { return 0; };
-            virtual int AddEvent (::XKeymapEvent* event) { return 0; };
+            virtual int AddEvent (::XButtonEvent* event);
+            virtual int AddEvent (::XMotionEvent* event);
+            virtual int AddEvent (::XCrossingEvent* event);
+            virtual int AddEvent (::XFocusChangeEvent* event);
+            virtual int AddEvent (::XKeymapEvent* event);
             virtual int AddEvent (::XExposeEvent* event);
-            virtual int AddEvent (::XGraphicsExposeEvent* event) { return 0; };
-            virtual int AddEvent (::XNoExposeEvent* event) { return 0; };
-            virtual int AddEvent (::XVisibilityEvent* event) { return 0; };
-            virtual int AddEvent (::XCreateWindowEvent* event) { return 0; };
-            virtual int AddEvent (::XDestroyWindowEvent* event) { return 0; };
-            virtual int AddEvent (::XUnmapEvent* event) { return 0; };
-            virtual int AddEvent (::XMapEvent* event) { return 0; };
-            virtual int AddEvent (::XMapRequestEvent* event) { return 0; };
-            virtual int AddEvent (::XReparentEvent* event) { return 0; };
-            virtual int AddEvent (::XConfigureEvent* event) { return 0; };
-            virtual int AddEvent (::XGravityEvent* event) { return 0; };
-            virtual int AddEvent (::XResizeRequestEvent* event) { return 0; };
-            virtual int AddEvent (::XConfigureRequestEvent* event) { return 0; };
-            virtual int AddEvent (::XCirculateEvent* event) { return 0; };
-            virtual int AddEvent (::XCirculateRequestEvent* event) { return 0; };
-            virtual int AddEvent (::XPropertyEvent* event) { return 0; };
-            virtual int AddEvent (::XSelectionClearEvent* event) { return 0; };
-            virtual int AddEvent (::XSelectionRequestEvent* event) { return 0; };
-            virtual int AddEvent (::XSelectionEvent* event) { return 0; };
-            virtual int AddEvent (::XColormapEvent* event) { return 0; };
-            virtual int AddEvent (::XClientMessageEvent* event) { return 0; };
-            virtual int AddEvent (::XMappingEvent* event) { return 0; };
-            virtual int AddEvent (::XErrorEvent* event) { return 0; };
+            virtual int AddEvent (::XGraphicsExposeEvent* event);
+            virtual int AddEvent (::XNoExposeEvent* event);
+            virtual int AddEvent (::XVisibilityEvent* event);
+            virtual int AddEvent (::XCreateWindowEvent* event);
+            virtual int AddEvent (::XDestroyWindowEvent* event);
+            virtual int AddEvent (::XUnmapEvent* event);
+            virtual int AddEvent (::XMapEvent* event);
+            virtual int AddEvent (::XMapRequestEvent* event);
+            virtual int AddEvent (::XReparentEvent* event);
+            virtual int AddEvent (::XConfigureEvent* event);
+            virtual int AddEvent (::XGravityEvent* event);
+            virtual int AddEvent (::XResizeRequestEvent* event);
+            virtual int AddEvent (::XConfigureRequestEvent* event);
+            virtual int AddEvent (::XCirculateEvent* event);
+            virtual int AddEvent (::XCirculateRequestEvent* event);
+            virtual int AddEvent (::XPropertyEvent* event);
+            virtual int AddEvent (::XSelectionClearEvent* event);
+            virtual int AddEvent (::XSelectionRequestEvent* event);
+            virtual int AddEvent (::XSelectionEvent* event);
+            virtual int AddEvent (::XColormapEvent* event);
+            virtual int AddEvent (::XClientMessageEvent* event);
+            virtual int AddEvent (::XMappingEvent* event);
+            virtual int AddEvent (::XErrorEvent* event);
 
             //this function can't be called into a constructor!
             virtual int         set_size( Size sz, Size min=Size(0u,0u) ); //replace with a XResizeRequestEvent
@@ -190,12 +190,10 @@ namespace GLUI
         protected: //variables
             NCRC_AutoPtr<theme> TheDefaultTheme;
             NCRC_AutoPtr<theme> ThemeData;
-            static NCRC_AutoPtr<Control> focussed;
             SizePolicy resizeable;
             Size Min;
             Size CurrentSize;
-            NCRC_AutoPtr<EventHandler> handler;
-            bool active;       ///< If true, we've got the focus
+            static NCRC_AutoPtr<EventInterpreter> handler;
                         /** relative coordinates Y axis up as in OGL */
             int             x, y;         //relative position from parent
             int  y_off_top, y_off_bot;    // top and bottom margin inside the control

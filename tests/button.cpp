@@ -18,36 +18,32 @@
 */
 
 #include <string.h>
-#include <GL/glui.h>
-
+#include <GL/glui/button.h>
+#include <GL/glui/window.h>
+using namespace GLUI;
 
 
 /**************************************** main() ********************/
 
 int main(int argc, char* argv[])
 {
-
-    glutInit(&argc, argv);
-    glutInitDisplayMode( GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH );
-    GLUI::Display *disp  = new GLUI::Display( NULL );
-    GLUI::Window *window = new GLUI::Window( disp, disp->DefaultScreen()->RootWindow(),
-            0, //winX,
-            0, //winY,
-            0, //winW,
-            0, //winH,
-            1, //border_width,
-            disp->DefaultScreen()->Depth(),
-            GLUI::Window::InputOutput,
-            disp->DefaultVisual(disp->DefaultScreen()),
-            0, //CWEventMask|CWBackPixel|CWBorderPixel,
-            &xswa);
-    window->set_resize_policy(GLUI_Control::AdaptThisToFitChilds);
-
-    GLUI_Button( glui, "Button");
-    GLUI_Master.set_glutIdleFunc( NULL );
-    glutMainLoop();
-
-    return EXIT_SUCCESS;
+        //Window->init(&argc, argv);  //optional
+        NCRC_AutoPtr<GLUI::Display>    TheDisplay = new GLUI::Display();
+        NCRC_AutoPtr<GLUI::Window> window = new GLUI::Window(TheDisplay,
+                                TheDisplay->XDefaultScreenOfDisplay()->XRootWindowOfScreen(),
+                                0, 0,
+                                200, 200,
+                                1,
+                                1,
+                                0);
+        NCRC_AutoPtr<Button> button1 = new Button("Button");
+        button1->set_size(Control::Size(100u,200u));
+        window->set_resize_policy(Control::AdaptThisToFitChilds);
+        window->add_control(button1);
+        window->Start();
+        window->XMapWindow();
+        int res = window->Wait();
+        exit(res);
 }
 
 

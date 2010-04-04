@@ -41,7 +41,7 @@ class myControl : public Control
                                 int draw();
                                 int update();
                         protected :
-                                VertexObject* drawing;
+                                NCRC_AutoPtr<VertexObject> drawing;
                                 myControl& Owner;
                 };
         public :
@@ -51,20 +51,17 @@ class myControl : public Control
 ///////////////////////////////////////////////////////////////////////
 myControl::myControltheme::myControltheme(myControl& owner) : Owner(owner)
 {
-        drawing = NULL;
         update();
 }
 
 ///////////////////////////////////////////////////////////////////////
 myControl::myControltheme::~myControltheme()
 {
-        if (drawing != NULL) delete drawing;
 }
 
 ///////////////////////////////////////////////////////////////////////
 int myControl::myControltheme::update()
 {
-        if (drawing != NULL) delete drawing;
         drawing = raised_box(Owner.Width(), Owner.Height());
         return 0;
 }

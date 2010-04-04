@@ -38,20 +38,22 @@ namespace GLUI
 {
 	class Node;
 
-	class GLUIAPI Button : public Container, public EventInterpreter
+	class GLUIAPI Button : public Container
 	{
                 public: //types
                         class DefaultTheme : public _DefaultTheme
                         {
                                 public : //methods
-                                        DefaultTheme(Button& owner) : Owner(owner) {};
+                                        DefaultTheme(Button& owner);
                                         ~DefaultTheme();
                                         virtual int draw();
                                         virtual int update();
                                 protected: //variable
                                         Button& Owner;
-                                        VertexObject* un_pressed;
-                                        VertexObject* pressed;
+                                        NCRC_AutoPtr<VertexObject> UnPressed;
+                                        NCRC_AutoPtr<Texture> TextureUnpressed;
+                                        NCRC_AutoPtr<VertexObject> Pressed;
+                                        NCRC_AutoPtr<Texture> TexturePressed;
                         };
 		public:
 			//LiveInt value;
@@ -64,10 +66,10 @@ namespace GLUI
 			  @param id Optional ID number, to pass to the optional callback function.
 			  @param callback Optional callback function, taking either the int ID or control.
 			  */
-			Button( Node *parent, const char *name,
+			Button( const char *name,
 					int id=-1, CB cb=CB() );
-			virtual int AddEvent(::XEvent *event);
-                        bool GetValue();
+			virtual int AddEvent(::XButtonEvent *event);
+                        int GetValue();
 
 		protected:
                         bool value;
@@ -110,7 +112,7 @@ namespace GLUI
 
 		public :
 			 void SetText(char* newtext);
-			 TextButton (Node *parent, const char *name,
+			 TextButton (const char *name,
 					int id=-1, CB cb=CB() ) ;
 
 		protected:

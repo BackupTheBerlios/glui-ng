@@ -19,8 +19,10 @@
    based on the work of Paul Rademacher (orignal software http://glui.sourceforge.net/)
 */
 #include <exception>
-#include <string>
 #include <errno.h>
+#include <iostream>
+#include <sstream>
+#include <string.h>
 namespace GLUI
 {
     class Exception : public std::exception
@@ -31,14 +33,14 @@ namespace GLUI
             std::string str;
             int err;
         public:
-             Exception(int errnb, const std::string& file, int line, const std::string& str);
+             Exception(int errnb, const std::string& file, int line,  const std::stringstream& str);
              ~Exception() throw() { }
              virtual const char * 	what () const throw ();
     };
 
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
-#define GLUI_THROW(errnb, str) throw Exception(errnb, __FILE__ , __LINE__,str )
+#define GLUI_THROW(errnb, str)  { std::stringstream mess; mess << str; throw Exception(errnb, __FILE__ , __LINE__, mess ); }
 }
 
 
